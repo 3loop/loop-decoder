@@ -1,0 +1,44 @@
+{
+  "name": "@3loop/transaction-decoder",
+  "version": "0.0.4",
+  "description": "A library for decoding Ethereum transactions",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "rm -rf dist && tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint --exit-on-fatal-error --ignore-path .eslintignore --ext .ts .",
+    "fix": "eslint --ignore-path .eslintignore --ext .ts . --fix",
+    "example": "ts-node --esm -P tsconfig.example.json -T example/index.ts"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "dependencies": {
+    "dataloader": "^2.2.2",
+    "ts-pattern": "^4.3.0"
+  },
+  "peerDependencies": {
+    "@effect/schema": "^0.33.2",
+    "effect": "^2.0.0-next.27",
+    "ethers": "^6.6.2"
+  },
+  "devDependencies": {
+    "@effect/schema": "^0.33.2",
+    "@types/node": "^20.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
+    "effect": "2.0.0-next.27",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
+    "prettier": "^2.8.8",
+    "ts-node": "^10.9.1",
+    "tsup": "^6.7.0",
+    "eslint-config-custom": "workspace:*",
+    "tsconfig": "workspace:*",
+    "typescript": "5.1.3"
+  }
+}

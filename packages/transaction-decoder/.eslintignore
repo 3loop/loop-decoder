@@ -1,0 +1,4 @@
+/dist
+jest.config.js
+*.d.ts
+/example
