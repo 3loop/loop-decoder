@@ -3,7 +3,7 @@ import { ContractLoader, ContractType, GetContractABI, GetContractMeta, decodeTr
 import { RPCProvider, UnknownNetwork } from '../src/provider.js'
 import { JsonRpcProvider } from 'ethers'
 
-const GOERLI_RPC = 'hhttps://rpc.ankr.com/eth_goerli'
+const GOERLI_RPC = 'https://rpc.ankr.com/eth_goerli'
 
 const program = Effect.gen(function* (_) {
     const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
