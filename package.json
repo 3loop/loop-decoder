@@ -5,14 +5,18 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "fix": "turbo run fix",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "check": "prettier --check \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "version": "changeset version && pnpm install --no-frozen-lockfile && pnpm format",
+    "publish-packages": "pnpm run build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.26.2",
     "eslint": "^8.47.0",
     "prettier": "^3.0.2",
     "tsconfig": "workspace:*",
     "turbo": "latest"
   },
   "packageManager": "pnpm@8.6.10",
-  "name": "my-turborepo"
+  "name": "@3loop/decoder-monorepo"
 }
