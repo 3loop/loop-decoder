@@ -11,7 +11,7 @@ A library to transform any EVM transaction into a human-readable format. It cons
 
 Transaction decoding is a crucial component of many dApps. Our goal is to create a library that can be integrated into any application without introducing any external infrastructure dependencies. This will allow developers to integrate decoding and interpretation into their stack without enforcing any data sources.
 
-Currently, the EVM transaction decoder requires developers to use specific databases or provide a lower-level API that requires maintenance. The Loop Decoder, however, can be used as a plug-and-play component in any layer of dApp infrastructure.
+Currently, the available EVM transaction decoders require developers to use specific databases or provide a lower-level API that requires maintenance. The Loop Decoder, however, can be used as a plug-and-play component in any layer of dApp infrastructure.
 
 ## Features
 
