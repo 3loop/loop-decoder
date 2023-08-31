@@ -15,9 +15,9 @@ Currently, the available EVM transaction decoders require developers to use spec
 
 ## Features
 
-- [x]  Can be used in any JavaScript environment
-- [x]  Minimal external dependencies - connect your own storage
-- [x]  Flexible interpreter that allows you to define any custom interpretation of EVM transactions.
+- [x] Can be used in any JavaScript environment
+- [x] Minimal external dependencies - connect your own storage
+- [x] Flexible interpreter that allows you to define any custom interpretation of EVM transactions.
 
 ## Looking for feedback
 

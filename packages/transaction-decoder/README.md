@@ -21,12 +21,12 @@ const getProvider = (chainID: number): Effect.Effect<never, UnknownNetwork, Json
 ```
 
 2. Create the ContractLoader
-   
+
 ContractLoader provides all the necessary data to decode the transaction data. In real world you might want to have a database that you can fetch the data from. In the following example we will have everything hardcoded.
 
 To create a new ContractLoader service you will need to implement two RequestResolvers.
 
-- `contractABIResolver` - fetch ABI or ABI Fragmend from address, signature, and chain ID.
+-   `contractABIResolver` - fetch ABI or ABI Fragmend from address, signature, and chain ID.
 
 ```ts
 import { Effect, Context, RequestResolver } from 'effect'
@@ -51,7 +51,7 @@ const contractABIResolver = RequestResolver.fromFunctionEffect(({ signature, cha
 })
 ```
 
-- `contractMetaResolver` - fetch the contract meta information from the address and chain ID.
+-   `contractMetaResolver` - fetch the contract meta information from the address and chain ID.
 
 ```ts
 const contractMetaResolver = RequestResolver.fromFunctionEffect((request: GetContractMeta) =>
@@ -107,4 +107,4 @@ Effect.runPromise(runnable).then(console.log).catch(console.error)
 
 Some ideas for the decoder and interpreter were inspired by open-source software. Special thanks to:
 
-- [EVM Translator](https://github.com/metagame-xyz/evm-translator) - some data types and data manipulations were heavily inspired by this source.
+-   [EVM Translator](https://github.com/metagame-xyz/evm-translator) - some data types and data manipulations were heavily inspired by this source.
