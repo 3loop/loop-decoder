@@ -1,0 +1,74 @@
+{
+  "assetsReceived": [],
+  "assetsSent": [],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC1155 Contract",
+  "contractType": "ERC1155",
+  "effectiveGasPrice": "1386",
+  "fromAddress": "0x75dD23ba3BA67f9663CbF6F9bdc7aB4923dD91D7",
+  "gasPaid": "0.00000000009225909",
+  "gasUsed": "66565",
+  "interactions": [
+    {
+      "chainID": 5,
+      "contractAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "contractName": "Mock ERC1155 Contract",
+      "contractSymbol": "ERC1155",
+      "contractType": "ERC1155",
+      "decimals": null,
+      "event": {
+        "eventName": "ApprovalForAll",
+        "logIndex": 1553,
+        "params": {
+          "account": "0x75dD23ba3BA67f9663CbF6F9bdc7aB4923dD91D7",
+          "approved": "true",
+          "operator": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "operator",
+        "type": "address",
+        "value": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+      },
+      {
+        "name": "approved",
+        "type": "bool",
+        "value": "true",
+      },
+    ],
+    "name": "setApprovalForAll",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1693791180,
+  "toAddress": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
+  "traceCalls": [
+    {
+      "from": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "name": "setApprovalForAll",
+      "params": [
+        {
+          "name": "operator",
+          "type": "address",
+          "value": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+        },
+        {
+          "name": "approved",
+          "type": "bool",
+          "value": "true",
+        },
+      ],
+      "signature": "setApprovalForAll(address,bool)",
+      "to": "0x4447621f9cfa4d1225f3e76d5d9784287988b0f5",
+      "type": "function",
+    },
+  ],
+  "txHash": "0xaf25e307654bed21aaec67fc439695fbed7cadf6c542cd97b4c5391f6c23f7bc",
+  "txIndex": 40,
+  "txType": "contract interaction",
+}

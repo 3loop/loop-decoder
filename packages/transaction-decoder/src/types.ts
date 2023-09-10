@@ -20,7 +20,7 @@ export type TreeNode = InputArg | Tree
 export type MostTypes = string | number | boolean | null | string[]
 
 export interface InputArg extends Node {
-    value: string
+    value: string | string[]
     components?: never
 }
 
@@ -55,6 +55,7 @@ export const enum ContractType {
     ERC721 = 'ERC721',
     ERC1155 = 'ERC1155',
     WETH = 'WETH',
+    GNOSIS = 'Gnosis Safe',
     OTHER = 'OTHER',
 }
 
@@ -64,7 +65,6 @@ export interface ContractData {
     contractAddress: string
     tokenSymbol: string
     decimals?: number
-    contractOfficialName: string
     type: ContractType
     chainID: number
 }
@@ -76,7 +76,7 @@ export interface Interaction {
     decimals: number | null
     chainID: number
     contractType: ContractType
-    events: InteractionEvent[]
+    event: InteractionEvent
 }
 
 export interface InteractionEvent {
@@ -92,6 +92,7 @@ export interface InteractionEventParams {
     from?: string | null
     dst?: string | null
     src?: string | null
+    tokenId?: string | null // ERC721
     [key: string]: string | string[] | undefined | null | number | boolean
 }
 
@@ -102,7 +103,6 @@ export interface DecodedTx {
     methodCall: MethodCall
     traceCalls: DecodeTraceResult[]
     contractName: string | null
-    officialContractName: string | null
     interactions: Interaction[]
     nativeValueSent: string
     chainSymbol: string
@@ -113,8 +113,10 @@ export interface DecodedTx {
     reverted: boolean
     timestamp: number
     gasUsed: string
+    gasPaid: string
     effectiveGasPrice: string | null
-    allAddresses: string[]
+    assetsReceived: Asset[]
+    assetsSent: Asset[]
 }
 
 export interface MethodCall {
@@ -127,4 +129,40 @@ export const enum TxType {
     TRANSFER = 'native token transfer',
     CONTRACT_DEPLOY = 'contract deploy',
     CONTRACT_INTERACTION = 'contract interaction',
+}
+
+export const enum AssetType {
+    ERC20 = 'ERC20',
+    ERC721 = 'ERC721',
+    ERC1155 = 'ERC1155',
+    LPToken = 'LPToken',
+    DEFAULT = 'unknown',
+    native = 'native',
+}
+
+export interface Asset {
+    type: AssetType
+    name: string | null
+    symbol: string | null
+    address: string
+    amount?: string
+    token0?: Asset
+    token1?: Asset
+    pair?: string // "RARE-WETH"
+    tokenId?: string
+}
+
+export interface InternalEvent {
+    txHash: string
+    userAddress: string
+    contractName: string | null
+    contractAddress: string | null
+    assetsSent: Asset[]
+    assetsReceived: Asset[]
+    chainSymbol: string
+    reverted: boolean
+    gasPaid: string
+    timestamp: number | null
+    methodName?: string
+    eventName?: string
 }

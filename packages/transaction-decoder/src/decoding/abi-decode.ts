@@ -8,6 +8,14 @@ export class DecodeError {
     constructor(readonly error: unknown) {}
 }
 
+function stringifyValue(value: MostTypes): string | string[] {
+    if (Array.isArray(value)) {
+        return value.map((v) => v.toString())
+    }
+
+    return value?.toString() ?? ''
+}
+
 function attachValues(components: ParamType[], decoded: any): TreeNode[] {
     return components.map((input, index): TreeNode => {
         if (input.type === 'tuple') {
@@ -22,10 +30,11 @@ function attachValues(components: ParamType[], decoded: any): TreeNode[] {
                 components: attachValues(components, value),
             }
         }
+
         return {
             name: input.name,
             type: input.type,
-            value: decoded[index] ? String(decoded[index]) : '',
+            value: decoded[index] ? stringifyValue(decoded[index]) : '',
         }
     })
 }

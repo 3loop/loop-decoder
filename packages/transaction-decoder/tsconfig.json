@@ -1,9 +1,4 @@
 {
-    "extends": "tsconfig/universal-esm.json",
-    "compilerOptions": {
-        "outDir": "dist",
-        "allowJs": true
-    },
-    "include": ["src"],
-    "exclude": ["dist", "node_modules"]
+    "extends": "./tsconfig.build.json",
+    "include": ["src/**/*", "test/**/*", "examples/**/*"]
 }

@@ -44,7 +44,7 @@ const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
             )
 
             if (abi == null) {
-                return yield* _(Effect.fail(new DecodeError('')))
+                return yield* _(Effect.fail(new DecodeError(`Missing ABI for ${to} ${signature}`)))
             }
 
             return yield* _(
@@ -64,7 +64,7 @@ const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
             )
         }
 
-        return yield* _(Effect.fail(new DecodeError('')))
+        return yield* _(Effect.fail(new DecodeError(`Could not decode trace log ${JSON.stringify(call)}`)))
     })
 
 export const decodeTransactionTrace = ({
@@ -167,7 +167,6 @@ function traceLogToEvent(nativeTransfer: TraceLog): InteractionEvent {
 
 const isCallTrace = (log: TraceLog): log is CallTraceLog =>
     log.type === 'call' && log.action.callType === 'call' && !(log.action.value === BigInt(0)) && log.error == null
-const sameAddress = (a: string, b: string) => a.toLowerCase() === b.toLowerCase()
 
 function filterToNativeTransfers(traceLogs: TraceLog[]): CallTraceLog[] {
     return traceLogs.filter(isCallTrace)
@@ -178,29 +177,14 @@ export function augmentTraceLogs(
     interactionsWithoutNativeTransfers: Interaction[],
     traceLogs: TraceLog[],
 ): Interaction[] {
-    const interactions = [...interactionsWithoutNativeTransfers]
-
-    const nativeTransfers = filterToNativeTransfers(traceLogs)
-
-    for (const nt of nativeTransfers) {
-        const interaction = interactions.find(
-            (i) => sameAddress(i.contractAddress, nt.action.from) || sameAddress(i.contractAddress, nt.action.to),
-        )
-
-        if (interaction) {
-            interaction.events.push(traceLogToEvent(nt))
-        } else {
-            interactions.push({
-                contractAddress: nt.action.from,
-                contractName: null,
-                contractSymbol: null,
-                contractType: ContractType.OTHER,
-                events: [traceLogToEvent(nt)],
-                decimals: null,
-                chainID: Number(transaction.chainId),
-            })
-        }
-    }
-
-    return interactions
+    const nativeTransfers = filterToNativeTransfers(traceLogs).map((log) => ({
+        contractAddress: log.action.from,
+        contractName: null,
+        contractSymbol: null,
+        contractType: ContractType.OTHER,
+        event: traceLogToEvent(log),
+        decimals: null,
+        chainID: Number(transaction.chainId),
+    }))
+    return [...interactionsWithoutNativeTransfers, ...nativeTransfers]
 }

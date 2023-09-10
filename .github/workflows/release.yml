@@ -11,6 +11,9 @@ jobs:
     if: github.repository == '3loop/loop-decoder'
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3

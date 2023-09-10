@@ -1,0 +1,1 @@
+{"type":"function","inputs":[],"name":"symbol","constant":true,"outputs":[{"name":"","type":"string","baseType":"string","components":null,"arrayLength":null,"arrayChildren":null}],"stateMutability":"view","payable":false,"gas":null}
