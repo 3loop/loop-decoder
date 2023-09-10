@@ -19,6 +19,5 @@ export interface RPCProvider {
 
 export const RPCProvider = Context.Tag<RPCProvider>('@3loop-decoder/RPCProvider')
 
-// TODO: Replace ethers
 export const RPCProviderLayer = (url: string, network?: Networkish, options?: JsonRpcApiProviderOptions) =>
     Effect.sync(() => new JsonRpcProvider(url, network, options))

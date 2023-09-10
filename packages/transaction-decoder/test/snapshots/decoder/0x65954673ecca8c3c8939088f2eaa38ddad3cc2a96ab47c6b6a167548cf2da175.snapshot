@@ -1,0 +1,84 @@
+{
+  "assetsReceived": [],
+  "assetsSent": [
+    {
+      "address": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "name": "Mock ERC721 Contract",
+      "symbol": "ERC721",
+      "tokenId": "69",
+      "type": "ERC721",
+    },
+  ],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC721 Contract",
+  "contractType": "ERC721",
+  "effectiveGasPrice": "1500000028",
+  "fromAddress": "0x6951AE195690E95E9f3eAfadBe241ac19Ef263E4",
+  "gasPaid": "0.000127456502379188",
+  "gasUsed": "84971",
+  "interactions": [
+    {
+      "chainID": 5,
+      "contractAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "contractName": "Mock ERC721 Contract",
+      "contractSymbol": "ERC721",
+      "contractType": "ERC721",
+      "decimals": null,
+      "event": {
+        "eventName": "Approval",
+        "logIndex": 117,
+        "params": {
+          "approved": "0x0000000000000000000000000000000000000000",
+          "owner": "0x6951AE195690E95E9f3eAfadBe241ac19Ef263E4",
+          "tokenId": "69",
+        },
+      },
+    },
+    {
+      "chainID": 5,
+      "contractAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "contractName": "Mock ERC721 Contract",
+      "contractSymbol": "ERC721",
+      "contractType": "ERC721",
+      "decimals": null,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 118,
+        "params": {
+          "from": "0x6951AE195690E95E9f3eAfadBe241ac19Ef263E4",
+          "to": "0x2bF4761d2f9002c0a24fBAC3A65B794f0561BB7F",
+          "tokenId": "69",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "from",
+        "type": "address",
+        "value": "0x6951AE195690E95E9f3eAfadBe241ac19Ef263E4",
+      },
+      {
+        "name": "to",
+        "type": "address",
+        "value": "0x2bF4761d2f9002c0a24fBAC3A65B794f0561BB7F",
+      },
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "value": "69",
+      },
+    ],
+    "name": "transferFrom",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1692347904,
+  "toAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
+  "traceCalls": [],
+  "txHash": "0x65954673ecca8c3c8939088f2eaa38ddad3cc2a96ab47c6b6a167548cf2da175",
+  "txIndex": 70,
+  "txType": "contract interaction",
+}

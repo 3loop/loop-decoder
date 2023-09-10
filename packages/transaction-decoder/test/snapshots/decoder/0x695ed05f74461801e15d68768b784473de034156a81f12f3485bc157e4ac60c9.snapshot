@@ -1,0 +1,239 @@
+{
+  "assetsReceived": [
+    {
+      "address": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "amount": "3000.0",
+      "name": "Mock ERC1155 Contract",
+      "symbol": "ERC1155",
+      "tokenId": "1",
+      "type": "ERC1155",
+    },
+    {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "amount": "3.0",
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "type": "native",
+    },
+  ],
+  "assetsSent": [
+    {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "amount": "3",
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "type": "native",
+    },
+  ],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC1155 Contract",
+  "contractType": "ERC1155",
+  "effectiveGasPrice": "1500000008",
+  "fromAddress": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+  "gasPaid": "0.000261153001392816",
+  "gasUsed": "174102",
+  "interactions": [
+    {
+      "chainID": 5,
+      "contractAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "contractName": "Mock ERC1155 Contract",
+      "contractSymbol": "ERC1155",
+      "contractType": "ERC1155",
+      "decimals": null,
+      "event": {
+        "eventName": "TransferSingle",
+        "logIndex": 17,
+        "params": {
+          "from": "0x0000000000000000000000000000000000000000",
+          "id": "1",
+          "operator": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+          "to": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+          "value": "3000",
+        },
+      },
+    },
+    {
+      "chainID": 5,
+      "contractAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "contractName": "Mock ERC1155 Contract",
+      "contractSymbol": "ERC1155",
+      "contractType": "ERC1155",
+      "decimals": null,
+      "event": {
+        "eventName": "TokensClaimed",
+        "logIndex": 18,
+        "params": {
+          "claimConditionIndex": "0",
+          "claimer": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+          "quantityClaimed": "3000",
+          "receiver": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+          "tokenId": "1",
+        },
+      },
+    },
+    {
+      "chainID": 5,
+      "contractAddress": "0xbdddd277583dcae0b501046ba86714feea71b03f",
+      "contractName": null,
+      "contractSymbol": null,
+      "contractType": "OTHER",
+      "decimals": null,
+      "event": {
+        "eventName": "NativeTransfer",
+        "logIndex": null,
+        "nativeTransfer": true,
+        "params": {
+          "from": "0xbdddd277583dcae0b501046ba86714feea71b03f",
+          "to": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+          "value": "3000000000000000000",
+        },
+      },
+    },
+    {
+      "chainID": 5,
+      "contractAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "contractName": null,
+      "contractSymbol": null,
+      "contractType": "OTHER",
+      "decimals": null,
+      "event": {
+        "eventName": "NativeTransfer",
+        "logIndex": null,
+        "nativeTransfer": true,
+        "params": {
+          "from": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+          "to": "0xbdddd277583dcae0b501046ba86714feea71b03f",
+          "value": "3000000000000000000",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "_receiver",
+        "type": "address",
+        "value": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+      },
+      {
+        "name": "_tokenId",
+        "type": "uint256",
+        "value": "1",
+      },
+      {
+        "name": "_quantity",
+        "type": "uint256",
+        "value": "3000",
+      },
+      {
+        "name": "_currency",
+        "type": "address",
+        "value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      },
+      {
+        "name": "_pricePerToken",
+        "type": "uint256",
+        "value": "1000000000000000",
+      },
+      {
+        "name": "proof",
+        "type": "bytes32[]",
+        "value": [
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+        ],
+      },
+      {
+        "name": "quantityLimitPerWallet",
+        "type": "uint256",
+        "value": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+      },
+      {
+        "name": "pricePerToken",
+        "type": "uint256",
+        "value": "1000000000000000",
+      },
+      {
+        "name": "currency",
+        "type": "address",
+        "value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      },
+      {
+        "name": "_data",
+        "type": "bytes",
+        "value": "0x",
+      },
+    ],
+    "name": "claim",
+  },
+  "nativeValueSent": "3000000000000000000",
+  "reverted": false,
+  "timestamp": 1693789380,
+  "toAddress": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
+  "traceCalls": [
+    {
+      "from": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "name": "claim",
+      "params": [
+        {
+          "name": "_receiver",
+          "type": "address",
+          "value": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+        },
+        {
+          "name": "_tokenId",
+          "type": "uint256",
+          "value": "1",
+        },
+        {
+          "name": "_quantity",
+          "type": "uint256",
+          "value": "3000",
+        },
+        {
+          "name": "_currency",
+          "type": "address",
+          "value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        },
+        {
+          "name": "_pricePerToken",
+          "type": "uint256",
+          "value": "1000000000000000",
+        },
+        {
+          "name": "proof",
+          "type": "bytes32[]",
+          "value": [
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+          ],
+        },
+        {
+          "name": "quantityLimitPerWallet",
+          "type": "uint256",
+          "value": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+        },
+        {
+          "name": "pricePerToken",
+          "type": "uint256",
+          "value": "1000000000000000",
+        },
+        {
+          "name": "currency",
+          "type": "address",
+          "value": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        },
+        {
+          "name": "_data",
+          "type": "bytes",
+          "value": "0x",
+        },
+      ],
+      "signature": "claim(address,uint256,uint256,address,uint256,(bytes32[],uint256,uint256,address),bytes)",
+      "to": "0x4447621f9cfa4d1225f3e76d5d9784287988b0f5",
+      "type": "function",
+    },
+  ],
+  "txHash": "0x695ed05f74461801e15d68768b784473de034156a81f12f3485bc157e4ac60c9",
+  "txIndex": 3,
+  "txType": "contract interaction",
+}

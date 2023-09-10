@@ -1,0 +1,54 @@
+{
+  "assetsReceived": [],
+  "assetsSent": [],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC721 Contract",
+  "contractType": "ERC721",
+  "effectiveGasPrice": "1500000010",
+  "fromAddress": "0x63c640dE6f9963A90AFdFa64fD44Ee97e2169a18",
+  "gasPaid": "0.00043732950291553",
+  "gasUsed": "291553",
+  "interactions": [
+    {
+      "chainID": 5,
+      "contractAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "contractName": "Mock ERC721 Contract",
+      "contractSymbol": "ERC721",
+      "contractType": "ERC721",
+      "decimals": null,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 49,
+        "params": {
+          "from": "0x0000000000000000000000000000000000000000",
+          "to": "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+          "tokenId": "173",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "to",
+        "type": "address",
+        "value": "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "value": "https://nftstorage.link/ipfs/bafybeiagqdepcds2x2qenfv7way7q6rohxzqusbx4rles3nl2utln3ceoi/158e4875-d8de-405b-9abd-6fcfaace28cc.json",
+      },
+    ],
+    "name": "safeMint",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1692818604,
+  "toAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
+  "traceCalls": [],
+  "txHash": "0x867ee0665a0e37bb52e5c2211b122ee952c358ee1d509c45b1157c2b3be8313c",
+  "txIndex": 16,
+  "txType": "contract interaction",
+}

@@ -1,8 +1,66 @@
 # Loop Decoder
 
+## Requirements
+
+-   TypeScript 5.x
+-   `exactOptionalPropertyTypes` and `strict` enabled in your tsconfig.json
+
 ## Getting Started
 
-Public API exposeses [Effect](https://effect.website/) interfaces.
+To get started, install the package from npm, along with its peer dependencies:
+
+```
+$ npm i @3loop/transaction-decoder
+```
+
+To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three callback functions:
+
+-   `getProvider`: This function returns an ethers JsonRpcProvider based on the chain ID.
+-   `getContractMeta`: This function returns contract meta-information. See the `ContractData` type for the required properties.
+-   `getContractAbi`: This function returns the contract or fragment ABI based on the chain ID, address, and/or signature.
+
+```ts
+import { TransactionDecoder } from '@3loop/transaction-decoder'
+
+const db = {} // Your data source
+
+const decoded = new TransactionDecoder({
+    getProvider: (chainId: number) => {
+        return new JsonRpcProvider(RPC_URL[chainId])
+    },
+    getContractAbi: async ({ address, chainId, signature }): Promise<string> => {
+        return db.getContractAbi({
+            address: address,
+            chainId: chainId,
+        })
+    },
+    getContractMeta: async (request) => {
+        return db.getContractMeta({
+            address: address,
+            chainId: chainId,
+        })
+    },
+})
+```
+
+It's important to note that the Loop Decoder does not enforce any specific data source, allowing users of the library to load contract data as they see fit. Depending on your application's needs, you can either include the required data directly in your code for a small number of contracts or use a database as a cache and automate data retrieval from different sources, such as etherscan or 4bytes.directory, for ABIs.
+
+In the near future, we plan to provide common data adapters and utilities for loading ABIs and contract meta-information for popular dApps.
+
+LoopDecoder instances provide a single public method, `decodeTransaction`, which fetches and decodes a given transaction:
+
+```ts
+const result = await decoded.decodeTransaction({
+    chainID: 5,
+    hash: '0x...',
+})
+```
+
+Feel free to reach out if you have any questions or need further assistance with the Loop Decoder library.
+
+## Advanced Effect API
+
+Loop decoder also exposes [Effect](https://effect.website/) API interfaces.
 
 To get started with using the Decoder, first, you have to provide the RPC Provider and a ContractLoader Service.
 
@@ -62,7 +120,6 @@ const contractMetaResolver = RequestResolver.fromFunctionEffect((request: GetCon
         contractAddress: request.address,
         tokenSymbol: 'MOCK',
         decimals: 18,
-        contractOfficialName: 'Mock Contract',
         type: ContractType.ERC20,
     }),
 )

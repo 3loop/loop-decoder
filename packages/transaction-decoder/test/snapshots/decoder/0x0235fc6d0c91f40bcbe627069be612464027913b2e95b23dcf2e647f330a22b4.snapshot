@@ -1,0 +1,54 @@
+{
+  "assetsReceived": [],
+  "assetsSent": [],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC721 Contract",
+  "contractType": "ERC721",
+  "effectiveGasPrice": "28687531",
+  "fromAddress": "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+  "gasPaid": "0.00000134085519894",
+  "gasUsed": "46740",
+  "interactions": [
+    {
+      "chainID": 5,
+      "contractAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "contractName": "Mock ERC721 Contract",
+      "contractSymbol": "ERC721",
+      "contractType": "ERC721",
+      "decimals": null,
+      "event": {
+        "eventName": "ApprovalForAll",
+        "logIndex": 350,
+        "params": {
+          "approved": "true",
+          "operator": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+          "owner": "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "operator",
+        "type": "address",
+        "value": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+      },
+      {
+        "name": "approved",
+        "type": "bool",
+        "value": "true",
+      },
+    ],
+    "name": "setApprovalForAll",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1692818220,
+  "toAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
+  "traceCalls": [],
+  "txHash": "0x0235fc6d0c91f40bcbe627069be612464027913b2e95b23dcf2e647f330a22b4",
+  "txIndex": 153,
+  "txType": "contract interaction",
+}

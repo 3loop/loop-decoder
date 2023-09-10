@@ -4,12 +4,23 @@ import { Effect } from 'effect'
 import type { Interaction, RawDecodedLog } from '../types.js'
 import { ContractType } from '../types.js'
 import { ContractLoader, GetContractABI, GetContractMeta } from '../contract-loader.js'
+import { getProxyStorageSlot } from './proxies.js'
 
 const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
     Effect.gen(function* (_) {
         const service = yield* _(ContractLoader)
+        const chainID = Number(transaction.chainId)
 
         const address = logItem.address.toLowerCase()
+        let abiAddress = address
+
+        // //if contract is a proxy, get the implementation address
+        //TODO: explore if this can be in contract-loader
+        const implementation = yield* _(getProxyStorageSlot({ address: abiAddress, chainID }))
+
+        if (implementation) {
+            abiAddress = implementation
+        }
 
         const blankRawLog: RawDecodedLog = {
             name: null,
@@ -22,9 +33,9 @@ const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
         const abiItem = yield* _(
             Effect.request(
                 GetContractABI({
-                    address,
+                    address: abiAddress,
                     signature: logItem.topics[0],
-                    chainID: Number(transaction.chainId),
+                    chainID,
                 }),
                 service.contractABIResolver,
             ).pipe(
@@ -37,12 +48,18 @@ const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
             return blankRawLog
         }
 
-        const iface = yield* _(Effect.sync(() => new Interface(abiItem)))
+        const iface = yield* _(Effect.try(() => new Interface(abiItem)))
 
-        const decodedData = iface.parseLog({
-            topics: [...logItem.topics],
-            data: logItem.data,
-        })
+        const decodedData = yield* _(
+            Effect.try({
+                try: () =>
+                    iface.parseLog({
+                        topics: [...logItem.topics],
+                        data: logItem.data,
+                    }),
+                catch: () => console.error('Error decoding log', logItem),
+            }),
+        )
 
         interface DecodedParam {
             name: string
@@ -54,10 +71,10 @@ const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
                 try: () =>
                     decodedData?.args.map((arg, index) => {
                         const name = decodedData.fragment.inputs[index].name
-
+                        const value = Array.isArray(arg) ? arg.map((item) => item?.toString()) : arg.toString()
                         return {
                             name,
-                            value: arg.toString(),
+                            value,
                         } as DecodedParam
                     }),
                 catch: () => undefined,
@@ -87,17 +104,14 @@ export const decodeLogs = ({ logs, transaction }: { logs: readonly Log[]; transa
         )
     })
 
-const transformLog = (transaction: TransactionResponse, log: RawDecodedLog) =>
+const transformLog = (
+    transaction: TransactionResponse,
+    log: RawDecodedLog,
+): Effect.Effect<ContractLoader, unknown, Interaction> =>
     Effect.gen(function* (_) {
         const service = yield* _(ContractLoader)
 
-        const events = Object.fromEntries(
-            log.events.map((param) => [
-                param.name,
-                // Array.isArray(param.value) ? param.value.map((arg) => arg.value) :
-                param.value,
-            ]) ?? [],
-        )
+        const events = Object.fromEntries(log.events.map((param) => [param.name, param.value]))
 
         // NOTE: Can use a common parser with branded type evrywhere
         const address = log.address.toLowerCase()
@@ -122,14 +136,12 @@ const transformLog = (transaction: TransactionResponse, log: RawDecodedLog) =>
             decimals: contractData?.decimals || null,
             chainID: Number(transaction.chainId),
             contractType: contractData?.type ?? ContractType.OTHER,
-            events: [
-                {
-                    eventName: log.name,
-                    logIndex: log.logIndex,
-                    params: events,
-                    ...(!log.decoded && { decoded: log.decoded }),
-                },
-            ],
+            event: {
+                eventName: log.name,
+                logIndex: log.logIndex,
+                params: events,
+                ...(!log.decoded && { decoded: log.decoded }),
+            },
         }
     })
 
@@ -143,19 +155,9 @@ export const transformDecodedLogs = ({
     Effect.gen(function* (_) {
         const effects = decodedLogs.filter((log) => Boolean(log)).map((log) => transformLog(transaction, log))
 
-        const interactions = yield* _(
+        return yield* _(
             Effect.all(effects, {
                 concurrency: 'unbounded',
             }),
         )
-
-        return interactions.reduce<Interaction[]>((acc, interaction) => {
-            const existingInteraction = acc.find((i) => i.contractAddress === interaction.contractAddress)
-
-            if (existingInteraction) {
-                existingInteraction.events.push(...interaction.events)
-                return acc
-            }
-            return [...acc, interaction]
-        }, [])
     })

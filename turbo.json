@@ -13,6 +13,18 @@
         "!.next/cache/**"
       ]
     },
+    "test": {
+      "outputs": [],
+      "dependsOn": [
+        "^build"
+      ]
+    },
+    "coverage": {
+      "outputs": [],
+      "dependsOn": [
+        "^build"
+      ]
+    },
     "lint": {},
     "fix": {},
     "dev": {

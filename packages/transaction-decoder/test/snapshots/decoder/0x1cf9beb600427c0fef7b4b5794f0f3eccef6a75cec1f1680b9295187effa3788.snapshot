@@ -1,0 +1,61 @@
+{
+  "assetsReceived": [],
+  "assetsSent": [],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC1155 Contract",
+  "contractType": "ERC1155",
+  "effectiveGasPrice": "1003151084",
+  "fromAddress": "0x80f6EC9E30340f2c2fE96493c242b227C85e520d",
+  "gasPaid": "0.000033173203196796",
+  "gasUsed": "33069",
+  "interactions": [
+    {
+      "chainID": 5,
+      "contractAddress": "0x58c3c2547084cc1c94130d6fd750a3877c7ca5d2",
+      "contractName": "Mock ERC1155 Contract",
+      "contractSymbol": "ERC1155",
+      "contractType": "ERC1155",
+      "decimals": null,
+      "event": {
+        "eventName": "TransferSingle",
+        "logIndex": 209,
+        "params": {
+          "from": "0x0000000000000000000000000000000000000000",
+          "id": "1",
+          "operator": "0x80f6EC9E30340f2c2fE96493c242b227C85e520d",
+          "to": "0xC20fc7A16FBd98C3291Cc370B603A876d3c12f41",
+          "value": "2",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "account",
+        "type": "address",
+        "value": "0xC20fc7A16FBd98C3291Cc370B603A876d3c12f41",
+      },
+      {
+        "name": "id",
+        "type": "uint256",
+        "value": "1",
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "value": "2",
+      },
+    ],
+    "name": "mint",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1691435796,
+  "toAddress": "0x58c3c2547084CC1C94130D6fd750A3877c7Ca5D2",
+  "traceCalls": [],
+  "txHash": "0x1cf9beb600427c0fef7b4b5794f0f3eccef6a75cec1f1680b9295187effa3788",
+  "txIndex": 58,
+  "txType": "contract interaction",
+}

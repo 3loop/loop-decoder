@@ -1,0 +1,208 @@
+{
+  "assetsReceived": [],
+  "assetsSent": [],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "1500000008",
+  "fromAddress": "0x927d3480bbad9DB9806f2063F46e05Ee876750AB",
+  "gasPaid": "0.000466435502487656",
+  "gasUsed": "310957",
+  "interactions": [
+    {
+      "chainID": 5,
+      "contractAddress": "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+      "contractName": null,
+      "contractSymbol": null,
+      "contractType": "OTHER",
+      "decimals": null,
+      "event": {
+        "eventName": "NativeTransfer",
+        "logIndex": null,
+        "nativeTransfer": true,
+        "params": {
+          "from": "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+          "to": "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+          "value": "4169830538084065",
+        },
+      },
+    },
+    {
+      "chainID": 5,
+      "contractAddress": "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+      "contractName": null,
+      "contractSymbol": null,
+      "contractType": "OTHER",
+      "decimals": null,
+      "event": {
+        "eventName": "NativeTransfer",
+        "logIndex": null,
+        "nativeTransfer": true,
+        "params": {
+          "from": "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+          "to": "0x8a521f0112e031acd5941f8f12fa6b08e1675f8e",
+          "value": "4169830538084065",
+        },
+      },
+    },
+    {
+      "chainID": 5,
+      "contractAddress": "0x8a521f0112e031acd5941f8f12fa6b08e1675f8e",
+      "contractName": null,
+      "contractSymbol": null,
+      "contractType": "OTHER",
+      "decimals": null,
+      "event": {
+        "eventName": "NativeTransfer",
+        "logIndex": null,
+        "nativeTransfer": true,
+        "params": {
+          "from": "0x8a521f0112e031acd5941f8f12fa6b08e1675f8e",
+          "to": "0x12a3877fc4995c45550840266d9af1fd5379af8d",
+          "value": "4169830538084065",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "commands",
+        "type": "bytes",
+        "value": "0x080c",
+      },
+      {
+        "name": "inputs",
+        "type": "bytes[]",
+        "value": [
+          "0x00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000de0b6b3a764000000000000000000000000000000000000000000000000000000000000ee85701b00000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000008a521f0112e031acd5941f8f12fa6b08e1675f8e000000000000000000000000b4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+          "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000ee85701b",
+        ],
+      },
+      {
+        "name": "deadline",
+        "type": "uint256",
+        "value": "1693718820",
+      },
+    ],
+    "name": "execute",
+  },
+  "nativeValueSent": "0",
+  "reverted": true,
+  "timestamp": 1693717080,
+  "toAddress": "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
+  "traceCalls": [
+    {
+      "from": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "name": "transferFrom",
+      "params": [
+        {
+          "name": "from",
+          "type": "address",
+          "value": "0x927d3480bbad9DB9806f2063F46e05Ee876750AB",
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "value": "0xd4e544Eb4fC494f9C712A19A94aEbF03E1d3F4b5",
+        },
+        {
+          "name": "amount",
+          "type": "uint160",
+          "value": "1000000000000000000",
+        },
+        {
+          "name": "token",
+          "type": "address",
+          "value": "0x8a521F0112E031AcD5941f8f12fA6b08E1675F8e",
+        },
+      ],
+      "signature": "transferFrom(address,address,uint160,address)",
+      "to": "0x000000000022d473030f116ddee9f6b43ac78ba3",
+      "type": "function",
+    },
+    {
+      "from": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "",
+          "type": "address",
+          "value": "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+      "type": "function",
+    },
+    {
+      "from": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "name": "getReserves",
+      "params": [],
+      "signature": "getReserves()",
+      "to": "0xd4e544eb4fc494f9c712a19a94aebf03e1d3f4b5",
+      "type": "function",
+    },
+    {
+      "from": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "_owner",
+          "type": "address",
+          "value": "0xd4e544Eb4fC494f9C712A19A94aEbF03E1d3F4b5",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0x8a521f0112e031acd5941f8f12fa6b08e1675f8e",
+      "type": "function",
+    },
+    {
+      "from": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "name": "swap",
+      "params": [
+        {
+          "name": "amount0Out",
+          "type": "uint256",
+          "value": "",
+        },
+        {
+          "name": "amount1Out",
+          "type": "uint256",
+          "value": "3513850674",
+        },
+        {
+          "name": "to",
+          "type": "address",
+          "value": "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
+        },
+        {
+          "name": "data",
+          "type": "bytes",
+          "value": "0x",
+        },
+      ],
+      "signature": "swap(uint256,uint256,address,bytes)",
+      "to": "0xd4e544eb4fc494f9c712a19a94aebf03e1d3f4b5",
+      "type": "function",
+    },
+    {
+      "from": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "",
+          "type": "address",
+          "value": "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+      "type": "function",
+    },
+  ],
+  "txHash": "0xae500d717f8b7b646b1e5e66b3f3674eeca3535a54e3212fad613cce31fd2e27",
+  "txIndex": 7,
+  "txType": "contract interaction",
+}

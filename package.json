@@ -8,7 +8,9 @@
     "check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "version": "changeset version && pnpm install --no-frozen-lockfile && pnpm format",
-    "publish-packages": "pnpm run build && changeset publish"
+    "publish-packages": "pnpm run build && changeset publish",
+    "test": "turbo run test",
+    "coverage": "turbo run coverage"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",

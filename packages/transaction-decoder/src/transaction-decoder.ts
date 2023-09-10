@@ -1,7 +1,7 @@
 import { Effect } from 'effect'
 import type { TransactionReceipt, TransactionResponse } from 'ethers'
-import { Network } from 'ethers'
-import { ContractLoader, GetContractABI } from './contract-loader.js'
+import { Network, formatEther } from 'ethers'
+import { ContractLoader, GetContractABI, GetContractMeta } from './contract-loader.js'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
 import * as AbiDecoder from './decoding/abi-decode.js'
 import * as LogDecoder from './decoding/log-decode.js'
@@ -10,6 +10,8 @@ import { transferDecode } from './decoding/transfer-decode.js'
 import type { DecodedTx, Interaction } from './types.js'
 import { ContractType, TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
+import { getAssetsReceived, getAssetsSent } from './transformers/tokens.js'
+import { getProxyStorageSlot } from './decoding/proxies.js'
 
 export class UnsupportedEvent {
     readonly _tag = 'UnsupportedEvent'
@@ -49,13 +51,21 @@ export const decodeMethod = ({ transaction }: { transaction: TransactionResponse
 
         const signature = transaction.data.slice(0, 10)
         const chainID = Number(transaction.chainId)
+        let abiAddress = transaction.to.toLocaleLowerCase()
+
+        //if contract is a proxy, get the implementation address
+        const implementation = yield* _(getProxyStorageSlot({ address: abiAddress, chainID }))
+
+        if (implementation) {
+            abiAddress = implementation
+        }
 
         const service = yield* _(ContractLoader)
 
         const abi = yield* _(
             Effect.request(
                 GetContractABI({
-                    address: transaction.to,
+                    address: abiAddress,
                     signature,
                     chainID,
                 }),
@@ -124,6 +134,8 @@ export const decodeTransaction = ({
     timestamp: number
 }) =>
     Effect.gen(function* (_) {
+        const service = yield* _(ContractLoader)
+
         const { decodedData, decodedTrace, decodedLogs } = yield* _(
             Effect.all(
                 {
@@ -137,39 +149,51 @@ export const decodeTransaction = ({
             ),
         )
 
-        const interpreterMap = {
-            contractName: null,
-            contractOfficialName: null,
-            type: ContractType.OTHER,
-        }
+        const interpreterMap = yield* _(
+            Effect.request(
+                GetContractMeta({
+                    address: receipt.to!,
+                    chainID: Number(transaction.chainId),
+                }),
+                service.contractMetaResolver,
+            ).pipe(
+                Effect.withRequestCaching(true),
+                Effect.catchAll(() => Effect.succeed(null)),
+            ),
+        )
 
         const interactions: Interaction[] = TraceDecoder.augmentTraceLogs(transaction, decodedLogs, trace)
 
         const value = transaction.value.toString()
+
+        const effectiveGasPrice = receipt.gasPrice ?? BigInt(0)
+        const gasPaid = formatEther((receipt.gasUsed * effectiveGasPrice).toString())
 
         const decodedTx: DecodedTx = {
             txHash: transaction.hash,
             txType: TxType.CONTRACT_INTERACTION,
             fromAddress: receipt.from,
             toAddress: receipt.to,
-            allAddresses: [],
-            officialContractName: interpreterMap.contractOfficialName || null,
-            contractName: interpreterMap.contractName || null,
-            contractType: interpreterMap.type || ContractType.OTHER,
+            contractName: interpreterMap?.contractName ?? null,
+            contractType: interpreterMap?.type ?? ContractType.OTHER,
             methodCall: {
-                name: decodedData.name ?? 'unknown',
-                arguments: decodedData.params ?? [],
+                name: decodedData?.name ?? 'unknown',
+                arguments: decodedData?.params ?? [],
             },
             traceCalls: decodedTrace,
             nativeValueSent: value,
-            chainSymbol: Network.from(transaction.chainId).name,
+            chainSymbol: Network.from(Number(transaction.chainId)).name,
             chainID: Number(transaction.chainId),
             interactions,
-            effectiveGasPrice: receipt.gasPrice.toString() || null,
+            effectiveGasPrice: receipt.gasPrice.toString(),
             gasUsed: receipt.gasUsed.toString(),
-            timestamp, // TODO: get timestamp from block
+            gasPaid: gasPaid.toString(),
+            timestamp,
             txIndex: receipt.index,
             reverted: receipt.status === 0, // will return true if status==undefined
+            // NOTE: Explore how to set assets for more flexible tracking of the in and out addresses
+            assetsReceived: getAssetsReceived(interactions, receipt.from),
+            assetsSent: getAssetsSent(interactions, value, receipt.from, receipt.from),
         }
 
         return decodedTx

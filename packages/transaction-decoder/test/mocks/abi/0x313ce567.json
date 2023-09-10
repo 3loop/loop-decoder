@@ -1,0 +1,1 @@
+{"type":"function","inputs":[],"name":"decimals","constant":true,"outputs":[{"name":"","type":"uint8","baseType":"uint8","components":null,"arrayLength":null,"arrayChildren":null}],"stateMutability":"view","payable":false,"gas":null}
