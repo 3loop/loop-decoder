@@ -30,14 +30,16 @@ const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
 
         if ('to' in call.action && 'input' in call.action) {
             const { to, input, from } = call.action
+            const chainID = Number(transaction.chainId)
             const signature = call.action.input.slice(0, 10)
+            const contractAddress = to.toLowerCase()
 
             const abi = yield* _(
                 Effect.request(
                     GetContractABI({
-                        address: to,
+                        address: contractAddress,
                         signature,
-                        chainID: Number(transaction.chainId),
+                        chainID,
                     }),
                     service.contractABIResolver,
                 ).pipe(Effect.catchAll(() => Effect.succeed(null))),

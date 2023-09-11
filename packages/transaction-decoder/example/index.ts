@@ -29,7 +29,6 @@ const contractMetaResolver = RequestResolver.fromFunctionEffect((request: GetCon
         contractAddress: request.address,
         tokenSymbol: 'MOCK',
         decimals: 18,
-        contractOfficialName: 'Mock Contract',
         type: ContractType.ERC20,
     }),
 )

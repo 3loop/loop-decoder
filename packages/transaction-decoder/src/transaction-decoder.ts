@@ -51,7 +51,7 @@ export const decodeMethod = ({ transaction }: { transaction: TransactionResponse
 
         const signature = transaction.data.slice(0, 10)
         const chainID = Number(transaction.chainId)
-        let abiAddress = transaction.to.toLocaleLowerCase()
+        let abiAddress = transaction.to.toLowerCase()
 
         //if contract is a proxy, get the implementation address
         const implementation = yield* _(getProxyStorageSlot({ address: abiAddress, chainID }))
