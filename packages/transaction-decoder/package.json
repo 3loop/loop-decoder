@@ -17,7 +17,7 @@
     }
   },
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "tsc -P tsconfig.build.json --watch",
     "coverage": "vitest run --config ./vitest.config.mts --coverage",
     "build": "rm -rf dist && tsc -P tsconfig.build.json",
     "check": "tsc --noEmit",
