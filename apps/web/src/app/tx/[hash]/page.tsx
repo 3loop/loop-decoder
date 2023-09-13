@@ -13,6 +13,11 @@ export default async function TransactionPage({
     return <DecodingForm />;
   }
   const decoded = await decodeTransaction({ hash: params.hash, chainID: 1 });
+
+  if (!decoded) {
+    return <DecodingForm currentHash={params.hash} />;
+  }
+
   const defaultIntepretors = Object.values(data).map((d) => d.interpreter);
   const intepretor = await findInterpreter(decoded, defaultIntepretors);
 

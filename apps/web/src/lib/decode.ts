@@ -18,11 +18,11 @@ export async function decodeTransaction({
 }: {
   chainID: number;
   hash: string;
-}): Promise<DecodedTx> {
+}): Promise<DecodedTx | undefined> {
   return decodeTransactionByHash(hash, chainID)
     .pipe(Effect.provideSomeRuntime(customRuntime), Effect.runPromise)
     .catch((error: unknown) => {
       console.error("Decode error", JSON.stringify(error, null, 2));
-      throw error;
+      return undefined;
     });
 }

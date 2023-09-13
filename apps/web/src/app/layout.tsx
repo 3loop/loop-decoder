@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { MainNav } from "@/components/ui/main-nav";
+import { Analytics } from "@vercel/analytics/react";
 
 import { aaveV2 } from "../app/data";
 
@@ -61,6 +62,7 @@ export default function RootLayout({
           </div>
           <div className="container h-full py-6">{children}</div>
         </div>
+        <Analytics />
       </body>
     </html>
   );

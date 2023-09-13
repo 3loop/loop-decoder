@@ -78,7 +78,7 @@ export default function DecodingForm({
                         className="flex-1 flex"
                         id="hash"
                         name="hash"
-                        placeholder={`Hash`}
+                        placeholder={`Paste Ethereum transaction hash or click on examples`}
                         defaultValue={currentHash}
                       />
                       <Button type="submit">Decode</Button>

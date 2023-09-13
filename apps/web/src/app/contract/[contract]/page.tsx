@@ -8,7 +8,9 @@ import { getTransactions } from "@/lib/etherscan";
 import { decodeTransaction } from "@/lib/decode";
 import { DecodedTx } from "@3loop/transaction-decoder";
 
-async function getListOfDecodedTxs(contract?: string): Promise<DecodedTx[]> {
+async function getListOfDecodedTxs(
+  contract?: string,
+): Promise<(DecodedTx | undefined)[]> {
   if (!contract || contract !== aaveV2) return [];
 
   try {
@@ -30,7 +32,9 @@ export default async function Home({
   params: { contract?: string };
 }) {
   let contract = params.contract?.toLowerCase();
-  const decodedTxs = await getListOfDecodedTxs(contract);
+  const decodedTxs = (await getListOfDecodedTxs(contract)).filter(
+    (tx): tx is DecodedTx => !!tx,
+  );
 
   return (
     <div>
