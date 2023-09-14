@@ -35,8 +35,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="hidden h-full flex-col md:flex">
-          <div className="container flex flex-col items-start justify-between space-y-2 py-4 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
+        <div className="flex h-full flex-col">
+          <div className="container flex justify-between py-4 flex-row items-center space-y-0 md:h-16">
             <h2 className="text-lg font-semibold">Loop Decoder</h2>
             <div className="flex flex-row space-x-4">
               <a

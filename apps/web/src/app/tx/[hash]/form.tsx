@@ -66,7 +66,7 @@ export default function DecodingForm({
   return (
     <div className="grid h-full items-stretch gap-6 md:grid-cols-[1fr_200px]">
       <div className="md:order-1">
-        <div className="hidden flex-col space-y-4 sm:flex md:order-2">
+        <div className="flex-col space-y-4 flex">
           <div className="flex flex-col space-y-4">
             <div className="grid h-full gap-6 lg:grid-cols-2">
               <div className="flex flex-col space-y-4">
@@ -86,7 +86,7 @@ export default function DecodingForm({
                   </form>
                 </div>
 
-                <div className="flex flex-1 flex-col space-y-2">
+                <div className="flex flex-1 flex-col space-y-2 min-h-[250px]">
                   <Label htmlFor="input">Decoded transaction</Label>
                   <Textarea
                     id="decoding"
@@ -98,7 +98,7 @@ export default function DecodingForm({
                     }
                   />
                 </div>
-                <div className="flex flex-1 flex-col space-y-2">
+                <div className="flex flex-1 flex-col space-y-2 min-h-[250px]">
                   <div className="flex flex-row">
                     <Label htmlFor="intepretation">
                       Intepretation (
