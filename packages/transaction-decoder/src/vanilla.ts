@@ -14,7 +14,12 @@ import { decodeTransactionByHash } from './transaction-decoder.js'
 interface TransactionDecoderOptions {
     getProvider: (chainID: number) => JsonRpcProvider | undefined
     getContractMeta: (_: { address: string; chainID: number }) => Promise<ContractData | null>
-    getContractAbi: (_: { address: string; signature: string; chainID: number }) => Promise<string | null>
+    getContractAbi: (_: {
+        address: string
+        signature?: string | undefined
+        event?: string | undefined
+        chainID: number
+    }) => Promise<string | null>
     logging?: boolean
 }
 
@@ -40,12 +45,11 @@ export class TransactionDecoder {
             },
         })
 
-        const contractABIResolver = RequestResolver.fromFunctionEffect(
-            ({ address, signature, chainID }: GetContractABI) =>
-                Effect.tryPromise({
-                    try: () => getContractAbi({ address, signature, chainID }),
-                    catch: () => new MissingABIError(address, signature),
-                }),
+        const contractABIResolver = RequestResolver.fromFunctionEffect((req: GetContractABI) =>
+            Effect.tryPromise({
+                try: () => getContractAbi(req),
+                catch: () => new MissingABIError(req.address, req.chainID),
+            }),
         )
 
         const contractMetaResolver = RequestResolver.fromFunctionEffect((request: GetContractMeta) =>

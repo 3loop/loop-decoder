@@ -6,7 +6,7 @@ export class MissingABIError {
     readonly _tag = 'MissingABIError'
     constructor(
         readonly address: string,
-        readonly signature: string,
+        readonly chainID: number,
     ) {}
 }
 
@@ -20,11 +20,15 @@ export class MissingContractMetaError {
 
 export type ContractABI = string
 
-export interface GetContractABI extends Request.Request<MissingABIError, ContractABI | null> {
-    readonly _tag: 'ContractABI'
+interface IGetContractABI {
     readonly address: string
-    readonly signature: string
     readonly chainID: number
+    readonly signature?: string
+    readonly event?: string
+}
+
+export interface GetContractABI extends Request.Request<MissingABIError, ContractABI | null>, IGetContractABI {
+    readonly _tag: 'ContractABI'
 }
 
 export const GetContractABI = Request.tagged<GetContractABI>('ContractABI')

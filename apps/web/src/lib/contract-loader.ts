@@ -13,7 +13,7 @@ import { fetchContractABI } from "./etherscan";
 import prisma from "./prisma";
 
 const contractABIResolver = RequestResolver.fromFunctionEffect(
-  ({ address, signature, chainID }: GetContractABI) =>
+  ({ address, chainID }: GetContractABI) =>
     Effect.gen(function* (_) {
       const normAddress = address.toLowerCase();
       const cached = yield* _(
@@ -24,7 +24,7 @@ const contractABIResolver = RequestResolver.fromFunctionEffect(
                 address: normAddress,
               },
             }),
-          catch: () => new MissingABIError(normAddress, signature),
+          catch: () => new MissingABIError(normAddress, chainID),
         }),
       );
 
@@ -35,14 +35,12 @@ const contractABIResolver = RequestResolver.fromFunctionEffect(
       const etherscan = yield* _(
         Effect.tryPromise({
           try: () => fetchContractABI(normAddress, chainID),
-          catch: () => new MissingABIError(normAddress, signature),
+          catch: () => new MissingABIError(normAddress, chainID),
         }),
       );
 
       if (etherscan == null) {
-        return yield* _(
-          Effect.fail(new MissingABIError(normAddress, signature)),
-        );
+        return yield* _(Effect.fail(new MissingABIError(normAddress, chainID)));
       } else {
         yield* _(
           Effect.tryPromise({
@@ -53,7 +51,7 @@ const contractABIResolver = RequestResolver.fromFunctionEffect(
                   abi: etherscan,
                 },
               }),
-            catch: () => new MissingABIError(normAddress, signature),
+            catch: () => new MissingABIError(normAddress, chainID),
           }),
         );
 

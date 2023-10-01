@@ -34,7 +34,7 @@ const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
             Effect.request(
                 GetContractABI({
                     address: abiAddress,
-                    signature: logItem.topics[0],
+                    event: logItem.topics[0],
                     chainID,
                 }),
                 service.contractABIResolver,

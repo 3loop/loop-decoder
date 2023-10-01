@@ -11,18 +11,21 @@ describe('Transaction Decoder', () => {
                 if (chainID === 5) return new MockedProvider()
                 return undefined
             },
-            getContractAbi: async ({ address, signature }) => {
+            getContractAbi: async ({ address, signature, event }) => {
                 const addressExists = fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`)
 
                 if (addressExists) {
                     return fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString()
                 }
 
-                const signatureExists = fs.existsSync(`./test/mocks/abi/${signature.toLowerCase()}.json`)
+                const sig = signature ?? event
+                if (sig != null) {
+                    const signatureExists = fs.existsSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)
 
-                if (signatureExists) {
-                    const signatureAbi = fs.readFileSync(`./test/mocks/abi/${signature.toLowerCase()}.json`)?.toString()
-                    return `[${signatureAbi}]`
+                    if (signatureExists) {
+                        const signatureAbi = fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString()
+                        return `[${signatureAbi}]`
+                    }
                 }
 
                 return null

@@ -1,5 +1,5 @@
 import { JsonRpcProvider } from 'ethers'
-import fs from 'fs'
+import fs from 'node:fs'
 import { RPCProvider, UnknownNetwork } from '@/effect.js'
 import { Effect } from 'effect'
 import { Block, TransactionReceipt, TransactionResponse } from 'ethers'
