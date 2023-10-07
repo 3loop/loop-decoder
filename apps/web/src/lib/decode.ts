@@ -1,10 +1,13 @@
 import { Effect, Layer, pipe } from "effect";
 import { RPCProviderLive } from "./rpc-provider";
-import { ContractLoaderLive } from "./contract-loader";
-import { decodeTransactionByHash } from "@3loop/transaction-decoder";
-import { DecodedTx } from "@3loop/transaction-decoder";
+import {
+  decodeTransactionByHash,
+  type DecodedTx,
+} from "@3loop/transaction-decoder";
+import { AbiStoreLive, ContractMetaStoreLive } from "./contract-loader";
 
-const MainLayer = Layer.provideMerge(RPCProviderLive, ContractLoaderLive);
+const LoadersLayer = Layer.provideMerge(AbiStoreLive, ContractMetaStoreLive);
+const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer);
 
 const customRuntime = pipe(
   Layer.toRuntime(MainLayer),
