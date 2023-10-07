@@ -1,4 +1,3 @@
-export * from './contract-loader.js'
 export * from './provider.js'
 export * from './transaction-decoder.js'
 export * from './transaction-loader.js'
