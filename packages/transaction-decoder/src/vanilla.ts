@@ -24,6 +24,7 @@ interface VanillaContractMetaStore {
     set: (key: ContractMetaParams, val: ContractData) => Promise<void>
 }
 
+// TODO: allow adding custom strategies to vanilla API
 export class TransactionDecoder {
     private readonly context: Context.Context<EffectAbiStore | EffectContractMetaStore | RPCProvider>
     private readonly logging: boolean
