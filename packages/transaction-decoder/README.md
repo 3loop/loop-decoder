@@ -198,6 +198,18 @@ Loop Decoder provides 4 strategies out of the box:
 
 You can create your own strategy by implementing the `GetContractABIStrategy` Effect RequestResolver.
 
+### Release with Changeset
+
+When adding a new feature, please use the [Changeset](https://github.com/changesets/changesets) tool to create a new release. This will automatically update the changelog and create a new release on GitHub.
+
+To create a new changelog, run the following command:
+
+```
+$ pnpm changeset
+```
+
+To create a new release, one of the maintainers will merge the changeset PR into the main branch. This will trigger a new release to npm.
+
 ### Credits
 
 Some ideas for the decoder and interpreter were inspired by open-source software. Special thanks to:
