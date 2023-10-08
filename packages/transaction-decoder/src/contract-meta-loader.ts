@@ -1,6 +1,5 @@
 import { Context, Effect } from 'effect'
 import { ContractData } from './types.js'
-import { RPCProvider } from './provider.js'
 
 export interface ContractMetaParams {
     address: string
@@ -9,8 +8,8 @@ export interface ContractMetaParams {
 
 // NOTE: Maybe we can avoid passing RPCProvider and let the user provide it?
 export interface ContractMetaStore<Key = ContractMetaParams, Value = ContractData> {
-    readonly set: (arg: Key, value: Value) => Effect.Effect<RPCProvider, never, void>
-    readonly get: (arg: Key) => Effect.Effect<RPCProvider, never, Value | null>
+    readonly set: (arg: Key, value: Value) => Effect.Effect<never, never, void>
+    readonly get: (arg: Key) => Effect.Effect<never, never, Value | null>
 }
 
 export const ContractMetaStore = Context.Tag<ContractMetaStore>('@3loop-decoder/ContractMetaStore')

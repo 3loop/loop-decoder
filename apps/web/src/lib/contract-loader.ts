@@ -4,6 +4,7 @@ import {
   ContractMetaStore,
   EtherscanStrategyResolver,
   SourcifyStrategyResolver,
+  RPCProvider,
 } from "@3loop/transaction-decoder";
 import { Effect, Layer } from "effect";
 import { fetchAndCacheErc20Meta } from "./contract-meta";
@@ -58,44 +59,51 @@ export const AbiStoreLive = Layer.succeed(
 );
 
 // TODO: Provide context of RPCProvider
-export const ContractMetaStoreLive = Layer.succeed(
+export const ContractMetaStoreLive = Layer.effect(
   ContractMetaStore,
-  ContractMetaStore.of({
-    get: ({ address, chainID }) =>
-      Effect.gen(function* (_) {
-        const normAddress = address.toLowerCase();
-        const data = yield* _(
-          Effect.tryPromise(() =>
-            prisma.contractMeta.findFirst({
-              where: {
-                address: normAddress,
-                chainID: chainID,
-              },
-            }),
-          ).pipe(Effect.catchAll((_) => Effect.succeed(null))),
-        );
+  Effect.gen(function* (_) {
+    const rpcProvider = yield* _(RPCProvider);
 
-        if (data != null) {
-          return data as ContractData;
-        }
+    return ContractMetaStore.of({
+      get: ({ address, chainID }) =>
+        Effect.gen(function* (_) {
+          const normAddress = address.toLowerCase();
+          const data = yield* _(
+            Effect.tryPromise(() =>
+              prisma.contractMeta.findFirst({
+                where: {
+                  address: normAddress,
+                  chainID: chainID,
+                },
+              }),
+            ).pipe(Effect.catchAll((_) => Effect.succeed(null))),
+          );
 
-        const tryERC20 = yield* _(
-          fetchAndCacheErc20Meta({
-            contractAddress: normAddress,
-            chainID,
-          }).pipe(Effect.catchAll((_) => Effect.succeed(null))),
-        );
+          if (data != null) {
+            return data as ContractData;
+          }
 
-        if (tryERC20 != null) {
-          return tryERC20;
-        }
+          const tryERC20 = yield* _(
+            fetchAndCacheErc20Meta({
+              contractAddress: normAddress,
+              chainID,
+            }).pipe(
+              Effect.provideService(RPCProvider, rpcProvider),
+              Effect.catchAll((_) => Effect.succeed(null)),
+            ),
+          );
 
-        return null;
-      }),
-    set: () =>
-      Effect.sync(() => {
-        console.error("Set not implemented for ContractMetaStoreLive");
-        return null;
-      }),
+          if (tryERC20 != null) {
+            return tryERC20;
+          }
+
+          return null;
+        }),
+      set: () =>
+        Effect.sync(() => {
+          console.error("Set not implemented for ContractMetaStoreLive");
+          return null;
+        }),
+    });
   }),
 );

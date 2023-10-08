@@ -6,7 +6,7 @@ import {
 } from "@3loop/transaction-decoder";
 import { AbiStoreLive, ContractMetaStoreLive } from "./contract-loader";
 
-const LoadersLayer = Layer.provideMerge(AbiStoreLive, ContractMetaStoreLive);
+const LoadersLayer = Layer.mergeAll(AbiStoreLive, ContractMetaStoreLive);
 const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer);
 
 const customRuntime = pipe(
