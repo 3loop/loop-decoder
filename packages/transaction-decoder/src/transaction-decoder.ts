@@ -12,7 +12,7 @@ import type { TraceLog } from './schema/trace.js'
 import { getAssetsReceived, getAssetsSent } from './transformers/tokens.js'
 import { getProxyStorageSlot } from './decoding/proxies.js'
 import { getAndCacheAbi } from './abi-loader.js'
-import { ContractMetaStore } from './contract-meta-loader.js'
+import { getAndCacheContractMeta } from './contract-meta-loader.js'
 
 export class UnsupportedEvent {
     readonly _tag = 'UnsupportedEvent'
@@ -130,8 +130,6 @@ export const decodeTransaction = ({
     timestamp: number
 }) =>
     Effect.gen(function* (_) {
-        const metaStore = yield* _(ContractMetaStore)
-
         const { decodedData, decodedTrace, decodedLogs } = yield* _(
             Effect.all(
                 {
@@ -146,7 +144,7 @@ export const decodeTransaction = ({
         )
 
         const interpreterMap = yield* _(
-            metaStore.get({
+            getAndCacheContractMeta({
                 address: receipt.to!,
                 chainID: Number(transaction.chainId),
             }),

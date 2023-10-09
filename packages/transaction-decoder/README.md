@@ -105,7 +105,7 @@ const AbiStoreLive = Layer.succeed(
     AbiStore,
     AbiStore.of({
         strategies: [],
-        set: ({ address = {}, signature = {} }) =>
+        set: ({ address = {}, func = {}, event = {} }) =>
             Effect.sync(() => {
                 // NOTE: Ignore caching as we relay only on local abis
             }),
@@ -122,7 +122,7 @@ const AbiStoreLive = Layer.succeed(
 
                 const abi = signatureAbiMap[signature]
 
-                if (abi && chainID === 5) {
+                if (abi) {
                     return abi
                 }
 
@@ -141,20 +141,19 @@ export const MetaStoreLive = Layer.succeed(
     ContractMetaStore,
     ContractMetaStore.of({
         get: ({ address, chainID }) => Effect.sync(() => {
-
             return {
-        address: request.address,
-        chainID: request.chainID,
-        contractName: 'Mock Contract',
-        contractAddress: request.address,
-        tokenSymbol: 'MOCK',
-        decimals: 18,
-        type: ContractType.ERC20,
-    }
-        })
+                address: request.address,
+                chainID: request.chainID,
+                contractName: 'Mock Contract',
+                contractAddress: request.address,
+                tokenSymbol: 'MOCK',
+                decimals: 18,
+                type: ContractType.ERC20,
+            }
+        }),
         set: ({ address, chainID }) => Effect.sync(() => {
             // NOTE: Ignore for now
-        })
+        }),
     })
 ```
 
