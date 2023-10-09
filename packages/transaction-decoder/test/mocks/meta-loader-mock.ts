@@ -1,5 +1,4 @@
 import { ContractMetaStore } from '@/contract-meta-loader.js'
-import { ContractType } from '@/index.js'
 import { Effect, Layer } from 'effect'
 
 const ERC1155_CONTRACTS = ['0x58c3c2547084cc1c94130d6fd750a3877c7ca5d2', '0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80']
@@ -18,7 +17,7 @@ export const MockedMetaStoreLive = Layer.succeed(
                         contractAddress: address,
                         tokenSymbol: 'WETH',
                         decimals: 18,
-                        type: ContractType.WETH,
+                        type: 'WETH',
                     }
                 }
 
@@ -29,7 +28,7 @@ export const MockedMetaStoreLive = Layer.succeed(
                         contractName: 'Mock ERC1155 Contract',
                         contractAddress: address,
                         tokenSymbol: 'ERC1155',
-                        type: ContractType.ERC1155,
+                        type: 'ERC1155',
                     }
                 }
 
@@ -40,7 +39,7 @@ export const MockedMetaStoreLive = Layer.succeed(
                         contractName: 'Mock ERC721 Contract',
                         contractAddress: address,
                         tokenSymbol: 'ERC721',
-                        type: ContractType.ERC721,
+                        type: 'ERC721',
                     }
                 }
 
@@ -51,7 +50,7 @@ export const MockedMetaStoreLive = Layer.succeed(
                     contractAddress: address,
                     tokenSymbol: 'ERC20',
                     decimals: 18,
-                    type: ContractType.ERC20,
+                    type: 'ERC20',
                 }
             }),
         set: () =>

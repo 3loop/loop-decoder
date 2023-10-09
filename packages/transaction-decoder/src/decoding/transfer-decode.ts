@@ -1,6 +1,6 @@
 import { formatEther, type TransactionReceipt, type TransactionResponse } from 'ethers'
 import type { DecodedTx } from '../types.js'
-import { ContractType, TxType } from '../types.js'
+import { TxType } from '../types.js'
 
 export function transferDecode({
     transaction,
@@ -15,7 +15,7 @@ export function transferDecode({
 
     const decodedTx: DecodedTx = {
         contractName: null,
-        contractType: ContractType.OTHER,
+        contractType: 'OTHER',
         txHash: transaction.hash,
         txType: TxType.TRANSFER,
         fromAddress: receipt.from,

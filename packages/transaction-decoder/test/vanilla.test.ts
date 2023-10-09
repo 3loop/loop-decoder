@@ -2,7 +2,6 @@ import { describe, expect, test } from 'vitest'
 import { MockedProvider } from './mocks/json-rpc-mock.js'
 import { TransactionDecoder } from '@/vanilla.js'
 import fs from 'fs'
-import { ContractType } from '@/types.js'
 
 describe('Transaction Decoder', () => {
     test('should be able to decode using vanilla API', async () => {
@@ -47,7 +46,7 @@ describe('Transaction Decoder', () => {
                             contractAddress: request.address,
                             tokenSymbol: 'WETH',
                             decimals: 18,
-                            type: ContractType.WETH,
+                            type: 'WETH',
                         }
                     }
                     return {
@@ -57,7 +56,7 @@ describe('Transaction Decoder', () => {
                         contractAddress: request.address,
                         tokenSymbol: 'ERC20',
                         decimals: 18,
-                        type: ContractType.ERC20,
+                        type: 'ERC20',
                     }
                 },
                 set: async () => {

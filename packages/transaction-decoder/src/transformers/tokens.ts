@@ -1,6 +1,5 @@
 import { formatEther, formatUnits } from 'ethers'
 import { Asset, AssetType, Interaction, InteractionEvent } from '../types.js'
-import { ContractType } from '../types.js'
 import { sameAddress } from '../address.js'
 
 const toKeys = ['to', '_to', 'dst']
@@ -21,13 +20,13 @@ function getTokenType(interaction: Interaction): AssetType {
     if (interaction.contractSymbol && LPTokenSymbols.includes(interaction.contractSymbol)) {
         tokenType = AssetType.LPToken
         // ERC-1155
-    } else if (interaction.contractType === ContractType.ERC1155) {
+    } else if (interaction.contractType === 'ERC1155') {
         tokenType = AssetType.ERC1155
         // ERC-721
-    } else if (interaction.contractType === ContractType.ERC721) {
+    } else if (interaction.contractType === 'ERC721') {
         tokenType = AssetType.ERC721
         // ERC-20
-    } else if (interaction.contractType === ContractType.ERC20) {
+    } else if (interaction.contractType === 'ERC20') {
         tokenType = AssetType.ERC20
     }
 
@@ -160,7 +159,7 @@ function getWethInteraction(interactions: Interaction[], direction: string, user
     const eventDirection = direction === 'received' ? 'Deposit' : 'Withdraw'
     const wethInteractions = interactions.filter(
         (interaction) =>
-            interaction.contractType === ContractType.WETH &&
+            interaction.contractType === 'WETH' &&
             interaction.event.eventName === eventDirection &&
             sameAddress(interaction.event.params.dst, userAddress),
     )

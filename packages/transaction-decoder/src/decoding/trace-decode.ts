@@ -1,7 +1,6 @@
 import type { TransactionResponse } from 'ethers'
 import { Effect, Either } from 'effect/index'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
-import { ContractType } from '../types.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
@@ -174,14 +173,16 @@ export function augmentTraceLogs(
     interactionsWithoutNativeTransfers: Interaction[],
     traceLogs: TraceLog[],
 ): Interaction[] {
-    const nativeTransfers = filterToNativeTransfers(traceLogs).map((log) => ({
-        contractAddress: log.action.from,
-        contractName: null,
-        contractSymbol: null,
-        contractType: ContractType.OTHER,
-        event: traceLogToEvent(log),
-        decimals: null,
-        chainID: Number(transaction.chainId),
-    }))
+    const nativeTransfers = filterToNativeTransfers(traceLogs).map(
+        (log): Interaction => ({
+            contractAddress: log.action.from,
+            contractName: null,
+            contractSymbol: null,
+            contractType: 'OTHER',
+            event: traceLogToEvent(log),
+            decimals: null,
+            chainID: Number(transaction.chainId),
+        }),
+    )
     return [...interactionsWithoutNativeTransfers, ...nativeTransfers]
 }

@@ -2,7 +2,6 @@ import type { Log, TransactionResponse } from 'ethers'
 import { Interface } from 'ethers'
 import { Effect } from 'effect'
 import type { Interaction, RawDecodedLog } from '../types.js'
-import { ContractType } from '../types.js'
 import { getProxyStorageSlot } from './proxies.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 import { getAndCacheContractMeta } from '../contract-meta-loader.js'
@@ -118,7 +117,7 @@ const transformLog = (transaction: TransactionResponse, log: RawDecodedLog) =>
             contractAddress: address,
             decimals: contractData?.decimals || null,
             chainID: Number(transaction.chainId),
-            contractType: contractData?.type ?? ContractType.OTHER,
+            contractType: contractData?.type ?? 'OTHER',
             event: {
                 eventName: log.name,
                 logIndex: log.logIndex,
