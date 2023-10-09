@@ -38,14 +38,19 @@ function parseEventSignature(signature: string): string {
     return Fragment.from('event ' + signature).format('json')
 }
 
-async function fetchABI({ address, chainID, signature, event }: RequestModel.GetContractABIStrategy) {
+async function fetchABI({
+    address,
+    chainID,
+    signature,
+    event,
+}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI> {
     if (signature != null) {
         const response = await fetch(`${endpoint}?function=${signature}`, options)
         if (response.status === 200) {
             const json = (await response.json()) as OpenchainResponse
 
             return {
-                signature: {
+                func: {
                     [signature]: parseFunctionSignature(json.result.function[signature][0].name),
                 },
             }

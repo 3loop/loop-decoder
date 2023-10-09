@@ -6,10 +6,10 @@ export const MockedAbiStoreLive = Layer.succeed(
     AbiStore,
     AbiStore.of({
         strategies: [],
-        set: ({ address = {}, signature = {} }) =>
+        set: ({ address = {}, func = {}, event = {} }) =>
             Effect.gen(function* (_) {
                 const addressMatches = Object.entries(address)
-                const sigMatches = Object.entries(signature)
+                const sigMatches = Object.entries(func).concat(Object.entries(event))
 
                 // Cache all addresses
                 yield* _(

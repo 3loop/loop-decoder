@@ -16,9 +16,10 @@ export class ResolveStrategyABIError {
     ) {}
 }
 
-export type ContractABI = {
+export interface ContractABI {
     address?: Record<string, string>
-    signature?: Record<string, string>
+    func?: Record<string, string>
+    event?: Record<string, string>
 }
 
 export interface GetContractABIStrategy extends Request.Request<ResolveStrategyABIError, ContractABI>, FetchABIParams {

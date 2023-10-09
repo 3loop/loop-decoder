@@ -13,7 +13,12 @@ import prisma from "./prisma";
 export const AbiStoreLive = Layer.succeed(
   AbiStore,
   AbiStore.of({
-    strategies: [EtherscanStrategyResolver(), SourcifyStrategyResolver()],
+    strategies: [
+      EtherscanStrategyResolver({
+        apikey: process.env.ETHERSCAN_API_KEY,
+      }),
+      SourcifyStrategyResolver(),
+    ],
     set: ({ address = {} }) =>
       Effect.gen(function* (_) {
         const addressMatches = Object.entries(address);

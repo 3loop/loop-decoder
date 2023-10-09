@@ -48,17 +48,17 @@ export const getAndCacheAbi = ({ chainID, address, event, signature }: GetAbiPar
         if (abi != null) {
             yield* _(abiStore.set(abi))
 
-            const addressmatch = abi?.address?.[address]
+            const addressmatch = abi.address?.[address]
             if (addressmatch != null) {
                 return addressmatch
             }
 
-            const signaturematch = signature ? abi?.signature?.[signature] : null
-            if (signaturematch != null) {
-                return `[${signaturematch}]`
+            const funcmatch = signature ? abi.func?.[signature] : null
+            if (funcmatch != null) {
+                return `[${funcmatch}]`
             }
 
-            const eventmatch = event ? abi?.signature?.[event] : null
+            const eventmatch = event ? abi.event?.[event] : null
             if (eventmatch != null) {
                 return `[${eventmatch}]`
             }

@@ -1,11 +1,11 @@
-import { Effect, Context, Logger, LogLevel } from 'effect'
+import { Effect, Context, Logger, LogLevel, RequestResolver } from 'effect'
 import { RPCProvider, UnknownNetwork } from './provider.js'
 import { type JsonRpcProvider } from 'ethers'
 import { ContractData } from './types.js'
 import { decodeTransactionByHash } from './transaction-decoder.js'
 import { AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
 import { ContractMetaParams, ContractMetaStore as EffectContractMetaStore } from './contract-meta-loader.js'
-import { ContractABI } from './abi-strategy/index.js'
+import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
 
 interface TransactionDecoderOptions {
     getProvider: (chainID: number) => JsonRpcProvider | undefined
@@ -15,6 +15,7 @@ interface TransactionDecoderOptions {
 }
 
 interface VanillaAbiStore {
+    strategies?: readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]
     get: (key: GetAbiParams) => Promise<string | null>
     set: (val: ContractABI) => Promise<void>
 }
@@ -48,7 +49,7 @@ export class TransactionDecoder {
         })
 
         const AbiStoreLive = EffectAbiStore.of({
-            strategies: [],
+            strategies: abiStore.strategies ?? [],
             get: (key) => Effect.promise(() => abiStore.get(key)),
             set: (val) => Effect.promise(() => abiStore.set(val)),
         })

@@ -14,7 +14,7 @@ async function createMock(hash: string, rpcUrl: string) {
 
     if (transaction == null) return
 
-    const block = await provider.getBlock(transaction.blockNumber!)
+    const block = transaction.blockNumber ? await provider.getBlock(transaction.blockNumber) : undefined
 
     return {
         receipt,

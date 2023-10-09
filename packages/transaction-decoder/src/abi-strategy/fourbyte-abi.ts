@@ -20,14 +20,19 @@ function parseEventSignature(signature: string): string {
 }
 
 // TODO: instead of getting the first match, we should detect the best match
-async function fetchABI({ address, event, signature, chainID }: RequestModel.GetContractABIStrategy) {
+async function fetchABI({
+    address,
+    event,
+    signature,
+    chainID,
+}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI> {
     if (signature != null) {
         const full_match = await fetch(`${endpoint}/signatures/?hex_signature=${signature}`)
         if (full_match.status === 200) {
             const json = (await full_match.json()) as FourBytesResponse
 
             return {
-                signature: {
+                func: {
                     [signature]: parseFunctionSignature(json.results[0]?.text_signature),
                 },
             }
