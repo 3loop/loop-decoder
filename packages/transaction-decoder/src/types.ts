@@ -50,14 +50,7 @@ export interface RawDecodedLog {
     decoded: boolean
 }
 
-export const enum ContractType {
-    ERC20 = 'ERC20',
-    ERC721 = 'ERC721',
-    ERC1155 = 'ERC1155',
-    WETH = 'WETH',
-    GNOSIS = 'Gnosis Safe',
-    OTHER = 'OTHER',
-}
+export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'Gnosis Safe' | 'OTHER'
 
 export interface ContractData {
     address: string

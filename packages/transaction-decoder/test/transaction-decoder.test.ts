@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'vitest'
-import { Effect, Context } from 'effect'
-import { ContractLoader, decodeTransactionByHash } from '@/effect.js'
+import { Effect, Layer, pipe } from 'effect'
+import { decodeTransactionByHash } from '@/effect.js'
 import { RPCProvider } from '../src/provider.js'
 import { MockedRPCProvider } from './mocks/json-rpc-mock.js'
-import { MockedContractLoader } from './mocks/contract-loader-mock.js'
 import { TEST_TRANSACTIONS } from './constants.js'
+import { MockedAbiStoreLive } from './mocks/abi-loader-mock.js'
+import { MockedMetaStoreLive } from './mocks/meta-loader-mock.js'
 
 describe('Transaction Decoder', () => {
     test.each(TEST_TRANSACTIONS)('Resolve and decode transaction', async ({ hash, chainID }) => {
@@ -12,14 +13,14 @@ describe('Transaction Decoder', () => {
             return yield* _(decodeTransactionByHash(hash, chainID))
         })
 
-        const context = Context.empty().pipe(
-            Context.add(RPCProvider, MockedRPCProvider),
-            Context.add(ContractLoader, MockedContractLoader),
-        )
+        const LoadersLayer = Layer.provideMerge(MockedAbiStoreLive, MockedMetaStoreLive)
+        const RPCProviderLive = Layer.succeed(RPCProvider, MockedRPCProvider)
 
-        const runnable = Effect.provideContext(program, context)
+        const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer)
 
-        const result = await Effect.runPromise(runnable)
+        const customRuntime = pipe(Layer.toRuntime(MainLayer), Effect.scoped, Effect.runSync)
+
+        const result = await program.pipe(Effect.provideSomeRuntime(customRuntime), Effect.runPromise)
 
         await expect(result).toMatchFileSnapshot(`./snapshots/decoder/${hash}.snapshot`)
     })

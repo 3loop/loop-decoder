@@ -1,17 +1,18 @@
 import { Effect } from 'effect'
 import type { TransactionReceipt, TransactionResponse } from 'ethers'
 import { Network, formatEther } from 'ethers'
-import { ContractLoader, GetContractABI, GetContractMeta } from './contract-loader.js'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
 import * as AbiDecoder from './decoding/abi-decode.js'
 import * as LogDecoder from './decoding/log-decode.js'
 import * as TraceDecoder from './decoding/trace-decode.js'
 import { transferDecode } from './decoding/transfer-decode.js'
 import type { DecodedTx, Interaction } from './types.js'
-import { ContractType, TxType } from './types.js'
+import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
 import { getAssetsReceived, getAssetsSent } from './transformers/tokens.js'
 import { getProxyStorageSlot } from './decoding/proxies.js'
+import { getAndCacheAbi } from './abi-loader.js'
+import { getAndCacheContractMeta } from './contract-meta-loader.js'
 
 export class UnsupportedEvent {
     readonly _tag = 'UnsupportedEvent'
@@ -60,17 +61,12 @@ export const decodeMethod = ({ transaction }: { transaction: TransactionResponse
             abiAddress = implementation
         }
 
-        const service = yield* _(ContractLoader)
-
         const abi = yield* _(
-            Effect.request(
-                GetContractABI({
-                    address: abiAddress,
-                    signature,
-                    chainID,
-                }),
-                service.contractABIResolver,
-            ).pipe(Effect.withRequestCaching(true)),
+            getAndCacheAbi({
+                address: abiAddress,
+                signature,
+                chainID,
+            }),
         )
 
         if (!abi) {
@@ -81,7 +77,7 @@ export const decodeMethod = ({ transaction }: { transaction: TransactionResponse
         const decoded = yield* _(Effect.try(() => AbiDecoder.decodeMethod(transaction.data, abi)))
 
         if (decoded == null) {
-            return yield* _(Effect.fail(new DecodeError('Failed to decode method')))
+            return yield* _(Effect.fail(new DecodeError(`Failed to decode method: ${transaction.data}`)))
         }
 
         return decoded
@@ -134,8 +130,6 @@ export const decodeTransaction = ({
     timestamp: number
 }) =>
     Effect.gen(function* (_) {
-        const service = yield* _(ContractLoader)
-
         const { decodedData, decodedTrace, decodedLogs } = yield* _(
             Effect.all(
                 {
@@ -150,16 +144,10 @@ export const decodeTransaction = ({
         )
 
         const interpreterMap = yield* _(
-            Effect.request(
-                GetContractMeta({
-                    address: receipt.to!,
-                    chainID: Number(transaction.chainId),
-                }),
-                service.contractMetaResolver,
-            ).pipe(
-                Effect.withRequestCaching(true),
-                Effect.catchAll(() => Effect.succeed(null)),
-            ),
+            getAndCacheContractMeta({
+                address: receipt.to!,
+                chainID: Number(transaction.chainId),
+            }),
         )
 
         const interactions: Interaction[] = TraceDecoder.augmentTraceLogs(transaction, decodedLogs, trace)
@@ -175,7 +163,7 @@ export const decodeTransaction = ({
             fromAddress: receipt.from,
             toAddress: receipt.to,
             contractName: interpreterMap?.contractName ?? null,
-            contractType: interpreterMap?.type ?? ContractType.OTHER,
+            contractType: interpreterMap?.type ?? 'OTHER',
             methodCall: {
                 name: decodedData?.name ?? 'unknown',
                 arguments: decodedData?.params ?? [],

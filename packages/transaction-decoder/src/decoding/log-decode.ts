@@ -2,13 +2,12 @@ import type { Log, TransactionResponse } from 'ethers'
 import { Interface } from 'ethers'
 import { Effect } from 'effect'
 import type { Interaction, RawDecodedLog } from '../types.js'
-import { ContractType } from '../types.js'
-import { ContractLoader, GetContractABI, GetContractMeta } from '../contract-loader.js'
 import { getProxyStorageSlot } from './proxies.js'
+import { getAndCacheAbi } from '../abi-loader.js'
+import { getAndCacheContractMeta } from '../contract-meta-loader.js'
 
 const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
     Effect.gen(function* (_) {
-        const service = yield* _(ContractLoader)
         const chainID = Number(transaction.chainId)
 
         const address = logItem.address.toLowerCase()
@@ -31,17 +30,11 @@ const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
         }
 
         const abiItem = yield* _(
-            Effect.request(
-                GetContractABI({
-                    address: abiAddress,
-                    signature: logItem.topics[0],
-                    chainID,
-                }),
-                service.contractABIResolver,
-            ).pipe(
-                Effect.withRequestCaching(true),
-                Effect.catchAll(() => Effect.succeed(null)),
-            ),
+            getAndCacheAbi({
+                address: abiAddress,
+                event: logItem.topics[0],
+                chainID,
+            }),
         )
 
         if (abiItem == null) {
@@ -104,29 +97,18 @@ export const decodeLogs = ({ logs, transaction }: { logs: readonly Log[]; transa
         )
     })
 
-const transformLog = (
-    transaction: TransactionResponse,
-    log: RawDecodedLog,
-): Effect.Effect<ContractLoader, unknown, Interaction> =>
+const transformLog = (transaction: TransactionResponse, log: RawDecodedLog) =>
     Effect.gen(function* (_) {
-        const service = yield* _(ContractLoader)
-
         const events = Object.fromEntries(log.events.map((param) => [param.name, param.value]))
 
         // NOTE: Can use a common parser with branded type evrywhere
         const address = log.address.toLowerCase()
 
         const contractData = yield* _(
-            Effect.request(
-                GetContractMeta({
-                    address,
-                    chainID: Number(transaction.chainId),
-                }),
-                service.contractMetaResolver,
-            ).pipe(
-                Effect.withRequestCaching(true),
-                Effect.catchAll(() => Effect.succeed(null)),
-            ),
+            getAndCacheContractMeta({
+                address,
+                chainID: Number(transaction.chainId),
+            }),
         )
 
         return {
@@ -135,7 +117,7 @@ const transformLog = (
             contractAddress: address,
             decimals: contractData?.decimals || null,
             chainID: Number(transaction.chainId),
-            contractType: contractData?.type ?? ContractType.OTHER,
+            contractType: contractData?.type ?? 'OTHER',
             event: {
                 eventName: log.name,
                 logIndex: log.logIndex,
@@ -155,9 +137,11 @@ export const transformDecodedLogs = ({
     Effect.gen(function* (_) {
         const effects = decodedLogs.filter((log) => Boolean(log)).map((log) => transformLog(transaction, log))
 
-        return yield* _(
+        const result: Interaction[] = yield* _(
             Effect.all(effects, {
                 concurrency: 'unbounded',
             }),
         )
+
+        return result
     })

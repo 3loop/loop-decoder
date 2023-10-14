@@ -1,10 +1,9 @@
 import type { TransactionResponse } from 'ethers'
 import { Effect, Either } from 'effect/index'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
-import { ContractType } from '../types.js'
-import { ContractLoader, GetContractABI } from '../contract-loader.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, decodeMethod } from './abi-decode.js'
+import { getAndCacheAbi } from '../abi-loader.js'
 
 const pruneTraceRecursive = (calls: TraceLog[]): TraceLog[] => {
     if (calls.length === 0) {
@@ -26,8 +25,6 @@ const pruneTraceRecursive = (calls: TraceLog[]): TraceLog[] => {
 
 const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
     Effect.gen(function* (_) {
-        const service = yield* _(ContractLoader)
-
         if ('to' in call.action && 'input' in call.action) {
             const { to, input, from } = call.action
             const chainID = Number(transaction.chainId)
@@ -35,14 +32,11 @@ const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
             const contractAddress = to.toLowerCase()
 
             const abi = yield* _(
-                Effect.request(
-                    GetContractABI({
-                        address: contractAddress,
-                        signature,
-                        chainID,
-                    }),
-                    service.contractABIResolver,
-                ).pipe(Effect.catchAll(() => Effect.succeed(null))),
+                getAndCacheAbi({
+                    address: contractAddress,
+                    signature,
+                    chainID,
+                }),
             )
 
             if (abi == null) {
@@ -179,14 +173,16 @@ export function augmentTraceLogs(
     interactionsWithoutNativeTransfers: Interaction[],
     traceLogs: TraceLog[],
 ): Interaction[] {
-    const nativeTransfers = filterToNativeTransfers(traceLogs).map((log) => ({
-        contractAddress: log.action.from,
-        contractName: null,
-        contractSymbol: null,
-        contractType: ContractType.OTHER,
-        event: traceLogToEvent(log),
-        decimals: null,
-        chainID: Number(transaction.chainId),
-    }))
+    const nativeTransfers = filterToNativeTransfers(traceLogs).map(
+        (log): Interaction => ({
+            contractAddress: log.action.from,
+            contractName: null,
+            contractSymbol: null,
+            contractType: 'OTHER',
+            event: traceLogToEvent(log),
+            decimals: null,
+            chainID: Number(transaction.chainId),
+        }),
+    )
     return [...interactionsWithoutNativeTransfers, ...nativeTransfers]
 }

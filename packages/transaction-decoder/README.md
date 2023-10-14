@@ -13,11 +13,11 @@ To get started, install the package from npm, along with its peer dependencies:
 $ npm i @3loop/transaction-decoder
 ```
 
-To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three callback functions:
+To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three data loaders:
 
 -   `getProvider`: This function returns an ethers JsonRpcProvider based on the chain ID.
--   `getContractMeta`: This function returns contract meta-information. See the `ContractData` type for the required properties.
--   `getContractAbi`: This function returns the contract or fragment ABI based on the chain ID, address, and/or signature.
+-   `contractMetaStore`: This object has 2 properties `get` and `set` that returns and caches contract meta-information. See the `ContractData` type for the required properties.
+-   `abiStore`: Similarly, this object has 2 properties `get` and `set` that returns and cache the contract or fragment ABI based on the chain ID, address, and/or signature.
 
 ```ts
 import { TransactionDecoder } from '@3loop/transaction-decoder'
@@ -28,24 +28,40 @@ const decoded = new TransactionDecoder({
     getProvider: (chainId: number) => {
         return new JsonRpcProvider(RPC_URL[chainId])
     },
-    getContractAbi: async ({ address, chainId, signature }): Promise<string> => {
-        return db.getContractAbi({
-            address: address,
-            chainId: chainId,
-        })
+    abiStore: {
+        get: async (req: {
+            chainID: number
+            address: string
+            event?: string | undefined
+            signature?: string | undefined
+        }) => {
+            return db.getContractAbi(req)
+        },
+        set: async (req: {
+            address?: Record<string, string>
+            signature?: Record<string, string>
+        }) => {
+            await db.setContractAbi(req)
+        },
     },
-    getContractMeta: async (request) => {
-        return db.getContractMeta({
-            address: address,
-            chainId: chainId,
-        })
+    contractMetaStore: {
+        get: async (req: {
+            address: string
+            chainID: number
+        }) => {
+            return db.getContractMeta(req)
+        },
+        set: async (req: {
+            address: string
+            chainID: number
+        }) {
+            // NOTE: not yet called as we do not have any automatic resolve strategy
+        },
     },
 })
 ```
 
-It's important to note that the Loop Decoder does not enforce any specific data source, allowing users of the library to load contract data as they see fit. Depending on your application's needs, you can either include the required data directly in your code for a small number of contracts or use a database as a cache and automate data retrieval from different sources, such as etherscan or 4bytes.directory, for ABIs.
-
-In the near future, we plan to provide common data adapters and utilities for loading ABIs and contract meta-information for popular dApps.
+It's important to note that the Loop Decoder does not enforce any specific data source, allowing users of the library to load contract data as they see fit. Depending on the requirements of your application, you can either include the necessary data directly in your code for a small number of contracts or use a database as a cache.
 
 LoopDecoder instances provide a single public method, `decodeTransaction`, which fetches and decodes a given transaction:
 
@@ -78,70 +94,79 @@ const getProvider = (chainID: number): Effect.Effect<never, UnknownNetwork, Json
 }
 ```
 
-2. Create the ContractLoader
+2. Create the AbiStore
 
-ContractLoader provides all the necessary data to decode the transaction data. In real world you might want to have a database that you can fetch the data from. In the following example we will have everything hardcoded.
+`AbiStore` serves as a repository for obtaining and caching the contract ABI necessary for decoding transaction data. In a real-world scenario, it may be preferable to retrieve this data from a database. In the following example, we will be hardcoding all the necessary information.
 
-To create a new ContractLoader service you will need to implement two RequestResolvers.
-
--   `contractABIResolver` - fetch ABI or ABI Fragmend from address, signature, and chain ID.
+To create a new `AbiStore` service you will need to implement two methods `set` and `get`.
 
 ```ts
-import { Effect, Context, RequestResolver } from 'effect'
+const AbiStoreLive = Layer.succeed(
+    AbiStore,
+    AbiStore.of({
+        strategies: [],
+        set: ({ address = {}, func = {}, event = {} }) =>
+            Effect.sync(() => {
+                // NOTE: Ignore caching as we relay only on local abis
+            }),
+        get: ({ address, signature, event }) =>
+            Effect.sync(() => {
+                const signatureAbiMap = {
+                    '0x3593564c': 'execute(bytes,bytes[],uint256)',
+                    '0x0902f1ac': 'getReserves()',
+                    '0x36c78516': 'transferFrom(address,address,uint160,address)	',
+                    '0x70a08231': 'balanceOf(address)',
+                    '0x022c0d9f': 'swap(uint256,uint256,address,bytes)',
+                    '0x2e1a7d4d': 'withdraw(uint256)',
+                }
 
-const contractABIResolver = RequestResolver.fromFunctionEffect(({ signature, chainID }: GetContractABI) => {
-    const signatureAbiMap = {
-        '0x3593564c': 'execute(bytes,bytes[],uint256)',
-        '0x0902f1ac': 'getReserves()',
-        '0x36c78516': 'transferFrom(address,address,uint160,address)	',
-        '0x70a08231': 'balanceOf(address)',
-        '0x022c0d9f': 'swap(uint256,uint256,address,bytes)',
-        '0x2e1a7d4d': 'withdraw(uint256)',
-    }
+                const abi = signatureAbiMap[signature]
 
-    const abi = signatureAbiMap[signature]
+                if (abi) {
+                    return abi
+                }
 
-    if (abi && chainID === 5) {
-        return Effect.succeed(abi)
-    }
-
-    return Effect.succeed(null)
-})
-```
-
--   `contractMetaResolver` - fetch the contract meta information from the address and chain ID.
-
-```ts
-const contractMetaResolver = RequestResolver.fromFunctionEffect((request: GetContractMeta) =>
-    Effect.succeed({
-        address: request.address,
-        chainID: request.chainID,
-        contractName: 'Mock Contract',
-        contractAddress: request.address,
-        tokenSymbol: 'MOCK',
-        decimals: 18,
-        type: ContractType.ERC20,
+                return null
+            }),
     }),
 )
 ```
 
-3. Create a context using the services we created above
+3. Create the ContractMetaStore
+
+Similarly to AbiStore, but returns all the contract meta data
 
 ```ts
-const context = Context.empty().pipe(
-    Context.add(RPCProvider, RPCProvider.of({ _tag: 'RPCProvider', getProvider: getProvider })),
-    Context.add(
-        ContractLoader,
-        ContractLoader.of({
-            _tag: 'ContractLoader',
-            contractABIResolver: contractABIResolver,
-            contractMetaResolver: contractMetaResolver,
+export const MetaStoreLive = Layer.succeed(
+    ContractMetaStore,
+    ContractMetaStore.of({
+        get: ({ address, chainID }) => Effect.sync(() => {
+            return {
+                address: request.address,
+                chainID: request.chainID,
+                contractName: 'Mock Contract',
+                contractAddress: request.address,
+                tokenSymbol: 'MOCK',
+                decimals: 18,
+                type: ContractType.ERC20,
+            }
         }),
-    ),
-)
+        set: ({ address, chainID }) => Effect.sync(() => {
+            // NOTE: Ignore for now
+        }),
+    })
 ```
 
-4. Fetch and decode a transaction
+4. Create a context using the services we created above
+
+```ts
+const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
+const RPCProviderLive = Layer.succeed(RPCProvider, RPCProvider.of({ _tag: 'RPCProvider', getProvider: getProvider }))
+
+const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer)
+```
+
+5. Fetch and decode a transaction
 
 ```ts
 const program = Effect.gen(function* (_) {
@@ -152,13 +177,37 @@ const program = Effect.gen(function* (_) {
 })
 ```
 
-5. Finally provide the context and run the program
+6. Finally provide the context and run the program
 
 ```ts
-const runnable = Effect.provideContext(program, context)
-
-Effect.runPromise(runnable).then(console.log).catch(console.error)
+const customRuntime = pipe(Layer.toRuntime(MainLayer), Effect.scoped, Effect.runSync)
+const result = await program.pipe(Effect.provideSomeRuntime(customRuntime), Effect.runPromise)
 ```
+
+## ABI Strategies
+
+`AbiStore` accepts an array of strategies that are used to resolve the ABI from third-party APIs in case the store is missing the ABI. If an ABI is successfully resolved, it is then cached in the store.
+
+Loop Decoder provides 4 strategies out of the box:
+
+-   `EtherscanStrategyResolver` - resolves the ABI from Etherscan
+-   `SourcifyStrategyResolver` - resolves the ABI from Sourcify
+-   `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
+-   `OpenchainStrategyResolver` - resolves the ABI from Openchain
+
+You can create your own strategy by implementing the `GetContractABIStrategy` Effect RequestResolver.
+
+### Release with Changeset
+
+When adding a new feature, please use the [Changeset](https://github.com/changesets/changesets) tool to create a new release. This will automatically update the changelog and create a new release on GitHub.
+
+To create a new changelog, run the following command:
+
+```
+$ pnpm changeset
+```
+
+To create a new release, one of the maintainers will merge the changeset PR into the main branch. This will trigger a new release to npm.
 
 ### Credits
 

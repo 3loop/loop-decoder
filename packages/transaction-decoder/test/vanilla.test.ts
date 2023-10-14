@@ -2,7 +2,6 @@ import { describe, expect, test } from 'vitest'
 import { MockedProvider } from './mocks/json-rpc-mock.js'
 import { TransactionDecoder } from '@/vanilla.js'
 import fs from 'fs'
-import { ContractType } from '@/types.js'
 
 describe('Transaction Decoder', () => {
     test('should be able to decode using vanilla API', async () => {
@@ -11,43 +10,58 @@ describe('Transaction Decoder', () => {
                 if (chainID === 5) return new MockedProvider()
                 return undefined
             },
-            getContractAbi: async ({ address, signature }) => {
-                const addressExists = fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`)
+            abiStore: {
+                get: async ({ address, signature, event }) => {
+                    const addressExists = fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`)
 
-                if (addressExists) {
-                    return fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString()
-                }
+                    if (addressExists) {
+                        return fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString()
+                    }
 
-                const signatureExists = fs.existsSync(`./test/mocks/abi/${signature.toLowerCase()}.json`)
+                    const sig = signature ?? event
+                    if (sig != null) {
+                        const signatureExists = fs.existsSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)
 
-                if (signatureExists) {
-                    const signatureAbi = fs.readFileSync(`./test/mocks/abi/${signature.toLowerCase()}.json`)?.toString()
-                    return `[${signatureAbi}]`
-                }
+                        if (signatureExists) {
+                            const signatureAbi = fs
+                                .readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)
+                                ?.toString()
+                            return `[${signatureAbi}]`
+                        }
+                    }
 
-                return null
+                    return null
+                },
+                set: async () => {
+                    console.error('Not implemented')
+                },
             },
-            getContractMeta: async (request) => {
-                if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === request.address.toLowerCase()) {
+            contractMetaStore: {
+                get: async (request) => {
+                    if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === request.address.toLowerCase()) {
+                        return {
+                            address: request.address,
+                            chainID: request.chainID,
+                            contractName: 'Wrapped Ether',
+                            contractAddress: request.address,
+                            tokenSymbol: 'WETH',
+                            decimals: 18,
+                            type: 'WETH',
+                        }
+                    }
                     return {
                         address: request.address,
                         chainID: request.chainID,
-                        contractName: 'Wrapped Ether',
+                        contractName: 'Mock ERC20 Contract',
                         contractAddress: request.address,
-                        tokenSymbol: 'WETH',
+                        tokenSymbol: 'ERC20',
                         decimals: 18,
-                        type: ContractType.WETH,
+                        type: 'ERC20',
                     }
-                }
-                return {
-                    address: request.address,
-                    chainID: request.chainID,
-                    contractName: 'Mock ERC20 Contract',
-                    contractAddress: request.address,
-                    tokenSymbol: 'ERC20',
-                    decimals: 18,
-                    type: ContractType.ERC20,
-                }
+                },
+                set: async () => {
+                    console.error('Not implemented')
+                },
             },
         })
 
