@@ -1,5 +1,5 @@
 import type { TransactionResponse } from 'ethers'
-import { Effect, Either } from 'effect/index'
+import { Effect, Either } from 'effect'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, decodeMethod } from './abi-decode.js'
