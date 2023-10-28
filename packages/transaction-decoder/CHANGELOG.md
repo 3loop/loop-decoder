@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.1.1
+
+### Patch Changes
+
+- cec2752: Fix wrong import from effect
+
 ## 0.1.0
 
 ### Minor Changes
