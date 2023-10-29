@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.1.4
+
+### Patch Changes
+
+- 3c8bd17: Use tsup to build transaction-decoder
+
 ## 0.1.1
 
 ### Patch Changes
