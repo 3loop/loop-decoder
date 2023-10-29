@@ -7,20 +7,20 @@ import { AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
 import { ContractMetaParams, ContractMetaStore as EffectContractMetaStore } from './contract-meta-loader.js'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
 
-interface TransactionDecoderOptions {
+export interface TransactionDecoderOptions {
     getProvider: (chainID: number) => JsonRpcProvider | undefined
     abiStore: VanillaAbiStore
     contractMetaStore: VanillaContractMetaStore
     logging?: boolean
 }
 
-interface VanillaAbiStore {
+export interface VanillaAbiStore {
     strategies?: readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]
     get: (key: GetAbiParams) => Promise<string | null>
     set: (val: ContractABI) => Promise<void>
 }
 
-interface VanillaContractMetaStore {
+export interface VanillaContractMetaStore {
     get: (key: ContractMetaParams) => Promise<ContractData | null>
     set: (key: ContractMetaParams, val: ContractData) => Promise<void>
 }

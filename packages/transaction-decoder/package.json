@@ -1,25 +1,32 @@
 {
   "name": "@3loop/transaction-decoder",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "A library for decoding Ethereum transactions",
   "type": "module",
   "types": "dist/index.d.ts",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "license": "GPL-3.0-only",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
-    "./effect": {
-      "types": "./dist/effect.d.ts",
-      "import": "./dist/effect.js"
+    "./*": {
+      "import": {
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
+      },
+      "require": {
+        "types": "./dist/*.d.cts",
+        "default": "./dist/*.cjs"
+      }
     }
   },
   "scripts": {
-    "dev": "tsc -P tsconfig.build.json --watch",
+    "dev": "tsup --watch",
     "coverage": "vitest run --config ./vitest.config.mts --coverage",
-    "build": "rm -rf dist && tsc -P tsconfig.build.json",
+    "build": "rm -rf dist && tsup",
     "check": "tsc --noEmit",
     "lint": "eslint --exit-on-fatal-error --ignore-path .eslintignore --ext .ts .",
     "fix": "eslint --ignore-path .eslintignore --ext .ts . --fix",
@@ -39,20 +46,21 @@
     "ethers": "^6.6.2"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.59.6",
-    "@typescript-eslint/parser": "^5.59.6",
-    "ethers": "^6.6.2",
     "@effect/schema": "^0.33.2",
     "@total-typescript/ts-reset": "^0.5.1",
     "@types/node": "^20.6.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.6",
+    "@typescript-eslint/parser": "^5.59.6",
     "@vitest/coverage-v8": "0.34.2",
     "effect": "2.0.0-next.31",
     "eslint": "^8.49.0",
     "eslint-config-custom": "workspace:*",
     "eslint-config-prettier": "^8.10.0",
+    "ethers": "^6.6.2",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
     "tsconfig": "workspace:*",
+    "tsup": "^7.2.0",
     "typescript": "5.1.3",
     "vite": "4.4.9",
     "vite-tsconfig-paths": "4.2.0",
