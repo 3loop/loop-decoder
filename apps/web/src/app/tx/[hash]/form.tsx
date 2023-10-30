@@ -2,8 +2,7 @@
 import * as React from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Interpreter, data } from "../../data";
-import { runInterpreter } from "../../utils";
+import { transactions } from "../../data";
 import { useLocalStorage } from "usehooks-ts";
 import { SidebarNav } from "@/components/ui/sidebar-nav";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
@@ -16,11 +15,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { DecodedTx } from "@3loop/transaction-decoder";
+import { Interpreter, runInterpreter } from "@/lib/interpreter";
 
-export const sidebarNavItems = Object.keys(data).map((tx) => {
+export const sidebarNavItems = transactions.map((tx) => {
   return {
-    href: `/tx/${tx}`,
-    title: `${data[tx]["name"]} tx ${tx.slice(0, 6)}...`,
+    href: `/tx/${tx.hash}`,
+    title: `${tx.name} tx ${tx.hash.slice(0, 6)}...`,
   };
 });
 
@@ -38,7 +38,7 @@ export default function DecodingForm({
   const [result, setResult] = React.useState<string>();
   const [schema, setSchema] = useLocalStorage(
     defaultInterpreter?.id ?? "unknown",
-    defaultInterpreter?.schema,
+    defaultInterpreter?.schema
   );
 
   const router = useRouter();
@@ -55,6 +55,7 @@ export default function DecodingForm({
         id: defaultInterpreter.id,
         canInterpret: defaultInterpreter.canInterpret,
         schema: schema,
+        contractAddress: defaultInterpreter.contractAddress,
       };
 
       runInterpreter(decoded, newInterpreter).then((res) => {

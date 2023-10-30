@@ -9,14 +9,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import React from "react";
-import { findAndRunInterpreter } from "../../utils";
-import { Interpreter, data } from "../../data";
 import { DecodedTx } from "@3loop/transaction-decoder";
+import {
+  Interpreter,
+  findAndRunInterpreter,
+  defaultInterpretors,
+} from "@/lib/interpreter";
 
 function getAvaliableInterpretors() {
   if (typeof window === "undefined") return undefined;
 
-  const defaultInterpretors = Object.values(data).map((d) => d.interpreter);
   let res: Interpreter[] = [];
 
   for (const interpretor of defaultInterpretors) {
@@ -28,6 +30,7 @@ function getAvaliableInterpretors() {
         id: interpretor.id,
         schema: prepare,
         canInterpret: interpretor.canInterpret,
+        contractAddress: interpretor.contractAddress,
       });
     } else {
       res.push(interpretor);
@@ -53,7 +56,7 @@ export default function TxTable({ txs }: { txs: DecodedTx[] }) {
       const withIntepretations = await Promise.all(
         txs.map((tx) => {
           return findAndRunInterpreter(tx, intepretors);
-        }),
+        })
       );
 
       setResult(withIntepretations);
