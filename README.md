@@ -1,3 +1,5 @@
+# Status: 🚧 In active development
+
 # Loop Decoder
 
 ## Decode and interpret any EVM-based transactions
