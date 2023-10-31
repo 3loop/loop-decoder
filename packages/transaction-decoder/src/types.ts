@@ -159,3 +159,11 @@ export interface InternalEvent {
     methodName?: string
     eventName?: string
 }
+
+export interface Interpreter {
+    id: string
+    schema: string
+    filter: string
+    chainID: number
+    contractAddress?: string
+}

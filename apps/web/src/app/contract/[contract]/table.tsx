@@ -9,9 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import React from "react";
-import { DecodedTx } from "@3loop/transaction-decoder";
+import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
 import {
-  Interpreter,
   findAndRunInterpreter,
   defaultInterpretors,
 } from "@/lib/interpreter";
@@ -24,13 +23,11 @@ function getAvaliableInterpretors() {
   for (const interpretor of defaultInterpretors) {
     const stored = window.localStorage.getItem(interpretor.id);
     if (stored) {
-      const prepare = JSON.parse(stored);
+      const updatedSchema = JSON.parse(stored);
 
       res.push({
-        id: interpretor.id,
-        schema: prepare,
-        canInterpret: interpretor.canInterpret,
-        contractAddress: interpretor.contractAddress,
+        ...interpretor,
+        schema: updatedSchema,
       });
     } else {
       res.push(interpretor);

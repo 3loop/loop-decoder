@@ -1,12 +1,17 @@
-import jsonata from "jsonata";
-import { DecodedTx } from "@3loop/transaction-decoder";
+import {
+  DecodedTx,
+  Interpreter,
+  findInterpreter,
+  runInterpreter,
+} from "@3loop/transaction-decoder";
 
-export interface Interpreter {
-  schema: string;
-  canInterpret: string;
-  id: string;
-  contractAddress: string;
-}
+export const emptyInterpretor: Interpreter = {
+  id: "default",
+  contractAddress: "",
+  schema: "",
+  filter: "txHash ? true : false",
+  chainID: 1,
+};
 
 export const defaultInterpretors: Interpreter[] = [
   {
@@ -21,7 +26,8 @@ export const defaultInterpretors: Interpreter[] = [
             "assetsSent": assetsSent
         }
               `,
-    canInterpret: `methodCall.name = "repay" and  toAddress = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9" ? true : false`,
+    filter: `methodCall.name = "repay"`,
+    chainID: 1,
   },
   {
     id: "aave-deposit",
@@ -35,7 +41,8 @@ export const defaultInterpretors: Interpreter[] = [
             "assetsSent": assetsSent
         }
               `,
-    canInterpret: `methodCall.name = "deposit" and  toAddress = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9" ? true : false`,
+    filter: `methodCall.name = "deposit"`,
+    chainID: 1,
   },
   {
     id: "aave-borrow",
@@ -49,7 +56,8 @@ export const defaultInterpretors: Interpreter[] = [
             "assetsReceived": assetsReceived
         }
               `,
-    canInterpret: `methodCall.name = "borrow" and  toAddress = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9" ? true : false`,
+    filter: `methodCall.name = "borrow"`,
+    chainID: 1,
   },
   {
     id: "aave-withdraw",
@@ -63,93 +71,46 @@ export const defaultInterpretors: Interpreter[] = [
             "assetsReceived": assetsReceived
         }
               `,
-    canInterpret: `methodCall.name = "withdraw" and  toAddress = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9" ? true : false`,
+    filter: `methodCall.name = "withdraw"`,
+    chainID: 1,
   },
 ];
 
-function findInterpretorsForContract(
-  contractAddress: string,
-  interpretors: Interpreter[]
-): Interpreter[] {
-  return interpretors.filter(
-    (interpretor) =>
-      interpretor.contractAddress.toLowerCase() ===
-      contractAddress.toLowerCase()
-  );
-}
-
-export async function findInterpreter(
-  decoded: DecodedTx,
-  interpretors: Interpreter[]
-): Promise<Interpreter | undefined> {
-  const contractAddress = decoded.toAddress
-    ? decoded.toAddress.toLowerCase()
-    : null;
-
-  if (!contractAddress) {
-    return undefined;
-  }
-
-  const contractInterpreters = findInterpretorsForContract(
-    contractAddress,
-    interpretors
-  );
-
-  if (!contractInterpreters) {
-    return undefined;
-  }
-
-  for (const interpreter of contractInterpreters) {
-    const canInterpret = jsonata(interpreter.canInterpret);
-    const canInterpretResult = await canInterpret.evaluate(decoded);
-
-    console.log("canInterpretResult", canInterpretResult);
-    console.log("interpreter", decoded);
-
-    if (!canInterpretResult) {
-      continue;
-    }
-    return interpreter;
-  }
-  return undefined;
-}
-
-export async function runInterpreter(
-  decoded: DecodedTx,
+export async function interpretTx(
+  decodedTx: DecodedTx,
   interpreter: Interpreter
-): Promise<any> {
+) {
   try {
-    const expression = jsonata(interpreter.schema);
-    const result = await expression.evaluate(decoded);
-    return result;
-  } catch (e) {
-    console.error("Run interpreter", e);
-    return;
+    const res = await runInterpreter({ decodedTx, interpreter });
+    return res;
+  } catch (error) {
+    console.error("Interpret error", error);
+    return undefined;
   }
 }
 
 export async function findAndRunInterpreter(
-  decoded: DecodedTx,
+  decodedTx: DecodedTx,
   interpretors: Interpreter[]
 ) {
-  const interpreter = await findInterpreter(decoded, interpretors);
+  const interpreter = await findInterpreter({ decodedTx, interpretors });
 
   if (!interpreter) {
     return {
-      tx: decoded,
+      tx: decodedTx,
       interpretation: {
         action: "Unknown",
-        txHash: decoded.txHash,
-        user: decoded.fromAddress,
-        method: decoded.methodCall.name,
+        txHash: decodedTx.txHash,
+        user: decodedTx.fromAddress,
+        method: decodedTx.methodCall.name,
       },
     };
   }
 
-  const res = await runInterpreter(decoded, interpreter);
+  const res = await runInterpreter({ decodedTx, interpreter });
 
   return {
-    tx: decoded,
+    tx: decodedTx,
     interpretation: res,
   };
 }

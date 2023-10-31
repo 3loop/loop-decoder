@@ -1,12 +1,8 @@
 import * as React from "react";
 import DecodingForm from "./form";
 import { decodeTransaction } from "@/lib/decode";
-import {
-  Interpreter,
-  defaultInterpretors,
-  findInterpreter,
-} from "@/lib/interpreter";
-import { defaultContract } from "../../data";
+import { defaultInterpretors, emptyInterpretor } from "@/lib/interpreter";
+import { findInterpreter } from "@3loop/transaction-decoder";
 
 export default async function TransactionPage({
   params,
@@ -22,20 +18,16 @@ export default async function TransactionPage({
     return <DecodingForm currentHash={params.hash} />;
   }
 
-  const intepretor = await findInterpreter(decoded, defaultInterpretors);
+  const intepretor = await findInterpreter({
+    decodedTx: decoded,
+    interpretors: defaultInterpretors,
+  });
 
   if (!intepretor) {
-    const newInterpreter: Interpreter = {
-      id: "default",
-      canInterpret: "txHash ? true : false",
-      schema: "",
-      contractAddress: defaultContract,
-    };
-
     return (
       <DecodingForm
         decoded={decoded}
-        defaultInterpreter={newInterpreter}
+        defaultInterpreter={emptyInterpretor}
         currentHash={params.hash}
       />
     );

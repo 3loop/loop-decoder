@@ -20,3 +20,4 @@ export const transactions = [
 
 export const defaultTrasaction = transactions[0];
 export const defaultContract = aaveV2;
+export const defaultChainID = 1;

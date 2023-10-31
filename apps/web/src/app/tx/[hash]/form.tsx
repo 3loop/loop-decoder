@@ -14,8 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { DecodedTx } from "@3loop/transaction-decoder";
-import { Interpreter, runInterpreter } from "@/lib/interpreter";
+import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
+import { interpretTx} from "@/lib/interpreter";
 
 export const sidebarNavItems = transactions.map((tx) => {
   return {
@@ -52,13 +52,11 @@ export default function DecodingForm({
   React.useEffect(() => {
     if (schema && defaultInterpreter != null && decoded != null) {
       const newInterpreter = {
-        id: defaultInterpreter.id,
-        canInterpret: defaultInterpreter.canInterpret,
+        ...defaultInterpreter,
         schema: schema,
-        contractAddress: defaultInterpreter.contractAddress,
       };
 
-      runInterpreter(decoded, newInterpreter).then((res) => {
+      interpretTx(decoded, newInterpreter).then((res) => {
         setResult(res);
       });
     }
@@ -129,8 +127,7 @@ export default function DecodingForm({
                               JSONata
                             </a>
                             {` is a lightweight query and transformation language
-                            for JSON data. To get the list of assets sent and received in tx, use predifined varibales 
-                            $assetsReceived and $assetsSent.`}
+                            for JSON data.`}
                           </p>
                         </div>
                       </HoverCardContent>

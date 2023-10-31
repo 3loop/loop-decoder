@@ -5,33 +5,6 @@ const endpoints: { [k: number]: string } = {
   5: "https://api-goerli.etherscan.io/api",
 };
 
-export async function fetchContractABI(
-  address: string,
-  chainID: number,
-): Promise<string | null> {
-  const apikey = process.env.ETHERSCAN_API_KEY;
-  if (!apikey) {
-    console.warn("Missing ETHERSCAN_API_KEY");
-  }
-
-  const endpoint = endpoints[chainID];
-
-  const params = new URLSearchParams({
-    module: "contract",
-    action: "getabi",
-    address: address,
-    apikey: apikey || "",
-  });
-
-  const response = await fetch(`${endpoint}?${params.toString()}`);
-  const json = (await response.json()) as { status: string; result: string };
-
-  if (json.status === "1") {
-    return json.result;
-  }
-  return null;
-}
-
 export interface Transfer {
   timeStamp: string;
   uniqueId: string;
