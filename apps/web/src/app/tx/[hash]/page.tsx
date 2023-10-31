@@ -1,7 +1,7 @@
 import * as React from "react";
 import DecodingForm from "./form";
 import { decodeTransaction } from "@/lib/decode";
-import { defaultInterpretors, emptyInterpretor } from "@/lib/interpreter";
+import { defaultinterpreters, emptyinterpreter } from "@/lib/interpreter";
 import { findInterpreter } from "@3loop/transaction-decoder";
 
 export default async function TransactionPage({
@@ -20,14 +20,14 @@ export default async function TransactionPage({
 
   const intepretor = await findInterpreter({
     decodedTx: decoded,
-    interpretors: defaultInterpretors,
+    interpreters: defaultinterpreters,
   });
 
   if (!intepretor) {
     return (
       <DecodingForm
         decoded={decoded}
-        defaultInterpreter={emptyInterpretor}
+        defaultInterpreter={emptyinterpreter}
         currentHash={params.hash}
       />
     );

@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
-import { interpretTx} from "@/lib/interpreter";
+import { interpretTx } from "@/lib/interpreter";
 
 export const sidebarNavItems = transactions.map((tx) => {
   return {
@@ -38,7 +38,7 @@ export default function DecodingForm({
   const [result, setResult] = React.useState<string>();
   const [schema, setSchema] = useLocalStorage(
     defaultInterpreter?.id ?? "unknown",
-    defaultInterpreter?.schema
+    defaultInterpreter?.schema,
   );
 
   const router = useRouter();

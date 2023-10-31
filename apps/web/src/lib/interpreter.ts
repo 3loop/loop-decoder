@@ -5,7 +5,7 @@ import {
   runInterpreter,
 } from "@3loop/transaction-decoder";
 
-export const emptyInterpretor: Interpreter = {
+export const emptyinterpreter: Interpreter = {
   id: "default",
   contractAddress: "",
   schema: "",
@@ -13,7 +13,7 @@ export const emptyInterpretor: Interpreter = {
   chainID: 1,
 };
 
-export const defaultInterpretors: Interpreter[] = [
+export const defaultinterpreters: Interpreter[] = [
   {
     id: "aave-repay",
     contractAddress: "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9",
@@ -78,7 +78,7 @@ export const defaultInterpretors: Interpreter[] = [
 
 export async function interpretTx(
   decodedTx: DecodedTx,
-  interpreter: Interpreter
+  interpreter: Interpreter,
 ) {
   try {
     const res = await runInterpreter({ decodedTx, interpreter });
@@ -91,9 +91,9 @@ export async function interpretTx(
 
 export async function findAndRunInterpreter(
   decodedTx: DecodedTx,
-  interpretors: Interpreter[]
+  interpreters: Interpreter[],
 ) {
-  const interpreter = await findInterpreter({ decodedTx, interpretors });
+  const interpreter = await findInterpreter({ decodedTx, interpreters });
 
   if (!interpreter) {
     return {

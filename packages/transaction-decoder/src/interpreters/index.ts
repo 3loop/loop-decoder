@@ -2,43 +2,47 @@ import { sameAddress } from '../helpers/address.js'
 import type { DecodedTx, Interpreter } from '../types.js'
 import jsonata from 'jsonata'
 
-function findInterpretorsForContract(
+function findinterpretersForContract(
     contractAddress: string,
     chainID: number,
-    interpretors: Interpreter[],
+    interpreters: Interpreter[],
 ): Interpreter[] {
-    return interpretors.filter(
-        (interpretor) => sameAddress(interpretor.contractAddress, contractAddress) && interpretor.chainID === chainID,
+    return interpreters.filter(
+        (interpreter) => sameAddress(interpreter.contractAddress, contractAddress) && interpreter.chainID === chainID,
     )
 }
 
 export async function findInterpreter({
     decodedTx,
-    interpretors,
+    interpreters,
 }: {
     decodedTx: DecodedTx
-    interpretors: Interpreter[]
+    interpreters: Interpreter[]
 }): Promise<Interpreter | undefined> {
-    const contractAddress = decodedTx.toAddress
-    const chainID = decodedTx.chainID
-    if (!contractAddress) {
-        return undefined
-    }
-
-    const contractInterpreters = findInterpretorsForContract(contractAddress, chainID, interpretors)
-
-    if (!contractInterpreters) {
-        return undefined
-    }
-
-    for (const interpreter of contractInterpreters) {
-        const canInterpret = jsonata(interpreter.filter)
-        const canInterpretResult = await canInterpret.evaluate(decodedTx)
-
-        if (!canInterpretResult) {
-            continue
+    try {
+        const contractAddress = decodedTx.toAddress
+        const chainID = decodedTx.chainID
+        if (!contractAddress) {
+            return undefined
         }
-        return interpreter
+
+        const contractInterpreters = findinterpretersForContract(contractAddress, chainID, interpreters)
+
+        if (!contractInterpreters) {
+            return undefined
+        }
+
+        for (const interpreter of contractInterpreters) {
+            const canInterpret = jsonata(interpreter.filter)
+            const canInterpretResult = await canInterpret.evaluate(decodedTx)
+
+            if (!canInterpretResult) {
+                continue
+            }
+            return interpreter
+        }
+    } catch (e) {
+        throw new Error(`Failed to find interpreter: ${e}`)
     }
 }
 
