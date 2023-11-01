@@ -1,6 +1,6 @@
 import { formatEther, formatUnits } from 'ethers'
 import { Asset, AssetType, Interaction, InteractionEvent } from '../types.js'
-import { sameAddress } from '../address.js'
+import { sameAddress } from '../helpers/address.js'
 
 const toKeys = ['to', '_to', 'dst']
 const fromKeys = ['from', '_from', 'src']

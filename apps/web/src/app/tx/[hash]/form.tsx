@@ -2,8 +2,7 @@
 import * as React from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Interpreter, data } from "../../data";
-import { runInterpreter } from "../../utils";
+import { transactions } from "../../data";
 import { useLocalStorage } from "usehooks-ts";
 import { SidebarNav } from "@/components/ui/sidebar-nav";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
@@ -15,12 +14,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { DecodedTx } from "@3loop/transaction-decoder";
+import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
+import { interpretTx } from "@/lib/interpreter";
 
-export const sidebarNavItems = Object.keys(data).map((tx) => {
+export const sidebarNavItems = transactions.map((tx) => {
   return {
-    href: `/tx/${tx}`,
-    title: `${data[tx]["name"]} tx ${tx.slice(0, 6)}...`,
+    href: `/tx/${tx.hash}`,
+    title: `${tx.name} tx ${tx.hash.slice(0, 6)}...`,
   };
 });
 
@@ -52,12 +52,11 @@ export default function DecodingForm({
   React.useEffect(() => {
     if (schema && defaultInterpreter != null && decoded != null) {
       const newInterpreter = {
-        id: defaultInterpreter.id,
-        canInterpret: defaultInterpreter.canInterpret,
+        ...defaultInterpreter,
         schema: schema,
       };
 
-      runInterpreter(decoded, newInterpreter).then((res) => {
+      interpretTx(decoded, newInterpreter).then((res) => {
         setResult(res);
       });
     }
@@ -128,8 +127,7 @@ export default function DecodingForm({
                               JSONata
                             </a>
                             {` is a lightweight query and transformation language
-                            for JSON data. To get the list of assets sent and received in tx, use predifined varibales 
-                            $assetsReceived and $assetsSent.`}
+                            for JSON data.`}
                           </p>
                         </div>
                       </HoverCardContent>
