@@ -13,7 +13,6 @@ export function transferDecode({
     const effectiveGasPrice = receipt.gasPrice ?? BigInt(0)
     const gasPaid = formatEther(receipt.gasUsed * effectiveGasPrice)
 
-
     const decodedTx: DecodedTx = {
         contractName: null,
         contractType: 'OTHER',
