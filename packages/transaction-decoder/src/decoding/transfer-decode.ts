@@ -13,6 +13,7 @@ export function transferDecode({
     const effectiveGasPrice = receipt.gasPrice ?? BigInt(0)
     const gasPaid = formatEther(receipt.gasUsed * effectiveGasPrice)
 
+
     const decodedTx: DecodedTx = {
         contractName: null,
         contractType: 'OTHER',
@@ -37,6 +38,7 @@ export function transferDecode({
         reverted: receipt.status === 0, // will return true if status==undefined
         assetsReceived: [],
         assetsSent: [], // TDOO: display the eth sent
+        addresses: [receipt.from, receipt.to].filter(Boolean),
     }
 
     return decodedTx

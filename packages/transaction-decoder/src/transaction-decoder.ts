@@ -1,18 +1,19 @@
 import { Effect } from 'effect'
 import type { TransactionReceipt, TransactionResponse } from 'ethers'
-import { Network, formatEther } from 'ethers'
+import { Network, formatEther, isAddress } from 'ethers'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
 import * as AbiDecoder from './decoding/abi-decode.js'
 import * as LogDecoder from './decoding/log-decode.js'
 import * as TraceDecoder from './decoding/trace-decode.js'
 import { transferDecode } from './decoding/transfer-decode.js'
-import type { DecodedTx, Interaction } from './types.js'
+import type { DecodeResult, DecodedTx, Interaction } from './types.js'
 import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
 import { getAssetsReceived, getAssetsSent } from './transformers/tokens.js'
 import { getProxyStorageSlot } from './decoding/proxies.js'
 import { getAndCacheAbi } from './abi-loader.js'
 import { getAndCacheContractMeta } from './contract-meta-loader.js'
+import traverse from 'traverse'
 
 export class UnsupportedEvent {
     readonly _tag = 'UnsupportedEvent'
@@ -118,6 +119,34 @@ export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transac
         )
     })
 
+const collectAllAddresses = ({
+    interactions,
+    decodedData,
+}: {
+    interactions: Interaction[]
+    decodedData: DecodeResult
+}) => {
+    const addresses = new Set<string>()
+    for (const interaction of interactions) {
+        addresses.add(interaction.contractAddress)
+        traverse(interaction.event).forEach(function (value: string) {
+            if (this.isLeaf && isAddress(value)) {
+                addresses.add(value)
+            }
+        })
+    }
+
+    if (decodedData.params) {
+        for (const param of decodedData.params) {
+            if (param.value && isAddress(param.value)) {
+                addresses.add(param.value)
+            }
+        }
+    }
+
+    return [...addresses]
+}
+
 export const decodeTransaction = ({
     transaction,
     receipt,
@@ -182,6 +211,7 @@ export const decodeTransaction = ({
             // NOTE: Explore how to set assets for more flexible tracking of the in and out addresses
             assetsReceived: getAssetsReceived(interactions, receipt.from),
             assetsSent: getAssetsSent(interactions, value, receipt.from, receipt.from),
+            addresses: collectAllAddresses({ interactions, decodedData }),
         }
 
         return decodedTx
