@@ -44,4 +44,8 @@ export const TEST_TRANSACTIONS = [
         hash: '0x1cf9beb600427c0fef7b4b5794f0f3eccef6a75cec1f1680b9295187effa3788', //ERC-1155 Mint
         chainID: 5,
     },
+    {
+        hash: '0x9d20b73d7b102aacc63dadf01ed7767cbbfd1c3f92302b08f6741be4bd8fb6cf', // Disperse app
+        chainID: 5,
+    },
 ]

@@ -1,4 +1,9 @@
 {
+  "addresses": [
+    "0xc3e4214dd442136079df06bb2529bae276d37564",
+    "0x0000000000000000000000000000000000000000",
+    "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+  ],
   "assetsReceived": [],
   "assetsSent": [],
   "chainID": 5,

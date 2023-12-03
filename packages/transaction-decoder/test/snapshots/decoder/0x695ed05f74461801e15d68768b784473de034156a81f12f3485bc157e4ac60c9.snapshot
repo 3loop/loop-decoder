@@ -1,4 +1,11 @@
 {
+  "addresses": [
+    "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+    "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+    "0x0000000000000000000000000000000000000000",
+    "0xbdddd277583dcae0b501046ba86714feea71b03f",
+    "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+  ],
   "assetsReceived": [
     {
       "address": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",

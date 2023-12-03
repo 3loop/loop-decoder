@@ -1,4 +1,14 @@
 {
+  "addresses": [
+    "0xdd69db25f6d620a7bad3023c5d32761d353d3de9",
+    "0x44f356E8716575f2a713A3D91Ae4ed1c7c054A90",
+    "0x88124Ef4A9EC47e691F254F2E8e348fd1e341e9B",
+    "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+    "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
+    "0x88124ef4a9ec47e691f254f2e8e348fd1e341e9b",
+    "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+    "0x44f356e8716575f2a713a3d91ae4ed1c7c054a90",
+  ],
   "assetsReceived": [
     {
       "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
