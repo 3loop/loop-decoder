@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { transactions } from "../../data";
+import { DEFAULT_CHAIN_ID, transactions } from "../../../data";
 import { useLocalStorage } from "usehooks-ts";
 import { SidebarNav } from "@/components/ui/sidebar-nav";
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
@@ -19,12 +19,13 @@ import { interpretTx } from "@/lib/interpreter";
 
 export const sidebarNavItems = transactions.map((tx) => {
   return {
-    href: `/tx/${tx.hash}`,
+    href: `/tx/${tx.chainID}/${tx.hash}`,
     title: `${tx.name} tx ${tx.hash.slice(0, 6)}...`,
   };
 });
 
 interface FormProps {
+  currentChainID: number;
   decoded?: DecodedTx;
   defaultInterpreter?: Interpreter;
   currentHash?: string;
@@ -34,6 +35,7 @@ export default function DecodingForm({
   decoded,
   defaultInterpreter,
   currentHash,
+  currentChainID,
 }: FormProps) {
   const [result, setResult] = React.useState<string>();
   const [schema, setSchema] = useLocalStorage(
@@ -45,8 +47,8 @@ export default function DecodingForm({
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const value = e.target.hash.value;
-    router.push(`/tx/${value}`);
+    const hash = e.target.hash.value;
+    router.push(`/tx/${currentChainID}/${hash}`);
   };
 
   React.useEffect(() => {
