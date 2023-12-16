@@ -1,10 +1,17 @@
 import { RPCProvider, UnknownNetwork } from "@3loop/transaction-decoder";
 import { JsonRpcProvider } from "ethers";
 import { Layer, Effect } from "effect";
+import { supportedChains } from "@/app/data";
 
-const urls: Record<number, string> = {
-  1: process.env.MAINNET_RPC_URL as string,
-};
+const urls: Record<number, string> = supportedChains.reduce(
+  (acc, { chainID, rpcUrl }) => {
+    return {
+      ...acc,
+      [chainID]: rpcUrl,
+    };
+  },
+  {},
+);
 
 const providers: Record<number, JsonRpcProvider> = {};
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import TxTable from "./table";
-import { aaveV2 } from "../../data";
+import { aaveV2, DEFAULT_CHAIN_ID, DEFAULT_CONTRACT } from "../../data";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -9,14 +9,15 @@ import { decodeTransaction } from "@/lib/decode";
 import { DecodedTx } from "@3loop/transaction-decoder";
 
 async function getListOfDecodedTxs(
-  contract?: string,
+  contract: string,
+  chainID: number,
 ): Promise<(DecodedTx | undefined)[]> {
-  if (!contract || contract !== aaveV2) return [];
+  if (contract !== aaveV2) return [];
 
   try {
     const txs = await getTransactions(1, contract);
     const decodedTxs = await Promise.all(
-      txs.map(({ hash }) => decodeTransaction({ hash, chainID: 1 })),
+      txs.map(({ hash }) => decodeTransaction({ hash, chainID: chainID })),
     );
 
     return decodedTxs;
@@ -31,10 +32,10 @@ export default async function Home({
 }: {
   params: { contract?: string };
 }) {
-  let contract = params.contract?.toLowerCase();
-  const decodedTxs = (await getListOfDecodedTxs(contract)).filter(
-    (tx): tx is DecodedTx => !!tx,
-  );
+  let contract = params.contract?.toLowerCase() || DEFAULT_CONTRACT;
+  const decodedTxs = (
+    await getListOfDecodedTxs(contract, DEFAULT_CHAIN_ID)
+  ).filter((tx): tx is DecodedTx => !!tx);
 
   return (
     <div>

@@ -7,15 +7,17 @@ import { findInterpreter } from "@3loop/transaction-decoder";
 export default async function TransactionPage({
   params,
 }: {
-  params: { hash: string };
+  params: { hash: string; chainID: number };
 }) {
-  if (!params.hash) {
-    return <DecodingForm />;
-  }
-  const decoded = await decodeTransaction({ hash: params.hash, chainID: 1 });
+  const decoded = await decodeTransaction({
+    hash: params.hash,
+    chainID: params.chainID,
+  });
 
   if (!decoded) {
-    return <DecodingForm currentHash={params.hash} />;
+    return (
+      <DecodingForm currentHash={params.hash} currentChainID={params.chainID} />
+    );
   }
 
   const intepretor = await findInterpreter({
@@ -23,21 +25,12 @@ export default async function TransactionPage({
     interpreters: defaultinterpreters,
   });
 
-  if (!intepretor) {
-    return (
-      <DecodingForm
-        decoded={decoded}
-        defaultInterpreter={emptyinterpreter}
-        currentHash={params.hash}
-      />
-    );
-  }
-
   return (
     <DecodingForm
       decoded={decoded}
-      defaultInterpreter={intepretor}
+      defaultInterpreter={intepretor || emptyinterpreter}
       currentHash={params.hash}
+      currentChainID={params.chainID}
     />
   );
 }

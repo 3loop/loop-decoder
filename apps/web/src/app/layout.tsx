@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { MainNav } from "@/components/ui/main-nav";
 import { Analytics } from "@vercel/analytics/react";
-
-import { aaveV2 } from "../app/data";
+import { aaveV2, DEFAULT_CHAIN_ID } from "../app/data";
+import { NetworkSelect } from "@/components/ui/network-select";
 
 const navLinks = [
   {
@@ -57,9 +57,16 @@ export default function RootLayout({
           </div>
           <Separator />
 
-          <div className="container flex flex-row py-4">
-            <MainNav className="mx-6" navLinks={navLinks} />
+          <div className="space-between flex items-center">
+            <div className="container flex flex-row py-4">
+              <MainNav className="mx-6" navLinks={navLinks} />
+
+              <div className="ml-auto mr-4">
+                <NetworkSelect defaultValue={DEFAULT_CHAIN_ID.toString()} />
+              </div>
+            </div>
           </div>
+
           <div className="container h-full py-6">{children}</div>
         </div>
         <Analytics />
