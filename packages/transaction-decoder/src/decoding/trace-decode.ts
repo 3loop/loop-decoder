@@ -5,24 +5,6 @@ import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 
-const pruneTraceRecursive = (calls: TraceLog[]): TraceLog[] => {
-    if (calls.length === 0) {
-        console.warn('ERROR! Faulty structure of multicall subtraces')
-        return []
-    }
-    if (calls[0].subtraces == null) {
-        return calls
-    }
-    const callsToRemove = calls[0].subtraces
-    let newRestOfCalls = [...calls]
-    for (let i = 0; i < callsToRemove; i++) {
-        newRestOfCalls = [newRestOfCalls[0], ...pruneTraceRecursive(newRestOfCalls.slice(1))]
-        newRestOfCalls.splice(1, 1)
-    }
-
-    return newRestOfCalls
-}
-
 const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
     Effect.gen(function* (_) {
         if ('to' in call.action && 'input' in call.action) {
@@ -78,11 +60,22 @@ export const decodeTransactionTrace = ({
         const secondLevelCallsCount = trace[0]?.subtraces
         const secondLevelCalls: TraceLog[] = []
         let callsToPrune = trace.slice(1)
+
         for (let i = 0; i < secondLevelCallsCount; i++) {
-            callsToPrune = pruneTraceRecursive(callsToPrune)
             secondLevelCalls.push(callsToPrune[0])
-            callsToPrune.shift()
+
+            let pruneCount = 1
+            while (pruneCount > 0 && callsToPrune.length > 0) {
+                const nextCall = callsToPrune[0]
+                if (nextCall.subtraces) {
+                    pruneCount = nextCall.subtraces + pruneCount - 1
+                } else {
+                    pruneCount -= 1
+                }
+                callsToPrune = callsToPrune.slice(1)
+            }
         }
+
         if (callsToPrune.length > 0) {
             return []
         }
