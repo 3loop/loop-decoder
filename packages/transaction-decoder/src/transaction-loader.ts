@@ -1,8 +1,10 @@
 import { Effect } from 'effect'
 import * as Schema from '@effect/schema/Schema'
 import { RPCFetchError, RPCProvider } from './provider.js'
-import type { TraceLog } from './schema/trace.js'
+import type { TraceLog, TraceLogTree } from './schema/trace.js'
 import { EthTrace } from './schema/trace.js'
+import { GetTraceMethod } from './types.js'
+import { transformTraceTree } from './helpers/trace.js'
 
 export const getTransaction = (hash: string, chainID: number) =>
     Effect.gen(function* (_) {
@@ -28,32 +30,54 @@ export const getTransactionReceipt = (hash: string, chainID: number) =>
         )
     })
 
-export const getTrace = (hash: string, chainID: number) =>
+export const getTrace = (hash: string, chainID: number, method: GetTraceMethod = 'trace_transaction') =>
     Effect.gen(function* (_) {
         const service = yield* _(RPCProvider)
         const provider = yield* _(service.getProvider(chainID))
-        const trace = yield* _(
-            Effect.tryPromise({
-                try: async () => {
-                    const trace = await provider.send('trace_transaction', [hash])
-                    if (trace == null) return []
-                    return trace
-                },
-                catch: () => new RPCFetchError('Get trace'),
-            }),
-        )
 
-        const effects: Effect.Effect<never, null, TraceLog>[] = trace.map((log: string) => {
-            return Schema.parse(EthTrace)(log)
-        })
+        if (method === 'trace_transaction') {
+            const trace = yield* _(
+                Effect.tryPromise({
+                    try: async () => {
+                        const trace = await provider.send('trace_transaction', [hash])
+                        if (trace == null) return []
+                        return trace
+                    },
+                    catch: () => new RPCFetchError('Get trace'),
+                }),
+            )
 
-        const results = yield* _(
-            Effect.all(effects, {
-                concurrency: 'unbounded',
-            }),
-        )
+            const effects: Effect.Effect<never, null, TraceLog>[] = trace.map((log: string) => {
+                return Schema.parse(EthTrace)(log)
+            })
 
-        return results
+            const results = yield* _(
+                Effect.all(effects, {
+                    concurrency: 'unbounded',
+                }),
+            )
+
+            return results
+        }
+
+        if (method === 'debug_traceTransaction') {
+            const trace = yield* _(
+                Effect.tryPromise({
+                    try: async () => {
+                        const trace = await provider.send('debug_traceTransaction', [hash, { tracer: 'callTracer' }])
+                        if (trace == null) return []
+                        return trace
+                    },
+                    catch: () => new RPCFetchError('Get trace'),
+                }),
+            )
+
+            const result = trace as TraceLogTree
+
+            const transformedTrace = transformTraceTree(result)
+
+            return transformedTrace
+        }
     })
 
 export const getBlockTimestamp = (blockNumber: number, chainID: number) =>

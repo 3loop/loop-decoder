@@ -1,6 +1,8 @@
 import type { ParamType } from 'ethers'
 import type { TraceLog } from './schema/trace.js'
 
+export type GetTraceMethod = 'trace_transaction' | 'debug_traceTransaction'
+
 export interface RawTxData {
     txTrace: TraceLog[]
 }

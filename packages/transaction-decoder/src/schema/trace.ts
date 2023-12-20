@@ -22,7 +22,6 @@ const EthTraceActionCall = Schema.struct({
 const EthTraceActionCreate = Schema.struct({
     from: Address,
     gas: bigintFromString,
-    init: Schema.string,
     value: bigintFromString,
 })
 
@@ -39,21 +38,15 @@ const EthTraceActionReward = Schema.struct({
 })
 
 const EthTraceResult = Schema.struct({
-    address: Schema.optional(Schema.string),
     gasUsed: bigintFromString,
     output: Schema.string,
-    code: Schema.optional(Schema.string),
 })
 
 const EthTraceBase = Schema.struct({
     result: Schema.optional(EthTraceResult),
-    blockHash: Schema.string,
-    blockNumber: Schema.number,
-    error: Schema.optional(Schema.string),
     subtraces: Schema.number,
     traceAddress: Schema.array(Schema.number),
-    transactionHash: Schema.string,
-    transactionPosition: Schema.number,
+    error: Schema.optional(Schema.string),
 })
 
 const CallTrace = Schema.extend(
@@ -88,7 +81,35 @@ const SuicideTrace = Schema.extend(
     }),
 )
 
+const DebugCallType = Schema.literal(
+    'CALL',
+    'DELEGATECALL',
+    'CALLCODE',
+    'STATICCALL',
+    'CREATE',
+    'SELFDESTRUCT',
+    'REWARD',
+)
+
+const EthDebugTraceBase = Schema.struct({
+    gas: bigintFromString,
+    to: Address,
+    from: Address,
+    gasUsed: bigintFromString,
+    input: Schema.string,
+    type: DebugCallType,
+    value: Schema.optional(bigintFromString),
+    output: Schema.string,
+})
+
+type DebugTraceLog = Schema.To<typeof EthDebugTraceBase>
+
+export type TraceLogTree = {
+    calls?: Array<TraceLogTree>
+} & DebugTraceLog
+
 export const EthTrace = Schema.union(CallTrace, CreateTrace, RewardTrace, SuicideTrace)
 
 export type TraceLog = Schema.To<typeof EthTrace>
 export type CallTraceLog = Schema.To<typeof CallTrace>
+export type CallType = Schema.To<typeof CallType>
