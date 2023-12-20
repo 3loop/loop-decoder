@@ -5,6 +5,18 @@ import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 
+function getSecondLevelCalls(trace: TraceLog[]) {
+    const secondLevelCalls: TraceLog[] = []
+
+    for (let i = 0; i < trace.length; i++) {
+        if (trace[i].traceAddress.length === 1) {
+            secondLevelCalls.push(trace[i])
+        }
+    }
+
+    return secondLevelCalls
+}
+
 const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
     Effect.gen(function* (_) {
         if ('to' in call.action && 'input' in call.action) {
@@ -57,26 +69,9 @@ export const decodeTransactionTrace = ({
             return []
         }
 
-        const secondLevelCallsCount = trace[0]?.subtraces
-        const secondLevelCalls: TraceLog[] = []
-        let callsToPrune = trace.slice(1)
+        const secondLevelCalls = getSecondLevelCalls(trace)
 
-        for (let i = 0; i < secondLevelCallsCount; i++) {
-            secondLevelCalls.push(callsToPrune[0])
-
-            let pruneCount = 1
-            while (pruneCount > 0 && callsToPrune.length > 0) {
-                const nextCall = callsToPrune[0]
-                if (nextCall.subtraces) {
-                    pruneCount = nextCall.subtraces + pruneCount - 1
-                } else {
-                    pruneCount -= 1
-                }
-                callsToPrune = callsToPrune.slice(1)
-            }
-        }
-
-        if (callsToPrune.length > 0) {
+        if (secondLevelCalls.length === 0) {
             return []
         }
 
