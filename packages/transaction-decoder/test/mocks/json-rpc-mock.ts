@@ -1,6 +1,6 @@
 import { JsonRpcProvider } from 'ethers'
 import fs from 'node:fs'
-import { RPCProvider, UnknownNetwork } from '@/effect.js'
+import { RPCProvider, RPCProviderObject, UnknownNetwork } from '@/effect.js'
 import { Effect } from 'effect'
 import { Block, TransactionReceipt, TransactionResponse } from 'ethers'
 
@@ -57,9 +57,9 @@ export class MockedProvider extends JsonRpcProvider {
     }
 }
 
-const getProvider = (chainID: number): Effect.Effect<never, UnknownNetwork, JsonRpcProvider> => {
+const getProvider = (chainID: number): Effect.Effect<never, UnknownNetwork, RPCProviderObject> => {
     if (chainID === 5) {
-        return Effect.succeed(new MockedProvider())
+        return Effect.succeed({ provider: new MockedProvider() })
     }
     return Effect.fail(new UnknownNetwork(chainID))
 }

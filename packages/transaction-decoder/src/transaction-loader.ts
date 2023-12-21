@@ -3,13 +3,12 @@ import * as Schema from '@effect/schema/Schema'
 import { RPCFetchError, RPCProvider } from './provider.js'
 import type { TraceLog, TraceLogTree } from './schema/trace.js'
 import { EthTrace } from './schema/trace.js'
-import { GetTraceMethod } from './types.js'
 import { transformTraceTree } from './helpers/trace.js'
 
 export const getTransaction = (hash: string, chainID: number) =>
     Effect.gen(function* (_) {
         const service = yield* _(RPCProvider)
-        const provider = yield* _(service.getProvider(chainID))
+        const { provider } = yield* _(service.getProvider(chainID))
         return yield* _(
             Effect.tryPromise({
                 try: () => provider.getTransaction(hash),
@@ -21,7 +20,7 @@ export const getTransaction = (hash: string, chainID: number) =>
 export const getTransactionReceipt = (hash: string, chainID: number) =>
     Effect.gen(function* (_) {
         const service = yield* _(RPCProvider)
-        const provider = yield* _(service.getProvider(chainID))
+        const { provider } = yield* _(service.getProvider(chainID))
         return yield* _(
             Effect.tryPromise({
                 try: () => provider.getTransactionReceipt(hash),
@@ -30,12 +29,13 @@ export const getTransactionReceipt = (hash: string, chainID: number) =>
         )
     })
 
-export const getTrace = (hash: string, chainID: number, method: GetTraceMethod = 'trace_transaction') =>
+export const getTrace = (hash: string, chainID: number) =>
     Effect.gen(function* (_) {
         const service = yield* _(RPCProvider)
-        const provider = yield* _(service.getProvider(chainID))
+        const { provider, config } = yield* _(service.getProvider(chainID))
+        const traceAPISupport = config?.supportTraceAPI ?? true
 
-        if (method === 'trace_transaction') {
+        if (traceAPISupport) {
             const trace = yield* _(
                 Effect.tryPromise({
                     try: async () => {
@@ -58,9 +58,7 @@ export const getTrace = (hash: string, chainID: number, method: GetTraceMethod =
             )
 
             return results
-        }
-
-        if (method === 'debug_traceTransaction') {
+        } else {
             const trace = yield* _(
                 Effect.tryPromise({
                     try: async () => {
@@ -83,7 +81,7 @@ export const getTrace = (hash: string, chainID: number, method: GetTraceMethod =
 export const getBlockTimestamp = (blockNumber: number, chainID: number) =>
     Effect.gen(function* (_) {
         const service = yield* _(RPCProvider)
-        const provider = yield* _(service.getProvider(chainID))
+        const { provider } = yield* _(service.getProvider(chainID))
         const block = yield* _(
             Effect.tryPromise({
                 try: () => provider.getBlock(blockNumber),

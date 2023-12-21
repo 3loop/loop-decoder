@@ -1,9 +1,7 @@
 import type { TraceLogTree, TraceLog, CallType } from '../schema/trace.js'
 
 export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | undefined {
-    let type: TraceLog['type'], callType: CallType
     let traceLog: TraceLog | undefined
-    let action: TraceLog['action']
 
     const traceLogBase = {
         subtraces: node.calls?.length ?? 0,
@@ -14,55 +12,48 @@ export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | u
         },
     }
 
-    if (
-        node.type === 'CALL' ||
-        node.type === 'DELEGATECALL' ||
-        node.type === 'CALLCODE' ||
-        node.type === 'STATICCALL'
-    ) {
-        type = 'call'
-        callType = node.type.toLowerCase() as CallType
-        action = {
-            callType: callType,
-            from: node.from,
-            to: node.to,
-            gas: node.gas,
-            input: node.input,
-            value: node.value ?? BigInt('0x0'),
-        }
-        traceLog = {
-            ...traceLogBase,
-            type,
-            action,
-        }
-    }
-
-    if (node.type === 'CREATE') {
-        type = 'create'
-        action = {
-            from: node.from,
-            gas: node.gas,
-            value: node.value ?? BigInt('0x0'),
-        }
-        traceLog = {
-            ...traceLogBase,
-            type,
-            action,
-        }
-    }
-
-    if (node.type === 'SELFDESTRUCT') {
-        type = 'suicide'
-        action = {
-            refundAddress: node.to,
-            address: node.from,
-            balance: node.value ?? BigInt('0x0'),
-        }
-        traceLog = {
-            ...traceLogBase,
-            type,
-            action,
-        }
+    switch (node.type) {
+        case 'CALL':
+        case 'DELEGATECALL':
+        case 'CALLCODE':
+        case 'STATICCALL':
+            traceLog = {
+                ...traceLogBase,
+                type: 'call',
+                action: {
+                    callType: node.type.toLowerCase() as CallType,
+                    from: node.from,
+                    to: node.to,
+                    gas: node.gas,
+                    input: node.input,
+                    value: node.value ?? BigInt('0x0'),
+                },
+            }
+            break
+        case 'CREATE':
+            traceLog = {
+                ...traceLogBase,
+                type: 'create',
+                action: {
+                    from: node.from,
+                    gas: node.gas,
+                    value: node.value ?? BigInt('0x0'),
+                },
+            }
+            break
+        case 'SELFDESTRUCT':
+            traceLog = {
+                ...traceLogBase,
+                type: 'suicide',
+                action: {
+                    refundAddress: node.to,
+                    address: node.from,
+                    balance: node.value ?? BigInt('0x0'),
+                },
+            }
+            break
+        default:
+            traceLog = undefined
     }
 
     return traceLog

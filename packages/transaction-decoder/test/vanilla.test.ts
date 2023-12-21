@@ -7,7 +7,7 @@ describe('Transaction Decoder', () => {
     test('should be able to decode using vanilla API', async () => {
         const decoded = new TransactionDecoder({
             getProvider: (chainID) => {
-                if (chainID === 5) return new MockedProvider()
+                if (chainID === 5) return { provider: new MockedProvider() }
                 return undefined
             },
             abiStore: {

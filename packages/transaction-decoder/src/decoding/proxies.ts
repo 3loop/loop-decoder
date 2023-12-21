@@ -19,7 +19,7 @@ export const GetStorageSlot = Request.tagged<GetStorageSlot>('GetStorageSlot')
 export const GetStorageSlotResolver = RequestResolver.fromFunctionEffect((request: GetStorageSlot) =>
     Effect.gen(function* (_) {
         const service = yield* _(RPCProvider)
-        const provider = yield* _(service.getProvider(request.chainID))
+        const { provider } = yield* _(service.getProvider(request.chainID))
         const effects = storageSlots.map((slot) =>
             Effect.tryPromise({
                 try: async () => {
