@@ -1,4 +1,4 @@
-import { Effect } from 'effect'
+import { Effect, Either } from 'effect'
 import type { TransactionReceipt, TransactionResponse } from 'ethers'
 import { Network, formatEther, isAddress } from 'ethers'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
@@ -25,11 +25,6 @@ export class UnknownContract {
     constructor(readonly address: string) {}
 }
 
-export class DecodeError {
-    readonly _tag = 'DecodeError'
-    constructor(readonly error: string) {}
-}
-
 export class DecodeLogsError {
     readonly _tag = 'DecodeLogsError'
     constructor(readonly cause: unknown) {}
@@ -48,7 +43,7 @@ export class FetchTransactionError {
 export const decodeMethod = ({ transaction }: { transaction: TransactionResponse }) =>
     Effect.gen(function* (_) {
         if (transaction.to == null) {
-            return yield* _(Effect.fail(new UnsupportedEvent('Contract creation')))
+            return yield* _(Effect.die(new UnsupportedEvent('Contract creation')))
         }
 
         const signature = transaction.data.slice(0, 10)
@@ -71,14 +66,14 @@ export const decodeMethod = ({ transaction }: { transaction: TransactionResponse
         )
 
         if (!abi) {
-            return yield* _(Effect.fail(new UnknownContract(transaction.to)))
+            return yield* _(Effect.fail(new AbiDecoder.MissingABIError(abiAddress, signature, chainID)))
         }
 
         // TODO: Pass the error message, so we can easier debug
         const decoded = yield* _(Effect.try(() => AbiDecoder.decodeMethod(transaction.data, abi)))
 
         if (decoded == null) {
-            return yield* _(Effect.fail(new DecodeError(`Failed to decode method: ${transaction.data}`)))
+            return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.data}`)))
         }
 
         return decoded
@@ -92,21 +87,12 @@ export const decodeLogs = ({
     receipt: TransactionReceipt
 }) =>
     Effect.gen(function* (_) {
-        const decodedLogs = yield* _(
+        return yield* _(
             LogDecoder.decodeLogs({
                 logs: receipt.logs,
                 transaction,
             }),
         )
-
-        const logs = yield* _(
-            LogDecoder.transformDecodedLogs({
-                decodedLogs,
-                transaction,
-            }),
-        )
-
-        return logs
     })
 
 export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transaction: TransactionResponse }) =>
@@ -172,6 +158,15 @@ export const decodeTransaction = ({
             ),
         )
 
+        const decodedLogsRight = decodedLogs.filter(Either.isRight).map((r) => r.right)
+        const decodedTraceRight = decodedTrace.filter(Either.isRight).map((r) => r.right)
+
+        const logsErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
+        if (logsErrors.length > 0) yield* _(Effect.logError(logsErrors))
+
+        const traceErrors = decodedTrace.filter(Either.isLeft).map((r) => r.left)
+        if (traceErrors.length > 0) yield* _(Effect.logError(traceErrors))
+
         const interpreterMap = yield* _(
             getAndCacheContractMeta({
                 address: receipt.to!,
@@ -179,7 +174,7 @@ export const decodeTransaction = ({
             }),
         )
 
-        const interactions: Interaction[] = TraceDecoder.augmentTraceLogs(transaction, decodedLogs, trace)
+        const interactions: Interaction[] = TraceDecoder.augmentTraceLogs(transaction, decodedLogsRight, trace)
 
         const value = transaction.value.toString()
 
@@ -197,7 +192,7 @@ export const decodeTransaction = ({
                 name: decodedData?.name ?? 'unknown',
                 arguments: decodedData?.params ?? [],
             },
-            traceCalls: decodedTrace,
+            traceCalls: decodedTraceRight,
             nativeValueSent: value,
             chainSymbol: Network.from(Number(transaction.chainId)).name,
             chainID: Number(transaction.chainId),

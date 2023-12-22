@@ -1,10 +1,11 @@
 import type { Log, TransactionResponse } from 'ethers'
 import { Interface } from 'ethers'
 import { Effect } from 'effect'
-import type { Interaction, RawDecodedLog } from '../types.js'
+import type { DecodedLogEvent, Interaction, RawDecodedLog } from '../types.js'
 import { getProxyStorageSlot } from './proxies.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 import { getAndCacheContractMeta } from '../contract-meta-loader.js'
+import * as AbiDecoder from './abi-decode.js'
 
 const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
     Effect.gen(function* (_) {
@@ -21,14 +22,6 @@ const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
             abiAddress = implementation
         }
 
-        const blankRawLog: RawDecodedLog = {
-            name: null,
-            events: [],
-            address: logItem.address,
-            logIndex: logItem.index,
-            decoded: false,
-        }
-
         const abiItem = yield* _(
             getAndCacheAbi({
                 address: abiAddress,
@@ -38,63 +31,53 @@ const decodedLog = (transaction: TransactionResponse, logItem: Log) =>
         )
 
         if (abiItem == null) {
-            return blankRawLog
+            return yield* _(Effect.fail(new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0], chainID)))
         }
-
-        const iface = yield* _(Effect.try(() => new Interface(abiItem)))
 
         const decodedData = yield* _(
             Effect.try({
-                try: () =>
-                    iface.parseLog({
+                try: () => {
+                    const iface = new Interface(abiItem)
+
+                    return iface.parseLog({
                         topics: [...logItem.topics],
                         data: logItem.data,
-                    }),
-                catch: () => console.error('Error decoding log', logItem),
+                    })
+                },
+                catch: (e) => new AbiDecoder.DecodeError(e),
             }),
         )
 
-        interface DecodedParam {
-            name: string
-            value: string
+        if (decodedData == null) {
+            return yield* _(Effect.fail(new AbiDecoder.DecodeError('Could not decode log')))
         }
 
         const decodedParams = yield* _(
             Effect.try({
                 try: () =>
-                    decodedData?.args.map((arg, index) => {
+                    decodedData.args.map((arg, index) => {
                         const name = decodedData.fragment.inputs[index].name
+                        const type = decodedData.fragment.inputs[index].type
                         const value = Array.isArray(arg) ? arg.map((item) => item?.toString()) : arg.toString()
                         return {
+                            type,
                             name,
                             value,
-                        } as DecodedParam
+                        } as DecodedLogEvent
                     }),
-                catch: () => undefined,
+                catch: () => [],
             }),
         )
 
-        if (decodedData != null) {
-            return {
-                events: decodedParams,
-                name: decodedData.name,
-                address,
-                logIndex: logItem.index,
-                decoded: true,
-            } as RawDecodedLog
+        const rawLog: RawDecodedLog = {
+            events: decodedParams,
+            name: decodedData.name,
+            address,
+            logIndex: logItem.index,
+            decoded: true,
         }
-        return blankRawLog
-    })
 
-export const decodeLogs = ({ logs, transaction }: { logs: readonly Log[]; transaction: TransactionResponse }) =>
-    Effect.gen(function* (_) {
-        const effects = logs.filter((log) => log.topics.length > 0).map((logItem) => decodedLog(transaction, logItem))
-
-        return yield* _(
-            Effect.all(effects, {
-                concurrency: 'unbounded',
-            }),
-        )
+        return yield* _(transformLog(transaction, rawLog))
     })
 
 const transformLog = (transaction: TransactionResponse, log: RawDecodedLog) =>
@@ -124,24 +107,17 @@ const transformLog = (transaction: TransactionResponse, log: RawDecodedLog) =>
                 params: events,
                 ...(!log.decoded && { decoded: log.decoded }),
             },
-        }
+        } as Interaction
     })
 
-export const transformDecodedLogs = ({
-    decodedLogs,
-    transaction,
-}: {
-    decodedLogs: RawDecodedLog[]
-    transaction: TransactionResponse
-}) =>
+export const decodeLogs = ({ logs, transaction }: { logs: readonly Log[]; transaction: TransactionResponse }) =>
     Effect.gen(function* (_) {
-        const effects = decodedLogs.filter((log) => Boolean(log)).map((log) => transformLog(transaction, log))
+        const effects = logs.filter((log) => log.topics.length > 0).map((logItem) => decodedLog(transaction, logItem))
+        const eithers = effects.map((e) => Effect.either(e))
 
-        const result: Interaction[] = yield* _(
-            Effect.all(effects, {
+        return yield* _(
+            Effect.all(eithers, {
                 concurrency: 'unbounded',
             }),
         )
-
-        return result
     })

@@ -1,8 +1,8 @@
 import type { TransactionResponse } from 'ethers'
-import { Effect, Either } from 'effect'
+import { Effect } from 'effect'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
-import { DecodeError, decodeMethod } from './abi-decode.js'
+import { DecodeError, MissingABIError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 
 function getSecondLevelCalls(trace: TraceLog[]) {
@@ -34,7 +34,7 @@ const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
             )
 
             if (abi == null) {
-                return yield* _(Effect.fail(new DecodeError(`Missing ABI for ${to} ${signature}`)))
+                return yield* _(Effect.fail(new MissingABIError(contractAddress, signature, chainID)))
             }
 
             return yield* _(
@@ -85,11 +85,7 @@ export const decodeTransactionTrace = ({
             }),
         )
 
-        const errors = result.filter(Either.isLeft).map((r) => r.left)
-
-        yield* _(Effect.logError(errors))
-
-        return result.filter(Either.isRight).map((r) => r.right)
+        return result
     })
 
 function traceLogToEvent(nativeTransfer: TraceLog): InteractionEvent {
