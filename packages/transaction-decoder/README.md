@@ -15,7 +15,7 @@ $ npm i @3loop/transaction-decoder
 
 To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three data loaders:
 
--   `getProvider`: This function returns an ethers JsonRpcProvider based on the chain ID.
+-   `getProvider`: This function returns an object with ethers JsonRpcProvider based on the chain ID.
 -   `contractMetaStore`: This object has 2 properties `get` and `set` that returns and caches contract meta-information. See the `ContractData` type for the required properties.
 -   `abiStore`: Similarly, this object has 2 properties `get` and `set` that returns and cache the contract or fragment ABI based on the chain ID, address, and/or signature.
 
@@ -26,7 +26,7 @@ const db = {} // Your data source
 
 const decoded = new TransactionDecoder({
     getProvider: (chainId: number) => {
-        return new JsonRpcProvider(RPC_URL[chainId])
+        return {provider: new JsonRpcProvider(RPC_URL[chainId])}
     },
     abiStore: {
         get: async (req: {
@@ -83,12 +83,13 @@ To get started with using the Decoder, first, you have to provide the RPC Provid
 1. Create an RPC Provider
 
 ```ts
-import { JsonRpcProvider } from 'ethers'
+import { RPCProviderObject } from 'ethers'
+import { RPCProviderObject } from '@3loop/transaction-decoder'
 import { Effect } from 'effect'
 
-const getProvider = (chainID: number): Effect.Effect<never, UnknownNetwork, JsonRpcProvider> => {
+const getProvider = (chainID: number): Effect.Effect<never, UnknownNetwork, RPCProviderObject> => {
     if (chainID === 5) {
-        return Effect.succeed(new JsonRpcProvider(GOERLI_RPC))
+        return { provider: Effect.succeed(new JsonRpcProvider(GOERLI_RPC)) }
     }
     return Effect.fail(new UnknownNetwork(chainID))
 }

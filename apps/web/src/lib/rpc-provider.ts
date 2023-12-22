@@ -1,29 +1,36 @@
-import { RPCProvider, UnknownNetwork } from "@3loop/transaction-decoder";
+import {
+  RPCProvider,
+  UnknownNetwork,
+  RPCProviderObject,
+} from "@3loop/transaction-decoder";
 import { JsonRpcProvider } from "ethers";
 import { Layer, Effect } from "effect";
 import { supportedChains } from "@/app/data";
 
-const urls: Record<number, string> = supportedChains.reduce(
-  (acc, { chainID, rpcUrl }) => {
-    return {
-      ...acc,
-      [chainID]: rpcUrl,
-    };
-  },
-  {},
-);
+const providerConfigs = supportedChains.reduce((acc, config) => {
+  return {
+    ...acc,
+    [config.chainID]: config,
+  };
+}, {});
 
-const providers: Record<number, JsonRpcProvider> = {};
+const providers: Record<number, RPCProviderObject> = {};
 
-export function getProvider(chainID: number): JsonRpcProvider | null {
+export function getProvider(chainID: number): RPCProviderObject | null {
   let provider = providers[chainID];
   if (provider != null) {
     return provider;
   }
 
-  const url = urls[chainID];
+  const url = providerConfigs[chainID]?.rpcUrl;
+
   if (url != null) {
-    provider = new JsonRpcProvider(url);
+    provider = {
+      provider: new JsonRpcProvider(url),
+      config: {
+        supportTraceAPI: providerConfigs[chainID]?.supportTraceAPI,
+      },
+    };
     providers[chainID] = provider;
     return provider;
   }

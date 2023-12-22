@@ -1,4 +1,3 @@
-import type { Networkish, JsonRpcApiProviderOptions } from 'ethers'
 import { JsonRpcProvider } from 'ethers'
 import { Context, Effect } from 'effect'
 
@@ -12,12 +11,18 @@ export class RPCFetchError {
     constructor(readonly reason: unknown) {}
 }
 
+export interface RPCProviderConfig {
+    readonly supportTraceAPI?: boolean
+}
+
+export interface RPCProviderObject {
+    provider: JsonRpcProvider
+    config?: RPCProviderConfig
+}
+
 export interface RPCProvider {
     readonly _tag: 'RPCProvider'
-    readonly getProvider: (chainID: number) => Effect.Effect<never, UnknownNetwork, JsonRpcProvider>
+    readonly getProvider: (chainID: number) => Effect.Effect<never, UnknownNetwork, RPCProviderObject>
 }
 
 export const RPCProvider = Context.Tag<RPCProvider>('@3loop-decoder/RPCProvider')
-
-export const RPCProviderLayer = (url: string, network?: Networkish, options?: JsonRpcApiProviderOptions) =>
-    Effect.sync(() => new JsonRpcProvider(url, network, options))

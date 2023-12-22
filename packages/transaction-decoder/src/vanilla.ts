@@ -1,6 +1,5 @@
 import { Effect, Context, Logger, LogLevel, RequestResolver } from 'effect'
-import { RPCProvider, UnknownNetwork } from './provider.js'
-import { type JsonRpcProvider } from 'ethers'
+import { RPCProvider, RPCProviderObject, UnknownNetwork } from './provider.js'
 import { ContractData } from './types.js'
 import { decodeTransactionByHash } from './transaction-decoder.js'
 import { AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
@@ -8,7 +7,7 @@ import { ContractMetaParams, ContractMetaStore as EffectContractMetaStore } from
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
 
 export interface TransactionDecoderOptions {
-    getProvider: (chainID: number) => JsonRpcProvider | undefined
+    getProvider: (chainID: number) => RPCProviderObject | undefined
     abiStore: VanillaAbiStore
     contractMetaStore: VanillaContractMetaStore
     logging?: boolean

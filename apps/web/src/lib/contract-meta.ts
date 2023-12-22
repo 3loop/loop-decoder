@@ -16,7 +16,7 @@ export const fetchAndCacheErc20Meta = ({
 }) =>
   Effect.gen(function* (_) {
     const rpcService = yield* _(RPCProvider);
-    const provider = yield* _(rpcService.getProvider(chainID));
+    const { provider } = yield* _(rpcService.getProvider(chainID));
 
     const inst = yield* _(
       Effect.sync(() => new Contract(contractAddress, ERC20, provider)),
