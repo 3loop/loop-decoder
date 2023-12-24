@@ -1,11 +1,12 @@
 import { Effect, Layer } from 'effect'
 import fs from 'node:fs'
 import { AbiStore } from '@/abi-loader.js'
+import { EtherscanStrategyResolver } from '@/effect.js'
 
 export const MockedAbiStoreLive = Layer.succeed(
     AbiStore,
     AbiStore.of({
-        strategies: [],
+        strategies: [EtherscanStrategyResolver()],
         set: ({ address = {}, func = {}, event = {} }) =>
             Effect.gen(function* (_) {
                 const addressMatches = Object.entries(address)

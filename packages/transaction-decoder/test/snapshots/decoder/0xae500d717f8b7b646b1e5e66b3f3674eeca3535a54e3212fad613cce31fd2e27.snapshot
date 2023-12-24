@@ -9,6 +9,12 @@
   "fromAddress": "0x927d3480bbad9DB9806f2063F46e05Ee876750AB",
   "gasPaid": "0.000466435502487656",
   "gasUsed": "310957",
+  "interactedAddresses": [
+    "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+    "0x7a250d5630b4cf539739df2c5dacb4c659f2488d",
+    "0x8a521f0112e031acd5941f8f12fa6b08e1675f8e",
+    "0x12a3877fc4995c45550840266d9af1fd5379af8d",
+  ],
   "interactions": [
     {
       "chainID": 5,

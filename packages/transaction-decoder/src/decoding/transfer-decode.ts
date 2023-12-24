@@ -37,6 +37,7 @@ export function transferDecode({
         reverted: receipt.status === 0, // will return true if status==undefined
         assetsReceived: [],
         assetsSent: [], // TDOO: display the eth sent
+        interactedAddresses: [receipt.from, receipt.to].filter(Boolean),
     }
 
     return decodedTx

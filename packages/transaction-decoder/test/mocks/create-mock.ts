@@ -1,5 +1,5 @@
 import { JsonRpcProvider } from 'ethers'
-import fs from 'fs'
+import fs from 'node:fs'
 
 const GOERLI_RPC = 'https://rpc.ankr.com/eth_goerli'
 
