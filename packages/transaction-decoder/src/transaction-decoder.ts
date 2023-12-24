@@ -211,7 +211,7 @@ export const decodeTransaction = ({
             // NOTE: Explore how to set assets for more flexible tracking of the in and out addresses
             assetsReceived: getAssetsReceived(interactions, receipt.from),
             assetsSent: getAssetsSent(interactions, value, receipt.from, receipt.from),
-            addresses: collectAllAddresses({ interactions, decodedData }),
+            interactedAddresses: collectAllAddresses({ interactions, decodedData }),
         }
 
         return decodedTx

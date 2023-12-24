@@ -110,7 +110,7 @@ export interface DecodedTx {
     effectiveGasPrice: string | null
     assetsReceived: Asset[]
     assetsSent: Asset[]
-    addresses: string[]
+    interactedAddresses: string[]
 }
 
 export interface MethodCall {

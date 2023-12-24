@@ -1,5 +1,23 @@
 {
-  "addresses": [
+  "assetsReceived": [],
+  "assetsSent": [
+    {
+      "address": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "amount": "5050.0",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "type": "ERC20",
+    },
+  ],
+  "chainID": 5,
+  "chainSymbol": "goerli",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "1500000009",
+  "fromAddress": "0x25df6DA2f4e5C178DdFF45038378C0b08E0Bce54",
+  "gasPaid": "0.00413238002479428",
+  "gasUsed": "2754920",
+  "interactedAddresses": [
     "0x7619763c2013cb0dab65c61c104313a537beb41f",
     "0x25df6DA2f4e5C178DdFF45038378C0b08E0Bce54",
     "0xD152f549545093347A162Dce210e7293f1452150",
@@ -105,24 +123,6 @@
     "0xF1073bc25e25Be022553Ebf0995D8A08aB8ab534",
     "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
   ],
-  "assetsReceived": [],
-  "assetsSent": [
-    {
-      "address": "0x7619763c2013cb0dab65c61c104313a537beb41f",
-      "amount": "5050.0",
-      "name": "Mock ERC20 Contract",
-      "symbol": "ERC20",
-      "type": "ERC20",
-    },
-  ],
-  "chainID": 5,
-  "chainSymbol": "goerli",
-  "contractName": "Mock ERC20 Contract",
-  "contractType": "ERC20",
-  "effectiveGasPrice": "1500000009",
-  "fromAddress": "0x25df6DA2f4e5C178DdFF45038378C0b08E0Bce54",
-  "gasPaid": "0.00413238002479428",
-  "gasUsed": "2754920",
   "interactions": [
     {
       "chainID": 5,

@@ -1,9 +1,4 @@
 {
-  "addresses": [
-    "0xc3e4214dd442136079df06bb2529bae276d37564",
-    "0x0000000000000000000000000000000000000000",
-    "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
-  ],
   "assetsReceived": [],
   "assetsSent": [],
   "chainID": 5,
@@ -14,6 +9,11 @@
   "fromAddress": "0x63c640dE6f9963A90AFdFa64fD44Ee97e2169a18",
   "gasPaid": "0.00043732950291553",
   "gasUsed": "291553",
+  "interactedAddresses": [
+    "0xc3e4214dd442136079df06bb2529bae276d37564",
+    "0x0000000000000000000000000000000000000000",
+    "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+  ],
   "interactions": [
     {
       "chainID": 5,
