@@ -48,7 +48,7 @@ export class TransactionDecoder {
         })
 
         const AbiStoreLive = EffectAbiStore.of({
-            strategies: abiStore.strategies ?? [],
+            strategies: { default: abiStore.strategies ?? [] },
             get: (key) => Effect.promise(() => abiStore.get(key)),
             set: (val) => Effect.promise(() => abiStore.set(val)),
         })

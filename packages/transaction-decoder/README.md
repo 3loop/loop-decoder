@@ -105,7 +105,7 @@ To create a new `AbiStore` service you will need to implement two methods `set` 
 const AbiStoreLive = Layer.succeed(
     AbiStore,
     AbiStore.of({
-        strategies: [],
+        strategies: { default: [] },
         set: ({ address = {}, func = {}, event = {} }) =>
             Effect.sync(() => {
                 // NOTE: Ignore caching as we relay only on local abis
