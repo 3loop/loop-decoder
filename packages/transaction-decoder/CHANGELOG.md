@@ -1,5 +1,12 @@
 # @3loop/transaction-decoder
 
+## 0.3.0
+
+### Minor Changes
+
+- bcd03ed: Add all addresses involved in the transaction in the decode output
+- eb73069: Allow having custom abi loader strategy per each chain
+
 ## 0.2.0
 
 ### Minor Changes
