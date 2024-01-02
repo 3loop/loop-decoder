@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.3.0
+
+### Minor Changes
+
+- bcd03ed: Add all addresses involved in the transaction in the decode output
+
 ## 0.2.0
 
 ### Minor Changes
