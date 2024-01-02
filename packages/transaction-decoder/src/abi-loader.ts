@@ -8,8 +8,10 @@ export interface GetAbiParams {
     signature?: string | undefined
 }
 
+type ChainOrDefault = number | 'default'
+
 export interface AbiStore<Key = GetAbiParams, SetValue = ContractABI, Value = string | null> {
-    readonly strategies: readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]
+    readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
     // NOTE: I'm not sure if this is the best abi store interface, but it works for our nosql database
     readonly set: (value: SetValue) => Effect.Effect<never, never, void>
     readonly get: (arg: Key) => Effect.Effect<never, never, Value>
@@ -39,8 +41,10 @@ export const getAndCacheAbi = ({ chainID, address, event, signature }: GetAbiPar
             chainID,
         })
 
+        const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
+
         const abi = yield* _(
-            Effect.validateFirst(strategies, (strategy) => Effect.request(request, strategy)).pipe(
+            Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(request, strategy)).pipe(
                 Effect.catchAll(() => Effect.succeed(null)),
             ),
         )

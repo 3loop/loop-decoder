@@ -8,6 +8,15 @@ export class DecodeError {
     constructor(readonly error: unknown) {}
 }
 
+export class MissingABIError {
+    readonly _tag = 'MissingABIError'
+    constructor(
+        readonly address: string,
+        readonly signature: string,
+        readonly chainID: number,
+    ) {}
+}
+
 function stringifyValue(value: MostTypes): string | string[] {
     if (Array.isArray(value)) {
         return value.map((v) => v.toString())
