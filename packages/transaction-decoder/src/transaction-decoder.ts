@@ -14,6 +14,7 @@ import { getProxyStorageSlot } from './decoding/proxies.js'
 import { getAndCacheAbi } from './abi-loader.js'
 import { getAndCacheContractMeta } from './contract-meta-loader.js'
 import traverse from 'traverse'
+import { chainIdToNetwork } from './helpers/networks.js'
 
 export class UnsupportedEvent {
     readonly _tag = 'UnsupportedEvent'
@@ -194,7 +195,7 @@ export const decodeTransaction = ({
             },
             traceCalls: decodedTraceRight,
             nativeValueSent: value,
-            chainSymbol: Network.from(Number(transaction.chainId)).name,
+            chainSymbol: chainIdToNetwork[Number(transaction.chainId)] ?? 'unknown',
             chainID: Number(transaction.chainId),
             interactions,
             effectiveGasPrice: receipt.gasPrice.toString(),
