@@ -66,13 +66,11 @@ export const getTrace = (hash: string, chainID: number) =>
                         if (trace == null) return []
                         return trace
                     },
-                    catch: () => new RPCFetchError('Get trace'),
+                    catch: (e) => new RPCFetchError(e),
                 }),
             )
 
-            const result = trace as TraceLogTree
-
-            const transformedTrace = transformTraceTree(result)
+            const transformedTrace = transformTraceTree(trace as TraceLogTree)
 
             return transformedTrace
         }

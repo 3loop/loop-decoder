@@ -3,6 +3,9 @@ const endpoints: { [k: number]: string } = {
   3: "https://api-ropsten.etherscan.io/api",
   4: "https://api-rinkeby.etherscan.io/api",
   5: "https://api-goerli.etherscan.io/api",
+  8453: "https://api.basescan.org/api",
+  84531: "https://api-goerli.basescan.org/api",
+  84532: "https://api-sepolia.basescan.org/api",
 };
 
 export interface Transfer {

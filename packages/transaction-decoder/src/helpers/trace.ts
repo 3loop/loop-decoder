@@ -7,8 +7,8 @@ export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | u
         subtraces: node.calls?.length ?? 0,
         traceAddress: path,
         result: {
-            output: node.output,
-            gasUsed: node.gasUsed,
+            output: node.output ?? '0x0',
+            gasUsed: BigInt(node.gasUsed),
         },
     }
 
@@ -24,9 +24,9 @@ export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | u
                     callType: node.type.toLowerCase() as CallType,
                     from: node.from,
                     to: node.to,
-                    gas: node.gas,
+                    gas: BigInt(node.gas),
                     input: node.input,
-                    value: node.value ?? BigInt('0x0'),
+                    value: BigInt(node.value ?? '0x0'),
                 },
             }
             break
@@ -36,8 +36,8 @@ export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | u
                 type: 'create',
                 action: {
                     from: node.from,
-                    gas: node.gas,
-                    value: node.value ?? BigInt('0x0'),
+                    gas: BigInt(node.gas),
+                    value: BigInt(node.value ?? '0x0'),
                 },
             }
             break
@@ -48,7 +48,7 @@ export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | u
                 action: {
                     refundAddress: node.to,
                     address: node.from,
-                    balance: node.value ?? BigInt('0x0'),
+                    balance: BigInt(node.value ?? '0x0'),
                 },
             }
             break

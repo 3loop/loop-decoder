@@ -4,6 +4,7 @@ import {
   ContractMetaStore,
   EtherscanStrategyResolver,
   SourcifyStrategyResolver,
+  BlockscoutStrategyResolver,
   RPCProvider,
 } from "@3loop/transaction-decoder";
 import { Effect, Layer } from "effect";
@@ -20,6 +21,11 @@ export const AbiStoreLive = Layer.succeed(
         }),
         SourcifyStrategyResolver(),
       ],
+      169: [
+        BlockscoutStrategyResolver({
+          endpoint: "https://pacific-explorer.manta.network/api",
+        }),
+      ],
     },
     set: ({ address = {} }) =>
       Effect.gen(function* (_) {
@@ -30,12 +36,17 @@ export const AbiStoreLive = Layer.succeed(
           Effect.all(
             addressMatches.map(([key, value]) =>
               Effect.promise(() =>
-                prisma.contractAbi.create({
-                  data: {
-                    address: key.toLowerCase(),
-                    abi: value,
-                  },
-                }),
+                prisma.contractAbi
+                  .create({
+                    data: {
+                      address: key,
+                      abi: value,
+                    },
+                  })
+                  .catch((e) => {
+                    console.error("Failed to cache abi", e);
+                    return null;
+                  }),
               ),
             ),
             {

@@ -16,6 +16,7 @@ export class ResolveStrategyABIError {
     ) {}
 }
 
+//NOTE: we store address as key to be able to know adddress to abi mapping for caching
 export interface ContractABI {
     address?: Record<string, string>
     func?: Record<string, string>
