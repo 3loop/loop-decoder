@@ -91,14 +91,14 @@ const DebugCallType = Schema.literal(
     'REWARD',
 )
 
-const EthDebugTraceBase = Schema.struct({
-    gas: bigintFromString,
+export const EthDebugTraceBase = Schema.struct({
+    gas: Schema.string,
     to: Address,
     from: Address,
-    gasUsed: bigintFromString,
+    gasUsed: Schema.string,
     input: Schema.string,
     type: DebugCallType,
-    value: Schema.optional(bigintFromString),
+    value: Schema.optional(Schema.string),
     output: Schema.string,
 })
 
