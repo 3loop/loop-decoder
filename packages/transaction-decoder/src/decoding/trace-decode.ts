@@ -17,6 +17,17 @@ function getSecondLevelCalls(trace: TraceLog[]) {
     return secondLevelCalls
 }
 
+function replacer(key: unknown, value: unknown) {
+    if (typeof value === 'bigint') {
+        return {
+            type: 'bigint',
+            value: value.toString(),
+        }
+    } else {
+        return value
+    }
+}
+
 const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
     Effect.gen(function* (_) {
         if ('to' in call.action && 'input' in call.action) {
@@ -54,7 +65,7 @@ const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
             )
         }
 
-        return yield* _(Effect.fail(new DecodeError(`Could not decode trace log ${JSON.stringify(call)}`)))
+        return yield* _(Effect.fail(new DecodeError(`Could not decode trace log ${JSON.stringify(call, replacer)}`)))
     })
 
 export const decodeTransactionTrace = ({
