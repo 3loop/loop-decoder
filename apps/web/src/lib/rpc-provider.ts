@@ -24,7 +24,7 @@ export function getProvider(chainID: number): RPCProviderObject | null {
   const url = providerConfigs[chainID]?.rpcUrl;
 
   if (url != null) {
-    const batchMaxCount = providerConfigs[chainID]?.batching ? 100 : 1;
+    const batchMaxCount = providerConfigs[chainID]?.batchMaxCount ?? 100;
 
     provider = {
       provider: new JsonRpcProvider(url, undefined, {

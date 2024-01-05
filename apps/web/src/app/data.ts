@@ -27,13 +27,13 @@ export const supportedChains = [
     name: "Ethereum Mainnet",
     chainID: 1,
     rpcUrl:
-      (process.env.MAINNET_RPC_URL as string) || "https://rpc.ankr.com/eth",
+      (process.env.MAINNET_RPC_URL as string) ?? "https://rpc.ankr.com/eth",
   },
   {
     name: "Goerli Testnet",
     chainID: 5,
     rpcUrl:
-      (process.env.GOERLI_RPC_URL as string) ||
+      (process.env.GOERLI_RPC_URL as string) ??
       "https://rpc.ankr.com/eth_goerli",
   },
   {
@@ -41,13 +41,13 @@ export const supportedChains = [
     chainID: 8453,
     rpcUrl: process.env.BASE_RPC_URL as string,
     supportTraceAPI: false,
-    batching: false,
+    batchMaxCount: 1,
   },
   {
     name: "Manta pacific",
     chainID: 169,
     rpcUrl:
-      (process.env.MANTA_RPC_URL as string) ||
+      (process.env.MANTA_RPC_URL as string) ??
       "https://pacific-rpc.manta.network/http",
     supportTraceAPI: false,
   },
