@@ -1,0 +1,42 @@
+export const debounced = <A extends Request.Request<any, any>>(
+    self: RequestResolver.RequestResolver<A, never>,
+    duration: Duration.Duration,
+) =>
+    Effect.gen(function* (_) {
+        const running = yield* _(Ref.make(false))
+        const queue = yield* _(
+            Queue.unbounded<{
+                readonly request: A
+                readonly deferred: Deferred.Deferred<Request.Request.Error<A>, Request.Request.Success<A>>
+            }>(),
+        )
+
+        const scheduleBatch = pipe(
+            Effect.sleep(duration),
+            Effect.zipRight(Queue.takeAll(queue)),
+            Effect.flatMap(Effect.filterNot(({ deferred }) => Deferred.isDone(deferred))),
+            Effect.flatMap(
+                Effect.forEachParDiscard(({ request, deferred }) =>
+                    Effect.flatMap(Effect.exit(Effect.request(request, self)), (exit) =>
+                        Deferred.complete(deferred, exit),
+                    ),
+                ),
+            ),
+            Effect.ensuring(Ref.set(running, false)),
+        )
+
+        const maybeScheduleBatch = Effect.flatMap(Ref.getAndSet(running, true), (isRunning) =>
+            isRunning ? Effect.unit() : Effect.forkDaemon(scheduleBatch),
+        )
+
+        return RequestResolver.fromFunctionEffect((request: A) =>
+            Effect.flatMap(Deferred.make<Request.Request.Error<A>, Request.Request.Success<A>>(), (deferred) =>
+                pipe(
+                    Queue.offer(queue, { request, deferred }),
+                    Effect.zipLeft(maybeScheduleBatch),
+                    Effect.zipRight(Deferred.await(deferred)),
+                    Effect.onInterrupt(() => Deferred.interrupt(deferred)),
+                ),
+            ),
+        )
+    })
