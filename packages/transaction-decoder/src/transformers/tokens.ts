@@ -53,7 +53,7 @@ function getTokens(interactions: Interaction[], userAddress: string, direction: 
                 decimals = interaction.decimals
             }
 
-            // Batch transefers
+            // Batch transfers
             if (amounts != null) {
                 return amounts.map((amount, index) => {
                     const id =
