@@ -21,16 +21,20 @@ export function getProvider(chainID: number): RPCProviderObject | null {
   if (provider != null) {
     return provider;
   }
-
   const url = providerConfigs[chainID]?.rpcUrl;
 
   if (url != null) {
+    const batchMaxCount = providerConfigs[chainID]?.batchMaxCount ?? 100;
+
     provider = {
-      provider: new JsonRpcProvider(url),
+      provider: new JsonRpcProvider(url, undefined, {
+        batchMaxCount: batchMaxCount,
+      }),
       config: {
         supportTraceAPI: providerConfigs[chainID]?.supportTraceAPI,
       },
     };
+
     providers[chainID] = provider;
     return provider;
   }
