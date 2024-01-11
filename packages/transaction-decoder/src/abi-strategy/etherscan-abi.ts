@@ -45,7 +45,7 @@ async function fetchContractABI(
 }
 
 export const EtherscanStrategyResolver = (config?: { apikey?: string; endpoint?: string }) =>
-    RequestResolver.fromFunctionEffect((req: RequestModel.GetContractABIStrategy) =>
+    RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
         Effect.tryPromise({
             try: () => fetchContractABI(req, config),
             catch: () => new RequestModel.ResolveStrategyABIError('etherscan', req.address, req.chainID),

@@ -3,11 +3,12 @@ import * as Schema from '@effect/schema/Schema'
 const CallType = Schema.literal('call', 'delegatecall', 'callcode', 'staticcall')
 
 const Address = Schema.string // NOTE: Probably we can use a branded type
-const bigintFromString = Schema.transform(
+
+export const bigintFromString: Schema.Schema<string, bigint> = Schema.transform(
     Schema.string,
-    Schema.bigint,
-    (val) => BigInt(val),
-    (s) => String(s),
+    Schema.bigintFromSelf,
+    (s) => BigInt(s),
+    (b) => String(b),
 )
 
 const EthTraceActionCall = Schema.struct({
@@ -102,7 +103,7 @@ export const EthDebugTraceBase = Schema.struct({
     output: Schema.string,
 })
 
-type DebugTraceLog = Schema.To<typeof EthDebugTraceBase>
+type DebugTraceLog = Schema.Schema.To<typeof EthDebugTraceBase>
 
 export type TraceLogTree = {
     calls?: Array<TraceLogTree>
@@ -110,6 +111,6 @@ export type TraceLogTree = {
 
 export const EthTrace = Schema.union(CallTrace, CreateTrace, RewardTrace, SuicideTrace)
 
-export type TraceLog = Schema.To<typeof EthTrace>
-export type CallTraceLog = Schema.To<typeof CallTrace>
-export type CallType = Schema.To<typeof CallType>
+export type TraceLog = Schema.Schema.To<typeof EthTrace>
+export type CallTraceLog = Schema.Schema.To<typeof CallTrace>
+export type CallType = Schema.Schema.To<typeof CallType>

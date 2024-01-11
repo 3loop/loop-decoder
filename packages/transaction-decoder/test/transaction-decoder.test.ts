@@ -20,7 +20,7 @@ describe('Transaction Decoder', () => {
 
         const customRuntime = pipe(Layer.toRuntime(MainLayer), Effect.scoped, Effect.runSync)
 
-        const result = await program.pipe(Effect.provideSomeRuntime(customRuntime), Effect.runPromise)
+        const result = await program.pipe(Effect.provide(customRuntime), Effect.runPromise)
 
         await expect(result).toMatchFileSnapshot(`./snapshots/decoder/${hash}.snapshot`)
     })

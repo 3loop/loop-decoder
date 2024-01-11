@@ -182,7 +182,7 @@ const program = Effect.gen(function* (_) {
 
 ```ts
 const customRuntime = pipe(Layer.toRuntime(MainLayer), Effect.scoped, Effect.runSync)
-const result = await program.pipe(Effect.provideSomeRuntime(customRuntime), Effect.runPromise)
+const result = await program.pipe(Effect.provide(customRuntime), Effect.runPromise)
 ```
 
 ## ABI Strategies
