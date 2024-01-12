@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.4.0
+
+### Minor Changes
+
+- a6d534a: Update Effect to stable version
+
 ## 0.3.0
 
 ### Minor Changes
