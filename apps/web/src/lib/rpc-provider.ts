@@ -7,12 +7,13 @@ import { JsonRpcProvider } from "ethers";
 import { Layer, Effect } from "effect";
 import { supportedChains } from "@/app/data";
 
-const providerConfigs = supportedChains.reduce((acc, config) => {
-  return {
-    ...acc,
-    [config.chainID]: config,
-  };
-}, {});
+const providerConfigs: Record<string, (typeof supportedChains)[number]> =
+  supportedChains.reduce((acc, config) => {
+    return {
+      ...acc,
+      [config.chainID]: config,
+    };
+  }, {});
 
 const providers: Record<number, RPCProviderObject> = {};
 

@@ -73,7 +73,7 @@ async function fetchABI({
 }
 
 export const OpenchainStrategyResolver = () =>
-    RequestResolver.fromFunctionEffect((req: RequestModel.GetContractABIStrategy) =>
+    RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
         Effect.tryPromise({
             try: () => fetchABI(req),
             catch: () => new RequestModel.ResolveStrategyABIError('openchain', req.address, req.chainID),

@@ -45,9 +45,9 @@ export default function DecodingForm({
 
   const router = useRouter();
 
-  const onSubmit = (e) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const hash = e.target.hash.value;
+    const hash = (e.target as any).hash.value;
     router.push(`/tx/${currentChainID}/${hash}`);
   };
 

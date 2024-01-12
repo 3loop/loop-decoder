@@ -16,7 +16,7 @@ export interface GetStorageSlot extends Request.Request<RPCFetchError | UnknownN
 
 export const GetStorageSlot = Request.tagged<GetStorageSlot>('GetStorageSlot')
 
-export const GetStorageSlotResolver = RequestResolver.fromFunctionEffect((request: GetStorageSlot) =>
+export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetStorageSlot) =>
     Effect.gen(function* (_) {
         const service = yield* _(RPCProvider)
         const { provider } = yield* _(service.getProvider(request.chainID))

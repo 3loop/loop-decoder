@@ -70,7 +70,7 @@ export class TransactionDecoder {
             return yield* _(decodeTransactionByHash(hash, chainID))
         }).pipe(Logger.withMinimumLogLevel(this.logging ? LogLevel.Debug : LogLevel.Error))
 
-        const runnable = Effect.provideContext(program, this.context)
+        const runnable = Effect.provide(program, this.context)
 
         return Effect.runPromise(runnable)
     }

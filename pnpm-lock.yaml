@@ -87,8 +87,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0(@types/react@18.2.21)(react-dom@18.2.0)(react@18.2.0)
       effect:
-        specifier: ^2.0.0-next.27
-        version: 2.0.0-next.31(@effect/data@0.18.5)(@effect/io@0.40.1)(@effect/match@0.35.2)(@effect/stm@0.24.0)(@effect/stream@0.36.0)
+        specifier: ^2.0.3
+        version: 2.0.3
       eslint:
         specifier: ^8.47.0
         version: 8.47.0
@@ -97,7 +97,7 @@ importers:
         version: 13.4.19(eslint@8.47.0)(typescript@5.1.3)
       ethers:
         specifier: ^6.6.2
-        version: 6.6.2
+        version: 6.6.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       jsonata:
         specifier: ^2.0.3
         version: 2.0.3
@@ -129,12 +129,18 @@ importers:
         specifier: ^2.9.1
         version: 2.9.1(react-dom@18.2.0)(react@18.2.0)
     devDependencies:
+      bufferutil:
+        specifier: ^4.0.8
+        version: 4.0.8
       prisma:
         specifier: ^5.2.0
         version: 5.2.0
       typescript:
         specifier: 5.1.3
         version: 5.1.3
+      utf-8-validate:
+        specifier: ^6.0.3
+        version: 6.0.3
 
   packages/eslint-config-custom:
     devDependencies:
@@ -161,8 +167,8 @@ importers:
         version: 0.6.7
     devDependencies:
       '@effect/schema':
-        specifier: ^0.33.2
-        version: 0.33.2(@effect/data@0.18.5)(@effect/io@0.40.1)
+        specifier: ^0.59.1
+        version: 0.59.1(effect@2.0.3)(fast-check@3.15.0)
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -182,8 +188,8 @@ importers:
         specifier: 0.34.2
         version: 0.34.2(vitest@0.34.2)
       effect:
-        specifier: 2.0.0-next.31
-        version: 2.0.0-next.31(@effect/data@0.18.5)(@effect/io@0.40.1)(@effect/match@0.35.2)(@effect/stm@0.24.0)(@effect/stream@0.36.0)
+        specifier: 2.0.3
+        version: 2.0.3
       eslint:
         specifier: ^8.49.0
         version: 8.49.0
@@ -195,7 +201,7 @@ importers:
         version: 8.10.0(eslint@8.49.0)
       ethers:
         specifier: ^6.6.2
-        version: 6.6.2
+        version: 6.6.2(bufferutil@4.0.8)(utf-8-validate@6.0.3)
       jsonata:
         specifier: ^2.0.3
         version: 2.0.3
@@ -653,51 +659,15 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@effect/data@0.18.5:
-    resolution: {integrity: sha512-VFPJ0prGq3eF6/eZYKVI/1IC1purdGJXEHJC1ggKynPko03upjtmeCeCsEyMiY12DzVIAuME425JndiFb7m2xw==}
-
-  /@effect/io@0.40.1(@effect/data@0.18.5):
-    resolution: {integrity: sha512-OeMK7JonvW/D6Z377cOsuCSHUbsO9ZkmAIDmzQ1Qffx8+h5yUXRm0htmPwKkxtCHZr2QxyZfSBzxSzrGU7asXQ==}
+  /@effect/schema@0.59.1(effect@2.0.3)(fast-check@3.15.0):
+    resolution: {integrity: sha512-dighL1fSjOLNupETYaN4hvUo9zxvdi4w+lgJ9lHKYFZapaFxR2f8ZKB2WunsSGnF5mCyWLDS3GMtfLeqz2I2ug==}
     peerDependencies:
-      '@effect/data': ^0.18.5
+      effect: ^2.0.3
+      fast-check: ^3.13.2
     dependencies:
-      '@effect/data': 0.18.5
-
-  /@effect/match@0.35.2(@effect/data@0.18.5):
-    resolution: {integrity: sha512-2zZhWIdejX3xqbjormykBveHZTB/DBr/u/XBj5Ln6u2ShbMvoUykgVEscQLN3CsQeHDS14Vvr1DOvH0qeMILZQ==}
-    peerDependencies:
-      '@effect/data': ^0.18.3
-    dependencies:
-      '@effect/data': 0.18.5
-
-  /@effect/schema@0.33.2(@effect/data@0.18.5)(@effect/io@0.40.1):
-    resolution: {integrity: sha512-GfV4kXAs4tkx09bGD6J4RDqVN+xea4UP0I05r1wloox6j0eYgXYaSKAXAZ7qBKVywkba3cDUDZhc9nplAD8TAA==}
-    peerDependencies:
-      '@effect/data': ^0.17.1
-      '@effect/io': ^0.38.0
-    dependencies:
-      '@effect/data': 0.18.5
-      '@effect/io': 0.40.1(@effect/data@0.18.5)
-      fast-check: 3.12.0
+      effect: 2.0.3
+      fast-check: 3.15.0
     dev: true
-
-  /@effect/stm@0.24.0(@effect/data@0.18.5)(@effect/io@0.40.1):
-    resolution: {integrity: sha512-6L4zhy2lvkxn3jMG7dvZ4lKOmxSvaNBpkIT/ZOS6mad+B5/r8G3bKFe0C70aHwpQkxORd9LVmFr/f5MXLKZtfQ==}
-    peerDependencies:
-      '@effect/data': ^0.18.3
-      '@effect/io': ^0.40.0
-    dependencies:
-      '@effect/data': 0.18.5
-      '@effect/io': 0.40.1(@effect/data@0.18.5)
-
-  /@effect/stream@0.36.0(@effect/data@0.18.5)(@effect/io@0.40.1):
-    resolution: {integrity: sha512-vAMQ3kumsAXAiAwtuzJEOeII2bAB9rNY1NLYOqpgvXVWTUIYQf/wy4QbbcLXLuoMUUi7zS/JDVmC8jbPscfLNg==}
-    peerDependencies:
-      '@effect/data': ^0.18.3
-      '@effect/io': ^0.40.0
-    dependencies:
-      '@effect/data': 0.18.5
-      '@effect/io': 0.40.1(@effect/data@0.18.5)
 
   /@esbuild/android-arm64@0.18.20:
     resolution: {integrity: sha512-Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==}
@@ -2827,6 +2797,13 @@ packages:
       node-releases: 2.0.13
       update-browserslist-db: 1.0.11(browserslist@4.21.10)
 
+  /bufferutil@4.0.8:
+    resolution: {integrity: sha512-4T53u4PdgsXqKaIctwF8ifXlRTTmEPJ8iEPWFdGZvcf7sbwYo6FKFEX9eNNAnzFZ7EzJAQ3CJeOtCRA4rDp7Pw==}
+    engines: {node: '>=6.14.2'}
+    requiresBuild: true
+    dependencies:
+      node-gyp-build: 4.8.0
+
   /builtin-modules@3.3.0:
     resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
     engines: {node: '>=6'}
@@ -3254,20 +3231,8 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /effect@2.0.0-next.31(@effect/data@0.18.5)(@effect/io@0.40.1)(@effect/match@0.35.2)(@effect/stm@0.24.0)(@effect/stream@0.36.0):
-    resolution: {integrity: sha512-08bGtfQbd9e25AZvOavquEifcGEWn4f46ucJ2cgB97PsmlTa/+SrD81apLfeE+47meawnfwabSboYP/HFKZByA==}
-    peerDependencies:
-      '@effect/data': ^0.18.4
-      '@effect/io': ^0.40.0
-      '@effect/match': ^0.35.2
-      '@effect/stm': ^0.24.0
-      '@effect/stream': ^0.36.0
-    dependencies:
-      '@effect/data': 0.18.5
-      '@effect/io': 0.40.1(@effect/data@0.18.5)
-      '@effect/match': 0.35.2(@effect/data@0.18.5)
-      '@effect/stm': 0.24.0(@effect/data@0.18.5)(@effect/io@0.40.1)
-      '@effect/stream': 0.36.0(@effect/data@0.18.5)(@effect/io@0.40.1)
+  /effect@2.0.3:
+    resolution: {integrity: sha512-I/XvcbHypegNFWCr/arbfIR6pA+8JpSqv9wS4xOrgXypQMRj8H3wRorTcUiPmcQ0e6Ko67CdI2XZpjx7z0Ev/A==}
 
   /electron-to-chromium@1.4.498:
     resolution: {integrity: sha512-4LODxAzKGVy7CJyhhN5mebwe7U2L29P+0G+HUriHnabm0d7LSff8Yn7t+Wq+2/9ze2Fu1dhX7mww090xfv7qXQ==}
@@ -4058,7 +4023,7 @@ packages:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
 
-  /ethers@6.6.2:
+  /ethers@6.6.2(bufferutil@4.0.8)(utf-8-validate@6.0.3):
     resolution: {integrity: sha512-vyWfVAj2g7xeZIivOqlbpt7PbS2MzvJkKgsncgn4A/1xZr8Q3BznBmEBRQyPXKCgHmX4PzRQLpnYG7jl/yutMg==}
     engines: {node: '>=14.0.0'}
     dependencies:
@@ -4068,7 +4033,7 @@ packages:
       '@types/node': 18.15.13
       aes-js: 4.0.0-beta.5
       tslib: 2.4.0
-      ws: 8.5.0
+      ws: 8.5.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -4114,8 +4079,8 @@ packages:
       tmp: 0.0.33
     dev: true
 
-  /fast-check@3.12.0:
-    resolution: {integrity: sha512-SqahE9mlL3+lhjJ39joMLwcj6F+24hfZdf/tchlNO8sHcTdrUUdA5P/ZbSFZM9Xpzs36XaneGwE0FWepm/zyOA==}
+  /fast-check@3.15.0:
+    resolution: {integrity: sha512-iBz6c+EXL6+nI931x/sbZs1JYTZtLG6Cko0ouS8LRTikhDR7+wZk4TYzdRavlnByBs2G6+nuuJ7NYL9QplNt8Q==}
     engines: {node: '>=8.0.0'}
     dependencies:
       pure-rand: 6.0.2
@@ -5113,6 +5078,10 @@ packages:
       - '@babel/core'
       - babel-plugin-macros
     dev: false
+
+  /node-gyp-build@4.8.0:
+    resolution: {integrity: sha512-u6fs2AEUljNho3EYTJNBfImO5QTo/J/1Etd+NVdCj7qWKUSN/bSLkZwhDv7I+w/MSC6qJ4cknepkAYykDdK8og==}
+    hasBin: true
 
   /node-releases@2.0.13:
     resolution: {integrity: sha512-uYr7J37ae/ORWdZeQ1xxMJe3NtdmqMC/JZK+geofDrkLUApKRHPd18/TxtBOJ4A0/+uUIliorNrfYV6s1b02eQ==}
@@ -6568,6 +6537,13 @@ packages:
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
+  /utf-8-validate@6.0.3:
+    resolution: {integrity: sha512-uIuGf9TWQ/y+0Lp+KGZCMuJWc3N9BHA+l/UmHd/oUHwJJDeysyTRxNQVkbzsIWfGFbRe3OcgML/i0mvVRPOyDA==}
+    engines: {node: '>=6.14.2'}
+    requiresBuild: true
+    dependencies:
+      node-gyp-build: 4.8.0
+
   /util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: false
@@ -6842,7 +6818,7 @@ packages:
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  /ws@8.5.0:
+  /ws@8.5.0(bufferutil@4.0.8)(utf-8-validate@6.0.3):
     resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
@@ -6853,6 +6829,9 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
+    dependencies:
+      bufferutil: 4.0.8
+      utf-8-validate: 6.0.3
 
   /y18n@4.0.3:
     resolution: {integrity: sha512-JKhqTOwSrqNA1NY5lSztJ1GrBiUodLMmIZuLiDaMRJ+itFd+ABVE8XBjOvIWL+rSqNDC74LCSFmlb/U4UZ4hJQ==}
