@@ -3,7 +3,7 @@
 ## Requirements
 
 -   TypeScript 5.x
--   `exactOptionalPropertyTypes` and `strict` enabled in your tsconfig.json
+-   `strict` enabled in your tsconfig.json
 
 ## Getting Started
 

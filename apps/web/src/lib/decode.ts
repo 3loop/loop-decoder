@@ -1,4 +1,4 @@
-import { Effect, Layer, pipe } from "effect";
+import { Effect, Layer, Runtime, Scope, pipe } from "effect";
 import { RPCProviderLive } from "./rpc-provider";
 import {
   decodeTransactionByHash,
@@ -7,13 +7,7 @@ import {
 import { AbiStoreLive, ContractMetaStoreLive } from "./contract-loader";
 
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, ContractMetaStoreLive);
-const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer);
-
-const customRuntime = pipe(
-  Layer.toRuntime(MainLayer),
-  Effect.scoped,
-  Effect.runSync,
-);
+const MainLayer = LoadersLayer.pipe(Layer.provideMerge(RPCProviderLive));
 
 export async function decodeTransaction({
   chainID,
@@ -22,10 +16,12 @@ export async function decodeTransaction({
   chainID: number;
   hash: string;
 }): Promise<DecodedTx | undefined> {
-  return decodeTransactionByHash(hash, chainID)
-    .pipe(Effect.provideSomeRuntime(customRuntime), Effect.runPromise)
-    .catch((error: unknown) => {
-      console.error("Decode error", JSON.stringify(error, null, 2));
-      return undefined;
-    });
+  const runnable = Effect.provide(
+    decodeTransactionByHash(hash, chainID),
+    MainLayer,
+  );
+  return Effect.runPromise(runnable).catch((error: unknown) => {
+    console.error("Decode error", JSON.stringify(error, null, 2));
+    return undefined;
+  });
 }

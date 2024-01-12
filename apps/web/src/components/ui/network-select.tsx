@@ -15,16 +15,14 @@ export function NetworkSelect(props: SelectProps) {
   const router = useRouter();
   const params = useParams();
 
-  const onValueChange = (newChainID) => {
+  const onValueChange = (newChainID: string) => {
     router.push(`/tx/${newChainID}`);
   };
 
+  const chainID = (params.chainID as string) ?? props.defaultValue;
+
   return (
-    <Select
-      defaultValue={props.defaultValue}
-      onValueChange={onValueChange}
-      value={params.chainID as string}
-    >
+    <Select onValueChange={onValueChange} value={chainID}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Select a network" />
       </SelectTrigger>
