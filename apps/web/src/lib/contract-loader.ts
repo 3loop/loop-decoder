@@ -5,7 +5,7 @@ import {
   EtherscanStrategyResolver,
   SourcifyStrategyResolver,
   BlockscoutStrategyResolver,
-  RPCProvider,
+  PublicClient,
 } from "@3loop/transaction-decoder";
 import { Effect, Layer } from "effect";
 import { fetchAndCacheErc20Meta } from "./contract-meta";
@@ -80,7 +80,7 @@ export const AbiStoreLive = Layer.succeed(
 export const ContractMetaStoreLive = Layer.effect(
   ContractMetaStore,
   Effect.gen(function* (_) {
-    const rpcProvider = yield* _(RPCProvider);
+    const rpcProvider = yield* _(PublicClient);
 
     return ContractMetaStore.of({
       get: ({ address, chainID }) =>
@@ -106,7 +106,7 @@ export const ContractMetaStoreLive = Layer.effect(
               contractAddress: normAddress,
               chainID,
             }).pipe(
-              Effect.provideService(RPCProvider, rpcProvider),
+              Effect.provideService(PublicClient, rpcProvider),
               Effect.catchAll((_) => Effect.succeed(null)),
             ),
           );

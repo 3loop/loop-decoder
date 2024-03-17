@@ -1,10 +1,11 @@
-import { Effect, Layer, Runtime, Scope, pipe } from "effect";
+import { Effect, Layer } from "effect";
 import { RPCProviderLive } from "./rpc-provider";
 import {
   decodeTransactionByHash,
   type DecodedTx,
 } from "@3loop/transaction-decoder";
 import { AbiStoreLive, ContractMetaStoreLive } from "./contract-loader";
+import { Hex } from "viem";
 
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, ContractMetaStoreLive);
 const MainLayer = LoadersLayer.pipe(Layer.provideMerge(RPCProviderLive));
@@ -17,7 +18,7 @@ export async function decodeTransaction({
   hash: string;
 }): Promise<DecodedTx | undefined> {
   const runnable = Effect.provide(
-    decodeTransactionByHash(hash, chainID),
+    decodeTransactionByHash(hash as Hex, chainID),
     MainLayer,
   );
   return Effect.runPromise(runnable).catch((error: unknown) => {

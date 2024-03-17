@@ -1,11 +1,10 @@
 import { Effect } from "effect";
-import { Contract } from "ethers";
-import { ERC20 } from "./contracts";
 import {
   ContractData,
   ContractType,
-  RPCProvider,
+  PublicClient,
 } from "@3loop/transaction-decoder";
+import { erc20Abi, getAddress, getContract } from "viem";
 
 export const fetchAndCacheErc20Meta = ({
   contractAddress,
@@ -15,16 +14,22 @@ export const fetchAndCacheErc20Meta = ({
   chainID: number;
 }) =>
   Effect.gen(function* (_) {
-    const rpcService = yield* _(RPCProvider);
-    const { provider } = yield* _(rpcService.getProvider(chainID));
+    const service = yield* _(PublicClient);
+    const { client } = yield* _(service.getPublicClient(chainID));
 
     const inst = yield* _(
-      Effect.sync(() => new Contract(contractAddress, ERC20, provider)),
+      Effect.sync(() =>
+        getContract({
+          address: getAddress(contractAddress),
+          abi: erc20Abi,
+          client,
+        }),
+      ),
     );
 
     const name = yield* _(
       Effect.tryPromise({
-        try: () => inst.name() as Promise<string | null>,
+        try: () => inst.read.name() as Promise<string | null>,
         catch: () => null,
       }),
     );
@@ -37,11 +42,11 @@ export const fetchAndCacheErc20Meta = ({
       Effect.all(
         [
           Effect.tryPromise({
-            try: () => inst.symbol() as Promise<string>,
+            try: () => inst.read.symbol() as Promise<string>,
             catch: () => null,
           }),
           Effect.tryPromise({
-            try: () => inst.decimals() as Promise<number>,
+            try: () => inst.read.decimals() as Promise<number>,
             catch: () => null,
           }),
         ],

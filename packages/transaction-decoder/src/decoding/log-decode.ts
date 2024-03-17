@@ -35,14 +35,18 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
 
         const abiItem = JSON.parse(abiItem_) as Abi[]
 
-        const { eventName, args: args_ } = decodeEventLog({
-            abi: abiItem,
-            topics: logItem.topics,
-            data: logItem.data,
-        })
+        const { eventName, args: args_ } = yield* _(
+            Effect.try(() =>
+                decodeEventLog({
+                    abi: abiItem,
+                    topics: logItem.topics,
+                    data: logItem.data,
+                }),
+            ),
+        )
 
         if (args_ == null || eventName == null) {
-            return yield* _(Effect.fail(new AbiDecoder.DecodeError('Could not decode log')))
+            return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)))
         }
 
         const args = args_ as unknown as { [key: string]: any }
