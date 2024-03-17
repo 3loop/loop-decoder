@@ -1,7 +1,6 @@
-import type { ParamType } from 'ethers'
-import { Interface } from 'ethers'
+import { formatAbiItem } from 'viem/utils'
 import type { DecodeResult, InputArg, MostTypes, TreeNode } from '../types.js'
-import { parseABI } from './parse-abi.js'
+import { Hex, Abi, decodeFunctionData, AbiParameter, AbiFunction, getAbiItem } from 'viem'
 
 export class DecodeError {
     readonly _tag = 'DecodeError'
@@ -25,23 +24,41 @@ function stringifyValue(value: MostTypes): string | string[] {
     return value?.toString() ?? ''
 }
 
-function attachValues(components: ParamType[], decoded: any): TreeNode[] {
+function attachTupleValues(components: readonly AbiParameter[], decoded: Record<string, any>): TreeNode[] {
+    return components.map((input): TreeNode => {
+        if (input.name === undefined) {
+            throw new Error('input.name is undefined')
+        }
+        return {
+            name: input.name ?? 'unknown',
+            type: input.type,
+            value: decoded[input.name] ? stringifyValue(decoded[input.name]) : '',
+        }
+    })
+}
+
+function attachValues(components: readonly AbiParameter[], decoded: readonly any[]): TreeNode[] {
     return components.map((input, index): TreeNode => {
-        if (input.type === 'tuple') {
-            const value = decoded[index]
-            if (!Array.isArray(value)) {
-                throw new Error('input.type is tuple, but decoded value is not an array')
-            }
-            const components = input.components ? [...input.components] : []
+        if (input.type === 'tuple[]' && 'components' in input) {
             return {
-                name: input.name,
+                name: input.name ?? 'unknown',
                 type: input.type,
-                components: attachValues(components, value),
+                components: attachValues(input.components, decoded),
+            }
+        }
+
+        if (input.type === 'tuple' && 'components' in input) {
+            const value = decoded[index]
+
+            return {
+                name: input.name ?? 'unknown',
+                type: input.type,
+                components: attachTupleValues(input.components, value),
             }
         }
 
         return {
-            name: input.name,
+            name: input.name ?? 'unknown',
             type: input.type,
             value: decoded[index] ? stringifyValue(decoded[index]) : '',
         }
@@ -57,38 +74,30 @@ function flattenTree(tree: TreeNode[]): InputArg[] {
     }, [])
 }
 
-export function decodeMethod(data: string, abi: string): DecodeResult | undefined {
-    const iface = parseABI(abi)
-    if (iface instanceof Error) {
-        return
-    }
+export function decodeMethod(data: Hex, abi: Abi): DecodeResult | undefined {
+    const { functionName, args = [] } = decodeFunctionData({ abi, data })
 
-    if (iface instanceof Interface) {
-        const decoded = iface.parseTransaction({ data })
+    const method = getAbiItem({ abi, name: functionName, args }) as AbiFunction | undefined
 
-        if (decoded) {
-            const inputs = decoded.fragment.inputs ? [...decoded.fragment.inputs] : undefined
+    if (method != null) {
+        const signature = formatAbiItem(method)
+        let flattened: InputArg[] = []
 
-            let flattened: InputArg[] = []
+        const withValues = attachValues(method.inputs, args)
+        flattened = flattenTree(withValues)
 
-            if (inputs != null) {
-                const withValues = attachValues(inputs, decoded.args)
-                flattened = flattenTree(withValues)
-            }
-
-            if (flattenTree.length === 0) {
-                return {
-                    name: decoded.name,
-                    signature: decoded.signature,
-                    type: decoded.fragment.type,
-                }
-            }
+        if (flattenTree.length === 0) {
             return {
-                name: decoded.name,
-                signature: decoded.signature,
-                type: decoded.fragment.type,
-                params: flattened,
+                name: functionName,
+                signature,
+                type: 'function',
             }
+        }
+        return {
+            name: functionName,
+            signature,
+            type: 'function',
+            params: flattened,
         }
     }
 }

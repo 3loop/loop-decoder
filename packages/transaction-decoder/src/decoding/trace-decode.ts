@@ -1,9 +1,9 @@
-import type { TransactionResponse } from 'ethers'
 import { Effect } from 'effect'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, MissingABIError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
+import { Hex, type GetTransactionReturnType, Abi } from 'viem'
 
 function getSecondLevelCalls(trace: TraceLog[]) {
     const secondLevelCalls: TraceLog[] = []
@@ -28,15 +28,15 @@ function replacer(key: unknown, value: unknown) {
     }
 }
 
-const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
+const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =>
     Effect.gen(function* (_) {
         if ('to' in call.action && 'input' in call.action) {
             const { to, input, from } = call.action
             const chainID = Number(transaction.chainId)
             const signature = call.action.input.slice(0, 10)
-            const contractAddress = to.toLowerCase()
+            const contractAddress = to
 
-            const abi = yield* _(
+            const abi_ = yield* _(
                 getAndCacheAbi({
                     address: contractAddress,
                     signature,
@@ -44,14 +44,16 @@ const decodeTraceLog = (call: TraceLog, transaction: TransactionResponse) =>
                 }),
             )
 
-            if (abi == null) {
+            if (abi_ == null) {
                 return yield* _(Effect.fail(new MissingABIError(contractAddress, signature, chainID)))
             }
+
+            const abi = JSON.parse(abi_) as Abi
 
             return yield* _(
                 Effect.try({
                     try: () => {
-                        const method = decodeMethod(input, abi)
+                        const method = decodeMethod(input as Hex, abi)
                         return {
                             ...method,
                             from,
@@ -73,7 +75,7 @@ export const decodeTransactionTrace = ({
     transaction,
 }: {
     trace: TraceLog[]
-    transaction: TransactionResponse
+    transaction: GetTransactionReturnType
 }) =>
     Effect.gen(function* (_) {
         if (trace.length === 0) {
@@ -164,7 +166,7 @@ function filterToNativeTransfers(traceLogs: TraceLog[]): CallTraceLog[] {
 }
 
 export function augmentTraceLogs(
-    transaction: TransactionResponse,
+    transaction: GetTransactionReturnType,
     interactionsWithoutNativeTransfers: Interaction[],
     traceLogs: TraceLog[],
 ): Interaction[] {

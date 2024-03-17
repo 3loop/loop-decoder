@@ -1,4 +1,3 @@
-import type { ParamType } from 'ethers'
 import type { TraceLog } from './schema/trace.js'
 
 export interface RawTxData {
@@ -6,8 +5,8 @@ export interface RawTxData {
 }
 
 export interface Node {
-    name: ParamType['name']
-    type: ParamType['type']
+    name: string
+    type: string
 }
 
 export interface Tree extends Node {

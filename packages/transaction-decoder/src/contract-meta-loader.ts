@@ -17,7 +17,7 @@ export const ContractMetaStore = Context.Tag<ContractMetaStore>('@3loop-decoder/
 export const getAndCacheContractMeta = ({ chainID, address }: { readonly chainID: number; readonly address: string }) =>
     Effect.gen(function* (_) {
         const contractMetaStore = yield* _(ContractMetaStore)
-        const cached = yield* _(contractMetaStore.get({ address, chainID }))
+        const cached = yield* _(contractMetaStore.get({ address: address.toLowerCase(), chainID }))
         if (cached != null) {
             return cached
         }

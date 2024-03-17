@@ -1,6 +1,6 @@
 import { Effect, RequestResolver } from 'effect'
 import * as RequestModel from './request-model.js'
-import { Fragment } from 'ethers'
+import { parseAbiItem } from 'viem'
 
 type OpenchainResponse = {
     ok: boolean
@@ -31,11 +31,11 @@ const options = {
 }
 
 function parseFunctionSignature(signature: string): string {
-    return Fragment.from('function ' + signature).format('json')
+    return JSON.stringify(parseAbiItem('function ' + signature))
 }
 
 function parseEventSignature(signature: string): string {
-    return Fragment.from('event ' + signature).format('json')
+    return JSON.stringify(parseAbiItem('event ' + signature))
 }
 
 async function fetchABI({

@@ -1,4 +1,4 @@
-import { getAddress } from 'ethers'
+import { getAddress } from 'viem'
 import { Effect, RequestResolver } from 'effect'
 import * as RequestModel from './request-model.js'
 

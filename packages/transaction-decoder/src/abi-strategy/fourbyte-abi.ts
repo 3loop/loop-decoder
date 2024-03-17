@@ -1,6 +1,6 @@
 import { Effect, RequestResolver } from 'effect'
 import * as RequestModel from './request-model.js'
-import { Fragment } from 'ethers'
+import { parseAbiItem } from 'viem'
 
 type FourBytesResponse = {
     count: number
@@ -12,11 +12,11 @@ type FourBytesResponse = {
 const endpoint = 'https://www.4byte.directory/api/v1'
 
 function parseFunctionSignature(signature: string): string {
-    return Fragment.from('function ' + signature).format('json')
+    return JSON.stringify(parseAbiItem('function ' + signature))
 }
 
 function parseEventSignature(signature: string): string {
-    return Fragment.from('event ' + signature).format('json')
+    return JSON.stringify(parseAbiItem('event ' + signature))
 }
 
 // TODO: instead of getting the first match, we should detect the best match

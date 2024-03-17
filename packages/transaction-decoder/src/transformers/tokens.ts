@@ -1,4 +1,4 @@
-import { formatEther, formatUnits } from 'ethers'
+import { Address, formatEther, formatUnits, isAddress } from 'viem'
 import { Asset, AssetType, Interaction, InteractionEvent } from '../types.js'
 import { sameAddress } from '../helpers/address.js'
 
@@ -9,7 +9,12 @@ const transferEvents = ['Transfer', 'TransferBatch', 'TransferSingle']
 
 export function toOrFromUser(event: InteractionEvent, direction: 'to' | 'from', userAddress: string) {
     const directionArr = direction === 'to' ? toKeys : fromKeys
-    return directionArr.filter((key: string) => event.params[key] === userAddress).length > 0
+    return (
+        directionArr.filter(
+            (key: string) =>
+                isAddress(event.params[key] as string) && sameAddress(event.params[key] as Address, userAddress),
+        ).length > 0
+    )
 }
 
 function getTokenType(interaction: Interaction): AssetType {
@@ -60,7 +65,7 @@ function getTokens(interactions: Interaction[], userAddress: string, direction: 
                         event.params.ids != null && typeof event.params.ids === 'object'
                             ? BigInt(event.params.ids[index]).toString()
                             : null
-                    const _amount = BigInt(amount).toString()
+                    const _amount = BigInt(amount)
 
                     const amountNumber = amount ? Number(formatUnits(_amount, decimals)) : undefined
 
@@ -70,7 +75,7 @@ function getTokens(interactions: Interaction[], userAddress: string, direction: 
                         type: tokenType,
                         name: interaction.contractName,
                         symbol: interaction.contractSymbol,
-                        address: interaction.contractAddress.toLowerCase(),
+                        address: interaction.contractAddress,
                     }
 
                     if (tokenId) {
@@ -88,13 +93,13 @@ function getTokens(interactions: Interaction[], userAddress: string, direction: 
                     event.params._amount ||
                     event.params.wad) as string
 
-                const amountNumber = amount ? Number(formatUnits(amount, decimals ?? 18)) : undefined
+                const amountNumber = amount ? Number(formatUnits(BigInt(amount), decimals ?? 18)) : undefined
 
                 const asset: Asset = {
                     type: tokenType,
                     name: interaction.contractName,
                     symbol: interaction.contractSymbol,
-                    address: interaction.contractAddress.toLowerCase(),
+                    address: interaction.contractAddress,
                 }
 
                 if (tokenId) {
@@ -126,7 +131,7 @@ function getNativeTokenValueReceived(interactions: Interaction[], userAddress: s
     const nativeTokenEvents = getNativeTokenValueEvents(interactions)
     const nativeTokenEventsReceived = nativeTokenEvents.filter((event) => sameAddress(event.params.to, userAddress))
     const val = nativeTokenEventsReceived.reduce(
-        (acc, event) => acc + Number(formatEther((event.params.value as string) ?? 0)),
+        (acc, event) => acc + Number(formatEther(BigInt(event.params.value as string) ?? 0)),
         0,
     )
 
@@ -139,15 +144,15 @@ function getNativeTokenValueSent(
     fromAddress: string,
     userAddress: string,
 ): string {
-    if (fromAddress === userAddress)
-        return Number(formatEther(nativeValueSent || 0))
+    if (sameAddress(fromAddress, userAddress))
+        return Number(formatEther(BigInt(nativeValueSent || 0)))
             .toString()
             .replace(/^(\d+\.\d*?[0-9])0+$/g, '$1')
 
     const nativeTokenEvents = getNativeTokenValueEvents(interactions)
     const nativeTokenEventsReceived = nativeTokenEvents.filter((event) => sameAddress(event.params.from, userAddress))
     const val = nativeTokenEventsReceived.reduce(
-        (acc, event) => acc + Number(formatEther((event.params.value as string) || 0)),
+        (acc, event) => acc + Number(formatEther(BigInt((event.params.value as string | undefined) || 0))),
         0,
     )
     return val.toFixed(20).replace(/^(\d+\.\d*?[0-9])0+$/g, '$1')
@@ -165,7 +170,8 @@ function getWethInteraction(interactions: Interaction[], direction: string, user
     )
     if (wethInteractions.length > 0) {
         const val = wethInteractions.reduce(
-            (acc, interaction) => acc + Number(formatEther((interaction.event.params.wad as string) || 0)),
+            (acc, interaction) =>
+                acc + Number(formatEther(BigInt((interaction.event.params.wad as string | undefined) || 0))),
             0,
         )
         return {

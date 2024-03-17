@@ -1,13 +1,14 @@
 import { Effect, Context, Logger, LogLevel, RequestResolver } from 'effect'
-import { RPCProvider, RPCProviderObject, UnknownNetwork } from './provider.js'
+import { PublicClient, PublicClientObject, UnknownNetwork } from './public-client.js'
 import { ContractData } from './types.js'
 import { decodeTransactionByHash } from './transaction-decoder.js'
 import { AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
 import { ContractMetaParams, ContractMetaStore as EffectContractMetaStore } from './contract-meta-loader.js'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
+import { Hex } from 'viem'
 
 export interface TransactionDecoderOptions {
-    getProvider: (chainID: number) => RPCProviderObject | undefined
+    getPublicClient: (chainID: number) => PublicClientObject | undefined
     abiStore: VanillaAbiStore
     contractMetaStore: VanillaContractMetaStore
     logging?: boolean
@@ -26,17 +27,17 @@ export interface VanillaContractMetaStore {
 
 // TODO: allow adding custom strategies to vanilla API
 export class TransactionDecoder {
-    private readonly context: Context.Context<EffectAbiStore | EffectContractMetaStore | RPCProvider>
+    private readonly context: Context.Context<EffectAbiStore | EffectContractMetaStore | PublicClient>
     private readonly logging: boolean
 
-    constructor({ getProvider, abiStore, contractMetaStore, logging = false }: TransactionDecoderOptions) {
+    constructor({ getPublicClient, abiStore, contractMetaStore, logging = false }: TransactionDecoderOptions) {
         this.logging = logging
-        const RPCProviderLive = RPCProvider.of({
-            _tag: 'RPCProvider',
-            getProvider: (chainID) => {
+        const PublicClientLive = PublicClient.of({
+            _tag: 'PublicClient',
+            getPublicClient: (chainID) => {
                 return Effect.try({
                     try: () => {
-                        const provider = getProvider(chainID)
+                        const provider = getPublicClient(chainID)
                         if (provider == null) {
                             throw new Error(`Provider for chain ${chainID} not found`)
                         }
@@ -59,7 +60,7 @@ export class TransactionDecoder {
         })
 
         this.context = Context.empty().pipe(
-            Context.add(RPCProvider, RPCProviderLive),
+            Context.add(PublicClient, PublicClientLive),
             Context.add(EffectAbiStore, AbiStoreLive),
             Context.add(EffectContractMetaStore, MockedMetaStoreLive),
         )
@@ -67,7 +68,7 @@ export class TransactionDecoder {
 
     decodeTransaction({ chainID, hash }: { chainID: number; hash: string }) {
         const program = Effect.gen(function* (_) {
-            return yield* _(decodeTransactionByHash(hash, chainID))
+            return yield* _(decodeTransactionByHash(hash as Hex, chainID))
         }).pipe(Logger.withMinimumLogLevel(this.logging ? LogLevel.Debug : LogLevel.Error))
 
         const runnable = Effect.provide(program, this.context)
