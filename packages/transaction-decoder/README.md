@@ -15,7 +15,7 @@ $ npm i @3loop/transaction-decoder
 
 To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three data loaders:
 
--   `getProvider`: This function returns an object with ethers JsonRpcProvider based on the chain ID.
+-   `getPublicClient`: This function returns an object with viem PublicClient based on the chain ID.
 -   `contractMetaStore`: This object has 2 properties `get` and `set` that returns and caches contract meta-information. See the `ContractData` type for the required properties.
 -   `abiStore`: Similarly, this object has 2 properties `get` and `set` that returns and cache the contract or fragment ABI based on the chain ID, address, and/or signature.
 
@@ -25,8 +25,12 @@ import { TransactionDecoder } from '@3loop/transaction-decoder'
 const db = {} // Your data source
 
 const decoded = new TransactionDecoder({
-    getProvider: (chainId: number) => {
-        return {provider: new JsonRpcProvider(RPC_URL[chainId])}
+    getPublicClient: (chainId: number) => {
+        return {
+            client: createPublicClient({
+                transport: http(RPC_URL[chainId]),
+            }),
+        }
     },
     abiStore: {
         get: async (req: {
@@ -83,13 +87,16 @@ To get started with using the Decoder, first, you have to provide the RPC Provid
 1. Create an RPC Provider
 
 ```ts
-import { RPCProviderObject } from 'ethers'
-import { RPCProviderObject } from '@3loop/transaction-decoder'
+import { PublicClient, PublicClientObject } from '@3loop/transaction-decoder'
 import { Effect } from 'effect'
 
-const getProvider = (chainID: number): Effect.Effect<never, UnknownNetwork, RPCProviderObject> => {
+const getPublicClient = (chainID: number): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
     if (chainID === 5) {
-        return { provider: Effect.succeed(new JsonRpcProvider(GOERLI_RPC)) }
+        return Effect.succeed({
+            client: createPublicClient({
+                transport: http(GOERLI_RPC),
+            }),
+        })
     }
     return Effect.fail(new UnknownNetwork(chainID))
 }
@@ -162,9 +169,12 @@ export const MetaStoreLive = Layer.succeed(
 
 ```ts
 const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
-const RPCProviderLive = Layer.succeed(RPCProvider, RPCProvider.of({ _tag: 'RPCProvider', getProvider: getProvider }))
+const PublicClientLive = Layer.succeed(
+    PublicClient,
+    PublicClient.of({ _tag: 'PublicClient', getPublicClient: getPublicClient }),
+)
 
-const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer)
+const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer)
 ```
 
 5. Fetch and decode a transaction
@@ -189,12 +199,13 @@ const result = await program.pipe(Effect.provide(customRuntime), Effect.runPromi
 
 `AbiStore` accepts an array of strategies that are used to resolve the ABI from third-party APIs in case the store is missing the ABI. If an ABI is successfully resolved, it is then cached in the store.
 
-Loop Decoder provides 4 strategies out of the box:
+Loop Decoder provides 5 strategies out of the box:
 
 -   `EtherscanStrategyResolver` - resolves the ABI from Etherscan
 -   `SourcifyStrategyResolver` - resolves the ABI from Sourcify
 -   `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
 -   `OpenchainStrategyResolver` - resolves the ABI from Openchain
+-   `BlockscoutStrategyResolver` - resolves the ABI from Blockscout
 
 You can create your own strategy by implementing the `GetContractABIStrategy` Effect RequestResolver.
 

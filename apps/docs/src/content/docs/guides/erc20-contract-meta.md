@@ -9,15 +9,13 @@ Fetch ERC20 contract metadata using Effect API
 
 ```ts
 import { Effect, Layer } from "effect";
-import { Contract } from "ethers";
 import {
   ContractData,
   ContractType,
-  RPCProvider,
+  PublicClient,
   ContractMetaStore,
 } from "@3loop/transaction-decoder";
-
-const ERC20 = "here goes the abi";
+import { erc20Abi, getAddress, getContract } from "viem";
 
 export const fetchAndCacheErc20Meta = ({
   contractAddress,
@@ -27,15 +25,21 @@ export const fetchAndCacheErc20Meta = ({
   chainID: number;
 }) =>
   Effect.gen(function* (_) {
-    const rpcService = yield* _(RPCProvider);
-    const { provider } = yield* _(rpcService.getProvider(chainID));
+    const service = yield* _(PublicClient);
+    const { client } = yield* _(service.getPublicClient(chainID));
 
     const inst = yield* _(
-      Effect.sync(() => new Contract(contractAddress, ERC20, provider)),
+      Effect.sync(() =>
+        getContract({
+          address: getAddress(contractAddress),
+          abi: erc20Abi,
+          client,
+        }),
+      ),
     );
 
     const name = yield* _(
-      Effect.tryPromise(() => inst.name() as Promise<string | null>),
+      Effect.tryPromise(() => inst.read.name() as Promise<string | null>),
     );
 
     if (name == null) {
@@ -45,8 +49,8 @@ export const fetchAndCacheErc20Meta = ({
     const [symbol, decimals] = yield* _(
       Effect.all(
         [
-          Effect.tryPromise(() => inst.symbol() as Promise<string>),
-          Effect.tryPromise(() => inst.decimals() as Promise<number>),
+          Effect.tryPromise(() => inst.read.symbol() as Promise<string>),
+          Effect.tryPromise(() => inst.read.decimals() as Promise<number>),
         ],
         {
           concurrency: "unbounded",
