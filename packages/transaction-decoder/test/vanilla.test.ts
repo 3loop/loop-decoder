@@ -1,13 +1,22 @@
 import { describe, expect, test } from 'vitest'
-import { MockedProvider } from './mocks/json-rpc-mock.js'
+import { mockedTransport } from './mocks/json-rpc-mock.js'
 import { TransactionDecoder } from '@/vanilla.js'
 import fs from 'fs'
+import { createPublicClient } from 'viem'
+import { goerli } from 'viem/chains'
 
 describe('Transaction Decoder', () => {
     test('should be able to decode using vanilla API', async () => {
         const decoded = new TransactionDecoder({
-            getProvider: (chainID) => {
-                if (chainID === 5) return { provider: new MockedProvider() }
+            getPublicClient: (chainID) => {
+                if (chainID === 5) {
+                    return {
+                        client: createPublicClient({
+                            chain: goerli,
+                            transport: mockedTransport,
+                        }),
+                    }
+                }
                 return undefined
             },
             abiStore: {

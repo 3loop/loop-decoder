@@ -455,7 +455,7 @@
   "contractName": "Mock ERC1155 Contract",
   "contractType": "ERC1155",
   "effectiveGasPrice": "1500000008",
-  "fromAddress": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
+  "fromAddress": "0xbdddd277583dcae0b501046ba86714feea71b03f",
   "gasPaid": "0.00295564501576344",
   "gasUsed": "1970430",
   "interactedAddresses": [
@@ -1653,7 +1653,7 @@
   "nativeValueSent": "0",
   "reverted": false,
   "timestamp": 1693790700,
-  "toAddress": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
+  "toAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
   "traceCalls": [
     {
       "from": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
