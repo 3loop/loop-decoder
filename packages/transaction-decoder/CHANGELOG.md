@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.5.0
+
+### Minor Changes
+
+- 8310ae5: Breaking change, update transaction decoder to use viem instead of ethers.js
+
 ## 0.4.0
 
 ### Minor Changes
