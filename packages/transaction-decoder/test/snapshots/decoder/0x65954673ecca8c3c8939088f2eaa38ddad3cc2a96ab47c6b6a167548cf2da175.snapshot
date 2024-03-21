@@ -14,7 +14,7 @@
   "contractName": "Mock ERC721 Contract",
   "contractType": "ERC721",
   "effectiveGasPrice": "1500000028",
-  "fromAddress": "0x6951AE195690E95E9f3eAfadBe241ac19Ef263E4",
+  "fromAddress": "0x6951ae195690e95e9f3eafadbe241ac19ef263e4",
   "gasPaid": "0.000127456502379188",
   "gasUsed": "84971",
   "interactedAddresses": [
@@ -82,7 +82,7 @@
   "nativeValueSent": "0",
   "reverted": false,
   "timestamp": 1692347904,
-  "toAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
+  "toAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
   "traceCalls": [],
   "txHash": "0x65954673ecca8c3c8939088f2eaa38ddad3cc2a96ab47c6b6a167548cf2da175",
   "txIndex": 70,

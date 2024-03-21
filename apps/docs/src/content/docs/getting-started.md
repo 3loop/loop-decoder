@@ -20,11 +20,15 @@ npm i @3loop/transaction-decoder
 
 To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three data loaders:
 
-1. `getProvider`: This function returns an object with [Ethers](https://ethers.org) `JsonRpcProvider` based on the chain ID.
+1. `getPublicClient`: This function returns an object with [Viem](https://viem.sh/) `PublicClient` based on the chain ID.
 
 ```ts
-const getProvider = (chainId: number) => {
-  return { provider: new JsonRpcProvider(RPC_URL[chainId]) };
+const getPublicClient = (chainId: number) => {
+  return {
+    client: createPublicClient({
+      transport: http(RPC_URL[chainId]),
+    }),
+  };
 };
 ```
 
@@ -78,7 +82,7 @@ Finally, you can create a new instance of the LoopDecoder class:
 import { TransactionDecoder } from "@3loop/transaction-decoder";
 
 const decoded = new TransactionDecoder({
-  getProvider: getProvider,
+  getProvider: getPublicClient,
   abiStore: abiStore,
   contractMetaStore: contractMetaStore,
 });

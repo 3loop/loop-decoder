@@ -60,7 +60,7 @@ npm start
 For this guide, you will need to have the following packages installed:
 
 ```bash
-npm install @3loop/transaction-decoder ethers
+npm install @3loop/transaction-decoder viem
 ```
 
 ## Data Sources
@@ -69,17 +69,21 @@ Loop Decoder requires some data sources to be able to decode transactions. We wi
 
 ### RPC Provider
 
-We will start by creating a function which will return an object with JsonRpcProvider based on the chain ID. For the sake of this example, we will only support mainnet.
+We will start by creating a function which will return an object with PublicClient based on the chain ID. For the sake of this example, we will only support mainnet.
 
 ```ts
-import { JsonRpcProvider } from "ethers";
+import { createPublicClient, http } from "viem";
 
-const getProvider = (chainId: number) => {
+const getPublicClient = (chainId: number) => {
   if (chainId !== 1) {
     throw new Error(`Missing RPC provider for chain ID ${chainId}`);
   }
 
-  return { provider: new JsonRpcProvider("https://rpc.ankr.com/eth") };
+  return {
+    client: createPublicClient({
+      transport: http("https://rpc.ankr.com/eth"),
+    }),
+  };
 };
 ```
 
@@ -144,7 +148,7 @@ Finally, you can create a new instance of the LoopDecoder class:
 import { TransactionDecoder } from "@3loop/transaction-decoder";
 
 const decoder = new TransactionDecoder({
-  getProvider: getProvider,
+  getPublicClient: getPublicClient,
   abiStore: abiStore,
   contractMetaStore: contractMetaStore,
 });

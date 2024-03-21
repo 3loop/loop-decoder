@@ -1,11 +1,11 @@
 import {
-  RPCProvider,
+  PublicClient,
   UnknownNetwork,
-  RPCProviderObject,
+  PublicClientObject,
 } from "@3loop/transaction-decoder";
-import { JsonRpcProvider } from "ethers";
 import { Layer, Effect } from "effect";
 import { supportedChains } from "@/app/data";
+import { createPublicClient, http } from "viem";
 
 const providerConfigs: Record<string, (typeof supportedChains)[number]> =
   supportedChains.reduce((acc, config) => {
@@ -15,9 +15,9 @@ const providerConfigs: Record<string, (typeof supportedChains)[number]> =
     };
   }, {});
 
-const providers: Record<number, RPCProviderObject> = {};
+const providers: Record<number, PublicClientObject> = {};
 
-export function getProvider(chainID: number): RPCProviderObject | null {
+export function getProvider(chainID: number): PublicClientObject | null {
   let provider = providers[chainID];
   if (provider != null) {
     return provider;
@@ -25,11 +25,9 @@ export function getProvider(chainID: number): RPCProviderObject | null {
   const url = providerConfigs[chainID]?.rpcUrl;
 
   if (url != null) {
-    const batchMaxCount = providerConfigs[chainID]?.batchMaxCount ?? 100;
-
     provider = {
-      provider: new JsonRpcProvider(url, undefined, {
-        batchMaxCount: batchMaxCount,
+      client: createPublicClient({
+        transport: http(url),
       }),
       config: {
         supportTraceAPI: providerConfigs[chainID]?.supportTraceAPI,
@@ -44,10 +42,10 @@ export function getProvider(chainID: number): RPCProviderObject | null {
 }
 
 export const RPCProviderLive = Layer.succeed(
-  RPCProvider,
-  RPCProvider.of({
-    _tag: "RPCProvider",
-    getProvider: (chainID: number) => {
+  PublicClient,
+  PublicClient.of({
+    _tag: "PublicClient",
+    getPublicClient: (chainID: number) => {
       const provider = getProvider(chainID);
       if (provider != null) {
         return Effect.succeed(provider);

@@ -1,4 +1,11 @@
-export const TEST_TRANSACTIONS = [
+import { Hex } from 'viem'
+
+type TXS = {
+    hash: Hex
+    chainID: number
+}[]
+
+export const TEST_TRANSACTIONS: TXS = [
     {
         hash: '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75',
         chainID: 5,

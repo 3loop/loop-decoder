@@ -22,7 +22,7 @@
   "contractName": "Mock ERC20 Contract",
   "contractType": "ERC20",
   "effectiveGasPrice": "136945022825",
-  "fromAddress": "0x44f356E8716575f2a713A3D91Ae4ed1c7c054A90",
+  "fromAddress": "0x44f356e8716575f2a713a3d91ae4ed1c7c054a90",
   "gasPaid": "0.01719618651613525",
   "gasUsed": "125570",
   "interactedAddresses": [
@@ -185,7 +185,7 @@
   "nativeValueSent": "0",
   "reverted": false,
   "timestamp": 1688483352,
-  "toAddress": "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
+  "toAddress": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
   "traceCalls": [
     {
       "from": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",

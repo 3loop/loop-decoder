@@ -1,4 +1,4 @@
-import { formatEther, type TransactionReceipt, type TransactionResponse } from 'ethers'
+import { formatEther, type TransactionReceipt, type GetTransactionReturnType } from 'viem'
 import type { DecodedTx } from '../types.js'
 import { TxType } from '../types.js'
 
@@ -6,11 +6,11 @@ export function transferDecode({
     transaction,
     receipt,
 }: {
-    transaction: TransactionResponse
+    transaction: GetTransactionReturnType
     receipt: TransactionReceipt
 }): DecodedTx {
     const value = transaction.value.toString()
-    const effectiveGasPrice = receipt.gasPrice ?? BigInt(0)
+    const effectiveGasPrice = receipt.effectiveGasPrice ?? BigInt(0)
     const gasPaid = formatEther(receipt.gasUsed * effectiveGasPrice)
 
     const decodedTx: DecodedTx = {
@@ -29,12 +29,12 @@ export function transferDecode({
         chainSymbol: 'ETH',
         interactions: [],
         chainID: Number(transaction.chainId),
-        effectiveGasPrice: receipt.gasPrice?.toString() ?? transaction.gasPrice.toString() ?? null,
+        effectiveGasPrice: receipt.effectiveGasPrice?.toString() ?? transaction.gasPrice?.toString() ?? null,
         gasUsed: receipt.gasUsed.toString(),
         gasPaid,
         timestamp: 0,
-        txIndex: receipt.index,
-        reverted: receipt.status === 0, // will return true if status==undefined
+        txIndex: receipt.transactionIndex,
+        reverted: receipt.status === 'reverted', // will return true if status==undefined
         assetsReceived: [],
         assetsSent: [], // TDOO: display the eth sent
         interactedAddresses: [receipt.from, receipt.to].filter(Boolean),

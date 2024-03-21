@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { Effect, Layer, pipe } from 'effect'
 import { decodeTransactionByHash } from '@/effect.js'
-import { RPCProvider } from '../src/provider.js'
+import { PublicClient } from '../src/public-client.js'
 import { MockedRPCProvider } from './mocks/json-rpc-mock.js'
 import { TEST_TRANSACTIONS } from './constants.js'
 import { MockedAbiStoreLive } from './mocks/abi-loader-mock.js'
@@ -14,7 +14,7 @@ describe('Transaction Decoder', () => {
         })
 
         const LoadersLayer = Layer.provideMerge(MockedAbiStoreLive, MockedMetaStoreLive)
-        const RPCProviderLive = Layer.succeed(RPCProvider, MockedRPCProvider)
+        const RPCProviderLive = Layer.succeed(PublicClient, MockedRPCProvider)
 
         const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer)
 

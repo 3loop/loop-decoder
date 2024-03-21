@@ -1,30 +1,40 @@
-import { type InterfaceAbi, Interface } from 'ethers'
+import { Abi } from 'viem'
+import { formatAbiItem, toFunctionSelector } from 'viem/utils'
+
+export type AbiItemType = 'constructor' | 'error' | 'event' | 'fallback' | 'function' | 'receive'
 
 interface Signature {
-    type: 'function' | 'event'
+    type: AbiItemType
     signature: string
     fragment: string
 }
 
-export function convertAbiToFragments(abi: InterfaceAbi): Signature[] {
-    const data = new Interface(abi)
-    const fragments: Signature[] = []
+type AbiItem = Abi[number]
 
-    data.forEachFunction(async (func) => {
-        fragments.push({
-            type: 'function',
-            signature: func.selector,
-            fragment: JSON.stringify(func),
+export function convertAbiToFragments(abi: string): Signature[] {
+    const data_ = JSON.parse(abi)
+
+    if (Array.isArray(data_)) {
+        const data = data_ as Abi
+        const fragments: Signature[] = []
+
+        data.forEach(async (item) => {
+            fragments.push({
+                type: item.type,
+                signature: toFunctionSelector(formatAbiItem(item)),
+                fragment: JSON.stringify(item),
+            })
         })
-    })
 
-    data.forEachEvent((event) => {
-        fragments.push({
-            type: 'event',
-            signature: event.topicHash,
-            fragment: JSON.stringify(event),
-        })
-    })
-
-    return fragments
+        return fragments
+    } else {
+        const data = data_ as AbiItem
+        return [
+            {
+                type: data.type,
+                signature: toFunctionSelector(formatAbiItem(data)),
+                fragment: abi,
+            },
+        ]
+    }
 }

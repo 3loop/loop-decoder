@@ -12,15 +12,18 @@ To get started with using the Decoder, first, you have to provide the RPC Provid
 1. Create an RPC Provider
 
 ```ts
-import { RPCProviderObject } from "ethers";
-import { RPCProviderObject } from "@3loop/transaction-decoder";
+import { PublicClient, PublicClientObject } from "@3loop/transaction-decoder";
 import { Effect } from "effect";
 
-const getProvider = (
+const getPublicClient = (
   chainID: number,
-): Effect.Effect<never, UnknownNetwork, RPCProviderObject> => {
+): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
   if (chainID === 5) {
-    return { provider: Effect.succeed(new JsonRpcProvider(GOERLI_RPC)) };
+    return Effect.succeed({
+      client: createPublicClient({
+        transport: http(GOERLI_RPC),
+      }),
+    });
   }
   return Effect.fail(new UnknownNetwork(chainID));
 };
@@ -93,12 +96,12 @@ export const MetaStoreLive = Layer.succeed(
 
 ```ts
 const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive);
-const RPCProviderLive = Layer.succeed(
-  RPCProvider,
-  RPCProvider.of({ _tag: "RPCProvider", getProvider: getProvider }),
+const PublicClientLive = Layer.succeed(
+  PublicClient,
+  PublicClient.of({ _tag: "PublicClient", getPublicClient: getPublicClient }),
 );
 
-const MainLayer = Layer.provideMerge(RPCProviderLive, LoadersLayer);
+const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer);
 ```
 
 5. Fetch and decode a transaction

@@ -1,6 +1,5 @@
 import { Effect, Either } from 'effect'
-import type { TransactionReceipt, TransactionResponse } from 'ethers'
-import { Network, formatEther, isAddress } from 'ethers'
+import { type Hash, type GetTransactionReturnType, type TransactionReceipt, isAddress, formatEther, Abi } from 'viem'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
 import * as AbiDecoder from './decoding/abi-decode.js'
 import * as LogDecoder from './decoding/log-decode.js'
@@ -41,15 +40,21 @@ export class FetchTransactionError {
     ) {}
 }
 
-export const decodeMethod = ({ transaction }: { transaction: TransactionResponse }) =>
+export const decodeMethod = ({ transaction }: { transaction: GetTransactionReturnType }) =>
     Effect.gen(function* (_) {
         if (transaction.to == null) {
             return yield* _(Effect.die(new UnsupportedEvent('Contract creation')))
         }
 
-        const signature = transaction.data.slice(0, 10)
+        if (!('input' in transaction)) {
+            return yield* _(Effect.die(new UnsupportedEvent('Unsupported transaction')))
+        }
+
+        const data = transaction.input
+
+        const signature = data.slice(0, 10)
         const chainID = Number(transaction.chainId)
-        let abiAddress = transaction.to.toLowerCase()
+        let abiAddress = transaction.to
 
         //if contract is a proxy, get the implementation address
         const implementation = yield* _(getProxyStorageSlot({ address: abiAddress, chainID }))
@@ -58,7 +63,7 @@ export const decodeMethod = ({ transaction }: { transaction: TransactionResponse
             abiAddress = implementation
         }
 
-        const abi = yield* _(
+        const abi_ = yield* _(
             getAndCacheAbi({
                 address: abiAddress,
                 signature,
@@ -66,15 +71,17 @@ export const decodeMethod = ({ transaction }: { transaction: TransactionResponse
             }),
         )
 
-        if (!abi) {
+        if (!abi_) {
             return yield* _(Effect.fail(new AbiDecoder.MissingABIError(abiAddress, signature, chainID)))
         }
 
+        const abi = JSON.parse(abi_) as Abi
+
         // TODO: Pass the error message, so we can easier debug
-        const decoded = yield* _(Effect.try(() => AbiDecoder.decodeMethod(transaction.data, abi)))
+        const decoded = yield* _(Effect.try(() => AbiDecoder.decodeMethod(data, abi)))
 
         if (decoded == null) {
-            return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.data}`)))
+            return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.input}`)))
         }
 
         return decoded
@@ -84,7 +91,7 @@ export const decodeLogs = ({
     transaction,
     receipt,
 }: {
-    transaction: TransactionResponse
+    transaction: GetTransactionReturnType
     receipt: TransactionReceipt
 }) =>
     Effect.gen(function* (_) {
@@ -96,7 +103,7 @@ export const decodeLogs = ({
         )
     })
 
-export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transaction: TransactionResponse }) =>
+export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transaction: GetTransactionReturnType }) =>
     Effect.gen(function* (_) {
         return yield* _(
             TraceDecoder.decodeTransactionTrace({
@@ -125,7 +132,7 @@ const collectAllAddresses = ({
 
     if (decodedData.params) {
         for (const param of decodedData.params) {
-            if (param.value && isAddress(param.value)) {
+            if (typeof param.value === 'string' && isAddress(param.value)) {
                 addresses.add(param.value)
             }
         }
@@ -140,7 +147,7 @@ export const decodeTransaction = ({
     trace,
     timestamp,
 }: {
-    transaction: TransactionResponse
+    transaction: GetTransactionReturnType
     receipt: TransactionReceipt
     trace: TraceLog[]
     timestamp: number
@@ -179,8 +186,8 @@ export const decodeTransaction = ({
 
         const value = transaction.value.toString()
 
-        const effectiveGasPrice = receipt.gasPrice ?? BigInt(0)
-        const gasPaid = formatEther((receipt.gasUsed * effectiveGasPrice).toString())
+        const effectiveGasPrice = receipt.effectiveGasPrice ?? BigInt(0)
+        const gasPaid = formatEther(receipt.gasUsed * effectiveGasPrice)
 
         const decodedTx: DecodedTx = {
             txHash: transaction.hash,
@@ -198,12 +205,12 @@ export const decodeTransaction = ({
             chainSymbol: chainIdToNetwork[Number(transaction.chainId)] ?? 'unknown',
             chainID: Number(transaction.chainId),
             interactions,
-            effectiveGasPrice: receipt.gasPrice.toString(),
+            effectiveGasPrice: receipt.effectiveGasPrice?.toString(),
             gasUsed: receipt.gasUsed.toString(),
             gasPaid: gasPaid.toString(),
             timestamp,
-            txIndex: receipt.index,
-            reverted: receipt.status === 0, // will return true if status==undefined
+            txIndex: receipt.transactionIndex,
+            reverted: receipt.status === 'reverted', // will return true if status==undefined
             // NOTE: Explore how to set assets for more flexible tracking of the in and out addresses
             assetsReceived: getAssetsReceived(interactions, receipt.from),
             assetsSent: getAssetsSent(interactions, value, receipt.from, receipt.from),
@@ -213,7 +220,7 @@ export const decodeTransaction = ({
         return decodedTx
     })
 
-export const decodeTransactionByHash = (hash: string, chainID: number) =>
+export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
     Effect.gen(function* (_) {
         const { transaction, receipt, trace } = yield* _(
             Effect.all(
@@ -236,7 +243,7 @@ export const decodeTransactionByHash = (hash: string, chainID: number) =>
 
         if (!receipt.to) {
             return yield* _(Effect.fail(new UnsupportedEvent('Contract creation')))
-        } else if (transaction.data === '0x') {
+        } else if (transaction.input === '0x') {
             return yield* _(Effect.sync(() => transferDecode({ transaction, receipt })))
         }
         return yield* _(
@@ -244,7 +251,7 @@ export const decodeTransactionByHash = (hash: string, chainID: number) =>
                 transaction,
                 receipt,
                 trace,
-                timestamp,
+                timestamp: Number(timestamp),
             }),
         )
     })
