@@ -1,52 +1,46 @@
-import { sameAddress } from '../helpers/address.js'
-import type { DecodedTx, Interpreter } from '../types.js'
-import jsonata from 'jsonata'
+import { DecodedTx, Interpreter } from '@/types.js'
+import makeVM from './vm.js'
 
-function findinterpretersForContract(
-    contractAddress: string,
-    chainID: number,
-    interpreters: Interpreter[],
-): Interpreter[] {
-    return interpreters.filter(
-        (interpreter) => sameAddress(interpreter.contractAddress, contractAddress) && interpreter.chainID === chainID,
-    )
+async function runJSCode(input: string, code: string) {
+    const vm = await makeVM(Date.now() + 1000)
+
+    vm.evalCode(code)
+    vm.runtime.executePendingJobs(-1)
+
+    const result = vm.unwrapResult(vm.evalCode('transformEvent(' + input + ')'))
+    const ok = vm.dump(result)
+
+    result.dispose()
+    vm.dispose()
+
+    return ok
 }
 
-export async function findInterpreter({
+export function findInterpreter({
     decodedTx,
     interpreters,
 }: {
     decodedTx: DecodedTx
     interpreters: Interpreter[]
-}): Promise<Interpreter | undefined> {
+}): Interpreter | undefined {
     try {
-        const contractAddress = decodedTx.toAddress
-        const chainID = decodedTx.chainID
+        const { toAddress: contractAddress, chainID } = decodedTx
+
         if (!contractAddress) {
             return undefined
         }
 
-        const contractInterpreters = findinterpretersForContract(contractAddress, chainID, interpreters)
+        const id = `contract:${contractAddress},chain:${chainID}`
 
-        if (!contractInterpreters) {
-            return undefined
-        }
+        const contractTransformation = interpreters.find((interpreter) => interpreter.id === id)
 
-        for (const interpreter of contractInterpreters) {
-            const canInterpret = jsonata(interpreter.filter)
-            const canInterpretResult = await canInterpret.evaluate(decodedTx)
-
-            if (!canInterpretResult) {
-                continue
-            }
-            return interpreter
-        }
+        return contractTransformation
     } catch (e) {
-        throw new Error(`Failed to find interpreter: ${e}`)
+        throw new Error(`Failed to find tx interpreter: ${e}`)
     }
 }
 
-export async function runInterpreter({
+export async function applyInterpreter({
     decodedTx,
     interpreter,
 }: {
@@ -54,8 +48,7 @@ export async function runInterpreter({
     interpreter: Interpreter
 }): Promise<any> {
     try {
-        const expression = jsonata(interpreter.schema)
-        const result = await expression.evaluate(decodedTx)
+        const result = await runJSCode(JSON.stringify(decodedTx), interpreter.schema)
         return result
     } catch (e) {
         throw new Error(`Failed to run interpreter: ${e}`)

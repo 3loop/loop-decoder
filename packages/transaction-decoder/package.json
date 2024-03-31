@@ -42,8 +42,7 @@
   "peerDependencies": {
     "@effect/schema": "^0.59.1",
     "effect": "^2.0.3",
-    "viem": "^2.7.22",
-    "jsonata": "^2.0.3"
+    "viem": "^2.7.22"
   },
   "devDependencies": {
     "@effect/schema": "^0.59.1",
@@ -57,7 +56,6 @@
     "eslint": "^8.49.0",
     "eslint-config-custom": "workspace:*",
     "eslint-config-prettier": "^8.10.0",
-    "jsonata": "^2.0.3",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
     "tsconfig": "workspace:*",
@@ -76,6 +74,7 @@
   },
   "sideEffects": false,
   "dependencies": {
+    "quickjs-emscripten": "^0.29.1",
     "traverse": "^0.6.7"
   }
 }
