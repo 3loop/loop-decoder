@@ -12,21 +12,19 @@ To get started with using the Decoder, first, you have to provide the RPC Provid
 1. Create an RPC Provider
 
 ```ts
-import { PublicClient, PublicClientObject } from "@3loop/transaction-decoder";
-import { Effect } from "effect";
+import { PublicClient, PublicClientObject } from '@3loop/transaction-decoder'
+import { Effect } from 'effect'
 
-const getPublicClient = (
-  chainID: number,
-): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
-  if (chainID === 5) {
-    return Effect.succeed({
-      client: createPublicClient({
-        transport: http(GOERLI_RPC),
-      }),
-    });
-  }
-  return Effect.fail(new UnknownNetwork(chainID));
-};
+const getPublicClient = (chainID: number): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
+    if (chainID === 5) {
+        return Effect.succeed({
+            client: createPublicClient({
+                transport: http(GOERLI_RPC),
+            }),
+        })
+    }
+    return Effect.fail(new UnknownNetwork(chainID))
+}
 ```
 
 2. Create the AbiStore
@@ -37,34 +35,34 @@ To create a new `AbiStore` service you will need to implement two methods `set` 
 
 ```ts
 const AbiStoreLive = Layer.succeed(
-  AbiStore,
-  AbiStore.of({
-    strategies: { default: [] },
-    set: ({ address = {}, func = {}, event = {} }) =>
-      Effect.sync(() => {
-        // NOTE: Ignore caching as we relay only on local abis
-      }),
-    get: ({ address, signature, event }) =>
-      Effect.sync(() => {
-        const signatureAbiMap = {
-          "0x3593564c": "execute(bytes,bytes[],uint256)",
-          "0x0902f1ac": "getReserves()",
-          "0x36c78516": "transferFrom(address,address,uint160,address)	",
-          "0x70a08231": "balanceOf(address)",
-          "0x022c0d9f": "swap(uint256,uint256,address,bytes)",
-          "0x2e1a7d4d": "withdraw(uint256)",
-        };
+    AbiStore,
+    AbiStore.of({
+        strategies: { default: [] },
+        set: ({ address = {}, func = {}, event = {} }) =>
+            Effect.sync(() => {
+                // NOTE: Ignore caching as we relay only on local abis
+            }),
+        get: ({ address, signature, event }) =>
+            Effect.sync(() => {
+                const signatureAbiMap = {
+                    '0x3593564c': 'execute(bytes,bytes[],uint256)',
+                    '0x0902f1ac': 'getReserves()',
+                    '0x36c78516': 'transferFrom(address,address,uint160,address)	',
+                    '0x70a08231': 'balanceOf(address)',
+                    '0x022c0d9f': 'swap(uint256,uint256,address,bytes)',
+                    '0x2e1a7d4d': 'withdraw(uint256)',
+                }
 
-        const abi = signatureAbiMap[signature];
+                const abi = signatureAbiMap[signature]
 
-        if (abi) {
-          return abi;
-        }
+                if (abi) {
+                    return abi
+                }
 
-        return null;
-      }),
-  }),
-);
+                return null
+            }),
+    }),
+)
 ```
 
 3. Create the ContractMetaStore
@@ -75,6 +73,7 @@ Similarly to AbiStore, but returns all the contract meta data
 export const MetaStoreLive = Layer.succeed(
     ContractMetaStore,
     ContractMetaStore.of({
+        strategies: { default: [] },
         get: ({ address, chainID }) => Effect.sync(() => {
             return {
                 address: request.address,
@@ -95,37 +94,29 @@ export const MetaStoreLive = Layer.succeed(
 4. Create a context using the services we created above
 
 ```ts
-const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive);
+const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
 const PublicClientLive = Layer.succeed(
-  PublicClient,
-  PublicClient.of({ _tag: "PublicClient", getPublicClient: getPublicClient }),
-);
+    PublicClient,
+    PublicClient.of({ _tag: 'PublicClient', getPublicClient: getPublicClient }),
+)
 
-const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer);
+const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer)
 ```
 
 5. Fetch and decode a transaction
 
 ```ts
 const program = Effect.gen(function* (_) {
-  const hash =
-    "0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75";
-  const chainID = 5;
+    const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
+    const chainID = 5
 
-  return yield* _(decodeTransactionByHash(hash, chainID));
-});
+    return yield* _(decodeTransactionByHash(hash, chainID))
+})
 ```
 
 6. Finally provide the context and run the program
 
 ```ts
-const customRuntime = pipe(
-  Layer.toRuntime(MainLayer),
-  Effect.scoped,
-  Effect.runSync,
-);
-const result = await program.pipe(
-  Effect.provideSomeRuntime(customRuntime),
-  Effect.runPromise,
-);
+const customRuntime = pipe(Layer.toRuntime(MainLayer), Effect.scoped, Effect.runSync)
+const result = await program.pipe(Effect.provideSomeRuntime(customRuntime), Effect.runPromise)
 ```

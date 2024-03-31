@@ -9,10 +9,10 @@ description: ABI Data Loaders Strategies used to fetch ABI data from third-party
 
 Loop Decoder provides some strategies out of the box:
 
-- `EtherscanStrategyResolver` - resolves the ABI from Etherscan
-- `SourcifyStrategyResolver` - resolves the ABI from Sourcify
-- `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
-- `OpenchainStrategyResolver` - resolves the ABI from Openchain
-- `BlockscoutStrategyResolver` - resolves the ABI from Blockscout
+-   `EtherscanStrategyResolver` - resolves the ABI from Etherscan
+-   `SourcifyStrategyResolver` - resolves the ABI from Sourcify
+-   `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
+-   `OpenchainStrategyResolver` - resolves the ABI from Openchain
+-   `BlockscoutStrategyResolver` - resolves the ABI from Blockscout
 
-  You can create your own strategy by implementing the `GetContractABIStrategy` Effect RequestResolver.
+    You can create your own strategy by implementing the `GetContractABIStrategy` Effect RequestResolver.

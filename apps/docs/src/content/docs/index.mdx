@@ -3,29 +3,27 @@ title: Loop Decoder
 description: A library to transform any EVM (Ethereum Virtual Machine) transaction into a human-readable format
 template: splash
 hero:
-  tagline: A library to transform any EVM transaction into a human-readable format
-  image:
-    file: ../../assets/tmp-image.png
-  actions:
-    - text: Getting Started
-      link: /getting-started
-      icon: right-arrow
-      variant: primary
-    - text: See our Playground
-      link: https://loop-decoder-web.vercel.app/
-      icon: external
+    tagline: A library to transform any EVM transaction into a human-readable format
+    image:
+        file: ../../assets/tmp-image.png
+    actions:
+        - text: Getting Started
+          link: /getting-started
+          icon: right-arrow
+          variant: primary
+        - text: See our Playground
+          link: https://loop-decoder-web.vercel.app/
+          icon: external
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
+import { Card, CardGrid } from '@astrojs/starlight/components'
 
 <CardGrid stagger>
-  <Card title="Transaction Decoder" icon="rocket">
-    Decode any EVM transaction into a human-readable format using TypeScript.
-    Loop Decoder does not enforce any infrastructure requirements, so you can
-    use it in any environment.
-  </Card>
-  <Card title="Data Loaders" icon="add-document">
-    Loop Decoder provides a set of data loaders to simplify resolution of ABIs
-    and other data required for decoding.
-  </Card>
+    <Card title="Transaction Decoder" icon="rocket">
+        Decode any EVM transaction into a human-readable format using TypeScript. Loop Decoder does not enforce any
+        infrastructure requirements, so you can use it in any environment.
+    </Card>
+    <Card title="Data Loaders" icon="add-document">
+        Loop Decoder provides a set of data loaders to simplify resolution of ABIs and other data required for decoding.
+    </Card>
 </CardGrid>
