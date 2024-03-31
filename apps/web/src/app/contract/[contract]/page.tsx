@@ -39,7 +39,7 @@ export default async function Home({
 
   return (
     <div>
-      <div className="py-4 grid w-full max-w-sm items-center gap-1.5">
+      <div className="py-4 grid w-full max-w-sm items-center gap-1.5 overflow-y-auto">
         <Label htmlFor="contractAddress">Contract address</Label>
         <Input
           disabled
