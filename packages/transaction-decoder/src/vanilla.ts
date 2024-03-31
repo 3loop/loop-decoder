@@ -6,6 +6,7 @@ import { AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
 import { ContractMetaParams, ContractMetaStore as EffectContractMetaStore } from './contract-meta-loader.js'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
 import { Hex } from 'viem'
+import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 
 export interface TransactionDecoderOptions {
     getPublicClient: (chainID: number) => PublicClientObject | undefined
@@ -20,7 +21,10 @@ export interface VanillaAbiStore {
     set: (val: ContractABI) => Promise<void>
 }
 
+type VanillaContractMetaStategy = (client: PublicClient) => RequestResolver.RequestResolver<GetContractMetaStrategy>
+
 export interface VanillaContractMetaStore {
+    strategies?: readonly VanillaContractMetaStategy[]
     get: (key: ContractMetaParams) => Promise<ContractData | null>
     set: (key: ContractMetaParams, val: ContractData) => Promise<void>
 }
@@ -32,6 +36,7 @@ export class TransactionDecoder {
 
     constructor({ getPublicClient, abiStore, contractMetaStore, logging = false }: TransactionDecoderOptions) {
         this.logging = logging
+
         const PublicClientLive = PublicClient.of({
             _tag: 'PublicClient',
             getPublicClient: (chainID) => {
@@ -54,7 +59,10 @@ export class TransactionDecoder {
             set: (val) => Effect.promise(() => abiStore.set(val)),
         })
 
-        const MockedMetaStoreLive = EffectContractMetaStore.of({
+        const contractMetaStrategies = contractMetaStore.strategies?.map((strategy) => strategy(PublicClientLive))
+
+        const MetaStoreLive = EffectContractMetaStore.of({
+            strategies: { default: contractMetaStrategies ?? [] },
             get: (key) => Effect.promise(() => contractMetaStore.get(key)),
             set: (key, val) => Effect.promise(() => contractMetaStore.set(key, val)),
         })
@@ -62,7 +70,7 @@ export class TransactionDecoder {
         this.context = Context.empty().pipe(
             Context.add(PublicClient, PublicClientLive),
             Context.add(EffectAbiStore, AbiStoreLive),
-            Context.add(EffectContractMetaStore, MockedMetaStoreLive),
+            Context.add(EffectContractMetaStore, MetaStoreLive),
         )
     }
 
