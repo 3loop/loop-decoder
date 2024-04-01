@@ -1,6 +1,6 @@
-import { getQuickJS, shouldInterruptAfterDeadline } from 'quickjs-emscripten'
+import { getQuickJS, QuickJSContext, shouldInterruptAfterDeadline } from 'quickjs-emscripten'
 
-export default async function makeVM(timeout = -1) {
+export default async function makeVM(timeout = -1): Promise<QuickJSContext> {
     const QuickJS = await getQuickJS()
     const vm = QuickJS.newContext()
     if (timeout !== -1) {

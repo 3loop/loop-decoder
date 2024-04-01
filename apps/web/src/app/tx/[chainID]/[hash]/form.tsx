@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
-import { interpretTx } from "@/lib/interpreter";
+import { Interpretation, interpretTx } from "@/lib/interpreter";
 import CodeBlock from "@/components/ui/code-block";
 import { NetworkSelect } from "@/components/ui/network-select";
 
@@ -33,10 +33,10 @@ export default function DecodingForm({
   currentHash,
   currentChainID,
 }: FormProps) {
-  const [result, setResult] = React.useState<string>();
+  const [result, setResult] = React.useState<Interpretation>();
   const [schema, setSchema] = useLocalStorage(
     defaultInterpreter?.id ?? "unknown",
-    defaultInterpreter?.schema
+    defaultInterpreter?.schema,
   );
 
   const router = useRouter();
@@ -59,6 +59,18 @@ export default function DecodingForm({
       });
     }
   }, [schema, decoded, defaultInterpreter]);
+
+  // Run the interpreter on page load
+  React.useEffect(() => {
+    if (
+      schema &&
+      defaultInterpreter != null &&
+      decoded != null &&
+      result == null
+    ) {
+      onRun();
+    }
+  }, [schema, decoded, defaultInterpreter, result, onRun]);
 
   return (
     <div className="grid h-full items-stretch gap-6 md:grid-cols-[1fr_200px]">
@@ -109,9 +121,14 @@ export default function DecodingForm({
             <div className="flex flex-row justify-between items-center">
               <Label>Result:</Label>
             </div>
+
             <CodeBlock
               language="json"
-              value={JSON.stringify(result, null, 2)}
+              value={
+                result?.error
+                  ? result?.error
+                  : JSON.stringify(result?.interpretation, null, 2)
+              }
               readonly={true}
               lineNumbers={false}
             />

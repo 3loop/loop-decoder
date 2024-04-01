@@ -10,7 +10,11 @@ import {
 } from "@/components/ui/table";
 import React from "react";
 import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
-import { findAndRunInterpreter, defaultInterpreters } from "@/lib/interpreter";
+import {
+  findAndRunInterpreter,
+  defaultInterpreters,
+  Interpretation,
+} from "@/lib/interpreter";
 
 function getAvaliableinterpreters() {
   if (typeof window === "undefined") return undefined;
@@ -35,12 +39,7 @@ function getAvaliableinterpreters() {
 }
 
 export default function TxTable({ txs }: { txs: DecodedTx[] }) {
-  const [result, setResult] = React.useState<
-    {
-      tx: DecodedTx;
-      interpretation: any;
-    }[]
-  >([]);
+  const [result, setResult] = React.useState<Interpretation[]>([]);
   const [interpreters] = React.useState(getAvaliableinterpreters);
 
   React.useEffect(() => {
@@ -52,6 +51,8 @@ export default function TxTable({ txs }: { txs: DecodedTx[] }) {
           return findAndRunInterpreter(tx, interpreters);
         }),
       );
+
+      console.log(withIntepretations[0]);
 
       setResult(withIntepretations);
     }

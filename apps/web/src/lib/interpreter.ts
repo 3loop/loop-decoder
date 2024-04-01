@@ -5,13 +5,18 @@ import {
   DecodedTx,
 } from "@3loop/transaction-decoder";
 
+export interface Interpretation {
+  tx: DecodedTx;
+  interpretation: any;
+  error?: string;
+}
+
 export const emptyInterpreter: Interpreter = {
   id: "default",
-  code: `
-  function transformEvent(event){
+  schema: `function transformEvent(event){
     return event;
 };
-  `,
+`,
 };
 
 export const defaultInterpreters: Interpreter[] = [
@@ -28,6 +33,7 @@ function transformEvent(event) {
         user: event.fromAddress,
         method: methodName,
         assetsSent: event.assetsSent,
+        assetsReceived: event?.assetsReceived
     }
 
     switch (methodName) {
@@ -58,29 +64,37 @@ function transformEvent(event) {
 
 export async function interpretTx(
   decodedTx: DecodedTx,
-  interpreter: Interpreter
-) {
-  const res = await applyInterpreter({ decodedTx, interpreter });
-  return res;
+  interpreter: Interpreter,
+): Promise<Interpretation> {
+  try {
+    const res = await applyInterpreter({ decodedTx, interpreter });
+    return {
+      tx: decodedTx,
+      interpretation: res,
+    };
+  } catch (e) {
+    return {
+      tx: decodedTx,
+      interpretation: undefined,
+      error: (e as Error).message,
+    };
+  }
 }
 
 export async function findAndRunInterpreter(
   decodedTx: DecodedTx,
-  interpreters: Interpreter[]
-) {
+  interpreters: Interpreter[],
+): Promise<Interpretation> {
   const interpreter = findInterpreter({ decodedTx, interpreters });
 
   if (!interpreter) {
     return {
       tx: decodedTx,
-      interpretation: decodedTx,
+      interpretation: undefined,
     };
   }
 
-  const res = await applyInterpreter({ decodedTx, interpreter });
+  const res = await interpretTx(decodedTx, interpreter);
 
-  return {
-    tx: decodedTx,
-    interpretation: res,
-  };
+  return res;
 }
