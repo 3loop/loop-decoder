@@ -1,54 +1,61 @@
 # @3loop/transaction-decoder
 
+## 0.6.0
+
+### Minor Changes
+
+-   bf4a5fc: Add automatic resolvers for contract metadata
+-   fb481d6: Change interpretation from jsonata to js code using QuickJS
+
 ## 0.5.0
 
 ### Minor Changes
 
-- 8310ae5: Breaking change, update transaction decoder to use viem instead of ethers.js
+-   8310ae5: Breaking change, update transaction decoder to use viem instead of ethers.js
 
 ## 0.4.0
 
 ### Minor Changes
 
-- a6d534a: Update Effect to stable version
+-   a6d534a: Update Effect to stable version
 
 ## 0.3.0
 
 ### Minor Changes
 
-- bcd03ed: Add all addresses involved in the transaction in the decode output
-- eb73069: Allow having custom abi loader strategy per each chain
+-   bcd03ed: Add all addresses involved in the transaction in the decode output
+-   eb73069: Allow having custom abi loader strategy per each chain
 
 ## 0.2.0
 
 ### Minor Changes
 
-- 879da09: Add helpers for tx interpretations using jsonata
+-   879da09: Add helpers for tx interpretations using jsonata
 
 ## 0.1.4
 
 ### Patch Changes
 
-- 3c8bd17: Use tsup to build transaction-decoder
+-   3c8bd17: Use tsup to build transaction-decoder
 
 ## 0.1.1
 
 ### Patch Changes
 
-- cec2752: Fix wrong import from effect
+-   cec2752: Fix wrong import from effect
 
 ## 0.1.0
 
 ### Minor Changes
 
-- 2010280: Add a new API for resolving contract abi and contract meta
+-   2010280: Add a new API for resolving contract abi and contract meta
 
 ### Patch Changes
 
-- e39622b: Add vanila api, proxy contract resolver and other small fixes
+-   e39622b: Add vanila api, proxy contract resolver and other small fixes
 
 ## 0.0.1
 
 ### Major Changes
 
-- Initial release
+-   Initial release
