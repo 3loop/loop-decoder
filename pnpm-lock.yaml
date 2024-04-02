@@ -190,9 +190,6 @@ importers:
 
   packages/transaction-decoder:
     dependencies:
-      quickjs-emscripten:
-        specifier: ^0.29.1
-        version: 0.29.1
       traverse:
         specifier: ^0.6.7
         version: 0.6.7
@@ -233,6 +230,9 @@ importers:
       prettier:
         specifier: ^2.8.8
         version: 2.8.8
+      quickjs-emscripten:
+        specifier: ^0.29.1
+        version: 0.29.1
       ts-node:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.6.0)(typescript@5.1.3)
@@ -1957,31 +1957,31 @@ packages:
 
   /@jitl/quickjs-ffi-types@0.29.1:
     resolution: {integrity: sha512-dVt//PvFmwNJIwfyfPx7vR6cg7mLnAq6/THbhIeZ3NqXb66qXQATnW2gNqAnOcTh1D/f6HyrHFwRf3GdKUN3nw==}
-    dev: false
+    dev: true
 
   /@jitl/quickjs-wasmfile-debug-asyncify@0.29.1:
     resolution: {integrity: sha512-jhxRDq+9ZWT8ddRt6JLcjLLF168EvFrOceiaoy+GuYYXJkWVrWk5p2Ray2GHzh+DL7byszRKEUAKqA9B86Rd9g==}
     dependencies:
       '@jitl/quickjs-ffi-types': 0.29.1
-    dev: false
+    dev: true
 
   /@jitl/quickjs-wasmfile-debug-sync@0.29.1:
     resolution: {integrity: sha512-qn6cxqg2fvobiJtQ/xHVSZH55djraIQ7g+9XGyJjf+ofsn1taMG8T5TIR2iZL7TMSdCRZkGiJeNOp9UaFCTN2w==}
     dependencies:
       '@jitl/quickjs-ffi-types': 0.29.1
-    dev: false
+    dev: true
 
   /@jitl/quickjs-wasmfile-release-asyncify@0.29.1:
     resolution: {integrity: sha512-1PD+TEw5raGk5s7G1N89gaT81J5A1N6PT79ixbm70gaU0xdUJyAUJoiLiS3YwLjcbpiiM0f7Vnf85M3Li914aQ==}
     dependencies:
       '@jitl/quickjs-ffi-types': 0.29.1
-    dev: false
+    dev: true
 
   /@jitl/quickjs-wasmfile-release-sync@0.29.1:
     resolution: {integrity: sha512-iVeMmZXIDg3gD0elfj5FscwrqGLmcglvpvWDIzs5tmzJ4AKiDAHXunGwd8X4gifeW6S+f0j681M8+tZuUIqnJA==}
     dependencies:
       '@jitl/quickjs-ffi-types': 0.29.1
-    dev: false
+    dev: true
 
   /@jridgewell/gen-mapping@0.3.3:
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
@@ -9380,7 +9380,7 @@ packages:
     resolution: {integrity: sha512-urFIWrPgKfzLFe/IwE8px3Oznb7UGsXpMjHLe15PTPbWongXmy6KAyxRpYFW8K/dDELilg0H/voysHbWHKj6uA==}
     dependencies:
       '@jitl/quickjs-ffi-types': 0.29.1
-    dev: false
+    dev: true
 
   /quickjs-emscripten@0.29.1:
     resolution: {integrity: sha512-9WX9cbbPW2/Wg/vedfAV6lL1kJB68xvE7kuILM24dkcIB/NCrIscZ94OdTGi9/77jYEJuajkzoQnHVn2BLzdaQ==}
@@ -9391,7 +9391,7 @@ packages:
       '@jitl/quickjs-wasmfile-release-asyncify': 0.29.1
       '@jitl/quickjs-wasmfile-release-sync': 0.29.1
       quickjs-emscripten-core: 0.29.1
-    dev: false
+    dev: true
 
   /rc@1.2.8:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
