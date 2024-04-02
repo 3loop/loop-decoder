@@ -1,116 +1,100 @@
 import {
-  DecodedTx,
   Interpreter,
   findInterpreter,
-  runInterpreter,
+  applyInterpreter,
+  DecodedTx,
 } from "@3loop/transaction-decoder";
 
-export const emptyinterpreter: Interpreter = {
+export interface Interpretation {
+  tx: DecodedTx;
+  interpretation: any;
+  error?: string;
+}
+
+export const emptyInterpreter: Interpreter = {
   id: "default",
-  contractAddress: "",
-  schema: "",
-  filter: "txHash ? true : false",
-  chainID: 1,
+  schema: `function transformEvent(event){
+    return event;
+};
+`,
 };
 
-export const defaultinterpreters: Interpreter[] = [
+export const defaultInterpreters: Interpreter[] = [
   {
-    id: "aave-repay",
-    contractAddress: "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9",
+    id: "contract:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9,chain:1",
     schema: `
-        {
-            "action": "User repaid " & assetsSent[1].amount & " " & assetsSent[1].symbol,
-            "txHash": txHash,
-            "user": fromAddress,
-            "method": methodCall.name,
-            "assetsSent": assetsSent
-        }
-              `,
-    filter: `methodCall.name = "repay"`,
-    chainID: 1,
-  },
-  {
-    id: "aave-deposit",
-    contractAddress: "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9",
-    schema: `
-        {
-            "action": "User deposited " & assetsSent[0].amount & " " & assetsSent[0].symbol,
-            "txHash": txHash,
-            "user": fromAddress,
-            "method": methodCall.name,
-            "assetsSent": assetsSent
-        }
-              `,
-    filter: `methodCall.name = "deposit"`,
-    chainID: 1,
-  },
-  {
-    id: "aave-borrow",
-    contractAddress: "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9",
-    schema: `
-        {
-            "action": "User borrowed " & assetsReceived[1].amount & " " & assetsReceived[1].symbol,
-            "txHash": txHash,
-            "user": fromAddress,
-            "method": methodCall.name,
-            "assetsReceived": assetsReceived
-        }
-              `,
-    filter: `methodCall.name = "borrow"`,
-    chainID: 1,
-  },
-  {
-    id: "aave-withdraw",
-    contractAddress: "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9",
-    schema: `
-        {
-            "action": "User withdrew " & assetsReceived[0].amount & " " & assetsReceived[0].symbol,
-            "txHash": txHash,
-            "user": fromAddress,
-            "method": methodCall.name,
-            "assetsReceived": assetsReceived
-        }
-              `,
-    filter: `methodCall.name = "withdraw"`,
-    chainID: 1,
+function transformEvent(event) {
+    const methodName = event.methodCall.name
+    let action = ''
+
+    const newEvent = {
+        action: action,
+        txHash: event.txHash,
+        user: event.fromAddress,
+        method: methodName,
+        assetsSent: event.assetsSent,
+        assetsReceived: event?.assetsReceived
+    }
+
+    switch (methodName) {
+        case 'repay':
+            action = \`User repaid \${event.assetsSent[1].amount} \${event.assetsSent[1].symbol}\`
+            break
+
+        case 'deposit':
+            action = \`User deposited \${event.assetsSent[0].amount} \${event.assetsSent[0].symbol}\`
+            break
+
+        case 'borrow':
+            action = \`User borrowed \${event.assetsReceived[1].amount} \${event.assetsReceived[1].symbol}\`
+            break
+
+        case 'withdraw':
+            action = \`User withdrew \${event.assetsReceived[0].amount} \${event.assetsReceived[0].symbol}\`
+            break
+    }
+
+    newEvent.action = action
+
+    return newEvent
+}
+    `,
   },
 ];
 
 export async function interpretTx(
   decodedTx: DecodedTx,
   interpreter: Interpreter,
-) {
+): Promise<Interpretation> {
   try {
-    const res = await runInterpreter({ decodedTx, interpreter });
-    return res;
-  } catch (error) {
-    console.error("Interpret error", error);
-    return undefined;
+    const res = await applyInterpreter({ decodedTx, interpreter });
+    return {
+      tx: decodedTx,
+      interpretation: res,
+    };
+  } catch (e) {
+    return {
+      tx: decodedTx,
+      interpretation: undefined,
+      error: (e as Error).message,
+    };
   }
 }
 
 export async function findAndRunInterpreter(
   decodedTx: DecodedTx,
   interpreters: Interpreter[],
-) {
-  const interpreter = await findInterpreter({ decodedTx, interpreters });
+): Promise<Interpretation> {
+  const interpreter = findInterpreter({ decodedTx, interpreters });
 
   if (!interpreter) {
     return {
       tx: decodedTx,
-      interpretation: {
-        action: "Unknown",
-        txHash: decodedTx.txHash,
-        user: decodedTx.fromAddress,
-        method: decodedTx.methodCall.name,
-      },
+      interpretation: undefined,
     };
   }
 
-  const res = await runInterpreter({ decodedTx, interpreter });
+  const res = await interpretTx(decodedTx, interpreter);
 
-  return {
-    tx: decodedTx,
-    interpretation: res,
-  };
+  return res;
 }

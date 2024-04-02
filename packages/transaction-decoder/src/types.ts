@@ -163,7 +163,4 @@ export interface InternalEvent {
 export interface Interpreter {
     id: string
     schema: string
-    filter: string
-    chainID: number
-    contractAddress?: string
 }

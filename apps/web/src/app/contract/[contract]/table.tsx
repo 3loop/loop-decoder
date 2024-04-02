@@ -10,14 +10,18 @@ import {
 } from "@/components/ui/table";
 import React from "react";
 import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
-import { findAndRunInterpreter, defaultinterpreters } from "@/lib/interpreter";
+import {
+  findAndRunInterpreter,
+  defaultInterpreters,
+  Interpretation,
+} from "@/lib/interpreter";
 
 function getAvaliableinterpreters() {
   if (typeof window === "undefined") return undefined;
 
   let res: Interpreter[] = [];
 
-  for (const interpreter of defaultinterpreters) {
+  for (const interpreter of defaultInterpreters) {
     const stored = window.localStorage.getItem(interpreter.id);
     if (stored) {
       const updatedSchema = JSON.parse(stored);
@@ -35,28 +39,25 @@ function getAvaliableinterpreters() {
 }
 
 export default function TxTable({ txs }: { txs: DecodedTx[] }) {
-  const [result, setResult] = React.useState<
-    {
-      tx: DecodedTx;
-      interpretation: any;
-    }[]
-  >([]);
-  const [intepretors] = React.useState(getAvaliableinterpreters);
+  const [result, setResult] = React.useState<Interpretation[]>([]);
+  const [interpreters] = React.useState(getAvaliableinterpreters);
 
   React.useEffect(() => {
     async function run() {
-      if (intepretors == null) return;
+      if (interpreters == null) return;
 
       const withIntepretations = await Promise.all(
         txs.map((tx) => {
-          return findAndRunInterpreter(tx, intepretors);
+          return findAndRunInterpreter(tx, interpreters);
         }),
       );
+
+      console.log(withIntepretations[0]);
 
       setResult(withIntepretations);
     }
     run();
-  }, [intepretors, txs]);
+  }, [interpreters, txs]);
 
   return (
     <Table>

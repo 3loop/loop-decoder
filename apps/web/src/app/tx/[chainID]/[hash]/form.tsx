@@ -1,21 +1,17 @@
 "use client";
 import * as React from "react";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { DEFAULT_CHAIN_ID, transactions } from "../../../data";
 import { useLocalStorage } from "usehooks-ts";
 import { SidebarNav } from "@/components/ui/sidebar-nav";
-import { QuestionMarkCircledIcon } from "@radix-ui/react-icons";
-import {
-  HoverCard,
-  HoverCardTrigger,
-  HoverCardContent,
-} from "@/components/ui/hover-card";
+import { PlayIcon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
-import { interpretTx } from "@/lib/interpreter";
+import { Interpretation, interpretTx } from "@/lib/interpreter";
+import CodeBlock from "@/components/ui/code-block";
+import { NetworkSelect } from "@/components/ui/network-select";
 
 export const sidebarNavItems = transactions.map((tx) => {
   return {
@@ -37,7 +33,7 @@ export default function DecodingForm({
   currentHash,
   currentChainID,
 }: FormProps) {
-  const [result, setResult] = React.useState<string>();
+  const [result, setResult] = React.useState<Interpretation>();
   const [schema, setSchema] = useLocalStorage(
     defaultInterpreter?.id ?? "unknown",
     defaultInterpreter?.schema,
@@ -51,7 +47,7 @@ export default function DecodingForm({
     router.push(`/tx/${currentChainID}/${hash}`);
   };
 
-  React.useEffect(() => {
+  const onRun = React.useCallback(() => {
     if (schema && defaultInterpreter != null && decoded != null) {
       const newInterpreter = {
         ...defaultInterpreter,
@@ -64,90 +60,78 @@ export default function DecodingForm({
     }
   }, [schema, decoded, defaultInterpreter]);
 
+  // Run the interpreter on page load
+  React.useEffect(() => {
+    if (
+      schema &&
+      defaultInterpreter != null &&
+      decoded != null &&
+      result == null
+    ) {
+      onRun();
+    }
+  }, [schema, decoded, defaultInterpreter, result, onRun]);
+
   return (
     <div className="grid h-full items-stretch gap-6 md:grid-cols-[1fr_200px]">
-      <div className="md:order-1">
-        <div className="flex-col space-y-4 flex">
-          <div className="flex flex-col space-y-4">
-            <div className="grid h-full gap-6 lg:grid-cols-2">
-              <div className="flex flex-col space-y-4">
-                <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="transactionHash">Transaction</Label>
-                  <form onSubmit={onSubmit}>
-                    <div className="flex w-full items-center space-x-2">
-                      <Input
-                        className="flex-1 flex"
-                        id="hash"
-                        name="hash"
-                        placeholder={`Paste Ethereum transaction hash or click on examples`}
-                        defaultValue={currentHash}
-                      />
-                      <Button type="submit">Decode</Button>
-                    </div>
-                  </form>
-                </div>
+      <div className="md:order-1 flex flex-col space-y-4">
+        <form onSubmit={onSubmit}>
+          <div className="flex w-full items-center space-x-2">
+            <NetworkSelect defaultValue={DEFAULT_CHAIN_ID.toString()} />
 
-                <div className="flex flex-1 flex-col space-y-2 min-h-[250px]">
-                  <Label htmlFor="input">Decoded transaction</Label>
-                  <Textarea
-                    id="decoding"
-                    placeholder="The decoded transaction will appear here"
-                    className="flex-1"
-                    disabled
-                    value={
-                      decoded ? JSON.stringify(decoded, null, 2) : undefined
-                    }
-                  />
-                </div>
-                <div className="flex flex-1 flex-col space-y-2 min-h-[250px]">
-                  <div className="flex flex-row">
-                    <Label htmlFor="intepretation">
-                      Intepretation (
-                      <a
-                        href="https://docs.jsonata.org/overview.html"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        JSONata
-                      </a>{" "}
-                      syntax)
-                    </Label>
-                    <HoverCard>
-                      <HoverCardTrigger asChild>
-                        <QuestionMarkCircledIcon />
-                      </HoverCardTrigger>
-                      <HoverCardContent className="w-80">
-                        <div className="flex justify-between space-x-4">
-                          <p className="text-base">
-                            <a
-                              href="https://docs.jsonata.org/overview.html"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline"
-                            >
-                              JSONata
-                            </a>
-                            {` is a lightweight query and transformation language
-                            for JSON data.`}
-                          </p>
-                        </div>
-                      </HoverCardContent>
-                    </HoverCard>
-                  </div>
-                  <Textarea
-                    id="intepretation"
-                    className="flex-1"
-                    value={schema}
-                    onChange={(e) => setSchema(e.target.value)}
-                    placeholder="Write a custom intepretation here or select one from the list on the right."
-                  />
-                </div>
-              </div>
-              <div className="mt-[21px] min-h-[400px] rounded-md border bg-muted lg:min-h-[700px] overflow-scroll">
-                <pre className="p-4">{JSON.stringify(result, null, 2)}</pre>
-              </div>
+            <Input
+              className="flex-1 flex"
+              id="hash"
+              name="hash"
+              placeholder={`Paste Ethereum transaction hash or click on examples`}
+              defaultValue={currentHash}
+            />
+            <Button type="submit">Decode</Button>
+            <Button variant={"outline"} onClick={onRun} type="button">
+              <PlayIcon className="mr-2 h-4 w-4" />
+              Interpret
+            </Button>
+          </div>
+        </form>
+
+        <div className="grid gap-6 lg:grid-cols-2 lg:grid-rows-2 h-full">
+          <div className="flex flex-col gap-2 col-span-2">
+            <Label>Interpretation:</Label>
+
+            <CodeBlock
+              language="javascript"
+              value={schema}
+              onChange={(value) => setSchema(value)}
+              lineNumbers={true}
+              readonly={false}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2 ">
+            <Label>Decoded transaction:</Label>
+            <CodeBlock
+              language="json"
+              value={JSON.stringify(decoded, null, 2)}
+              readonly={true}
+              lineNumbers={false}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row justify-between items-center">
+              <Label>Result:</Label>
             </div>
+
+            <CodeBlock
+              language="json"
+              value={
+                result?.error
+                  ? result?.error
+                  : JSON.stringify(result?.interpretation, null, 2)
+              }
+              readonly={true}
+              lineNumbers={false}
+            />
           </div>
         </div>
       </div>
