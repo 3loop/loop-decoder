@@ -119,6 +119,7 @@ export const ContractMetaStoreLive = Layer.effect(
               prisma.contractMeta.create({
                 data: {
                   ...contractMeta,
+                  decimals: contractMeta.decimals ?? 0,
                   address: normAddress,
                   chainID: chainID,
                 },
