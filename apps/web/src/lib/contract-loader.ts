@@ -4,12 +4,15 @@ import {
   ContractMetaStore,
   EtherscanStrategyResolver,
   SourcifyStrategyResolver,
+  FourByteStrategyResolver,
+  OpenchainStrategyResolver,
   BlockscoutStrategyResolver,
   PublicClient,
+  ERC20RPCStrategyResolver,
 } from "@3loop/transaction-decoder";
 import { Effect, Layer } from "effect";
-import { fetchAndCacheErc20Meta } from "./contract-meta";
 import prisma from "./prisma";
+import { NFTRPCStrategyResolver } from "@3loop/transaction-decoder";
 
 export const AbiStoreLive = Layer.succeed(
   AbiStore,
@@ -20,6 +23,8 @@ export const AbiStoreLive = Layer.succeed(
           apikey: process.env.ETHERSCAN_API_KEY,
         }),
         SourcifyStrategyResolver(),
+        OpenchainStrategyResolver(),
+        FourByteStrategyResolver(),
       ],
       169: [
         BlockscoutStrategyResolver({
@@ -80,47 +85,47 @@ export const AbiStoreLive = Layer.succeed(
 export const ContractMetaStoreLive = Layer.effect(
   ContractMetaStore,
   Effect.gen(function* (_) {
-    const rpcProvider = yield* _(PublicClient);
+    const publicClient = yield* _(PublicClient);
+    const erc20Loader = ERC20RPCStrategyResolver(publicClient);
+    const nftLoader = NFTRPCStrategyResolver(publicClient);
 
     return ContractMetaStore.of({
+      strategies: {
+        default: [erc20Loader, nftLoader],
+      },
       get: ({ address, chainID }) =>
         Effect.gen(function* (_) {
           const normAddress = address.toLowerCase();
           const data = yield* _(
+            Effect.tryPromise(
+              () =>
+                prisma.contractMeta.findFirst({
+                  where: {
+                    address: normAddress,
+                    chainID: chainID,
+                  },
+                }) as Promise<ContractData | null>,
+            ).pipe(Effect.catchAll((_) => Effect.succeed(null))),
+          );
+
+          return data;
+        }),
+      set: ({ address, chainID }, contractMeta) =>
+        Effect.gen(function* (_) {
+          const normAddress = address.toLowerCase();
+
+          yield* _(
             Effect.tryPromise(() =>
-              prisma.contractMeta.findFirst({
-                where: {
+              prisma.contractMeta.create({
+                data: {
+                  ...contractMeta,
+                  decimals: contractMeta.decimals ?? 0,
                   address: normAddress,
                   chainID: chainID,
                 },
               }),
             ).pipe(Effect.catchAll((_) => Effect.succeed(null))),
           );
-
-          if (data != null) {
-            return data as ContractData;
-          }
-
-          const tryERC20 = yield* _(
-            fetchAndCacheErc20Meta({
-              contractAddress: normAddress,
-              chainID,
-            }).pipe(
-              Effect.provideService(PublicClient, rpcProvider),
-              Effect.catchAll((_) => Effect.succeed(null)),
-            ),
-          );
-
-          if (tryERC20 != null) {
-            return tryERC20;
-          }
-
-          return null;
-        }),
-      set: () =>
-        Effect.sync(() => {
-          console.error("Set not implemented for ContractMetaStoreLive");
-          return null;
         }),
     });
   }),

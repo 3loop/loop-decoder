@@ -31,9 +31,9 @@ npx tsc --init
 
 ```json
 {
-  "compilerOptions": {
-    "strict": true
-  }
+    "compilerOptions": {
+        "strict": true
+    }
 }
 ```
 
@@ -43,9 +43,9 @@ npx tsc --init
 
 ```json
 {
-  "scripts": {
-    "start": "tsc && node index.js"
-  }
+    "scripts": {
+        "start": "tsc && node index.js"
+    }
 }
 ```
 
@@ -72,19 +72,19 @@ Loop Decoder requires some data sources to be able to decode transactions. We wi
 We will start by creating a function which will return an object with PublicClient based on the chain ID. For the sake of this example, we will only support mainnet.
 
 ```ts
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http } from 'viem'
 
 const getPublicClient = (chainId: number) => {
-  if (chainId !== 1) {
-    throw new Error(`Missing RPC provider for chain ID ${chainId}`);
-  }
+    if (chainId !== 1) {
+        throw new Error(`Missing RPC provider for chain ID ${chainId}`)
+    }
 
-  return {
-    client: createPublicClient({
-      transport: http("https://rpc.ankr.com/eth"),
-    }),
-  };
-};
+    return {
+        client: createPublicClient({
+            transport: http('https://rpc.ankr.com/eth'),
+        }),
+    }
+}
 ```
 
 ### ABI loader
@@ -94,34 +94,31 @@ To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API t
 Create a cache for contract ABI:
 
 ```ts
-import { EtherscanStrategyResolver } from "@3loop/transaction-decoder";
-const abiCache = new Map<string, string>();
+import { EtherscanStrategyResolver } from '@3loop/transaction-decoder'
+const abiCache = new Map<string, string>()
 
 const abiStore = {
-  strategies: [
-    EtherscanStrategyResolver({
-      apikey: "YourApiKeyToken",
-    }),
-    FourByteStrategyResolver(),
-  ],
-  get: async (req: {
-    chainID: number;
-    address: string;
-    event?: string | undefined;
-    signature?: string | undefined;
-  }) => {
-    return Promise.resolve(abiCache.get(req.address) ?? null);
-  },
-  set: async (req: {
-    address?: Record<string, string>;
-    signature?: Record<string, string>;
-  }) => {
-    const addresses = Object.keys(req.address ?? {});
-    addresses.forEach((address) => {
-      abiCache.set(address, req.address?.[address] ?? "");
-    });
-  },
-};
+    strategies: [
+        EtherscanStrategyResolver({
+            apikey: 'YourApiKeyToken',
+        }),
+        FourByteStrategyResolver(),
+    ],
+    get: async (req: {
+        chainID: number
+        address: string
+        event?: string | undefined
+        signature?: string | undefined
+    }) => {
+        return Promise.resolve(abiCache.get(req.address) ?? null)
+    },
+    set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
+        const addresses = Object.keys(req.address ?? {})
+        addresses.forEach((address) => {
+            abiCache.set(address, req.address?.[address] ?? '')
+        })
+    },
+}
 ```
 
 ### Contract Metadata loader
@@ -129,29 +126,30 @@ const abiStore = {
 Create a cache for contract meta-information, such as token name, decimals, symbol, etc.:
 
 ```ts
-import type { ContractData } from "@3loop/transaction-decoder";
-const contractMeta = new Map<string, ContractData>();
+import type { ContractData } from '@3loop/transaction-decoder'
+const contractMeta = new Map<string, ContractData>()
 
 const contractMetaStore = {
-  get: async (req: { address: string; chainID: number }) => {
-    return contractMeta.get(req.address) ?? null;
-  },
-  set: async (req: { address: string; chainID: number }) => {
-    // NOTE: not yet called as we do not have any automatic resolve strategy implemented
-  },
-};
+    strategies: { default: [ERC20RPCStrategyResolver] },
+    get: async (req: { address: string; chainID: number }) => {
+        return contractMeta.get(req.address) ?? null
+    },
+    set: async (req: { address: string; chainID: number }, data) => {
+        contractMeta.set(req.address, data)
+    },
+}
 ```
 
 Finally, you can create a new instance of the LoopDecoder class:
 
 ```ts
-import { TransactionDecoder } from "@3loop/transaction-decoder";
+import { TransactionDecoder } from '@3loop/transaction-decoder'
 
 const decoder = new TransactionDecoder({
-  getPublicClient: getPublicClient,
-  abiStore: abiStore,
-  contractMetaStore: contractMetaStore,
-});
+    getPublicClient: getPublicClient,
+    abiStore: abiStore,
+    contractMetaStore: contractMetaStore,
+})
 ```
 
 ## Decoding a Transaction
@@ -160,17 +158,17 @@ Now that we have all the necessary components, we can start decoding a transacti
 
 ```ts
 async function main() {
-  try {
-    const decoded = await decoder.decodeTransaction({
-      chainID: 1,
-      hash: "0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7",
-    });
+    try {
+        const decoded = await decoder.decodeTransaction({
+            chainID: 1,
+            hash: '0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7',
+        })
 
-    console.log(JSON.stringify(decoded, null, 2));
-  } catch (e) {
-    console.error(JSON.stringify(e, null, 2));
-  }
+        console.log(JSON.stringify(decoded, null, 2))
+    } catch (e) {
+        console.error(JSON.stringify(e, null, 2))
+    }
 }
 
-main();
+main()
 ```

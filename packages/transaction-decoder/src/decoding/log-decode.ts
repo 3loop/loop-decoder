@@ -1,4 +1,4 @@
-import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, type Abi } from 'viem'
+import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, type Abi, getAddress } from 'viem'
 import { Effect } from 'effect'
 import type { DecodedLogEvent, Interaction, RawDecodedLog } from '../types.js'
 import { getProxyStorageSlot } from './proxies.js'
@@ -96,7 +96,7 @@ const transformLog = (transaction: GetTransactionReturnType, log: RawDecodedLog)
         const events = Object.fromEntries(log.events.map((param) => [param.name, param.value]))
 
         // NOTE: Can use a common parser with branded type evrywhere
-        const address = log.address.toLowerCase()
+        const address = getAddress(log.address)
 
         const contractData = yield* _(
             getAndCacheContractMeta({

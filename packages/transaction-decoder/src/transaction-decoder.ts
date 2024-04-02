@@ -78,7 +78,14 @@ export const decodeMethod = ({ transaction }: { transaction: GetTransactionRetur
         const abi = JSON.parse(abi_) as Abi
 
         // TODO: Pass the error message, so we can easier debug
-        const decoded = yield* _(Effect.try(() => AbiDecoder.decodeMethod(data, abi)))
+        const decoded = yield* _(
+            Effect.try({
+                try: () => AbiDecoder.decodeMethod(data, abi),
+                catch: (e) => {
+                    return new AbiDecoder.DecodeError(e)
+                },
+            }),
+        )
 
         if (decoded == null) {
             return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.input}`)))

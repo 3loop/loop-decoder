@@ -4,6 +4,7 @@ import { TransactionDecoder } from '@/vanilla.js'
 import fs from 'fs'
 import { createPublicClient } from 'viem'
 import { goerli } from 'viem/chains'
+import { ERC20RPCStrategyResolver } from '@/effect.js'
 
 describe('Transaction Decoder', () => {
     test('should be able to decode using vanilla API', async () => {
@@ -46,6 +47,7 @@ describe('Transaction Decoder', () => {
                 },
             },
             contractMetaStore: {
+                strategies: [ERC20RPCStrategyResolver],
                 get: async (request) => {
                     if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === request.address.toLowerCase()) {
                         return {
