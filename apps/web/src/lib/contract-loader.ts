@@ -115,16 +115,24 @@ export const ContractMetaStoreLive = Layer.effect(
           const normAddress = address.toLowerCase();
 
           yield* _(
-            Effect.tryPromise(() =>
-              prisma.contractMeta.create({
-                data: {
-                  ...contractMeta,
-                  decimals: contractMeta.decimals ?? 0,
-                  address: normAddress,
-                  chainID: chainID,
-                },
-              }),
-            ).pipe(Effect.catchAll((_) => Effect.succeed(null))),
+            Effect.promise(() =>
+              prisma.contractMeta
+                .create({
+                  data: {
+                    decimals: contractMeta.decimals ?? 0,
+                    address: normAddress,
+                    chainID: chainID,
+                    contractName: contractMeta.contractName,
+                    contractAddress: contractMeta.contractAddress,
+                    tokenSymbol: contractMeta.tokenSymbol,
+                    type: contractMeta.type,
+                  },
+                })
+                .catch((e) => {
+                  console.error("Failed to cache contract meta", e);
+                  return null;
+                }),
+            ),
           );
         }),
     });

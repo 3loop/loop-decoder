@@ -10,7 +10,7 @@ export default async function TransactionPage({
   params: { hash: string; chainID: number };
 }) {
   const decoded = await decodeTransaction({
-    hash: params.hash,
+    hashes: [params.hash],
     chainID: params.chainID,
   });
 
@@ -21,13 +21,13 @@ export default async function TransactionPage({
   }
 
   const interpreter = await findInterpreter({
-    decodedTx: decoded,
+    decodedTx: decoded[0],
     interpreters: defaultInterpreters,
   });
 
   return (
     <DecodingForm
-      decoded={decoded}
+      decoded={decoded[0]}
       defaultInterpreter={interpreter || emptyInterpreter}
       currentHash={params.hash}
       currentChainID={params.chainID}

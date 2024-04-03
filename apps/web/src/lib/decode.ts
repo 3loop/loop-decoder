@@ -12,15 +12,26 @@ const MainLayer = LoadersLayer.pipe(Layer.provideMerge(RPCProviderLive));
 
 export async function decodeTransaction({
   chainID,
-  hash,
+  hashes,
 }: {
   chainID: number;
-  hash: string;
-}): Promise<DecodedTx | undefined> {
-  const runnable = Effect.provide(
-    decodeTransactionByHash(hash as Hex, chainID),
-    MainLayer,
+  hashes: string[];
+}): Promise<DecodedTx[] | undefined> {
+  const program = Effect.gen(function* (_) {
+    return yield* _(
+      Effect.all(
+        hashes.map((hash) => decodeTransactionByHash(hash as Hex, chainID)),
+        {
+          concurrency: "unbounded",
+        },
+      ),
+    );
+  });
+
+  const runnable = Effect.provide(program, MainLayer).pipe(
+    Effect.timeout(9000),
   );
+
   return Effect.runPromise(runnable).catch((error: unknown) => {
     console.error("Decode error", JSON.stringify(error, null, 2));
     return undefined;

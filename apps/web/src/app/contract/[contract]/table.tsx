@@ -52,8 +52,6 @@ export default function TxTable({ txs }: { txs: DecodedTx[] }) {
         }),
       );
 
-      console.log(withIntepretations[0]);
-
       setResult(withIntepretations);
     }
     run();

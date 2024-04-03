@@ -1,41 +1,40 @@
+"use client";
 import * as React from "react";
 import TxTable from "./table";
-import { aaveV2, DEFAULT_CHAIN_ID, DEFAULT_CONTRACT } from "../../data";
+import { aaveV2, DEFAULT_CONTRACT } from "../../data";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { getTransactions } from "@/lib/etherscan";
-import { decodeTransaction } from "@/lib/decode";
 import { DecodedTx } from "@3loop/transaction-decoder";
+import LoadingPage from "../[contract]/loading";
 
-async function getListOfDecodedTxs(
-  contract: string,
-  chainID: number,
-): Promise<(DecodedTx | undefined)[]> {
-  if (contract !== aaveV2) return [];
+export default function Home({ params }: { params: { contract?: string } }) {
+  let contract = params.contract?.toLowerCase() || DEFAULT_CONTRACT;
 
-  try {
-    const txs = await getTransactions(1, contract);
-    const decodedTxs = await Promise.all(
-      txs.map(({ hash }) => decodeTransaction({ hash, chainID: chainID })),
+  const [txs, setTxs] = React.useState<DecodedTx[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  const getDecodedTxs = async (contractAddress: string) => {
+    const res = await fetch(`/api/contract/${contractAddress}`).then((res) =>
+      res.json(),
     );
 
-    return decodedTxs;
-  } catch (e) {
-    console.error(e);
-    return [];
-  }
-}
+    if (res.error) {
+      setTxs([]);
+    } else {
+      setTxs(res);
+    }
 
-export default async function Home({
-  params,
-}: {
-  params: { contract?: string };
-}) {
-  let contract = params.contract?.toLowerCase() || DEFAULT_CONTRACT;
-  const decodedTxs = (
-    await getListOfDecodedTxs(contract, DEFAULT_CHAIN_ID)
-  ).filter((tx): tx is DecodedTx => !!tx);
+    setLoading(false);
+  };
+
+  React.useEffect(() => {
+    getDecodedTxs(contract);
+  }, [contract]);
+
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   return (
     <div>
@@ -49,7 +48,7 @@ export default async function Home({
         />
       </div>
       <Separator />
-      <TxTable txs={decodedTxs} />
+      <TxTable txs={txs} />
     </div>
   );
 }
