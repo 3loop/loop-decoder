@@ -1,4 +1,17 @@
-import { Interpreter, findInterpreter, applyInterpreter, DecodedTx } from '@3loop/transaction-decoder'
+import { Interpreter, applyInterpreterInVM, DecodedTx, initQuickJSVM, QuickJSVM } from '@3loop/transaction-decoder'
+import { Effect, Layer } from 'effect'
+import variant from '@jitl/quickjs-singlefile-browser-release-sync'
+
+const layer = Layer.effect(
+  QuickJSVM,
+  Effect.tryPromise(async () => ({
+    _tag: 'QuickJSVM' as const,
+    runtime: await initQuickJSVM({
+      variant: variant,
+      runtimeConfig: { timeout: 1000 },
+    }),
+  })),
+)
 
 export interface Interpretation {
   tx: DecodedTx
@@ -58,18 +71,45 @@ function transformEvent(event) {
 ]
 
 export async function interpretTx(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
+  const runnable = Effect.provide(applyInterpreterInVM({ decodedTx, interpreter }), layer)
+
+  return Effect.runPromise(runnable)
+    .then((interpretation) => {
+      return {
+        tx: decodedTx,
+        interpretation,
+      }
+    })
+    .catch((e) => {
+      return {
+        tx: decodedTx,
+        interpretation: null,
+        error: (e as Error).message,
+      }
+    })
+}
+
+export function findInterpreter({
+  decodedTx,
+  interpreters,
+}: {
+  decodedTx: DecodedTx
+  interpreters: Interpreter[]
+}): Interpreter | undefined {
   try {
-    const res = await applyInterpreter({ decodedTx, interpreter })
-    return {
-      tx: decodedTx,
-      interpretation: res,
+    const { toAddress: contractAddress, chainID } = decodedTx
+
+    if (!contractAddress) {
+      return undefined
     }
+
+    const id = `contract:${contractAddress.toLowerCase()},chain:${chainID}`
+
+    const contractTransformation = interpreters.find((interpreter) => interpreter.id.toLowerCase() === id)
+
+    return contractTransformation
   } catch (e) {
-    return {
-      tx: decodedTx,
-      interpretation: undefined,
-      error: (e as Error).message,
-    }
+    throw new Error(`Failed to find tx interpreter: ${e}`)
   }
 }
 
@@ -82,7 +122,7 @@ export async function findAndRunInterpreter(
   if (!interpreter) {
     return {
       tx: decodedTx,
-      interpretation: undefined,
+      interpretation: null,
     }
   }
 
