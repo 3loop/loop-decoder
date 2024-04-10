@@ -9,7 +9,7 @@ const storageSlots: Hex[] = [
 
 const zeroSlot = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
-export interface GetStorageSlot extends Request.Request<RPCFetchError | UnknownNetwork, Address | undefined> {
+export interface GetStorageSlot extends Request.Request<Address | undefined, RPCFetchError | UnknownNetwork> {
     readonly _tag: 'GetStorageSlot'
     readonly address: Address
     readonly chainID: number
@@ -39,7 +39,12 @@ export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetSt
             }),
         )
 
-        const res = yield* _(Effect.all(effects, { concurrency: 'unbounded' }))
+        const res = yield* _(
+            Effect.all(effects, {
+                concurrency: 'inherit',
+                batching: 'inherit',
+            }),
+        )
         return res.find((x) => x != null)
     }),
 ).pipe(RequestResolver.contextFromEffect)

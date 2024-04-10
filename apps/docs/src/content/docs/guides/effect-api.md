@@ -15,7 +15,7 @@ To get started with using the Decoder, first, you have to provide the RPC Provid
 import { PublicClient, PublicClientObject } from '@3loop/transaction-decoder'
 import { Effect } from 'effect'
 
-const getPublicClient = (chainID: number): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
+const getPublicClient = (chainID: number): Effect.Effect<PublicClientObject, UnknownNetwork> => {
     if (chainID === 5) {
         return Effect.succeed({
             client: createPublicClient({
@@ -31,7 +31,7 @@ const getPublicClient = (chainID: number): Effect.Effect<never, UnknownNetwork, 
 
 `AbiStore` serves as a repository for obtaining and caching the contract ABI necessary for decoding transaction data. In a real-world scenario, it may be preferable to retrieve this data from a database. In the following example, we will be hardcoding all the necessary information.
 
-To create a new `AbiStore` service you will need to implement two methods `set` and `get`.
+To create a new `AbiStore` service you will need to implement two methods `set` and `get`, optionally provide an `getMany` implementation.
 
 ```ts
 const AbiStoreLive = Layer.succeed(

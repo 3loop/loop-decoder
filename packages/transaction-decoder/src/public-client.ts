@@ -22,7 +22,7 @@ export interface PublicClientObject {
 
 export interface PublicClient {
     readonly _tag: 'PublicClient'
-    readonly getPublicClient: (chainID: number) => Effect.Effect<never, UnknownNetwork, PublicClientObject>
+    readonly getPublicClient: (chainID: number) => Effect.Effect<PublicClientObject, UnknownNetwork>
 }
 
-export const PublicClient = Context.Tag<PublicClient>('@3loop-decoder/PublicClient')
+export const PublicClient = Context.GenericTag<PublicClient>('@3loop-decoder/PublicClient')

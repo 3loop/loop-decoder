@@ -2,7 +2,6 @@ import fs from 'node:fs'
 import { PublicClient, PublicClientObject, UnknownNetwork } from '@/effect.js'
 import { Effect } from 'effect'
 import { createPublicClient, custom } from 'viem'
-import { goerli } from 'viem/chains'
 
 interface MockedTransaction {
     transaction: unknown
@@ -12,8 +11,6 @@ interface MockedTransaction {
 
 export const mockedTransport = custom({
     request: async ({ method, params }) => {
-        // console.log('method', method, 'params', params)
-
         if (method === 'eth_getTransactionByHash') {
             const hash = params[0]
             const exists = fs.existsSync(`./test/mocks/tx/${hash.toLowerCase()}.json`)
@@ -57,16 +54,12 @@ export const mockedTransport = custom({
     },
 })
 
-const getPublicClient = (chainID: number): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
-    if (chainID === 5) {
-        return Effect.succeed({
-            client: createPublicClient({
-                chain: goerli,
-                transport: mockedTransport,
-            }),
-        })
-    }
-    return Effect.fail(new UnknownNetwork(chainID))
+const getPublicClient = (): Effect.Effect<PublicClientObject, UnknownNetwork> => {
+    return Effect.succeed({
+        client: createPublicClient({
+            transport: mockedTransport,
+        }),
+    })
 }
 
 export const MockedRPCProvider = PublicClient.of({ _tag: 'PublicClient', getPublicClient })

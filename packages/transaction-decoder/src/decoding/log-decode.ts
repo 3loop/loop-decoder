@@ -129,7 +129,8 @@ export const decodeLogs = ({ logs, transaction }: { logs: readonly Log[]; transa
 
         return yield* _(
             Effect.all(eithers, {
-                concurrency: 'unbounded',
+                concurrency: 'inherit',
+                batching: 'inherit',
             }),
         )
     })

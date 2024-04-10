@@ -23,7 +23,7 @@ export interface ContractABI {
     event?: Record<string, string>
 }
 
-export interface GetContractABIStrategy extends Request.Request<ResolveStrategyABIError, ContractABI>, FetchABIParams {
+export interface GetContractABIStrategy extends Request.Request<ContractABI, ResolveStrategyABIError>, FetchABIParams {
     readonly _tag: 'GetContractABIStrategy'
 }
 

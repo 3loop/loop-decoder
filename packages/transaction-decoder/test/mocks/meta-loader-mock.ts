@@ -7,6 +7,9 @@ const ERC721_CONTRACTS = ['0xc3e4214dd442136079df06bb2529bae276d37564']
 export const MockedMetaStoreLive = Layer.succeed(
     ContractMetaStore,
     ContractMetaStore.of({
+        strategies: {
+            default: [],
+        },
         get: ({ address, chainID }) =>
             Effect.sync(() => {
                 if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === address.toLowerCase()) {

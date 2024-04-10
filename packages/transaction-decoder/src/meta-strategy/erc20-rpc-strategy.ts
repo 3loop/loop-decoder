@@ -36,7 +36,8 @@ export const ERC20RPCStrategyResolver = (publicClientLive: PublicClient) =>
                         Effect.tryPromise({ try: () => inst.read.name(), catch: () => fail }),
                     ],
                     {
-                        concurrency: 'unbounded',
+                        concurrency: 'inherit',
+                        batching: 'inherit',
                     },
                 ),
             )

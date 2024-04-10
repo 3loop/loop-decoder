@@ -32,7 +32,8 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
                         }),
                     ],
                     {
-                        concurrency: 'unbounded',
+                        concurrency: 'inherit',
+                        batching: 'inherit',
                     },
                 ),
             )
@@ -58,7 +59,8 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
                         }),
                     ],
                     {
-                        concurrency: 'unbounded',
+                        concurrency: 'inherit',
+                        batching: 'inherit',
                     },
                 ),
             )

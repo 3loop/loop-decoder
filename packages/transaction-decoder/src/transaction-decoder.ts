@@ -168,6 +168,7 @@ export const decodeTransaction = ({
                     decodedLogs: decodeLogs({ receipt, transaction }),
                 },
                 {
+                    batching: true,
                     concurrency: 'unbounded',
                 },
             ),
@@ -238,6 +239,7 @@ export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
                 },
                 {
                     concurrency: 'unbounded',
+                    batching: true,
                 },
             ),
         )

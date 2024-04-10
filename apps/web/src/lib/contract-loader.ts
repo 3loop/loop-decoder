@@ -55,7 +55,8 @@ export const AbiStoreLive = Layer.succeed(
               ),
             ),
             {
-              concurrency: "unbounded",
+              concurrency: "inherit",
+              batching: "inherit",
             },
           ),
         );

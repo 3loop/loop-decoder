@@ -94,7 +94,8 @@ export const decodeTransactionTrace = ({
 
         const result = yield* _(
             Effect.all(eithers, {
-                concurrency: 'unbounded',
+                concurrency: 'inherit',
+                batching: 'inherit',
             }),
         )
 

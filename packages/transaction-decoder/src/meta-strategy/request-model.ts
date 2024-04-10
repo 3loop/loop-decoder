@@ -19,7 +19,7 @@ export class ResolveStrategyMetaError {
 
 // TODO: Remove UnknownNetwork
 export interface GetContractMetaStrategy
-    extends Request.Request<ResolveStrategyMetaError | UnknownNetwork, ContractData>,
+    extends Request.Request<ContractData, ResolveStrategyMetaError | UnknownNetwork>,
         FetchMetaParams {
     readonly _tag: 'GetContractMetaStrategy'
 }

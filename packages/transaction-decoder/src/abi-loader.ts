@@ -1,4 +1,4 @@
-import { Context, Effect, RequestResolver } from 'effect'
+import { Context, Effect, Either, RequestResolver, Request, ReadonlyArray } from 'effect'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
 
 export interface GetAbiParams {
@@ -12,61 +12,139 @@ type ChainOrDefault = number | 'default'
 
 export interface AbiStore<Key = GetAbiParams, SetValue = ContractABI, Value = string | null> {
     readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
-    // NOTE: I'm not sure if this is the best abi store interface, but it works for our nosql database
-    readonly set: (value: SetValue) => Effect.Effect<never, never, void>
-    readonly get: (arg: Key) => Effect.Effect<never, never, Value>
+    readonly set: (value: SetValue) => Effect.Effect<void, never>
+    readonly get: (arg: Key) => Effect.Effect<Value, never>
+    readonly getMany?: (arg: ReadonlyArray<Key>) => Effect.Effect<ReadonlyArray<Value>, never>
 }
 
-export const AbiStore = Context.Tag<AbiStore>('@3loop-decoder/AbiStore')
+export const AbiStore = Context.GenericTag<AbiStore>('@3loop-decoder/AbiStore')
 
-export const getAndCacheAbi = ({ chainID, address, event, signature }: GetAbiParams) =>
+export interface AbiLoader extends Request.Request<string | null, unknown> {
+    _tag: 'AbiLoader'
+    readonly chainID: number
+    readonly address: string
+    readonly event?: string | undefined
+    readonly signature?: string | undefined
+}
+
+const AbiLoader = Request.tagged<AbiLoader>('AbiLoader')
+
+function makeKey(key: AbiLoader) {
+    return `abi::${key.chainID}:${key.address}:${key.event}:${key.signature}`
+}
+
+const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
     Effect.gen(function* (_) {
-        // NOTE: skip contract loader for 0x signatures
-        if (event === '0x' || signature === '0x') {
-            return null
-        }
+        if (requests.length === 0) return
 
         const abiStore = yield* _(AbiStore)
         const strategies = abiStore.strategies
+        // NOTE: We can further optimize if we have match by Address by avoid extra requests for each signature
+        // but might need to update the Loader public API
+        const groups = ReadonlyArray.groupBy(requests, makeKey)
+        const uniqueRequests = Object.values(groups).map((group) => group[0])
 
-        const cached = yield* _(abiStore.get({ chainID, address, event, signature }))
-        if (cached != null) {
-            return cached
+        const getMany = (requests: ReadonlyArray<GetAbiParams>) => {
+            if (abiStore.getMany != null) {
+                return abiStore.getMany(requests)
+            } else {
+                return Effect.all(
+                    requests.map(({ chainID, address, event, signature }) =>
+                        abiStore.get({ chainID, address, event, signature }),
+                    ),
+                    {
+                        concurrency: 'inherit',
+                        batching: 'inherit',
+                    },
+                )
+            }
         }
 
-        const request = GetContractABIStrategy({
-            address,
-            event,
-            signature,
-            chainID,
-        })
+        const set = (abi: ContractABI | null) => {
+            return abi ? abiStore.set(abi) : Effect.succeed(null)
+        }
 
-        const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
+        const [remaining, results] = yield* _(
+            getMany(uniqueRequests),
+            Effect.map(
+                ReadonlyArray.partitionMap((resp, i) => {
+                    return resp == null ? Either.left(uniqueRequests[i]) : Either.right([uniqueRequests[i], resp] as const)
+                }),
+            ),
+            Effect.orElseSucceed(() => [uniqueRequests, []] as const),
+        )
 
-        const abi = yield* _(
-            Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(request, strategy)).pipe(
-                Effect.catchAll(() => Effect.succeed(null)),
+        //  Resolve ABI from the store
+        yield* _(
+            Effect.forEach(
+                results,
+                ([request, result]) => {
+                    const group = groups[makeKey(request)]
+                    return Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true })
+                },
+                {
+                    discard: true,
+                },
             ),
         )
 
-        if (abi != null) {
-            yield* _(abiStore.set(abi))
+        // Load the ABI from the strategies
+        yield* _(
+            Effect.forEach(remaining, ({ chainID, address, event, signature }) => {
+                const strategyRequest = GetContractABIStrategy({
+                    address,
+                    event,
+                    signature,
+                    chainID,
+                })
 
-            const addressmatch = abi.address?.[address]
-            if (addressmatch != null) {
-                return addressmatch
-            }
+                const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
 
-            const funcmatch = signature ? abi.func?.[signature] : null
-            if (funcmatch != null) {
-                return `[${funcmatch}]`
-            }
+                return Effect.validateFirst(allAvailableStrategies, (strategy) =>
+                    Effect.request(strategyRequest, strategy),
+                ).pipe(Effect.orElseSucceed(() => null))
+            }),
+            Effect.flatMap((results) =>
+                Effect.forEach(
+                    results,
+                    (abi, i) => {
+                        const request = remaining[i]
+                        const { address, event, signature } = request
 
-            const eventmatch = event ? abi.event?.[event] : null
-            if (eventmatch != null) {
-                return `[${eventmatch}]`
-            }
-        }
+                        let result: string | null = null
 
-        return null
-    })
+                        const addressmatch = abi?.address?.[address]
+                        if (addressmatch != null) {
+                            result = addressmatch
+                        }
+
+                        const funcmatch = signature ? abi?.func?.[signature] : null
+                        if (result == null && funcmatch != null) {
+                            result = `[${funcmatch}]`
+                        }
+
+                        const eventmatch = event ? abi?.event?.[event] : null
+                        if (result == null && eventmatch != null) {
+                            result = `[${eventmatch}]`
+                        }
+
+                        const group = groups[makeKey(request)]
+
+                        return Effect.zipRight(
+                            set(abi),
+                            Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
+                        )
+                    },
+                    { discard: true },
+                ),
+            ),
+        )
+    }),
+).pipe(RequestResolver.contextFromServices(AbiStore), Effect.withRequestCaching(true))
+
+export const getAndCacheAbi = (params: GetAbiParams) => {
+    if (params.event === '0x' || params.signature === '0x') {
+        return Effect.succeed(null)
+    }
+    return Effect.request(AbiLoader(params), AbiLoaderRequestResolver)
+}

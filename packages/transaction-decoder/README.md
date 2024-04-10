@@ -90,7 +90,7 @@ To get started with using the Decoder, first, you have to provide the RPC Provid
 import { PublicClient, PublicClientObject } from '@3loop/transaction-decoder'
 import { Effect } from 'effect'
 
-const getPublicClient = (chainID: number): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
+const getPublicClient = (chainID: number): Effect.Effect<PublicClientObject, UnknownNetwork> => {
     if (chainID === 5) {
         return Effect.succeed({
             client: createPublicClient({

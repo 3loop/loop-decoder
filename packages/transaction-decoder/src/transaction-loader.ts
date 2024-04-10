@@ -52,13 +52,14 @@ export const getTrace = (hash: Hash, chainID: number) =>
                 }),
             )
 
-            const effects: Effect.Effect<never, ParseError, TraceLog>[] = trace.map((log: string) => {
-                return Schema.parse(EthTrace)(log)
+            const effects: Effect.Effect<TraceLog, ParseError>[] = trace.map((log: string) => {
+                return Schema.decodeUnknown(EthTrace)(log)
             })
 
             const results = yield* _(
                 Effect.all(effects, {
-                    concurrency: 'unbounded',
+                    concurrency: 'inherit',
+                    batching: 'inherit',
                 }),
             )
 

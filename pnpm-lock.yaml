@@ -195,8 +195,8 @@ importers:
         version: 0.6.7
     devDependencies:
       '@effect/schema':
-        specifier: ^0.59.1
-        version: 0.59.1(effect@2.0.3)(fast-check@3.15.0)
+        specifier: ^0.64.20
+        version: 0.64.20(effect@2.4.18)(fast-check@3.15.0)
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -216,8 +216,8 @@ importers:
         specifier: 0.34.2
         version: 0.34.2(vitest@0.34.2)
       effect:
-        specifier: 2.0.3
-        version: 2.0.3
+        specifier: 2.4.18
+        version: 2.4.18
       eslint:
         specifier: ^8.49.0
         version: 8.49.0
@@ -1128,13 +1128,13 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@effect/schema@0.59.1(effect@2.0.3)(fast-check@3.15.0):
-    resolution: {integrity: sha512-dighL1fSjOLNupETYaN4hvUo9zxvdi4w+lgJ9lHKYFZapaFxR2f8ZKB2WunsSGnF5mCyWLDS3GMtfLeqz2I2ug==}
+  /@effect/schema@0.64.20(effect@2.4.18)(fast-check@3.15.0):
+    resolution: {integrity: sha512-oSphgsP9j7yHy31RxTQ0txWq76u1F/H1Hqw+GVcpjnK4n/fuZo7MNYU/qpG+TLJWj4+yUku5I3Rr0Vr7gVoMeQ==}
     peerDependencies:
-      effect: ^2.0.3
+      effect: ^2.4.18
       fast-check: ^3.13.2
     dependencies:
-      effect: 2.0.3
+      effect: 2.4.18
       fast-check: 3.15.0
     dev: true
 
@@ -4913,6 +4913,11 @@ packages:
 
   /effect@2.0.3:
     resolution: {integrity: sha512-I/XvcbHypegNFWCr/arbfIR6pA+8JpSqv9wS4xOrgXypQMRj8H3wRorTcUiPmcQ0e6Ko67CdI2XZpjx7z0Ev/A==}
+    dev: false
+
+  /effect@2.4.18:
+    resolution: {integrity: sha512-8nNzkhSzFLhG9YxowXKawlk4+b3zwwOsbZwaaYhy1OjZGcEgcE6i0ywMFieXNSfOtsQ8swV1+5hvF+VBEtwwqg==}
+    dev: true
 
   /electron-to-chromium@1.4.498:
     resolution: {integrity: sha512-4LODxAzKGVy7CJyhhN5mebwe7U2L29P+0G+HUriHnabm0d7LSff8Yn7t+Wq+2/9ze2Fu1dhX7mww090xfv7qXQ==}

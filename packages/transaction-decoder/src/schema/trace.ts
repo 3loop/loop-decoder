@@ -4,7 +4,7 @@ const CallType = Schema.literal('call', 'delegatecall', 'callcode', 'staticcall'
 
 const Address = Schema.string // NOTE: Probably we can use a branded type
 
-export const bigintFromString: Schema.Schema<string, bigint> = Schema.transform(
+export const bigintFromString = Schema.transform(
     Schema.string,
     Schema.bigintFromSelf,
     (s) => BigInt(s),
@@ -103,7 +103,7 @@ export const EthDebugTraceBase = Schema.struct({
     output: Schema.string,
 })
 
-type DebugTraceLog = Schema.Schema.To<typeof EthDebugTraceBase>
+type DebugTraceLog = Schema.Schema.Type<typeof EthDebugTraceBase>
 
 export type TraceLogTree = {
     calls?: Array<TraceLogTree>
@@ -111,6 +111,6 @@ export type TraceLogTree = {
 
 export const EthTrace = Schema.union(CallTrace, CreateTrace, RewardTrace, SuicideTrace)
 
-export type TraceLog = Schema.Schema.To<typeof EthTrace>
-export type CallTraceLog = Schema.Schema.To<typeof CallTrace>
-export type CallType = Schema.Schema.To<typeof CallType>
+export type TraceLog = Schema.Schema.Type<typeof EthTrace>
+export type CallTraceLog = Schema.Schema.Type<typeof CallTrace>
+export type CallType = Schema.Schema.Type<typeof CallType>
