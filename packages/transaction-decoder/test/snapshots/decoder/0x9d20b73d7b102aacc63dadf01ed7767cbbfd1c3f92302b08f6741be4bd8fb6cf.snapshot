@@ -2,7 +2,7 @@
   "assetsReceived": [],
   "assetsSent": [
     {
-      "address": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "address": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "amount": "5050.0",
       "name": "Mock ERC20 Contract",
       "symbol": "ERC20",
@@ -18,7 +18,7 @@
   "gasPaid": "0.00413238002479428",
   "gasUsed": "2754920",
   "interactedAddresses": [
-    "0x7619763c2013cb0dab65c61c104313a537beb41f",
+    "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
     "0x25df6DA2f4e5C178DdFF45038378C0b08E0Bce54",
     "0xD152f549545093347A162Dce210e7293f1452150",
     "0x00207f5CCddFBE98B38c87cD6D39674cb0090C62",
@@ -121,12 +121,11 @@
     "0x707219923AB33b5072EA93F1608C0A5CEe2D78d5",
     "0x884137D0752d75Ed6aC3b6744005f0f6B1ac350C",
     "0xF1073bc25e25Be022553Ebf0995D8A08aB8ab534",
-    "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
   ],
   "interactions": [
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -143,7 +142,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -160,7 +159,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -177,7 +176,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -194,7 +193,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -211,7 +210,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -228,7 +227,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -245,7 +244,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -262,7 +261,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -279,7 +278,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -296,7 +295,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -313,7 +312,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -330,7 +329,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -347,7 +346,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -364,7 +363,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -381,7 +380,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -398,7 +397,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -415,7 +414,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -432,7 +431,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -449,7 +448,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -466,7 +465,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -483,7 +482,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -500,7 +499,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -517,7 +516,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -534,7 +533,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -551,7 +550,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -568,7 +567,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -585,7 +584,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -602,7 +601,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -619,7 +618,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -636,7 +635,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -653,7 +652,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -670,7 +669,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -687,7 +686,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -704,7 +703,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -721,7 +720,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -738,7 +737,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -755,7 +754,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -772,7 +771,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -789,7 +788,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -806,7 +805,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -823,7 +822,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -840,7 +839,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -857,7 +856,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -874,7 +873,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -891,7 +890,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -908,7 +907,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -925,7 +924,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -942,7 +941,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -959,7 +958,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -976,7 +975,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -993,7 +992,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1010,7 +1009,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1027,7 +1026,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1044,7 +1043,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1061,7 +1060,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1078,7 +1077,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1095,7 +1094,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1112,7 +1111,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1129,7 +1128,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1146,7 +1145,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1163,7 +1162,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1180,7 +1179,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1197,7 +1196,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1214,7 +1213,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1231,7 +1230,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1248,7 +1247,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1265,7 +1264,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1282,7 +1281,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1299,7 +1298,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1316,7 +1315,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1333,7 +1332,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1350,7 +1349,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1367,7 +1366,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1384,7 +1383,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1401,7 +1400,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1418,7 +1417,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1435,7 +1434,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1452,7 +1451,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1469,7 +1468,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1486,7 +1485,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1503,7 +1502,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1520,7 +1519,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1537,7 +1536,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1554,7 +1553,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1571,7 +1570,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1588,7 +1587,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1605,7 +1604,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1622,7 +1621,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1639,7 +1638,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1656,7 +1655,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1673,7 +1672,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1690,7 +1689,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1707,7 +1706,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1724,7 +1723,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1741,7 +1740,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1758,7 +1757,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1775,7 +1774,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1792,7 +1791,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1809,7 +1808,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",
@@ -1826,7 +1825,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x7619763c2013cb0dab65c61c104313a537beb41f",
+      "contractAddress": "0x7619763c2013CB0DAB65C61C104313a537BEb41F",
       "contractName": "Mock ERC20 Contract",
       "contractSymbol": "ERC20",
       "contractType": "ERC20",

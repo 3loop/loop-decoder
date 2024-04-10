@@ -1,7 +1,7 @@
 {
   "assetsReceived": [
     {
-      "address": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "address": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
       "amount": "3000.0",
       "name": "Mock ERC1155 Contract",
       "symbol": "ERC1155",
@@ -34,16 +34,17 @@
   "gasPaid": "0.000261153001392816",
   "gasUsed": "174102",
   "interactedAddresses": [
-    "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+    "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
     "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
     "0x0000000000000000000000000000000000000000",
     "0xbdddd277583dcae0b501046ba86714feea71b03f",
+    "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
     "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
   ],
   "interactions": [
     {
       "chainID": 5,
-      "contractAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "contractAddress": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
       "contractName": "Mock ERC1155 Contract",
       "contractSymbol": "ERC1155",
       "contractType": "ERC1155",
@@ -62,7 +63,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+      "contractAddress": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
       "contractName": "Mock ERC1155 Contract",
       "contractSymbol": "ERC1155",
       "contractType": "ERC1155",

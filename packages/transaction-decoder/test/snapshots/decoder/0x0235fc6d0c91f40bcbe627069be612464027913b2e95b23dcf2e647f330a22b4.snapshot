@@ -10,14 +10,14 @@
   "gasPaid": "0.00000134085519894",
   "gasUsed": "46740",
   "interactedAddresses": [
-    "0xc3e4214dd442136079df06bb2529bae276d37564",
+    "0xC3E4214dd442136079dF06bb2529Bae276d37564",
     "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
     "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
   ],
   "interactions": [
     {
       "chainID": 5,
-      "contractAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "contractAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
       "contractName": "Mock ERC721 Contract",
       "contractSymbol": "ERC721",
       "contractType": "ERC721",

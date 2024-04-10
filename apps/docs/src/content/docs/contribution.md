@@ -21,4 +21,4 @@ To create a new release, one of the maintainers will merge the changeset PR into
 
 Some ideas for the decoder and interpreter were inspired by open-source software. Special thanks to:
 
--   [EVM Translator](https://github.com/metagame-xyz/evm-translator) - some data types and data manipulations were heavily inspired by this source.
+- [EVM Translator](https://github.com/metagame-xyz/evm-translator) - some data types and data manipulations were heavily inspired by this source.

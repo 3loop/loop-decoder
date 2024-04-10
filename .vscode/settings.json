@@ -1,6 +1,6 @@
 {
   "editor.rulers": [120],
-  "editor.tabSize": 4,
+  "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "editor.trimAutoWhitespace": true,
   "editor.formatOnSave": true,

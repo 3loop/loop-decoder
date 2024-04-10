@@ -31,9 +31,9 @@ npx tsc --init
 
 ```json
 {
-    "compilerOptions": {
-        "strict": true
-    }
+  "compilerOptions": {
+    "strict": true
+  }
 }
 ```
 
@@ -43,9 +43,9 @@ npx tsc --init
 
 ```json
 {
-    "scripts": {
-        "start": "tsc && node index.js"
-    }
+  "scripts": {
+    "start": "tsc && node index.js"
+  }
 }
 ```
 
@@ -75,15 +75,15 @@ We will start by creating a function which will return an object with PublicClie
 import { createPublicClient, http } from 'viem'
 
 const getPublicClient = (chainId: number) => {
-    if (chainId !== 1) {
-        throw new Error(`Missing RPC provider for chain ID ${chainId}`)
-    }
+  if (chainId !== 1) {
+    throw new Error(`Missing RPC provider for chain ID ${chainId}`)
+  }
 
-    return {
-        client: createPublicClient({
-            transport: http('https://rpc.ankr.com/eth'),
-        }),
-    }
+  return {
+    client: createPublicClient({
+      transport: http('https://rpc.ankr.com/eth'),
+    }),
+  }
 }
 ```
 
@@ -98,26 +98,26 @@ import { EtherscanStrategyResolver } from '@3loop/transaction-decoder'
 const abiCache = new Map<string, string>()
 
 const abiStore = {
-    strategies: [
-        EtherscanStrategyResolver({
-            apikey: 'YourApiKeyToken',
-        }),
-        FourByteStrategyResolver(),
-    ],
-    get: async (req: {
-        chainID: number
-        address: string
-        event?: string | undefined
-        signature?: string | undefined
-    }) => {
-        return Promise.resolve(abiCache.get(req.address) ?? null)
-    },
-    set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
-        const addresses = Object.keys(req.address ?? {})
-        addresses.forEach((address) => {
-            abiCache.set(address, req.address?.[address] ?? '')
-        })
-    },
+  strategies: [
+    EtherscanStrategyResolver({
+      apikey: 'YourApiKeyToken',
+    }),
+    FourByteStrategyResolver(),
+  ],
+  get: async (req: {
+    chainID: number
+    address: string
+    event?: string | undefined
+    signature?: string | undefined
+  }) => {
+    return Promise.resolve(abiCache.get(req.address) ?? null)
+  },
+  set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
+    const addresses = Object.keys(req.address ?? {})
+    addresses.forEach((address) => {
+      abiCache.set(address, req.address?.[address] ?? '')
+    })
+  },
 }
 ```
 
@@ -130,13 +130,13 @@ import type { ContractData } from '@3loop/transaction-decoder'
 const contractMeta = new Map<string, ContractData>()
 
 const contractMetaStore = {
-    strategies: { default: [ERC20RPCStrategyResolver] },
-    get: async (req: { address: string; chainID: number }) => {
-        return contractMeta.get(req.address) ?? null
-    },
-    set: async (req: { address: string; chainID: number }, data) => {
-        contractMeta.set(req.address, data)
-    },
+  strategies: { default: [ERC20RPCStrategyResolver] },
+  get: async (req: { address: string; chainID: number }) => {
+    return contractMeta.get(req.address) ?? null
+  },
+  set: async (req: { address: string; chainID: number }, data) => {
+    contractMeta.set(req.address, data)
+  },
 }
 ```
 
@@ -146,9 +146,9 @@ Finally, you can create a new instance of the LoopDecoder class:
 import { TransactionDecoder } from '@3loop/transaction-decoder'
 
 const decoder = new TransactionDecoder({
-    getPublicClient: getPublicClient,
-    abiStore: abiStore,
-    contractMetaStore: contractMetaStore,
+  getPublicClient: getPublicClient,
+  abiStore: abiStore,
+  contractMetaStore: contractMetaStore,
 })
 ```
 
@@ -158,16 +158,16 @@ Now that we have all the necessary components, we can start decoding a transacti
 
 ```ts
 async function main() {
-    try {
-        const decoded = await decoder.decodeTransaction({
-            chainID: 1,
-            hash: '0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7',
-        })
+  try {
+    const decoded = await decoder.decodeTransaction({
+      chainID: 1,
+      hash: '0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7',
+    })
 
-        console.log(JSON.stringify(decoded, null, 2))
-    } catch (e) {
-        console.error(JSON.stringify(e, null, 2))
-    }
+    console.log(JSON.stringify(decoded, null, 2))
+  } catch (e) {
+    console.error(JSON.stringify(e, null, 2))
+  }
 }
 
 main()

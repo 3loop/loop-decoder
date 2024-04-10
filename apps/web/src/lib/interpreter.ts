@@ -1,27 +1,22 @@
-import {
-  Interpreter,
-  findInterpreter,
-  applyInterpreter,
-  DecodedTx,
-} from "@3loop/transaction-decoder";
+import { Interpreter, findInterpreter, applyInterpreter, DecodedTx } from '@3loop/transaction-decoder'
 
 export interface Interpretation {
-  tx: DecodedTx;
-  interpretation: any;
-  error?: string;
+  tx: DecodedTx
+  interpretation: any
+  error?: string
 }
 
 export const emptyInterpreter: Interpreter = {
-  id: "default",
+  id: 'default',
   schema: `function transformEvent(event){
     return event;
 };
 `,
-};
+}
 
 export const defaultInterpreters: Interpreter[] = [
   {
-    id: "contract:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9,chain:1",
+    id: 'contract:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9,chain:1',
     schema: `
 function transformEvent(event) {
     const methodName = event.methodCall.name
@@ -60,24 +55,21 @@ function transformEvent(event) {
 }
     `,
   },
-];
+]
 
-export async function interpretTx(
-  decodedTx: DecodedTx,
-  interpreter: Interpreter,
-): Promise<Interpretation> {
+export async function interpretTx(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
   try {
-    const res = await applyInterpreter({ decodedTx, interpreter });
+    const res = await applyInterpreter({ decodedTx, interpreter })
     return {
       tx: decodedTx,
       interpretation: res,
-    };
+    }
   } catch (e) {
     return {
       tx: decodedTx,
       interpretation: undefined,
       error: (e as Error).message,
-    };
+    }
   }
 }
 
@@ -85,16 +77,16 @@ export async function findAndRunInterpreter(
   decodedTx: DecodedTx,
   interpreters: Interpreter[],
 ): Promise<Interpretation> {
-  const interpreter = findInterpreter({ decodedTx, interpreters });
+  const interpreter = findInterpreter({ decodedTx, interpreters })
 
   if (!interpreter) {
     return {
       tx: decodedTx,
       interpretation: undefined,
-    };
+    }
   }
 
-  const res = await interpretTx(decodedTx, interpreter);
+  const res = await interpretTx(decodedTx, interpreter)
 
-  return res;
+  return res
 }

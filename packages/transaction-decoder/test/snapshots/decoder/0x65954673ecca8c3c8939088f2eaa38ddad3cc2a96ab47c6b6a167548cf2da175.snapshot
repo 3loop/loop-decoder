@@ -2,7 +2,7 @@
   "assetsReceived": [],
   "assetsSent": [
     {
-      "address": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "address": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
       "name": "Mock ERC721 Contract",
       "symbol": "ERC721",
       "tokenId": "69",
@@ -18,7 +18,7 @@
   "gasPaid": "0.000127456502379188",
   "gasUsed": "84971",
   "interactedAddresses": [
-    "0xc3e4214dd442136079df06bb2529bae276d37564",
+    "0xC3E4214dd442136079dF06bb2529Bae276d37564",
     "0x6951AE195690E95E9f3eAfadBe241ac19Ef263E4",
     "0x0000000000000000000000000000000000000000",
     "0x2bF4761d2f9002c0a24fBAC3A65B794f0561BB7F",
@@ -26,7 +26,7 @@
   "interactions": [
     {
       "chainID": 5,
-      "contractAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "contractAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
       "contractName": "Mock ERC721 Contract",
       "contractSymbol": "ERC721",
       "contractType": "ERC721",
@@ -43,7 +43,7 @@
     },
     {
       "chainID": 5,
-      "contractAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
+      "contractAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
       "contractName": "Mock ERC721 Contract",
       "contractSymbol": "ERC721",
       "contractType": "ERC721",

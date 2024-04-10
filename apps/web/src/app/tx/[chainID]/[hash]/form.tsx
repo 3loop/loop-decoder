@@ -1,76 +1,63 @@
-"use client";
-import * as React from "react";
-import { Label } from "@/components/ui/label";
-import { DEFAULT_CHAIN_ID, transactions } from "../../../data";
-import { useLocalStorage } from "usehooks-ts";
-import { SidebarNav } from "@/components/ui/sidebar-nav";
-import { PlayIcon } from "@radix-ui/react-icons";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { DecodedTx, Interpreter } from "@3loop/transaction-decoder";
-import { Interpretation, interpretTx } from "@/lib/interpreter";
-import CodeBlock from "@/components/ui/code-block";
-import { NetworkSelect } from "@/components/ui/network-select";
+'use client'
+import * as React from 'react'
+import { Label } from '@/components/ui/label'
+import { DEFAULT_CHAIN_ID, transactions } from '../../../data'
+import { useLocalStorage } from 'usehooks-ts'
+import { SidebarNav } from '@/components/ui/sidebar-nav'
+import { PlayIcon } from '@radix-ui/react-icons'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
+import { DecodedTx, Interpreter } from '@3loop/transaction-decoder'
+import { Interpretation, interpretTx } from '@/lib/interpreter'
+import CodeBlock from '@/components/ui/code-block'
+import { NetworkSelect } from '@/components/ui/network-select'
 
 export const sidebarNavItems = transactions.map((tx) => {
   return {
     href: `/tx/${tx.chainID}/${tx.hash}`,
     title: `${tx.name} tx ${tx.hash.slice(0, 6)}...`,
-  };
-});
+  }
+})
 
 interface FormProps {
-  currentChainID: number;
-  decoded?: DecodedTx;
-  defaultInterpreter?: Interpreter;
-  currentHash?: string;
+  currentChainID: number
+  decoded?: DecodedTx
+  defaultInterpreter?: Interpreter
+  currentHash?: string
 }
 
-export default function DecodingForm({
-  decoded,
-  defaultInterpreter,
-  currentHash,
-  currentChainID,
-}: FormProps) {
-  const [result, setResult] = React.useState<Interpretation>();
-  const [schema, setSchema] = useLocalStorage(
-    defaultInterpreter?.id ?? "unknown",
-    defaultInterpreter?.schema,
-  );
+export default function DecodingForm({ decoded, defaultInterpreter, currentHash, currentChainID }: FormProps) {
+  const [result, setResult] = React.useState<Interpretation>()
+  const [schema, setSchema] = useLocalStorage(defaultInterpreter?.id ?? 'unknown', defaultInterpreter?.schema)
 
-  const router = useRouter();
+  const router = useRouter()
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const hash = (e.target as any).hash.value;
-    router.push(`/tx/${currentChainID}/${hash}`);
-  };
+    e.preventDefault()
+    const hash = (e.target as any).hash.value
+    router.push(`/tx/${currentChainID}/${hash}`)
+  }
 
   const onRun = React.useCallback(() => {
     if (schema && defaultInterpreter != null && decoded != null) {
       const newInterpreter = {
         ...defaultInterpreter,
         schema: schema,
-      };
+      }
 
       interpretTx(decoded, newInterpreter).then((res) => {
-        setResult(res);
-      });
+        setResult(res)
+      })
     }
-  }, [schema, decoded, defaultInterpreter]);
+  }, [schema, decoded, defaultInterpreter])
 
   // Run the interpreter on page load
   React.useEffect(() => {
-    if (
-      schema &&
-      defaultInterpreter != null &&
-      decoded != null &&
-      result == null
-    ) {
-      onRun();
+    if (schema && defaultInterpreter != null && decoded != null && result == null) {
+      onRun()
     }
-  }, [schema, decoded, defaultInterpreter, result, onRun]);
+  }, [schema, decoded, defaultInterpreter, result, onRun])
 
   return (
     <div className="grid h-full items-stretch gap-6 md:grid-cols-[1fr_200px]">
@@ -87,7 +74,7 @@ export default function DecodingForm({
               defaultValue={currentHash}
             />
             <Button type="submit">Decode</Button>
-            <Button variant={"outline"} onClick={onRun} type="button">
+            <Button variant={'outline'} onClick={onRun} type="button">
               <PlayIcon className="mr-2 h-4 w-4" />
               Interpret
             </Button>
@@ -109,12 +96,7 @@ export default function DecodingForm({
 
           <div className="flex flex-col gap-2 ">
             <Label>Decoded transaction:</Label>
-            <CodeBlock
-              language="json"
-              value={JSON.stringify(decoded, null, 2)}
-              readonly={true}
-              lineNumbers={false}
-            />
+            <CodeBlock language="json" value={JSON.stringify(decoded, null, 2)} readonly={true} lineNumbers={false} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -124,11 +106,7 @@ export default function DecodingForm({
 
             <CodeBlock
               language="json"
-              value={
-                result?.error
-                  ? result?.error
-                  : JSON.stringify(result?.interpretation, null, 2)
-              }
+              value={result?.error ? result?.error : JSON.stringify(result?.interpretation, null, 2)}
               readonly={true}
               lineNumbers={false}
             />
@@ -140,13 +118,11 @@ export default function DecodingForm({
         <div className="space-y-4">
           <div className="pl-4">
             <h2 className="text-lg font-semibold tracking-tight">AAVE V2</h2>
-            <p className="text-sm text-muted-foreground">
-              Example Transactions
-            </p>
+            <p className="text-sm text-muted-foreground">Example Transactions</p>
           </div>
           <SidebarNav items={sidebarNavItems} />
         </div>
       </div>
     </div>
-  );
+  )
 }

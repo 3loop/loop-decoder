@@ -5,8 +5,8 @@ description: A guide in my new Starlight docs site.
 
 ### Requirements
 
--   TypeScript 5.x
--   `exactOptionalPropertyTypes` and `strict` enabled in your tsconfig.json
+- TypeScript 5.x
+- `exactOptionalPropertyTypes` and `strict` enabled in your tsconfig.json
 
 ### Dependencies
 
@@ -24,11 +24,11 @@ To begin using the Loop Decoder, you need to create an instance of the LoopDecod
 
 ```ts
 const getPublicClient = (chainId: number) => {
-    return {
-        client: createPublicClient({
-            transport: http(RPC_URL[chainId]),
-        }),
-    }
+  return {
+    client: createPublicClient({
+      transport: http(RPC_URL[chainId]),
+    }),
+  }
 }
 ```
 
@@ -59,17 +59,17 @@ const contractMetaStore = {
 const db = {} // Your data source
 
 const abiStore = {
-    get: async (req: {
-        chainID: number
-        address: string
-        event?: string | undefined
-        signature?: string | undefined
-    }) => {
-        return db.getContractAbi(req)
-    },
-    set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
-        await db.setContractAbi(req)
-    },
+  get: async (req: {
+    chainID: number
+    address: string
+    event?: string | undefined
+    signature?: string | undefined
+  }) => {
+    return db.getContractAbi(req)
+  },
+  set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
+    await db.setContractAbi(req)
+  },
 }
 ```
 
@@ -79,9 +79,9 @@ Finally, you can create a new instance of the LoopDecoder class:
 import { TransactionDecoder } from '@3loop/transaction-decoder'
 
 const decoded = new TransactionDecoder({
-    getProvider: getPublicClient,
-    abiStore: abiStore,
-    contractMetaStore: contractMetaStore,
+  getProvider: getPublicClient,
+  abiStore: abiStore,
+  contractMetaStore: contractMetaStore,
 })
 ```
 
@@ -91,7 +91,7 @@ LoopDecoder instances provide a public method, `decodeTransaction`, which fetche
 
 ```ts
 const result = await decoded.decodeTransaction({
-    chainID: 5,
-    hash: '0x...',
+  chainID: 5,
+  hash: '0x...',
 })
 ```

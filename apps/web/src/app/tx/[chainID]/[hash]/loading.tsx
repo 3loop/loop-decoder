@@ -1,10 +1,10 @@
-import { Label } from "@/components/ui/label";
-import { SidebarNav } from "@/components/ui/sidebar-nav";
-import { sidebarNavItems } from "./form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { PlayIcon } from "lucide-react";
-import { NetworkSelect } from "@/components/ui/network-select";
+import { Label } from '@/components/ui/label'
+import { SidebarNav } from '@/components/ui/sidebar-nav'
+import { sidebarNavItems } from './form'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { PlayIcon } from 'lucide-react'
+import { NetworkSelect } from '@/components/ui/network-select'
 
 export default function Loading() {
   return (
@@ -14,16 +14,11 @@ export default function Loading() {
           <div className="flex w-full items-center space-x-2">
             <NetworkSelect disabled={true} />
 
-            <Input
-              className="flex-1 flex"
-              id="hash"
-              name="hash"
-              disabled={true}
-            />
+            <Input className="flex-1 flex" id="hash" name="hash" disabled={true} />
             <Button type="submit" disabled={true}>
               Decode
             </Button>
-            <Button variant={"outline"} disabled={true} type="button">
+            <Button variant={'outline'} disabled={true} type="button">
               <PlayIcon className="mr-2 h-4 w-4" />
               Interpret
             </Button>
@@ -55,13 +50,11 @@ export default function Loading() {
         <div className="space-y-4">
           <div className="pl-4">
             <h2 className="text-lg font-semibold tracking-tight">AAVE V2</h2>
-            <p className="text-sm text-muted-foreground">
-              Example Transactions
-            </p>
+            <p className="text-sm text-muted-foreground">Example Transactions</p>
           </div>
           <SidebarNav items={sidebarNavItems} />
         </div>
       </div>
     </div>
-  );
+  )
 }
