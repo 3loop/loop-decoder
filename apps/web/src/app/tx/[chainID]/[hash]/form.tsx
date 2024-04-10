@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { DecodedTx, Interpreter } from '@3loop/transaction-decoder'
-import { Interpretation, interpretTx } from '@/lib/interpreter'
+import { Interpretation, applyInterpreter } from '@/lib/interpreter'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
 
@@ -46,7 +46,7 @@ export default function DecodingForm({ decoded, defaultInterpreter, currentHash,
         schema: schema,
       }
 
-      interpretTx(decoded, newInterpreter).then((res) => {
+      applyInterpreter(decoded, newInterpreter).then((res) => {
         setResult(res)
       })
     }

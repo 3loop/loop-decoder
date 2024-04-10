@@ -1,4 +1,4 @@
-import { Interpreter, applyInterpreterInVM, DecodedTx, initQuickJSVM, QuickJSVM } from '@3loop/transaction-decoder'
+import { Interpreter, interpretTx, DecodedTx, initQuickJSVM, QuickJSVM } from '@3loop/transaction-decoder'
 import { Effect, Layer } from 'effect'
 import variant from '@jitl/quickjs-singlefile-browser-release-sync'
 
@@ -27,51 +27,8 @@ export const emptyInterpreter: Interpreter = {
 `,
 }
 
-export const defaultInterpreters: Interpreter[] = [
-  {
-    id: 'contract:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9,chain:1',
-    schema: `
-function transformEvent(event) {
-    const methodName = event.methodCall.name
-    let action = ''
-
-    const newEvent = {
-        action: action,
-        txHash: event.txHash,
-        user: event.fromAddress,
-        method: methodName,
-        assetsSent: event.assetsSent,
-        assetsReceived: event?.assetsReceived
-    }
-
-    switch (methodName) {
-        case 'repay':
-            action = \`User repaid \${event.assetsSent[1].amount} \${event.assetsSent[1].symbol}\`
-            break
-
-        case 'deposit':
-            action = \`User deposited \${event.assetsSent[0].amount} \${event.assetsSent[0].symbol}\`
-            break
-
-        case 'borrow':
-            action = \`User borrowed \${event.assetsReceived[1].amount} \${event.assetsReceived[1].symbol}\`
-            break
-
-        case 'withdraw':
-            action = \`User withdrew \${event.assetsReceived[0].amount} \${event.assetsReceived[0].symbol}\`
-            break
-    }
-
-    newEvent.action = action
-
-    return newEvent
-}
-    `,
-  },
-]
-
-export async function interpretTx(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
-  const runnable = Effect.provide(applyInterpreterInVM({ decodedTx, interpreter }), layer)
+export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
+  const runnable = Effect.provide(interpretTx({ decodedTx, interpreter }), layer)
 
   return Effect.runPromise(runnable)
     .then((interpretation) => {
@@ -126,7 +83,7 @@ export async function findAndRunInterpreter(
     }
   }
 
-  const res = await interpretTx(decodedTx, interpreter)
+  const res = await applyInterpreter(decodedTx, interpreter)
 
   return res
 }

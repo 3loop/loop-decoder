@@ -2,7 +2,8 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import React from 'react'
 import { DecodedTx, Interpreter } from '@3loop/transaction-decoder'
-import { findAndRunInterpreter, defaultInterpreters, Interpretation } from '@/lib/interpreter'
+import { findAndRunInterpreter, Interpretation } from '@/lib/interpreter'
+import { defaultInterpreters } from '@/lib/default-interpreters'
 
 function getAvaliableinterpreters() {
   if (typeof window === 'undefined') return undefined

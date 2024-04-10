@@ -11,7 +11,9 @@ import {
 } from 'quickjs-emscripten'
 
 interface RuntimeConfig {
-  timeout?: number
+    timeout?: number
+    memoryLimit?: number
+    maxStackSize?: number
 }
 
 export interface QuickJSVMConfig {
@@ -34,13 +36,12 @@ export async function initQuickJSVM(config: QuickJSVMConfig): Promise<QuickJSRun
 }
 
 async function newRuntime(module: QuickJSWASMModule, config: RuntimeConfig): Promise<QuickJSRuntime> {
-  const { timeout = -1 } = config
+    const { timeout = -1, memoryLimit = 1024 * 640, maxStackSize = 1024 * 320 } = config
+    const runtime = module.newRuntime()
 
-  const runtime = module.newRuntime()
-
-  if (timeout !== -1) {
-    runtime.setInterruptHandler(shouldInterruptAfterDeadline(Date.now() + timeout))
-  }
+    runtime.setMemoryLimit(memoryLimit)
+    runtime.setMaxStackSize(maxStackSize)
+    if (timeout !== -1) runtime.setInterruptHandler(shouldInterruptAfterDeadline(Date.now() + timeout))
 
   return runtime
 }
@@ -56,32 +57,17 @@ const newContext = () =>
       console.log('TxDecoder:', ...nativeArgs)
     })
 
-    // Partially implement `console` object
-    const consoleHandle = vm.newObject()
-    vm.setProp(consoleHandle, 'log', logHandle)
-    vm.setProp(vm.global, 'console', consoleHandle)
+export const interpretTx = ({ decodedTx, interpreter }: { decodedTx: DecodedTx; interpreter: Interpreter }) =>
+    Effect.gen(function* (_) {
+        const input = JSON.stringify(decodedTx)
+        const code = interpreter.schema
+        const vm = yield* _(newContext())
+        const result = vm.unwrapResult(vm.evalCode(code + '\n' + 'transformEvent(' + input + ')'))
+        const ok = vm.dump(result)
 
-    consoleHandle.dispose()
-    logHandle.dispose()
-
-    return vm
-  })
-
-export const applyInterpreterInVM = ({ decodedTx, interpreter }: { decodedTx: DecodedTx; interpreter: Interpreter }) =>
-  Effect.gen(function* (_) {
-    const input = JSON.stringify(decodedTx)
-    const code = interpreter.schema
-
-    const vm = yield* _(newContext())
-
-    vm.evalCode(code)
-    vm.runtime.executePendingJobs(-1)
-
-    const result = vm.unwrapResult(vm.evalCode('transformEvent(' + input + ')'))
-    const ok = vm.dump(result)
-
-    result.dispose()
-    vm.dispose()
+        vm.runtime.executePendingJobs(-1)
+        result.dispose()
+        vm.dispose()
 
     return ok
   })
