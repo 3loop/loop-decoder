@@ -1,36 +1,32 @@
-import { Separator } from "@/components/ui/separator";
-import "./globals.css";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { MainNav } from "@/components/ui/main-nav";
-import { Analytics } from "@vercel/analytics/react";
-import { aaveV2 } from "../app/data";
+import { Separator } from '@/components/ui/separator'
+import './globals.css'
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import { MainNav } from '@/components/ui/main-nav'
+import { Analytics } from '@vercel/analytics/react'
+import { aaveV2 } from '../app/data'
 
 const navLinks = [
   {
-    href: "/",
-    match: "tx",
-    title: "Playground",
+    href: '/',
+    match: 'tx',
+    title: 'Playground',
   },
   {
     href: `/contract/${aaveV2}`,
-    match: "contract",
-    title: "Test contract",
+    match: 'contract',
+    title: 'Test contract',
   },
-];
+]
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "Loop Decoder",
-  description: "Demo of Loop Decoder",
-};
+  title: 'Loop Decoder',
+  description: 'Demo of Loop Decoder',
+}
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -64,5 +60,5 @@ export default function RootLayout({
         <Analytics />
       </body>
     </html>
-  );
+  )
 }

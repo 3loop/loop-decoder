@@ -6,8 +6,8 @@
 
 A library to transform any EVM transaction into a human-readable format. It consists of 2 parts:
 
--   [Transaction decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder)
--   Customizable transaction interpreter
+- [Transaction decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder)
+- Customizable transaction interpreter
 
 ## Why
 
@@ -17,9 +17,9 @@ Currently, the available EVM transaction decoders require developers to use spec
 
 ## Features
 
--   [x] Can be used in any JavaScript environment
--   [x] Minimal external dependencies - connect your own storage
--   [x] Flexible interpreter that allows you to define any custom interpretation of EVM transactions.
+- [x] Can be used in any JavaScript environment
+- [x] Minimal external dependencies - connect your own storage
+- [x] Flexible interpreter that allows you to define any custom interpretation of EVM transactions.
 
 ## Looking for feedback
 

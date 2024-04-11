@@ -9,10 +9,10 @@ import {
   BlockscoutStrategyResolver,
   PublicClient,
   ERC20RPCStrategyResolver,
-} from "@3loop/transaction-decoder";
-import { Effect, Layer } from "effect";
-import prisma from "./prisma";
-import { NFTRPCStrategyResolver } from "@3loop/transaction-decoder";
+} from '@3loop/transaction-decoder'
+import { Effect, Layer } from 'effect'
+import prisma from './prisma'
+import { NFTRPCStrategyResolver } from '@3loop/transaction-decoder'
 
 export const AbiStoreLive = Layer.succeed(
   AbiStore,
@@ -28,13 +28,13 @@ export const AbiStoreLive = Layer.succeed(
       ],
       169: [
         BlockscoutStrategyResolver({
-          endpoint: "https://pacific-explorer.manta.network/api",
+          endpoint: 'https://pacific-explorer.manta.network/api',
         }),
       ],
     },
     set: ({ address = {} }) =>
       Effect.gen(function* (_) {
-        const addressMatches = Object.entries(address);
+        const addressMatches = Object.entries(address)
 
         // Cache all addresses
         yield* _(
@@ -49,20 +49,21 @@ export const AbiStoreLive = Layer.succeed(
                     },
                   })
                   .catch((e) => {
-                    console.error("Failed to cache abi", e);
-                    return null;
+                    console.error('Failed to cache abi', e)
+                    return null
                   }),
               ),
             ),
             {
-              concurrency: "unbounded",
+              concurrency: 'inherit',
+              batching: 'inherit',
             },
           ),
-        );
+        )
       }),
     get: ({ address }) =>
       Effect.gen(function* (_) {
-        const normAddress = address.toLowerCase();
+        const normAddress = address.toLowerCase()
         const cached = yield* _(
           Effect.promise(() =>
             prisma.contractAbi.findFirst({
@@ -71,23 +72,23 @@ export const AbiStoreLive = Layer.succeed(
               },
             }),
           ),
-        );
+        )
 
         if (cached != null) {
-          return cached.abi;
+          return cached.abi
         }
-        return null;
+        return null
       }),
   }),
-);
+)
 
 // TODO: Provide context of RPCProvider
 export const ContractMetaStoreLive = Layer.effect(
   ContractMetaStore,
   Effect.gen(function* (_) {
-    const publicClient = yield* _(PublicClient);
-    const erc20Loader = ERC20RPCStrategyResolver(publicClient);
-    const nftLoader = NFTRPCStrategyResolver(publicClient);
+    const publicClient = yield* _(PublicClient)
+    const erc20Loader = ERC20RPCStrategyResolver(publicClient)
+    const nftLoader = NFTRPCStrategyResolver(publicClient)
 
     return ContractMetaStore.of({
       strategies: {
@@ -95,7 +96,7 @@ export const ContractMetaStoreLive = Layer.effect(
       },
       get: ({ address, chainID }) =>
         Effect.gen(function* (_) {
-          const normAddress = address.toLowerCase();
+          const normAddress = address.toLowerCase()
           const data = yield* _(
             Effect.tryPromise(
               () =>
@@ -106,13 +107,13 @@ export const ContractMetaStoreLive = Layer.effect(
                   },
                 }) as Promise<ContractData | null>,
             ).pipe(Effect.catchAll((_) => Effect.succeed(null))),
-          );
+          )
 
-          return data;
+          return data
         }),
       set: ({ address, chainID }, contractMeta) =>
         Effect.gen(function* (_) {
-          const normAddress = address.toLowerCase();
+          const normAddress = address.toLowerCase()
 
           yield* _(
             Effect.tryPromise(() =>
@@ -125,8 +126,8 @@ export const ContractMetaStoreLive = Layer.effect(
                 },
               }),
             ).pipe(Effect.catchAll((_) => Effect.succeed(null))),
-          );
+          )
         }),
-    });
+    })
   }),
-);
+)

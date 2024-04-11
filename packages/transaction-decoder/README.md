@@ -2,8 +2,8 @@
 
 ## Requirements
 
--   TypeScript 5.x
--   `strict` enabled in your tsconfig.json
+- TypeScript 5.x
+- `strict` enabled in your tsconfig.json
 
 ## Getting Started
 
@@ -15,9 +15,9 @@ $ npm i @3loop/transaction-decoder
 
 To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three data loaders:
 
--   `getPublicClient`: This function returns an object with viem PublicClient based on the chain ID.
--   `contractMetaStore`: This object has 2 properties `get` and `set` that returns and caches contract meta-information. See the `ContractData` type for the required properties.
--   `abiStore`: Similarly, this object has 2 properties `get` and `set` that returns and cache the contract or fragment ABI based on the chain ID, address, and/or signature.
+- `getPublicClient`: This function returns an object with viem PublicClient based on the chain ID.
+- `contractMetaStore`: This object has 2 properties `get` and `set` that returns and caches contract meta-information. See the `ContractData` type for the required properties.
+- `abiStore`: Similarly, this object has 2 properties `get` and `set` that returns and cache the contract or fragment ABI based on the chain ID, address, and/or signature.
 
 ```ts
 import { TransactionDecoder } from '@3loop/transaction-decoder'
@@ -71,8 +71,8 @@ LoopDecoder instances provide a single public method, `decodeTransaction`, which
 
 ```ts
 const result = await decoded.decodeTransaction({
-    chainID: 5,
-    hash: '0x...',
+  chainID: 5,
+  hash: '0x...',
 })
 ```
 
@@ -90,15 +90,15 @@ To get started with using the Decoder, first, you have to provide the RPC Provid
 import { PublicClient, PublicClientObject } from '@3loop/transaction-decoder'
 import { Effect } from 'effect'
 
-const getPublicClient = (chainID: number): Effect.Effect<never, UnknownNetwork, PublicClientObject> => {
-    if (chainID === 5) {
-        return Effect.succeed({
-            client: createPublicClient({
-                transport: http(GOERLI_RPC),
-            }),
-        })
-    }
-    return Effect.fail(new UnknownNetwork(chainID))
+const getPublicClient = (chainID: number): Effect.Effect<PublicClientObject, UnknownNetwork> => {
+  if (chainID === 5) {
+    return Effect.succeed({
+      client: createPublicClient({
+        transport: http(GOERLI_RPC),
+      }),
+    })
+  }
+  return Effect.fail(new UnknownNetwork(chainID))
 }
 ```
 
@@ -110,33 +110,33 @@ To create a new `AbiStore` service you will need to implement two methods `set` 
 
 ```ts
 const AbiStoreLive = Layer.succeed(
-    AbiStore,
-    AbiStore.of({
-        strategies: { default: [] },
-        set: ({ address = {}, func = {}, event = {} }) =>
-            Effect.sync(() => {
-                // NOTE: Ignore caching as we relay only on local abis
-            }),
-        get: ({ address, signature, event }) =>
-            Effect.sync(() => {
-                const signatureAbiMap = {
-                    '0x3593564c': 'execute(bytes,bytes[],uint256)',
-                    '0x0902f1ac': 'getReserves()',
-                    '0x36c78516': 'transferFrom(address,address,uint160,address)	',
-                    '0x70a08231': 'balanceOf(address)',
-                    '0x022c0d9f': 'swap(uint256,uint256,address,bytes)',
-                    '0x2e1a7d4d': 'withdraw(uint256)',
-                }
+  AbiStore,
+  AbiStore.of({
+    strategies: { default: [] },
+    set: ({ address = {}, func = {}, event = {} }) =>
+      Effect.sync(() => {
+        // NOTE: Ignore caching as we relay only on local abis
+      }),
+    get: ({ address, signature, event }) =>
+      Effect.sync(() => {
+        const signatureAbiMap = {
+          '0x3593564c': 'execute(bytes,bytes[],uint256)',
+          '0x0902f1ac': 'getReserves()',
+          '0x36c78516': 'transferFrom(address,address,uint160,address)	',
+          '0x70a08231': 'balanceOf(address)',
+          '0x022c0d9f': 'swap(uint256,uint256,address,bytes)',
+          '0x2e1a7d4d': 'withdraw(uint256)',
+        }
 
-                const abi = signatureAbiMap[signature]
+        const abi = signatureAbiMap[signature]
 
-                if (abi) {
-                    return abi
-                }
+        if (abi) {
+          return abi
+        }
 
-                return null
-            }),
-    }),
+        return null
+      }),
+  }),
 )
 ```
 
@@ -170,8 +170,8 @@ export const MetaStoreLive = Layer.succeed(
 ```ts
 const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
 const PublicClientLive = Layer.succeed(
-    PublicClient,
-    PublicClient.of({ _tag: 'PublicClient', getPublicClient: getPublicClient }),
+  PublicClient,
+  PublicClient.of({ _tag: 'PublicClient', getPublicClient: getPublicClient }),
 )
 
 const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer)
@@ -181,10 +181,10 @@ const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer)
 
 ```ts
 const program = Effect.gen(function* (_) {
-    const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
-    const chainID = 5
+  const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
+  const chainID = 5
 
-    return yield* _(decodeTransactionByHash(hash, chainID))
+  return yield* _(decodeTransactionByHash(hash, chainID))
 })
 ```
 
@@ -201,11 +201,11 @@ const result = await program.pipe(Effect.provide(customRuntime), Effect.runPromi
 
 Loop Decoder provides 5 strategies out of the box:
 
--   `EtherscanStrategyResolver` - resolves the ABI from Etherscan
--   `SourcifyStrategyResolver` - resolves the ABI from Sourcify
--   `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
--   `OpenchainStrategyResolver` - resolves the ABI from Openchain
--   `BlockscoutStrategyResolver` - resolves the ABI from Blockscout
+- `EtherscanStrategyResolver` - resolves the ABI from Etherscan
+- `SourcifyStrategyResolver` - resolves the ABI from Sourcify
+- `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
+- `OpenchainStrategyResolver` - resolves the ABI from Openchain
+- `BlockscoutStrategyResolver` - resolves the ABI from Blockscout
 
 You can create your own strategy by implementing the `GetContractABIStrategy` Effect RequestResolver.
 
@@ -225,4 +225,4 @@ To create a new release, one of the maintainers will merge the changeset PR into
 
 Some ideas for the decoder and interpreter were inspired by open-source software. Special thanks to:
 
--   [EVM Translator](https://github.com/metagame-xyz/evm-translator) - some data types and data manipulations were heavily inspired by this source.
+- [EVM Translator](https://github.com/metagame-xyz/evm-translator) - some data types and data manipulations were heavily inspired by this source.

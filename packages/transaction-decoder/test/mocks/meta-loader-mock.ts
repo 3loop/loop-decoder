@@ -5,57 +5,60 @@ const ERC1155_CONTRACTS = ['0x58c3c2547084cc1c94130d6fd750a3877c7ca5d2', '0x4bed
 const ERC721_CONTRACTS = ['0xc3e4214dd442136079df06bb2529bae276d37564']
 
 export const MockedMetaStoreLive = Layer.succeed(
-    ContractMetaStore,
-    ContractMetaStore.of({
-        get: ({ address, chainID }) =>
-            Effect.sync(() => {
-                if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === address.toLowerCase()) {
-                    return {
-                        address,
-                        chainID,
-                        contractName: 'Wrapped Ether',
-                        contractAddress: address,
-                        tokenSymbol: 'WETH',
-                        decimals: 18,
-                        type: 'WETH',
-                    }
-                }
+  ContractMetaStore,
+  ContractMetaStore.of({
+    strategies: {
+      default: [],
+    },
+    get: ({ address, chainID }) =>
+      Effect.sync(() => {
+        if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === address.toLowerCase()) {
+          return {
+            address,
+            chainID,
+            contractName: 'Wrapped Ether',
+            contractAddress: address,
+            tokenSymbol: 'WETH',
+            decimals: 18,
+            type: 'WETH',
+          }
+        }
 
-                if (ERC1155_CONTRACTS.includes(address.toLowerCase())) {
-                    return {
-                        address,
-                        chainID,
-                        contractName: 'Mock ERC1155 Contract',
-                        contractAddress: address,
-                        tokenSymbol: 'ERC1155',
-                        type: 'ERC1155',
-                    }
-                }
+        if (ERC1155_CONTRACTS.includes(address.toLowerCase())) {
+          return {
+            address,
+            chainID,
+            contractName: 'Mock ERC1155 Contract',
+            contractAddress: address,
+            tokenSymbol: 'ERC1155',
+            type: 'ERC1155',
+          }
+        }
 
-                if (ERC721_CONTRACTS.includes(address.toLowerCase())) {
-                    return {
-                        address,
-                        chainID,
-                        contractName: 'Mock ERC721 Contract',
-                        contractAddress: address,
-                        tokenSymbol: 'ERC721',
-                        type: 'ERC721',
-                    }
-                }
+        if (ERC721_CONTRACTS.includes(address.toLowerCase())) {
+          return {
+            address,
+            chainID,
+            contractName: 'Mock ERC721 Contract',
+            contractAddress: address,
+            tokenSymbol: 'ERC721',
+            type: 'ERC721',
+          }
+        }
 
-                return {
-                    address,
-                    chainID,
-                    contractName: 'Mock ERC20 Contract',
-                    contractAddress: address,
-                    tokenSymbol: 'ERC20',
-                    decimals: 18,
-                    type: 'ERC20',
-                }
-            }),
-        set: () =>
-            Effect.sync(() => {
-                console.error('MockedMetaStoreLive.set not implemented in tests')
-            }),
-    }),
+        return {
+          address,
+          chainID,
+          contractName: 'Mock ERC20 Contract',
+          contractAddress: address,
+          tokenSymbol: 'ERC20',
+          decimals: 18,
+          type: 'ERC20',
+        }
+      }),
+    set: () =>
+      Effect.sync(() => {
+        console.error('MockedMetaStoreLive.set not implemented in tests')
+      }),
+  }),
 )

@@ -1,13 +1,13 @@
-"use client";
+'use client'
 
-import Editor from "@monaco-editor/react";
+import Editor from '@monaco-editor/react'
 
 interface CodeBlockProps {
-  language: string;
-  value?: string;
-  readonly?: boolean;
-  lineNumbers?: boolean;
-  onChange?: (value: string) => void;
+  language: string
+  value?: string
+  readonly?: boolean
+  lineNumbers?: boolean
+  onChange?: (value: string) => void
 }
 
 export default function CodeBlock(props: CodeBlockProps) {
@@ -18,17 +18,17 @@ export default function CodeBlock(props: CodeBlockProps) {
         value={props.value}
         onChange={(value) => {
           if (value !== undefined) {
-            props?.onChange && props?.onChange(value);
+            props?.onChange && props?.onChange(value)
           }
         }}
         options={{
           readOnly: props?.readonly ?? false,
-          lineNumbers: props?.lineNumbers ? "on" : "off",
+          lineNumbers: props?.lineNumbers ? 'on' : 'off',
           automaticLayout: true,
           glyphMargin: false,
           minimap: { enabled: false },
           scrollBeyondLastLine: false,
-          renderLineHighlight: "none",
+          renderLineHighlight: 'none',
           scrollbar: {
             verticalScrollbarSize: 5,
             horizontalScrollbarSize: 5,
@@ -40,5 +40,5 @@ export default function CodeBlock(props: CodeBlockProps) {
         }}
       />
     </div>
-  );
+  )
 }

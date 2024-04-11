@@ -1,29 +1,23 @@
-import * as React from "react";
-import DecodingForm from "./form";
-import { decodeTransaction } from "@/lib/decode";
-import { defaultInterpreters, emptyInterpreter } from "@/lib/interpreter";
-import { findInterpreter } from "@3loop/transaction-decoder";
+import * as React from 'react'
+import DecodingForm from './form'
+import { decodeTransaction } from '@/lib/decode'
+import { defaultInterpreters, emptyInterpreter } from '@/lib/interpreter'
+import { findInterpreter } from '@3loop/transaction-decoder'
 
-export default async function TransactionPage({
-  params,
-}: {
-  params: { hash: string; chainID: number };
-}) {
+export default async function TransactionPage({ params }: { params: { hash: string; chainID: number } }) {
   const decoded = await decodeTransaction({
     hash: params.hash,
     chainID: params.chainID,
-  });
+  })
 
   if (!decoded) {
-    return (
-      <DecodingForm currentHash={params.hash} currentChainID={params.chainID} />
-    );
+    return <DecodingForm currentHash={params.hash} currentChainID={params.chainID} />
   }
 
   const interpreter = await findInterpreter({
     decodedTx: decoded,
     interpreters: defaultInterpreters,
-  });
+  })
 
   return (
     <DecodingForm
@@ -32,5 +26,5 @@ export default async function TransactionPage({
       currentHash={params.hash}
       currentChainID={params.chainID}
     />
-  );
+  )
 }
