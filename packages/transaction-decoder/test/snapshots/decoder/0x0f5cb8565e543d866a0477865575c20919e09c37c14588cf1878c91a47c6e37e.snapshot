@@ -1,0 +1,113 @@
+{
+  "assetsReceived": [],
+  "assetsSent": [],
+  "chainID": 1,
+  "chainSymbol": "mainnet",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "13241256548",
+  "fromAddress": "0xbbdd1b3c87c211e482cda98ea14fa8bf50022ca0",
+  "gasPaid": "0.000696741678299212",
+  "gasUsed": "52619",
+  "interactedAddresses": [
+    "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
+    "0xbbDd1b3C87c211E482CdA98eA14fa8bF50022CA0",
+  ],
+  "interactions": [
+    {
+      "chainID": 1,
+      "contractAddress": "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "CancelTrade",
+        "logIndex": 176,
+        "params": {
+          "amount": "1",
+          "hash": "0xbd60bb31b78518f9d5de2511e923f9141ef83183a299ee74b7859bcff5f08379",
+          "index": "0",
+          "user": "0xbbDd1b3C87c211E482CdA98eA14fa8bF50022CA0",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "name": "hash",
+                "type": "bytes32",
+                "value": "0xbd60bb31b78518f9d5de2511e923f9141ef83183a299ee74b7859bcff5f08379",
+              },
+              {
+                "name": "index",
+                "type": "uint256",
+                "value": "0",
+              },
+              {
+                "name": "amount",
+                "type": "uint256",
+                "value": "1",
+              },
+            ],
+            "name": "cancels",
+            "type": "tuple",
+          },
+        ],
+        "name": "cancels",
+        "type": "tuple",
+      },
+    ],
+    "name": "cancelTrades",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1712476259,
+  "toAddress": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
+  "traceCalls": [
+    {
+      "from": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
+      "name": "cancelTrades",
+      "params": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "name": "hash",
+                  "type": "bytes32",
+                  "value": "0xbd60bb31b78518f9d5de2511e923f9141ef83183a299ee74b7859bcff5f08379",
+                },
+                {
+                  "name": "index",
+                  "type": "uint256",
+                  "value": "0",
+                },
+                {
+                  "name": "amount",
+                  "type": "uint256",
+                  "value": "1",
+                },
+              ],
+              "name": "cancels",
+              "type": "tuple",
+            },
+          ],
+          "name": "cancels",
+          "type": "tuple",
+        },
+      ],
+      "signature": "cancelTrades((bytes32,uint256,uint256)[])",
+      "to": "0x5fa60726e62c50af45ff2f6280c468da438a7837",
+      "type": "function",
+    },
+  ],
+  "txHash": "0x0f5cb8565e543d866a0477865575c20919e09c37c14588cf1878c91a47c6e37e",
+  "txIndex": 37,
+  "txType": "contract interaction",
+}

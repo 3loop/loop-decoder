@@ -5,7 +5,44 @@ type TXS = {
   chainID: number
 }[]
 
+const NFTS_BLUR = [
+  {
+    // cancelTrades
+    hash: '0x0f5cb8565e543d866a0477865575c20919e09c37c14588cf1878c91a47c6e37e',
+    chainID: 1,
+  },
+  {
+    // takeBid
+    hash: '0xb5c56b4213325cb3fba274d0467b40ab28d9d475ba4a652b46943251c3c0d697',
+    chainID: 1,
+  },
+  {
+    //takeBidSingle
+    hash: '0x02a4dda78f1452772d87aa080d65ed7c34785b9d0f4c20aa6c91c51a63ee1fa4',
+    chainID: 1,
+  },
+  {
+    //takeAskSinglePool
+    hash: '0xf852866a9d10ab4713b00f3a012b7e60a48055a6f2cd99ae7efce205c390f710',
+    chainID: 1,
+  },
+  {
+    //takeAsk
+    hash: '0xb98ca6d846d45556d0139a00be7314e32c0e8da7810db83ec6c9c0e7e44a7e10',
+    chainID: 1,
+  },
+] as const
+
+const AA_TRANSACTIONS = [
+  {
+    hash: '0xcc1f4e40e1186503bb19b5716c8527947ab4c7e972b79d3d64ad8a015cf10ff8',
+    chainID: 1,
+  },
+] as const
+
 export const TEST_TRANSACTIONS: TXS = [
+  ...NFTS_BLUR,
+  ...AA_TRANSACTIONS,
   {
     hash: '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75',
     chainID: 5,
@@ -55,4 +92,4 @@ export const TEST_TRANSACTIONS: TXS = [
     hash: '0x9d20b73d7b102aacc63dadf01ed7767cbbfd1c3f92302b08f6741be4bd8fb6cf', // Disperse app
     chainID: 5,
   },
-]
+] as const
