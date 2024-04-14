@@ -8,7 +8,15 @@
       "type": "ERC20",
     },
   ],
-  "assetsSent": [],
+  "assetsSent": [
+    {
+      "address": "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
+      "amount": "0.0",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "type": "ERC20",
+    },
+  ],
   "chainID": 1,
   "chainSymbol": "mainnet",
   "contractName": "Mock ERC20 Contract",
@@ -18,12 +26,48 @@
   "gasPaid": "0.002586856270874375",
   "gasUsed": "188543",
   "interactedAddresses": [
-    "0x0000000000A39bb272e79075ade125fd351887Ac",
-    "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+    "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
     "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
+    "0x0000000000000000000000000000000000000000",
+    "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+    "0x0000000000A39bb272e79075ade125fd351887Ac",
     "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
   ],
   "interactions": [
+    {
+      "chainID": 1,
+      "contractAddress": "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Approval",
+        "logIndex": 219,
+        "params": {
+          "approved": "0x0000000000000000000000000000000000000000",
+          "owner": "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
+          "tokenId": "9912",
+        },
+      },
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 220,
+        "params": {
+          "from": "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
+          "to": "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+          "tokenId": "9912",
+        },
+      },
+    },
     {
       "chainID": 1,
       "contractAddress": "0x0000000000A39bb272e79075ade125fd351887Ac",
@@ -35,9 +79,9 @@
         "eventName": "Transfer",
         "logIndex": 221,
         "params": {
+          "amount": "440000000000000000",
           "from": "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
           "to": "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
-          "value": "440000000000000000",
         },
       },
     },

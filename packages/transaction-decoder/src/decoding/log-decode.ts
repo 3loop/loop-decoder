@@ -13,10 +13,10 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     const address = logItem.address
     let abiAddress = address
 
-    //NOTE: if contract is a proxy, get the implementation address
     const implementation = yield* _(getProxyStorageSlot({ address: abiAddress, chainID }))
 
     if (implementation) {
+      yield* _(Effect.logDebug(`Proxy implementation found for ${abiAddress} at ${implementation}`))
       abiAddress = implementation
     }
 
@@ -29,42 +29,48 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     )
 
     if (abiItem_ == null) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return yield* _(Effect.fail(new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0]!, chainID)))
     }
 
     const abiItem = JSON.parse(abiItem_) as Abi[]
 
     const { eventName, args: args_ } = yield* _(
-      Effect.try(() =>
-        decodeEventLog({
-          abi: abiItem,
-          topics: logItem.topics,
-          data: logItem.data,
-        }),
-      ),
+      Effect.try({
+        try: () =>
+          decodeEventLog({
+            abi: abiItem,
+            topics: logItem.topics,
+            data: logItem.data,
+            strict: false,
+          }),
+        catch: () => {
+          Effect.logWarning(`Could not decode log ${abiAddress} ${JSON.stringify(logItem)}`)
+        },
+      }),
     )
 
     if (args_ == null || eventName == null) {
       return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)))
     }
 
-    const args = args_ as unknown as { [key: string]: any }
+    const args = args_ as any
 
     const fragment = getAbiItem({ abi: abiItem, name: eventName })
 
     if (fragment == null) {
-      return yield* _(Effect.fail(new AbiDecoder.DecodeError('Could not decode log')))
+      return yield* _(
+        Effect.fail(new AbiDecoder.DecodeError(`Could not find fragment in ABI ${abiAddress} ${eventName}`)),
+      )
     }
 
     const decodedParams = yield* _(
       Effect.try({
         try: () => {
           if ('inputs' in fragment && fragment.inputs != null) {
-            return fragment.inputs.map((input) => {
+            return fragment.inputs.map((input, i) => {
               if (input.name == null) return null
 
-              const arg = args[input.name]
+              const arg = Array.isArray(args) ? args[i] : args[input.name]
               const value = Array.isArray(arg) ? arg.map((item) => item?.toString()) : arg.toString()
 
               return {
@@ -76,7 +82,9 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
           }
           return []
         },
-        catch: () => [],
+        catch: () => {
+          Effect.logError(`Could not decode log params ${JSON.stringify(logItem)}`)
+        },
       }),
     )
 

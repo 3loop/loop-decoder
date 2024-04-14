@@ -52,7 +52,13 @@ export const mockedTransport = custom({
       if (params[0] === '0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5') {
         return Promise.resolve('0x0000000000000000000000005fa60726E62c50Af45Ff2F6280C468DA438A7837')
       }
+      if (params[0] === '0x0000000000a39bb272e79075ade125fd351887ac') {
+        return Promise.resolve('0x00000000000000000000000001a656024de4B89e2D0198BF4D468E8fd2358b17')
+      }
 
+      if (params[0] === '0x2e175f748976cd5cdb98f12d1abc5d137d6c9379') {
+        return Promise.resolve('0x00000000000000000000000001a656024de4B89e2D0198BF4D468E8fd2358b17')
+      }
       return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')
     }
 

@@ -283,7 +283,7 @@
       "name": "balanceOf",
       "params": [
         {
-          "name": "_owner",
+          "name": "account",
           "type": "address",
           "value": "0x607E064d6D9DC45D4109b835B915d9c75780103e",
         },
@@ -348,7 +348,7 @@
       "name": "balanceOf",
       "params": [
         {
-          "name": "_owner",
+          "name": "account",
           "type": "address",
           "value": "0x607E064d6D9DC45D4109b835B915d9c75780103e",
         },

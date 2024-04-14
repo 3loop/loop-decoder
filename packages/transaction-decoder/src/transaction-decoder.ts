@@ -178,11 +178,14 @@ export const decodeTransaction = ({
     const decodedTraceRight = decodedTrace.filter(Either.isRight).map((r) => r.right)
 
     const logsErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
-    if (logsErrors.length > 0) yield* _(Effect.logError(logsErrors))
+    if (logsErrors.length > 0) {
+      yield* _(Effect.logError(`Logs decode errors: ${JSON.stringify(logsErrors)}`))
+    }
 
     const traceErrors = decodedTrace.filter(Either.isLeft).map((r) => r.left)
-    if (traceErrors.length > 0) yield* _(Effect.logError(traceErrors))
-
+    if (traceErrors.length > 0) {
+      yield* _(Effect.logError(`Trace decode errors: ${JSON.stringify(traceErrors)}`))
+    }
     const interpreterMap = yield* _(
       getAndCacheContractMeta({
         address: receipt.to!,

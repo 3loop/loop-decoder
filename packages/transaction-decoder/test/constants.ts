@@ -89,7 +89,7 @@ export const TEST_TRANSACTIONS: TXS = [
     chainID: 5,
   },
   {
-    hash: '0x9d20b73d7b102aacc63dadf01ed7767cbbfd1c3f92302b08f6741be4bd8fb6cf', // Disperse app
-    chainID: 5,
+    hash: '0x026fdb8b0017ef0e468e6d1627357adb9a8c4b6205ac0049bad80c253c76750c', // Disperse app
+    chainID: 1,
   },
 ] as const

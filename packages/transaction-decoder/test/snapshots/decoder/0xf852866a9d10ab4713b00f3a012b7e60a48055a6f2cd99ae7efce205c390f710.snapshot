@@ -1,5 +1,13 @@
 {
-  "assetsReceived": [],
+  "assetsReceived": [
+    {
+      "address": "0x524cAB2ec69124574082676e6F654a18df49A048",
+      "amount": "0.0",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "type": "ERC20",
+    },
+  ],
   "assetsSent": [
     {
       "address": "0x0000000000A39bb272e79075ade125fd351887Ac",
@@ -21,6 +29,8 @@
     "0x0000000000A39bb272e79075ade125fd351887Ac",
     "0xAffca680e6dcbb1bb336108D5aCcA9c545885260",
     "0x0000000000000000000000000000000000000000",
+    "0x524cAB2ec69124574082676e6F654a18df49A048",
+    "0xB20760dd8b5997358a3ad088016202f793bA32dA",
     "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
     "0x0000000000a39bb272e79075ade125fd351887ac",
     "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
@@ -39,9 +49,43 @@
         "eventName": "Transfer",
         "logIndex": 202,
         "params": {
+          "amount": "1061717990000000000",
           "from": "0xAffca680e6dcbb1bb336108D5aCcA9c545885260",
           "to": "0x0000000000000000000000000000000000000000",
-          "value": "1061717990000000000",
+        },
+      },
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0x524cAB2ec69124574082676e6F654a18df49A048",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Approval",
+        "logIndex": 203,
+        "params": {
+          "approved": "0x0000000000000000000000000000000000000000",
+          "owner": "0xB20760dd8b5997358a3ad088016202f793bA32dA",
+          "tokenId": "16614",
+        },
+      },
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0x524cAB2ec69124574082676e6F654a18df49A048",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 204,
+        "params": {
+          "from": "0xB20760dd8b5997358a3ad088016202f793bA32dA",
+          "to": "0xAffca680e6dcbb1bb336108D5aCcA9c545885260",
+          "tokenId": "16614",
         },
       },
     },

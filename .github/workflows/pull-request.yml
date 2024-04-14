@@ -3,7 +3,7 @@ name: Pull Request
 on:
   pull_request:
     branches:
-      - "main"
+      - 'main'
 
 jobs:
   pr:
@@ -47,8 +47,8 @@ jobs:
       - name: Format check
         run: pnpm check
 
-      # - name: Test
-      #   run: pnpm test
+      - name: Test
+        run: pnpm test
 
       - name: Build
         run: pnpm build
