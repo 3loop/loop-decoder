@@ -1,4 +1,4 @@
-import { Context, Effect, RequestResolver, Option, Request, ReadonlyArray, Either } from 'effect'
+import { Context, Effect, RequestResolver, Request, ReadonlyArray, Either } from 'effect'
 import { ContractData } from './types.js'
 import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'

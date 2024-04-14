@@ -1,0 +1,379 @@
+{
+  "assetsReceived": [
+    {
+      "address": "0x0000000000A39bb272e79075ade125fd351887Ac",
+      "amount": "0.44",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "type": "ERC20",
+    },
+  ],
+  "assetsSent": [],
+  "chainID": 1,
+  "chainSymbol": "mainnet",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "13720245625",
+  "fromAddress": "0xde02fffb824720e25674a604baf2277f21c66a0f",
+  "gasPaid": "0.002586856270874375",
+  "gasUsed": "188543",
+  "interactedAddresses": [
+    "0x0000000000A39bb272e79075ade125fd351887Ac",
+    "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+    "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
+    "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
+  ],
+  "interactions": [
+    {
+      "chainID": 1,
+      "contractAddress": "0x0000000000A39bb272e79075ade125fd351887Ac",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 221,
+        "params": {
+          "from": "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+          "to": "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
+          "value": "440000000000000000",
+        },
+      },
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Execution721Packed",
+        "logIndex": 222,
+        "params": {
+          "collectionPriceSide": "452312849226327108798921444621190748174822047317687059691617804158898119307",
+          "orderHash": "0xbd8aa9fcf7aaf372b21ac34f9d2bc95a0d46f94876368601004dd3b505594ea1",
+          "tokenIdListingIndexTrader": "3708519897897837542598287020838563106149287084151295037",
+        },
+      },
+    },
+  ],
+  "methodCall": {
+    "arguments": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "name": "trader",
+                "type": "address",
+                "value": "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+              },
+              {
+                "name": "collection",
+                "type": "address",
+                "value": "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
+              },
+              {
+                "name": "listingsRoot",
+                "type": "bytes32",
+                "value": "0xc67bcf9161c7bcf95926314b517cf91f73860654ad43ea4115944da79ced8ff0",
+              },
+              {
+                "name": "numberOfListings",
+                "type": "uint256",
+                "value": "1",
+              },
+              {
+                "name": "expirationTime",
+                "type": "uint256",
+                "value": "1744003083",
+              },
+              {
+                "name": "assetType",
+                "type": "uint8",
+                "value": "0",
+              },
+              {
+                "components": [
+                  {
+                    "name": "recipient",
+                    "type": "address",
+                    "value": "0x0000000000000000000000000000000000000000",
+                  },
+                  {
+                    "name": "rate",
+                    "type": "uint16",
+                    "value": "0",
+                  },
+                ],
+                "name": "makerFee",
+                "type": "tuple",
+              },
+              {
+                "name": "salt",
+                "type": "uint256",
+                "value": "56758666382628944136237667133410871745",
+              },
+            ],
+            "name": "order",
+            "type": "tuple",
+          },
+          {
+            "components": [
+              {
+                "name": "index",
+                "type": "uint256",
+                "value": "0",
+              },
+              {
+                "name": "proof",
+                "type": "bytes32[]",
+                "value": [],
+              },
+              {
+                "components": [
+                  {
+                    "name": "index",
+                    "type": "uint256",
+                    "value": "0",
+                  },
+                  {
+                    "name": "tokenId",
+                    "type": "uint256",
+                    "value": "0",
+                  },
+                  {
+                    "name": "amount",
+                    "type": "uint256",
+                    "value": "2",
+                  },
+                  {
+                    "name": "price",
+                    "type": "uint256",
+                    "value": "440000000000000000",
+                  },
+                ],
+                "name": "listing",
+                "type": "tuple",
+              },
+              {
+                "components": [
+                  {
+                    "name": "tokenId",
+                    "type": "uint256",
+                    "value": "9912",
+                  },
+                  {
+                    "name": "amount",
+                    "type": "uint256",
+                    "value": "1",
+                  },
+                ],
+                "name": "taker",
+                "type": "tuple",
+              },
+            ],
+            "name": "exchange",
+            "type": "tuple",
+          },
+          {
+            "components": [
+              {
+                "name": "recipient",
+                "type": "address",
+                "value": "0x0000000000000000000000000000000000000000",
+              },
+              {
+                "name": "rate",
+                "type": "uint16",
+                "value": "0",
+              },
+            ],
+            "name": "takerFee",
+            "type": "tuple",
+          },
+          {
+            "name": "signature",
+            "type": "bytes",
+            "value": "0x11e274a93542a6397433d70cc050e6f8ab901bd359e336d0cababf27d5ec0a96052a14ebd55d81622f5d117ceb87226a8d148374ac4ef6de75b7d000c70e75a91c",
+          },
+        ],
+        "name": "inputs",
+        "type": "tuple",
+      },
+      {
+        "name": "oracleSignature",
+        "type": "bytes",
+        "value": "0xa70773cc07a8826f7324d6505b00617410e960c8a50e72f9c7386bb852d0560f458c8b36117d1f64d065a905b1b008814733be8de88f1421dbd7f08374f913151b012b1c306af68e5d010513ff70a3aaed9afeb8661116e6ce",
+      },
+    ],
+    "name": "takeBidSingle",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1712476739,
+  "toAddress": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
+  "traceCalls": [
+    {
+      "from": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
+      "name": "takeBidSingle",
+      "params": [
+        {
+          "components": [
+            {
+              "components": [
+                {
+                  "name": "trader",
+                  "type": "address",
+                  "value": "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+                },
+                {
+                  "name": "collection",
+                  "type": "address",
+                  "value": "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
+                },
+                {
+                  "name": "listingsRoot",
+                  "type": "bytes32",
+                  "value": "0xc67bcf9161c7bcf95926314b517cf91f73860654ad43ea4115944da79ced8ff0",
+                },
+                {
+                  "name": "numberOfListings",
+                  "type": "uint256",
+                  "value": "1",
+                },
+                {
+                  "name": "expirationTime",
+                  "type": "uint256",
+                  "value": "1744003083",
+                },
+                {
+                  "name": "assetType",
+                  "type": "uint8",
+                  "value": "0",
+                },
+                {
+                  "components": [
+                    {
+                      "name": "recipient",
+                      "type": "address",
+                      "value": "0x0000000000000000000000000000000000000000",
+                    },
+                    {
+                      "name": "rate",
+                      "type": "uint16",
+                      "value": "0",
+                    },
+                  ],
+                  "name": "makerFee",
+                  "type": "tuple",
+                },
+                {
+                  "name": "salt",
+                  "type": "uint256",
+                  "value": "56758666382628944136237667133410871745",
+                },
+              ],
+              "name": "order",
+              "type": "tuple",
+            },
+            {
+              "components": [
+                {
+                  "name": "index",
+                  "type": "uint256",
+                  "value": "0",
+                },
+                {
+                  "name": "proof",
+                  "type": "bytes32[]",
+                  "value": [],
+                },
+                {
+                  "components": [
+                    {
+                      "name": "index",
+                      "type": "uint256",
+                      "value": "0",
+                    },
+                    {
+                      "name": "tokenId",
+                      "type": "uint256",
+                      "value": "0",
+                    },
+                    {
+                      "name": "amount",
+                      "type": "uint256",
+                      "value": "2",
+                    },
+                    {
+                      "name": "price",
+                      "type": "uint256",
+                      "value": "440000000000000000",
+                    },
+                  ],
+                  "name": "listing",
+                  "type": "tuple",
+                },
+                {
+                  "components": [
+                    {
+                      "name": "tokenId",
+                      "type": "uint256",
+                      "value": "9912",
+                    },
+                    {
+                      "name": "amount",
+                      "type": "uint256",
+                      "value": "1",
+                    },
+                  ],
+                  "name": "taker",
+                  "type": "tuple",
+                },
+              ],
+              "name": "exchange",
+              "type": "tuple",
+            },
+            {
+              "components": [
+                {
+                  "name": "recipient",
+                  "type": "address",
+                  "value": "0x0000000000000000000000000000000000000000",
+                },
+                {
+                  "name": "rate",
+                  "type": "uint16",
+                  "value": "0",
+                },
+              ],
+              "name": "takerFee",
+              "type": "tuple",
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "value": "0x11e274a93542a6397433d70cc050e6f8ab901bd359e336d0cababf27d5ec0a96052a14ebd55d81622f5d117ceb87226a8d148374ac4ef6de75b7d000c70e75a91c",
+            },
+          ],
+          "name": "inputs",
+          "type": "tuple",
+        },
+        {
+          "name": "oracleSignature",
+          "type": "bytes",
+          "value": "0xa70773cc07a8826f7324d6505b00617410e960c8a50e72f9c7386bb852d0560f458c8b36117d1f64d065a905b1b008814733be8de88f1421dbd7f08374f913151b012b1c306af68e5d010513ff70a3aaed9afeb8661116e6ce",
+        },
+      ],
+      "signature": "takeBidSingle(((address,address,bytes32,uint256,uint256,uint8,(address,uint16),uint256),(uint256,bytes32[],(uint256,uint256,uint256,uint256),(uint256,uint256)),(address,uint16),bytes),bytes)",
+      "to": "0x5fa60726e62c50af45ff2f6280c468da438a7837",
+      "type": "function",
+    },
+  ],
+  "txHash": "0x02a4dda78f1452772d87aa080d65ed7c34785b9d0f4c20aa6c91c51a63ee1fa4",
+  "txIndex": 133,
+  "txType": "contract interaction",
+}

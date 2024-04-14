@@ -46,7 +46,13 @@ export const mockedTransport = custom({
       return Promise.resolve(JSON.parse(fs.readFileSync(`./test/mocks/tx/${blockNumber}.json`).toString()))
     }
 
+    // TODO: add mocks for storage slots
     if (method === 'eth_getStorageAt') {
+      // NOTE: mock for BLUR
+      if (params[0] === '0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5') {
+        return Promise.resolve('0x0000000000000000000000005fa60726E62c50Af45Ff2F6280C468DA438A7837')
+      }
+
       return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')
     }
 

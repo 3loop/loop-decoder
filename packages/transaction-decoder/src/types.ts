@@ -27,7 +27,7 @@ export interface DecodeResult {
   name: string
   signature: string
   type: string
-  params?: InputArg[]
+  params?: TreeNode[]
 }
 
 export interface DecodeTraceResult extends DecodeResult {
@@ -114,7 +114,7 @@ export interface DecodedTx {
 
 export interface MethodCall {
   name: string | null
-  arguments: InputArg[]
+  arguments: TreeNode[]
   decoded?: boolean
 }
 

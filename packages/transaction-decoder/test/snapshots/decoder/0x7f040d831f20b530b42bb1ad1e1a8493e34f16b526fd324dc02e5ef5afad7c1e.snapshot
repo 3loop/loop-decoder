@@ -326,7 +326,7 @@
         {
           "name": "amount1Out",
           "type": "uint256",
-          "value": "",
+          "value": "0",
         },
         {
           "name": "to",
@@ -369,7 +369,7 @@
         {
           "name": "zeroForOne",
           "type": "bool",
-          "value": "",
+          "value": "false",
         },
         {
           "name": "amountSpecified",

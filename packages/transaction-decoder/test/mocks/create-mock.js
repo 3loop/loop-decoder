@@ -1,8 +1,7 @@
 import fs from 'node:fs'
 import { createPublicClient, http } from 'viem'
-import { goerli } from 'viem/chains'
 
-const GOERLI_RPC = 'https://rpc.ankr.com/eth_goerli'
+const RPC = 'https://rpc.ankr.com/eth'
 
 BigInt.prototype.toJSON = function () {
     return this.toString()
@@ -10,7 +9,6 @@ BigInt.prototype.toJSON = function () {
 
 async function createMock(hash, rpcUrl) {
     const publicClient = createPublicClient({
-        chain: goerli,
         transport: http(rpcUrl),
     })
 
@@ -36,7 +34,7 @@ async function createMock(hash, rpcUrl) {
 
 async function main() {
     const hash = process.argv[2]
-    const rpcUrl = process.argv[3] ?? GOERLI_RPC
+    const rpcUrl = process.argv[3] ?? RPC
 
     if (hash == null) {
         console.log('Please provide a transaction hash')
@@ -47,14 +45,16 @@ async function main() {
 
     if (mock == null) return
 
-    fs.writeFileSync(`./test/mocks/tx/${hash.toLowerCase()}.json`, JSON.stringify(mock, null, 2))
-
     if (mock.block != null) {
         fs.writeFileSync(
-            `./test/mocks/tx/${mock.transaction.blockNumber.toString()}.json`,
+            `./test/mocks/tx/${Number(mock.transaction.blockNumber).toString()}.json`,
             JSON.stringify(mock.block, null, 2),
         )
     }
+
+    delete mock.block
+
+    fs.writeFileSync(`./test/mocks/tx/${hash.toLowerCase()}.json`, JSON.stringify(mock, null, 2))
 }
 
 main()

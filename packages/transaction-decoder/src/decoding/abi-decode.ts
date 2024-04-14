@@ -1,5 +1,5 @@
 import { formatAbiItem } from 'viem/utils'
-import type { DecodeResult, InputArg, MostTypes, TreeNode } from '../types.js'
+import type { DecodeResult, MostTypes, TreeNode } from '../types.js'
 import { Hex, Abi, decodeFunctionData, AbiParameter, AbiFunction, getAbiItem } from 'viem'
 
 export class DecodeError {
@@ -24,54 +24,59 @@ function stringifyValue(value: MostTypes): string | string[] {
   return value?.toString() ?? ''
 }
 
-function attachTupleValues(components: readonly AbiParameter[], decoded: Record<string, any>): TreeNode[] {
-  return components.map((input): TreeNode => {
-    if (input.name === undefined) {
-      throw new Error('input.name is undefined')
-    }
-    return {
-      name: input.name ?? 'unknown',
-      type: input.type,
-      value: decoded[input.name] ? stringifyValue(decoded[input.name]) : '',
-    }
-  })
+function getArrayComponents(type: string): [length: number | null, innerType: string] | undefined {
+  const matches = type.match(/^(.*)\[(\d+)?\]$/)
+  return matches ? [matches[2] ? Number(matches[2]) : null, matches[1]] : undefined
 }
 
-function attachValues(components: readonly AbiParameter[], decoded: readonly any[]): TreeNode[] {
+function attachValues<P extends readonly AbiParameter[]>(components: P, decoded: any): TreeNode[] {
   return components.map((input, index): TreeNode => {
-    if (input.type === 'tuple[]' && 'components' in input) {
+    const arrayComponents = getArrayComponents(input.type)
+    const value = Array.isArray(decoded) ? decoded[index] : decoded[input.name ?? '']
+
+    if (arrayComponents && 'components' in input) {
+      const [, innerType] = arrayComponents
+
+      if (Array.isArray(value)) {
+        return {
+          name: input.name ?? 'unknown',
+          type: innerType,
+          components: value.map((val) => {
+            return {
+              name: input.name ?? 'unknown',
+              type: innerType,
+              components: attachValues(input.components, val),
+            }
+          }),
+        }
+      }
+
       return {
         name: input.name ?? 'unknown',
-        type: input.type,
-        components: attachValues(input.components, decoded),
+        type: innerType,
+        components: attachValues(input.components, value),
       }
     }
 
     if (input.type === 'tuple' && 'components' in input) {
-      const value = decoded[index]
-
       return {
         name: input.name ?? 'unknown',
         type: input.type,
-        components: attachTupleValues(input.components, value),
+        components: attachValues(input.components, value),
       }
     }
 
     return {
       name: input.name ?? 'unknown',
       type: input.type,
-      value: decoded[index] ? stringifyValue(decoded[index]) : '',
+      value: value != null ? stringifyValue(value) : '',
     }
   })
 }
 
-function flattenTree(tree: TreeNode[]): InputArg[] {
-  return tree.reduce<InputArg[]>((acc, node) => {
-    if (node.components) {
-      return [...acc, ...flattenTree(node.components)]
-    }
-    return [...acc, node]
-  }, [])
+// @ts-expect-error - BigInt is not defined in the global scope
+BigInt.prototype.toJSON = function () {
+  return this.toString()
 }
 
 export function decodeMethod(data: Hex, abi: Abi): DecodeResult | undefined {
@@ -81,36 +86,14 @@ export function decodeMethod(data: Hex, abi: Abi): DecodeResult | undefined {
 
   if (method != null) {
     const signature = formatAbiItem(method)
-    let flattened: InputArg[] = []
 
-    const withValues = attachValues(method.inputs, args)
-    flattened = flattenTree(withValues)
+    const paramsTree = attachValues(method.inputs, args)
 
-    if (flattenTree.length === 0) {
-      return {
-        name: functionName,
-        signature,
-        type: 'function',
-      }
-    }
     return {
       name: functionName,
       signature,
       type: 'function',
-      params: flattened,
+      params: paramsTree,
     }
-  }
-}
-
-export function transformDecodedData(rawDecodedCallData: DecodeResult) {
-  const params: Record<string, MostTypes> = {}
-
-  rawDecodedCallData.params?.forEach((param) => {
-    params[param.name] = param.value
-  })
-
-  return {
-    name: rawDecodedCallData.name,
-    params,
   }
 }

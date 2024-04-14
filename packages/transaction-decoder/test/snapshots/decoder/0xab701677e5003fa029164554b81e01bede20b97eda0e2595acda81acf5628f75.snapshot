@@ -258,7 +258,7 @@
         {
           "name": "amount1Out",
           "type": "uint256",
-          "value": "",
+          "value": "0",
         },
         {
           "name": "to",
