@@ -52,7 +52,13 @@ export default function Loading() {
             <h2 className="text-lg font-semibold tracking-tight">AAVE V2</h2>
             <p className="text-sm text-muted-foreground">Example Transactions</p>
           </div>
-          <SidebarNav items={sidebarNavItems} />
+
+          {Object.entries(sidebarNavItems).map(([heading, items]) => (
+            <div key={heading}>
+              <p className="text-sm text-muted-foreground pl-4">{heading}</p>
+              <SidebarNav items={items} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ interface CodeBlockProps {
 
 export default function CodeBlock(props: CodeBlockProps) {
   return (
-    <div className="flex-1 p-4 border rounded-md">
+    <div className="flex-1 border rounded-md">
       <Editor
         language={props.language}
         value={props.value}
@@ -32,6 +32,10 @@ export default function CodeBlock(props: CodeBlockProps) {
           scrollbar: {
             verticalScrollbarSize: 5,
             horizontalScrollbarSize: 5,
+          },
+          padding: {
+            top: 4,
+            bottom: 4,
           },
           hideCursorInOverviewRuler: true,
           lineDecorationsWidth: 10,

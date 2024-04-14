@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react'
 import { Label } from '@/components/ui/label'
-import { DEFAULT_CHAIN_ID, transactions } from '../../../data'
+import { DEFAULT_CHAIN_ID, EXAMPLE_TXS } from '../../../data'
 import { useLocalStorage } from 'usehooks-ts'
 import { SidebarNav } from '@/components/ui/sidebar-nav'
 import { PlayIcon } from '@radix-ui/react-icons'
@@ -13,12 +13,16 @@ import { Interpretation, applyInterpreter } from '@/lib/interpreter'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
 
-export const sidebarNavItems = transactions.map((tx) => {
-  return {
+const generateNavItems = (transactions: any) => {
+  return transactions.map((tx: any) => ({
     href: `/tx/${tx.chainID}/${tx.hash}`,
-    title: `${tx.name} tx ${tx.hash.slice(0, 6)}...`,
-  }
-})
+    title: `${tx.name}`,
+  }))
+}
+
+export const sidebarNavItems = Object.fromEntries(
+  Object.entries(EXAMPLE_TXS).map(([key, value]) => [key, generateNavItems(value)]),
+)
 
 interface FormProps {
   currentChainID: number
@@ -115,12 +119,15 @@ export default function DecodingForm({ decoded, defaultInterpreter, currentHash,
       </div>
 
       <div className=" md:order-2">
-        <div className="space-y-4">
-          <div className="pl-4">
-            <h2 className="text-lg font-semibold tracking-tight">AAVE V2</h2>
-            <p className="text-sm text-muted-foreground">Example Transactions</p>
-          </div>
-          <SidebarNav items={sidebarNavItems} />
+        <div className="space-y-4 pl-4">
+          <p className="text-lg font-semibold tracking-tight">Example Transactions</p>
+
+          {Object.entries(sidebarNavItems).map(([heading, items]) => (
+            <div key={heading}>
+              <p className="text-sm text-muted-foreground pl-4">{heading}</p>
+              <SidebarNav items={items} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

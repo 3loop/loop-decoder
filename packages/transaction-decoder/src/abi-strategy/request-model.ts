@@ -9,11 +9,7 @@ export interface FetchABIParams {
 
 export class ResolveStrategyABIError {
   readonly _tag = 'ResolveStrategyABIError'
-  constructor(
-    readonly resolverName: string,
-    readonly address: string,
-    readonly chain: number,
-  ) {}
+  constructor(readonly resolverName: string, readonly address: string, readonly chain: number) {}
 }
 
 //NOTE: we store address as key to be able to know adddress to abi mapping for caching

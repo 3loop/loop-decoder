@@ -28,7 +28,7 @@ const NFTS_BLUR = [
   },
   {
     //takeAsk
-    hash: '0xb98ca6d846d45556d0139a00be7314e32c0e8da7810db83ec6c9c0e7e44a7e10',
+    hash: '0x9ed41e3d626605673c282dc8a0f7429e7abcab112d6529b0c77ee43954202cab',
     chainID: 1,
   },
 ] as const

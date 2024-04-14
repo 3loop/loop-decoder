@@ -1,5 +1,5 @@
 import { Context, Effect, Either, RequestResolver, Request, ReadonlyArray } from 'effect'
-import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
+import { ContractABI, GetContractABIStrategy } from './abi-strategy/request-model.js'
 
 export interface GetAbiParams {
   chainID: number
