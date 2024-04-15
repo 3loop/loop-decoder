@@ -51,6 +51,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               >
                 Twitter
               </a>
+              <a
+                target="_blank"
+                href="https://loop-decoder.3loop.io/"
+                className="text-sm font-medium text-gray-700 transition-colors hover:text-gray-900 dark:text-gray-200 dark:hover:text-gray-100"
+              >
+                Docs
+              </a>
             </div>
           </div>
           <Separator />
