@@ -83,3 +83,14 @@ export const supportedChains = [
 export const defaultTrasaction = EXAMPLE_TXS['AAVE V2'][0]
 export const DEFAULT_CONTRACT = aaveV2
 export const DEFAULT_CHAIN_ID = 1
+
+const generateNavItems = (transactions: any) => {
+  return transactions.map((tx: any) => ({
+    href: `/tx/${tx.chainID}/${tx.hash}`,
+    title: `${tx.name}`,
+  }))
+}
+
+export const sidebarNavItems = Object.fromEntries(
+  Object.entries(EXAMPLE_TXS).map(([key, value]) => [key, generateNavItems(value)]),
+)

@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react'
 import { Label } from '@/components/ui/label'
-import { DEFAULT_CHAIN_ID, EXAMPLE_TXS } from '../../../data'
+import { DEFAULT_CHAIN_ID, sidebarNavItems } from '@/app/data'
 import { useLocalStorage } from 'usehooks-ts'
 import { SidebarNav } from '@/components/ui/sidebar-nav'
 import { PlayIcon } from '@radix-ui/react-icons'
@@ -12,17 +12,6 @@ import { DecodedTx, Interpreter } from '@3loop/transaction-decoder'
 import { Interpretation, applyInterpreter } from '@/lib/interpreter'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
-
-const generateNavItems = (transactions: any) => {
-  return transactions.map((tx: any) => ({
-    href: `/tx/${tx.chainID}/${tx.hash}`,
-    title: `${tx.name}`,
-  }))
-}
-
-export const sidebarNavItems = Object.fromEntries(
-  Object.entries(EXAMPLE_TXS).map(([key, value]) => [key, generateNavItems(value)]),
-)
 
 interface FormProps {
   currentChainID: number

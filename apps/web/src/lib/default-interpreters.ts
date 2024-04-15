@@ -96,4 +96,30 @@ export const defaultInterpreters: Interpreter[] = [
   }
     `,
   },
+  {
+    id: 'contract:0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789,chain:1',
+    schema: `
+  function transformEvent(event) {
+      if (event.methodCall.name !== 'handleOps') return event
+
+      const userOpEvents = event.interactions.filter((e) => e.event.eventName === 'UserOperationEvent')
+      const isBatch = userOpEvents.length > 1
+
+      const newEvent = {
+          action: \`Account Abstraction transaction by \${
+              isBatch ? userOpEvents.length + ' adresses' : userOpEvents[0].event.params.sender
+          }\`,
+          bundlerAddress: event.methodCall.arguments[1].value,
+          entryPoint: event.toAddress,
+          paymaster: userOpEvents[0].event.params.paymaster,
+          fee: event.assetsReceived[0]?.amount,
+          userOps: userOpEvents.map((e) => {
+              return { sender: e.event.params.sender, hash: e.event.params.userOpHash }
+          }),
+      }
+
+      return newEvent
+  }
+    `,
+  },
 ]
