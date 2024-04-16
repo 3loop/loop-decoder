@@ -1,10 +1,10 @@
 import { Label } from '@/components/ui/label'
 import { SidebarNav } from '@/components/ui/sidebar-nav'
-import { sidebarNavItems } from './form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { PlayIcon } from 'lucide-react'
 import { NetworkSelect } from '@/components/ui/network-select'
+import { sidebarNavItems } from '@/app/data'
 
 export default function Loading() {
   return (
@@ -47,12 +47,15 @@ export default function Loading() {
       </div>
 
       <div className=" md:order-2">
-        <div className="space-y-4">
-          <div className="pl-4">
-            <h2 className="text-lg font-semibold tracking-tight">AAVE V2</h2>
-            <p className="text-sm text-muted-foreground">Example Transactions</p>
-          </div>
-          <SidebarNav items={sidebarNavItems} />
+        <div className="space-y-4 pl-4">
+          <p className="text-lg font-semibold tracking-tight">Example Transactions</p>
+
+          {Object.entries(sidebarNavItems).map(([heading, items]) => (
+            <div key={heading}>
+              <p className="text-sm text-muted-foreground pl-4">{heading}</p>
+              <SidebarNav items={items} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

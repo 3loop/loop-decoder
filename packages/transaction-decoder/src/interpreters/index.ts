@@ -1,56 +1,84 @@
 import { DecodedTx, Interpreter } from '@/types.js'
-import makeVM from './vm.js'
+import { Context, Effect } from 'effect'
+import {
+  shouldInterruptAfterDeadline,
+  QuickJSSyncVariant,
+  QuickJSWASMModule,
+  QuickJSRuntime,
+  getQuickJS,
+  newQuickJSWASMModuleFromVariant,
+  QuickJSContext,
+} from 'quickjs-emscripten'
 
-async function runJSCode(input: string, code: string) {
-  const vm = await makeVM(Date.now() + 1000)
-
-  vm.evalCode(code)
-  vm.runtime.executePendingJobs(-1)
-
-  const result = vm.unwrapResult(vm.evalCode('transformEvent(' + input + ')'))
-  const ok = vm.dump(result)
-
-  result.dispose()
-  vm.dispose()
-
-  return ok
+interface RuntimeConfig {
+  timeout?: number
+  memoryLimit?: number
+  maxStackSize?: number
 }
 
-export function findInterpreter({
-  decodedTx,
-  interpreters,
-}: {
-  decodedTx: DecodedTx
-  interpreters: Interpreter[]
-}): Interpreter | undefined {
-  try {
-    const { toAddress: contractAddress, chainID } = decodedTx
-
-    if (!contractAddress) {
-      return undefined
-    }
-
-    const id = `contract:${contractAddress},chain:${chainID}`
-
-    const contractTransformation = interpreters.find((interpreter) => interpreter.id === id)
-
-    return contractTransformation
-  } catch (e) {
-    throw new Error(`Failed to find tx interpreter: ${e}`)
-  }
+export interface QuickJSVMConfig {
+  variant?: QuickJSSyncVariant
+  runtimeConfig?: RuntimeConfig
 }
 
-export async function applyInterpreter({
-  decodedTx,
-  interpreter,
-}: {
-  decodedTx: DecodedTx
-  interpreter: Interpreter
-}): Promise<any> {
-  try {
-    const result = await runJSCode(JSON.stringify(decodedTx), interpreter.schema)
-    return result
-  } catch (e) {
-    throw new Error(`Failed to run interpreter: ${e}`)
-  }
+export interface QuickJSVM {
+  readonly _tag: 'QuickJSVM'
+  readonly runtime: QuickJSRuntime
 }
+
+export const QuickJSVM = Context.GenericTag<QuickJSVM>('@3loop-decoder/QuickJSVM')
+
+export async function initQuickJSVM(config: QuickJSVMConfig): Promise<QuickJSRuntime> {
+  const { variant, runtimeConfig = {} } = config
+  const module = variant ? await newQuickJSWASMModuleFromVariant(variant) : await getQuickJS()
+  const runtime = await newRuntime(module, runtimeConfig)
+  return runtime
+}
+
+async function newRuntime(module: QuickJSWASMModule, config: RuntimeConfig): Promise<QuickJSRuntime> {
+  const { timeout = -1, memoryLimit = 1024 * 640, maxStackSize = 1024 * 320 } = config
+  const runtime = module.newRuntime()
+
+  runtime.setMemoryLimit(memoryLimit)
+  runtime.setMaxStackSize(maxStackSize)
+  if (timeout !== -1) runtime.setInterruptHandler(shouldInterruptAfterDeadline(Date.now() + timeout))
+
+  return runtime
+}
+
+const newContext = () =>
+  Effect.gen(function* (_) {
+    const { runtime } = yield* _(QuickJSVM)
+
+    const vm: QuickJSContext = runtime.newContext()
+    // `console.log`
+    const logHandle = vm.newFunction('log', (...args) => {
+      const nativeArgs = args.map(vm.dump)
+      console.log('TxDecoder:', ...nativeArgs)
+    })
+
+    // Partially implement `console` object
+    const consoleHandle = vm.newObject()
+    vm.setProp(consoleHandle, 'log', logHandle)
+    vm.setProp(vm.global, 'console', consoleHandle)
+
+    consoleHandle.dispose()
+    logHandle.dispose()
+
+    return vm
+  })
+
+export const interpretTx = ({ decodedTx, interpreter }: { decodedTx: DecodedTx; interpreter: Interpreter }) =>
+  Effect.gen(function* (_) {
+    const input = JSON.stringify(decodedTx)
+    const code = interpreter.schema
+    const vm = yield* _(newContext())
+    const result = vm.unwrapResult(vm.evalCode(code + '\n' + 'transformEvent(' + input + ')'))
+    const ok = vm.dump(result)
+
+    vm.runtime.executePendingJobs(-1)
+    result.dispose()
+    vm.dispose()
+
+    return ok
+  })

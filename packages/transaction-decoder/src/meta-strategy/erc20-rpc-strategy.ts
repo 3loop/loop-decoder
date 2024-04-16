@@ -29,11 +29,12 @@ export const ERC20RPCStrategyResolver = (publicClientLive: PublicClient) =>
         return yield* _(Effect.fail(fail))
       }
 
+      //NOTE: keep for now to support blur pools
       const [symbol, name] = yield* _(
         Effect.all(
           [
-            Effect.tryPromise({ try: () => inst.read.symbol(), catch: () => fail }),
-            Effect.tryPromise({ try: () => inst.read.name(), catch: () => fail }),
+            Effect.tryPromise({ try: () => inst.read.symbol().catch(() => ''), catch: () => fail }),
+            Effect.tryPromise({ try: () => inst.read.name().catch(() => ''), catch: () => fail }),
           ],
           {
             concurrency: 'inherit',

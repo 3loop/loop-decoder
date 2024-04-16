@@ -1,8 +1,8 @@
 import * as React from 'react'
 import DecodingForm from './form'
 import { decodeTransaction } from '@/lib/decode'
-import { defaultInterpreters, emptyInterpreter } from '@/lib/interpreter'
-import { findInterpreter } from '@3loop/transaction-decoder'
+import { emptyInterpreter, findInterpreter } from '@/lib/interpreter'
+import { defaultInterpreters } from '@/lib/default-interpreters'
 
 export default async function TransactionPage({ params }: { params: { hash: string; chainID: number } }) {
   const decoded = await decodeTransaction({

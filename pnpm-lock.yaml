@@ -66,6 +66,9 @@ importers:
       '@3loop/transaction-decoder':
         specifier: workspace:*
         version: link:../../packages/transaction-decoder
+      '@jitl/quickjs-singlefile-browser-release-sync':
+        specifier: ^0.29.1
+        version: 0.29.1
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0)(react@18.2.0)
@@ -1957,7 +1960,12 @@ packages:
 
   /@jitl/quickjs-ffi-types@0.29.1:
     resolution: {integrity: sha512-dVt//PvFmwNJIwfyfPx7vR6cg7mLnAq6/THbhIeZ3NqXb66qXQATnW2gNqAnOcTh1D/f6HyrHFwRf3GdKUN3nw==}
-    dev: true
+
+  /@jitl/quickjs-singlefile-browser-release-sync@0.29.1:
+    resolution: {integrity: sha512-pEBOV7vgPCT9PQukSapYk9AI0hX0QUGmLtcBgXqnHsGcTJiNwzs1fvl1qbVqa3bsN5Z0kgDfGvWvuyRlM/sJJw==}
+    dependencies:
+      '@jitl/quickjs-ffi-types': 0.29.1
+    dev: false
 
   /@jitl/quickjs-wasmfile-debug-asyncify@0.29.1:
     resolution: {integrity: sha512-jhxRDq+9ZWT8ddRt6JLcjLLF168EvFrOceiaoy+GuYYXJkWVrWk5p2Ray2GHzh+DL7byszRKEUAKqA9B86Rd9g==}
