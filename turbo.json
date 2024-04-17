@@ -14,16 +14,10 @@
       ]
     },
     "test": {
-      "outputs": [],
-      "dependsOn": [
-        "^build"
-      ]
+      "outputs": []
     },
     "coverage": {
-      "outputs": [],
-      "dependsOn": [
-        "^build"
-      ]
+      "outputs": []
     },
     "lint": {},
     "fix": {},

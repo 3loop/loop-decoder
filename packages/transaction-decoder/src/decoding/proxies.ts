@@ -21,6 +21,7 @@ export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetSt
   Effect.gen(function* (_) {
     const service = yield* _(PublicClient)
     const { client: publicClient } = yield* _(service.getPublicClient(request.chainID))
+    // NOTE: Should we make this recursive when we have a Proxy of a Proxy?
     const effects = storageSlots.map((slot) =>
       Effect.tryPromise({
         try: async () => {
