@@ -94,7 +94,7 @@ To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API t
 Create a cache for contract ABI:
 
 ```ts
-import { EtherscanStrategyResolver } from '@3loop/transaction-decoder'
+import { EtherscanStrategyResolver, FourByteStrategyResolver } from '@3loop/transaction-decoder'
 const abiCache = new Map<string, string>()
 
 const abiStore = {
@@ -110,12 +110,12 @@ const abiStore = {
     event?: string | undefined
     signature?: string | undefined
   }) => {
-    return Promise.resolve(abiCache.get(req.address) ?? null)
+    return Promise.resolve(abiCache.get(req.address.toLowerCase()) ?? null)
   },
   set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
     const addresses = Object.keys(req.address ?? {})
     addresses.forEach((address) => {
-      abiCache.set(address, req.address?.[address] ?? '')
+      abiCache.set(address.toLowerCase(), req.address?.[address] ?? '')
     })
   },
 }
@@ -127,15 +127,17 @@ Create a cache for contract meta-information, such as token name, decimals, symb
 
 ```ts
 import type { ContractData } from '@3loop/transaction-decoder'
-const contractMeta = new Map<string, ContractData>()
+import { ERC20RPCStrategyResolver } from '@3loop/transaction-decoder'
+
+const contractMetaCache = new Map<string, ContractData>()
 
 const contractMetaStore = {
-  strategies: { default: [ERC20RPCStrategyResolver] },
+  strategies: [ERC20RPCStrategyResolver],
   get: async (req: { address: string; chainID: number }) => {
-    return contractMeta.get(req.address) ?? null
+    return contractMetaCache.get(req.address.toLowerCase()) ?? null
   },
-  set: async (req: { address: string; chainID: number }, data) => {
-    contractMeta.set(req.address, data)
+  set: async (req: { address: string; chainID: number }, data: ContractData) => {
+    contractMetaCache.set(req.address.toLowerCase(), data)
   },
 }
 ```
