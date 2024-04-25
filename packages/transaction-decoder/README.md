@@ -180,11 +180,11 @@ const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer)
 5. Fetch and decode a transaction
 
 ```ts
-const program = Effect.gen(function* (_) {
+const program = Effect.gen(function* () {
   const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
   const chainID = 5
 
-  return yield* _(decodeTransactionByHash(hash, chainID))
+  return yield* decodeTransactionByHash(hash, chainID)
 })
 ```
 

@@ -9,8 +9,8 @@ import { MockedMetaStoreLive } from './mocks/meta-loader-mock.js'
 
 describe('Transaction Decoder', () => {
   test.each(TEST_TRANSACTIONS)('Resolve and decode transaction', async ({ hash, chainID }) => {
-    const program = Effect.gen(function* (_) {
-      return yield* _(decodeTransactionByHash(hash, chainID))
+    const program = Effect.gen(function* () {
+      return yield* decodeTransactionByHash(hash, chainID)
     })
 
     const LoadersLayer = Layer.provideMerge(MockedAbiStoreLive, MockedMetaStoreLive)

@@ -1,6 +1,6 @@
 import { Hex } from 'viem'
 
-type TXS = {
+type TXS = readonly {
   hash: Hex
   chainID: number
 }[]

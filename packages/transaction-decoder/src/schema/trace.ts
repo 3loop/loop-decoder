@@ -1,88 +1,86 @@
 import * as Schema from '@effect/schema/Schema'
 
-const CallType = Schema.literal('call', 'delegatecall', 'callcode', 'staticcall')
+const CallType = Schema.Literal('call', 'delegatecall', 'callcode', 'staticcall')
 
-const Address = Schema.string // NOTE: Probably we can use a branded type
+const Address = Schema.String // NOTE: Probably we can use a branded type
 
-export const bigintFromString = Schema.transform(
-  Schema.string,
-  Schema.bigintFromSelf,
-  (s) => BigInt(s),
-  (b) => String(b),
-)
+export const bigintFromString = Schema.transform(Schema.String, Schema.BigIntFromSelf, {
+  decode: (value) => BigInt(value),
+  encode: (value) => value.toString(),
+})
 
-const EthTraceActionCall = Schema.struct({
+const EthTraceActionCall = Schema.Struct({
   callType: CallType,
   from: Address,
   to: Address,
   gas: bigintFromString,
-  input: Schema.string,
+  input: Schema.String,
   value: bigintFromString,
 })
 
-const EthTraceActionCreate = Schema.struct({
+const EthTraceActionCreate = Schema.Struct({
   from: Address,
   gas: bigintFromString,
   value: bigintFromString,
 })
 
-const EthTraceActionSuicide = Schema.struct({
+const EthTraceActionSuicide = Schema.Struct({
   address: Address,
   refundAddress: Address,
   balance: bigintFromString,
 })
 
-const EthTraceActionReward = Schema.struct({
+const EthTraceActionReward = Schema.Struct({
   author: Address,
-  rewardType: Schema.literal('block', 'uncle', 'emptyStep', 'external'),
+  rewardType: Schema.Literal('block', 'uncle', 'emptyStep', 'external'),
   value: bigintFromString,
 })
 
-const EthTraceResult = Schema.struct({
+const EthTraceResult = Schema.Struct({
   gasUsed: bigintFromString,
-  output: Schema.string,
+  output: Schema.String,
 })
 
-const EthTraceBase = Schema.struct({
+const EthTraceBase = Schema.Struct({
   result: Schema.optional(EthTraceResult),
-  subtraces: Schema.number,
-  traceAddress: Schema.array(Schema.number),
-  error: Schema.optional(Schema.string),
+  subtraces: Schema.Number,
+  traceAddress: Schema.Array(Schema.Number),
+  error: Schema.optional(Schema.String),
 })
 
 const CallTrace = Schema.extend(
   EthTraceBase,
-  Schema.struct({
+  Schema.Struct({
     action: EthTraceActionCall,
-    type: Schema.literal('call'),
+    type: Schema.Literal('call'),
   }),
 )
 
 const CreateTrace = Schema.extend(
   EthTraceBase,
-  Schema.struct({
+  Schema.Struct({
     action: EthTraceActionCreate,
-    type: Schema.literal('create'),
+    type: Schema.Literal('create'),
   }),
 )
 
 const RewardTrace = Schema.extend(
   EthTraceBase,
-  Schema.struct({
+  Schema.Struct({
     action: EthTraceActionReward,
-    type: Schema.literal('reward'),
+    type: Schema.Literal('reward'),
   }),
 )
 
 const SuicideTrace = Schema.extend(
   EthTraceBase,
-  Schema.struct({
+  Schema.Struct({
     action: EthTraceActionSuicide,
-    type: Schema.literal('suicide'),
+    type: Schema.Literal('suicide'),
   }),
 )
 
-const DebugCallType = Schema.literal(
+const DebugCallType = Schema.Literal(
   'CALL',
   'DELEGATECALL',
   'CALLCODE',
@@ -92,15 +90,15 @@ const DebugCallType = Schema.literal(
   'REWARD',
 )
 
-export const EthDebugTraceBase = Schema.struct({
-  gas: Schema.string,
+export const EthDebugTraceBase = Schema.Struct({
+  gas: Schema.String,
   to: Address,
   from: Address,
-  gasUsed: Schema.string,
-  input: Schema.string,
+  gasUsed: Schema.String,
+  input: Schema.String,
   type: DebugCallType,
-  value: Schema.optional(Schema.string),
-  output: Schema.string,
+  value: Schema.optional(Schema.String),
+  output: Schema.String,
 })
 
 type DebugTraceLog = Schema.Schema.Type<typeof EthDebugTraceBase>
@@ -109,7 +107,7 @@ export type TraceLogTree = {
   calls?: Array<TraceLogTree>
 } & DebugTraceLog
 
-export const EthTrace = Schema.union(CallTrace, CreateTrace, RewardTrace, SuicideTrace)
+export const EthTrace = Schema.Union(CallTrace, CreateTrace, RewardTrace, SuicideTrace)
 
 export type TraceLog = Schema.Schema.Type<typeof EthTrace>
 export type CallTraceLog = Schema.Schema.Type<typeof CallTrace>

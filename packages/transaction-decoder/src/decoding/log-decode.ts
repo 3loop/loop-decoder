@@ -7,50 +7,46 @@ import { getAndCacheContractMeta } from '../contract-meta-loader.js'
 import * as AbiDecoder from './abi-decode.js'
 
 const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     const chainID = Number(transaction.chainId)
 
     const address = logItem.address
     let abiAddress = address
 
-    const implementation = yield* _(getProxyStorageSlot({ address: abiAddress, chainID }))
+    const implementation = yield* getProxyStorageSlot({ address: abiAddress, chainID })
 
     if (implementation) {
-      yield* _(Effect.logDebug(`Proxy implementation found for ${abiAddress} at ${implementation}`))
+      yield* Effect.logDebug(`Proxy implementation found for ${abiAddress} at ${implementation}`)
       abiAddress = implementation
     }
 
-    const abiItem_ = yield* _(
-      getAndCacheAbi({
-        address: abiAddress,
-        event: logItem.topics[0],
-        chainID,
-      }),
-    )
+    const abiItem_ = yield* getAndCacheAbi({
+      address: abiAddress,
+      event: logItem.topics[0],
+      chainID,
+    })
 
     if (abiItem_ == null) {
-      return yield* _(Effect.fail(new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0]!, chainID)))
+      return yield* Effect.fail(new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0]!, chainID))
     }
 
     const abiItem = JSON.parse(abiItem_) as Abi[]
 
-    const { eventName, args: args_ } = yield* _(
-      Effect.try({
-        try: () =>
-          decodeEventLog({
-            abi: abiItem,
-            topics: logItem.topics,
-            data: logItem.data,
-            strict: false,
-          }),
-        catch: () => {
-          Effect.logWarning(`Could not decode log ${abiAddress} ${JSON.stringify(logItem)}`)
-        },
-      }),
-    )
+    const { eventName, args: args_ } = yield* Effect.try({
+      try: () =>
+        decodeEventLog({
+          abi: abiItem,
+          topics: logItem.topics,
+          data: logItem.data,
+          strict: false,
+        }),
+      catch: () => {
+        Effect.logWarning(`Could not decode log ${abiAddress} ${JSON.stringify(logItem)}`)
+      },
+    })
 
     if (args_ == null || eventName == null) {
-      return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)))
+      return yield* Effect.fail(new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`))
     }
 
     const args = args_ as any
@@ -58,35 +54,31 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     const fragment = getAbiItem({ abi: abiItem, name: eventName })
 
     if (fragment == null) {
-      return yield* _(
-        Effect.fail(new AbiDecoder.DecodeError(`Could not find fragment in ABI ${abiAddress} ${eventName}`)),
-      )
+      return yield* Effect.fail(new AbiDecoder.DecodeError(`Could not find fragment in ABI ${abiAddress} ${eventName}`))
     }
 
-    const decodedParams = yield* _(
-      Effect.try({
-        try: () => {
-          if ('inputs' in fragment && fragment.inputs != null) {
-            return fragment.inputs.map((input, i) => {
-              if (input.name == null) return null
+    const decodedParams = yield* Effect.try({
+      try: () => {
+        if ('inputs' in fragment && fragment.inputs != null) {
+          return fragment.inputs.map((input, i) => {
+            if (input.name == null) return null
 
-              const arg = Array.isArray(args) ? args[i] : args[input.name]
-              const value = Array.isArray(arg) ? arg.map((item) => item?.toString()) : arg.toString()
+            const arg = Array.isArray(args) ? args[i] : args[input.name]
+            const value = Array.isArray(arg) ? arg.map((item) => item?.toString()) : arg.toString()
 
-              return {
-                type: input.type,
-                name: input.name,
-                value,
-              } as DecodedLogEvent
-            })
-          }
-          return []
-        },
-        catch: () => {
-          Effect.logError(`Could not decode log params ${JSON.stringify(logItem)}`)
-        },
-      }),
-    )
+            return {
+              type: input.type,
+              name: input.name,
+              value,
+            } as DecodedLogEvent
+          })
+        }
+        return []
+      },
+      catch: () => {
+        Effect.logError(`Could not decode log params ${JSON.stringify(logItem)}`)
+      },
+    })
 
     const rawLog: RawDecodedLog = {
       events: decodedParams.filter((x) => x != null) as DecodedLogEvent[],
@@ -96,22 +88,20 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       decoded: true,
     }
 
-    return yield* _(transformLog(transaction, rawLog))
+    return yield* transformLog(transaction, rawLog)
   })
 
 const transformLog = (transaction: GetTransactionReturnType, log: RawDecodedLog) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     const events = Object.fromEntries(log.events.map((param) => [param.name, param.value]))
 
     // NOTE: Can use a common parser with branded type evrywhere
     const address = getAddress(log.address)
 
-    const contractData = yield* _(
-      getAndCacheContractMeta({
-        address,
-        chainID: Number(transaction.chainId),
-      }),
-    )
+    const contractData = yield* getAndCacheContractMeta({
+      address,
+      chainID: Number(transaction.chainId),
+    })
 
     return {
       contractName: contractData?.contractName || null,
@@ -130,15 +120,13 @@ const transformLog = (transaction: GetTransactionReturnType, log: RawDecodedLog)
   })
 
 export const decodeLogs = ({ logs, transaction }: { logs: readonly Log[]; transaction: GetTransactionReturnType }) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     const effects = logs.filter((log) => log.topics.length > 0).map((logItem) => decodedLog(transaction, logItem))
 
     const eithers = effects.map((e) => Effect.either(e))
 
-    return yield* _(
-      Effect.all(eithers, {
-        concurrency: 'inherit',
-        batching: 'inherit',
-      }),
-    )
+    return yield* Effect.all(eithers, {
+      concurrency: 'inherit',
+      batching: 'inherit',
+    })
   })

@@ -29,45 +29,41 @@ function replacer(key: unknown, value: unknown) {
 }
 
 const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     if ('to' in call.action && 'input' in call.action) {
       const { to, input, from } = call.action
       const chainID = Number(transaction.chainId)
       const signature = call.action.input.slice(0, 10)
       const contractAddress = to
 
-      const abi_ = yield* _(
-        getAndCacheAbi({
-          address: contractAddress,
-          signature,
-          chainID,
-        }),
-      )
+      const abi_ = yield* getAndCacheAbi({
+        address: contractAddress,
+        signature,
+        chainID,
+      })
 
       if (abi_ == null) {
-        return yield* _(Effect.fail(new MissingABIError(contractAddress, signature, chainID)))
+        return yield* Effect.fail(new MissingABIError(contractAddress, signature, chainID))
       }
 
       const abi = JSON.parse(abi_) as Abi
 
-      return yield* _(
-        Effect.try({
-          try: () => {
-            const method = decodeMethod(input as Hex, abi)
-            return {
-              ...method,
-              from,
-              to,
-            } as DecodeTraceResult
-          },
-          catch: (e) => {
-            return new DecodeError(e)
-          },
-        }),
-      )
+      return yield* Effect.try({
+        try: () => {
+          const method = decodeMethod(input as Hex, abi)
+          return {
+            ...method,
+            from,
+            to,
+          } as DecodeTraceResult
+        },
+        catch: (e) => {
+          return new DecodeError(e)
+        },
+      })
     }
 
-    return yield* _(Effect.fail(new DecodeError(`Could not decode trace log ${JSON.stringify(call, replacer)}`)))
+    return yield* Effect.fail(new DecodeError(`Could not decode trace log ${JSON.stringify(call, replacer)}`))
   })
 
 export const decodeTransactionTrace = ({
@@ -77,7 +73,7 @@ export const decodeTransactionTrace = ({
   trace: TraceLog[]
   transaction: GetTransactionReturnType
 }) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     if (trace.length === 0) {
       return []
     }
@@ -92,12 +88,10 @@ export const decodeTransactionTrace = ({
 
     const eithers = effects.map((e) => Effect.either(e))
 
-    const result = yield* _(
-      Effect.all(eithers, {
-        concurrency: 'inherit',
-        batching: 'inherit',
-      }),
-    )
+    const result = yield* Effect.all(eithers, {
+      concurrency: 'inherit',
+      batching: 'inherit',
+    })
 
     return result
   })

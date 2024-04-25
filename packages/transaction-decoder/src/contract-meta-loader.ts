@@ -1,4 +1,4 @@
-import { Context, Effect, RequestResolver, Request, ReadonlyArray, Either } from 'effect'
+import { Context, Effect, RequestResolver, Request, Array, Either } from 'effect'
 import { ContractData } from './types.js'
 import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'
@@ -15,7 +15,7 @@ export interface ContractMetaStore<Key = ContractMetaParams, Value = ContractDat
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractMetaStrategy>[]>
   readonly set: (arg: Key, value: Value) => Effect.Effect<void, never>
   readonly get: (arg: Key) => Effect.Effect<Value | null, never>
-  readonly getMany?: (arg: ReadonlyArray<Key>) => Effect.Effect<ReadonlyArray<Value | null>, never>
+  readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value | null>, never>
 }
 
 export const ContractMetaStore = Context.GenericTag<ContractMetaStore>('@3loop-decoder/ContractMetaStore')
@@ -33,14 +33,14 @@ function makeKey(key: ContractMetaLoader) {
 }
 
 const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<ContractMetaLoader>) =>
-  Effect.gen(function* (_) {
-    const contractMetaStore = yield* _(ContractMetaStore)
+  Effect.gen(function* () {
+    const contractMetaStore = yield* ContractMetaStore
     const strategies = contractMetaStore.strategies
 
-    const groups = ReadonlyArray.groupBy(requests, makeKey)
+    const groups = Array.groupBy(requests, makeKey)
     const uniqueRequests = Object.values(groups).map((group) => group[0])
 
-    const getMany = (requests: ReadonlyArray<ContractMetaLoader>) => {
+    const getMany = (requests: Array<ContractMetaLoader>) => {
       if (contractMetaStore.getMany != null) {
         return contractMetaStore.getMany(requests)
       } else {
@@ -58,10 +58,9 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
       return result ? contractMetaStore.set({ chainID, address }, result) : Effect.succeed(null)
     }
 
-    const [remaining, results] = yield* _(
-      getMany(uniqueRequests),
+    const [remaining, results] = yield* getMany(uniqueRequests).pipe(
       Effect.map(
-        ReadonlyArray.partitionMap((resp, i) => {
+        Array.partitionMap((resp, i) => {
           return resp == null ? Either.left(uniqueRequests[i]) : Either.right([uniqueRequests[i], resp] as const)
         }),
       ),
@@ -69,32 +68,29 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
     )
 
     // Resolve ContractMeta from the store
-    yield* _(
-      Effect.forEach(
-        results,
-        ([request, result]) => {
-          const group = groups[makeKey(request)]
-          return Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true })
-        },
-        {
-          discard: true,
-        },
-      ),
+    yield* Effect.forEach(
+      results,
+      ([request, result]) => {
+        const group = groups[makeKey(request)]
+        return Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true })
+      },
+      {
+        discard: true,
+      },
     )
 
     // Resolve ContractMeta from the strategies
-    yield* _(
-      Effect.forEach(remaining, ({ chainID, address }) => {
-        const strategyRequest = GetContractMetaStrategy({
-          address,
-          chainID,
-        })
-        const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
+    yield* Effect.forEach(remaining, ({ chainID, address }) => {
+      const strategyRequest = GetContractMetaStrategy({
+        address,
+        chainID,
+      })
+      const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
 
-        return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-          Effect.request(strategyRequest, strategy),
-        ).pipe(Effect.orElseSucceed(() => null))
-      }),
+      return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
+        Effect.orElseSucceed(() => null),
+      )
+    }).pipe(
       Effect.flatMap((results) =>
         Effect.forEach(
           results,

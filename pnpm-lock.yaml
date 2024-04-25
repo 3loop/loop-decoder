@@ -115,8 +115,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       effect:
-        specifier: ^2.4.18
-        version: 2.4.18
+        specifier: ^3.0.5
+        version: 3.0.5
       eslint:
         specifier: ^8.47.0
         version: 8.47.0
@@ -198,8 +198,8 @@ importers:
         version: 0.6.7
     devDependencies:
       '@effect/schema':
-        specifier: ^0.64.20
-        version: 0.64.20(effect@2.4.18)(fast-check@3.15.0)
+        specifier: ^0.66.8
+        version: 0.66.8(effect@3.0.5)(fast-check@3.15.0)
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -219,8 +219,8 @@ importers:
         specifier: 0.34.2
         version: 0.34.2(vitest@0.34.2)
       effect:
-        specifier: 2.4.18
-        version: 2.4.18
+        specifier: 3.0.5
+        version: 3.0.5
       eslint:
         specifier: ^8.49.0
         version: 8.49.0
@@ -1131,13 +1131,13 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@effect/schema@0.64.20(effect@2.4.18)(fast-check@3.15.0):
-    resolution: {integrity: sha512-oSphgsP9j7yHy31RxTQ0txWq76u1F/H1Hqw+GVcpjnK4n/fuZo7MNYU/qpG+TLJWj4+yUku5I3Rr0Vr7gVoMeQ==}
+  /@effect/schema@0.66.8(effect@3.0.5)(fast-check@3.15.0):
+    resolution: {integrity: sha512-TJ2wGt1O4WqNrZtz9bRd+Mo8sitS33Ifj1u9TqXAg8FlWn7OA+MtULQmktdDVAlWw18QmamKX7grKeatL+0iCg==}
     peerDependencies:
-      effect: ^2.4.18
+      effect: ^3.0.5
       fast-check: ^3.13.2
     dependencies:
-      effect: 2.4.18
+      effect: 3.0.5
       fast-check: 3.15.0
     dev: true
 
@@ -4919,8 +4919,8 @@ packages:
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  /effect@2.4.18:
-    resolution: {integrity: sha512-8nNzkhSzFLhG9YxowXKawlk4+b3zwwOsbZwaaYhy1OjZGcEgcE6i0ywMFieXNSfOtsQ8swV1+5hvF+VBEtwwqg==}
+  /effect@3.0.5:
+    resolution: {integrity: sha512-cXAKns46iWEQkZHgRU+ehgfV2Au34HopVIBkWwTbD+iRR50zMOHNEHEjXGnyJPtWyYlLBQtB9AZXFoc72ChwPA==}
 
   /electron-to-chromium@1.4.498:
     resolution: {integrity: sha512-4LODxAzKGVy7CJyhhN5mebwe7U2L29P+0G+HUriHnabm0d7LSff8Yn7t+Wq+2/9ze2Fu1dhX7mww090xfv7qXQ==}

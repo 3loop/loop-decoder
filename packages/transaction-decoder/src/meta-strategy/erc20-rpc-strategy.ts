@@ -6,9 +6,9 @@ import { erc20Abi, getContract } from 'viem'
 
 export const ERC20RPCStrategyResolver = (publicClientLive: PublicClient) =>
   RequestResolver.fromEffect(({ chainID, address }: RequestModel.GetContractMetaStrategy) =>
-    Effect.gen(function* (_) {
-      const service = yield* _(PublicClient)
-      const { client } = yield* _(service.getPublicClient(chainID))
+    Effect.gen(function* () {
+      const service = yield* PublicClient
+      const { client } = yield* service.getPublicClient(chainID)
 
       const inst = getContract({
         abi: erc20Abi,
@@ -18,29 +18,25 @@ export const ERC20RPCStrategyResolver = (publicClientLive: PublicClient) =>
 
       const fail = new RequestModel.ResolveStrategyMetaError('ERC20RPCStrategy', address, chainID)
 
-      const decimals = yield* _(
-        Effect.tryPromise({
-          try: () => inst.read.decimals(),
-          catch: () => fail,
-        }),
-      )
+      const decimals = yield* Effect.tryPromise({
+        try: () => inst.read.decimals(),
+        catch: () => fail,
+      })
 
       if (decimals == null) {
-        return yield* _(Effect.fail(fail))
+        return yield* Effect.fail(fail)
       }
 
       //NOTE: keep for now to support blur pools
-      const [symbol, name] = yield* _(
-        Effect.all(
-          [
-            Effect.tryPromise({ try: () => inst.read.symbol().catch(() => ''), catch: () => fail }),
-            Effect.tryPromise({ try: () => inst.read.name().catch(() => ''), catch: () => fail }),
-          ],
-          {
-            concurrency: 'inherit',
-            batching: 'inherit',
-          },
-        ),
+      const [symbol, name] = yield* Effect.all(
+        [
+          Effect.tryPromise({ try: () => inst.read.symbol().catch(() => ''), catch: () => fail }),
+          Effect.tryPromise({ try: () => inst.read.name().catch(() => ''), catch: () => fail }),
+        ],
+        {
+          concurrency: 'inherit',
+          batching: 'inherit',
+        },
       )
 
       const meta: ContractData = {
