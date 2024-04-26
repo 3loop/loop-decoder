@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.8.0
+
+### Minor Changes
+
+- 7f19bc0: Bump effect version to stable 3
+
 ## 0.7.0
 
 ### Minor Changes
