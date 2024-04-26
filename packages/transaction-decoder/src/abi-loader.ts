@@ -1,4 +1,4 @@
-import { Context, Effect, Either, RequestResolver, Request, ReadonlyArray } from 'effect'
+import { Context, Effect, Either, RequestResolver, Request, Array } from 'effect'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/request-model.js'
 
 export interface GetAbiParams {
@@ -14,7 +14,7 @@ export interface AbiStore<Key = GetAbiParams, SetValue = ContractABI, Value = st
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
   readonly set: (value: SetValue) => Effect.Effect<void, never>
   readonly get: (arg: Key) => Effect.Effect<Value, never>
-  readonly getMany?: (arg: ReadonlyArray<Key>) => Effect.Effect<ReadonlyArray<Value>, never>
+  readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value>, never>
 }
 
 export const AbiStore = Context.GenericTag<AbiStore>('@3loop-decoder/AbiStore')
@@ -34,17 +34,17 @@ function makeKey(key: AbiLoader) {
 }
 
 const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     if (requests.length === 0) return
 
-    const abiStore = yield* _(AbiStore)
+    const abiStore = yield* AbiStore
     const strategies = abiStore.strategies
     // NOTE: We can further optimize if we have match by Address by avoid extra requests for each signature
     // but might need to update the Loader public API
-    const groups = ReadonlyArray.groupBy(requests, makeKey)
+    const groups = Array.groupBy(requests, makeKey)
     const uniqueRequests = Object.values(groups).map((group) => group[0])
 
-    const getMany = (requests: ReadonlyArray<GetAbiParams>) => {
+    const getMany = (requests: Array<GetAbiParams>) => {
       if (abiStore.getMany != null) {
         return abiStore.getMany(requests)
       } else {
@@ -64,10 +64,9 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
       return abi ? abiStore.set(abi) : Effect.succeed(null)
     }
 
-    const [remaining, results] = yield* _(
-      getMany(uniqueRequests),
+    const [remaining, results] = yield* getMany(uniqueRequests).pipe(
       Effect.map(
-        ReadonlyArray.partitionMap((resp, i) => {
+        Array.partitionMap((resp, i) => {
           return resp == null ? Either.left(uniqueRequests[i]) : Either.right([uniqueRequests[i], resp] as const)
         }),
       ),
@@ -75,35 +74,32 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
     )
 
     //  Resolve ABI from the store
-    yield* _(
-      Effect.forEach(
-        results,
-        ([request, result]) => {
-          const group = groups[makeKey(request)]
-          return Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true })
-        },
-        {
-          discard: true,
-        },
-      ),
+    yield* Effect.forEach(
+      results,
+      ([request, result]) => {
+        const group = groups[makeKey(request)]
+        return Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true })
+      },
+      {
+        discard: true,
+      },
     )
 
     // Load the ABI from the strategies
-    yield* _(
-      Effect.forEach(remaining, ({ chainID, address, event, signature }) => {
-        const strategyRequest = GetContractABIStrategy({
-          address,
-          event,
-          signature,
-          chainID,
-        })
+    yield* Effect.forEach(remaining, ({ chainID, address, event, signature }) => {
+      const strategyRequest = GetContractABIStrategy({
+        address,
+        event,
+        signature,
+        chainID,
+      })
 
-        const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
+      const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
 
-        return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-          Effect.request(strategyRequest, strategy),
-        ).pipe(Effect.orElseSucceed(() => null))
-      }),
+      return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
+        Effect.orElseSucceed(() => null),
+      )
+    }).pipe(
       Effect.flatMap((results) =>
         Effect.forEach(
           results,

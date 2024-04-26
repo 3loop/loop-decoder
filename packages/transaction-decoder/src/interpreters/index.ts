@@ -47,8 +47,8 @@ async function newRuntime(module: QuickJSWASMModule, config: RuntimeConfig): Pro
 }
 
 const newContext = () =>
-  Effect.gen(function* (_) {
-    const { runtime } = yield* _(QuickJSVM)
+  Effect.gen(function* () {
+    const { runtime } = yield* QuickJSVM
 
     const vm: QuickJSContext = runtime.newContext()
     // `console.log`
@@ -69,10 +69,10 @@ const newContext = () =>
   })
 
 export const interpretTx = ({ decodedTx, interpreter }: { decodedTx: DecodedTx; interpreter: Interpreter }) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     const input = JSON.stringify(decodedTx)
     const code = interpreter.schema
-    const vm = yield* _(newContext())
+    const vm = yield* newContext()
     const result = vm.unwrapResult(vm.evalCode(code + '\n' + 'transformEvent(' + input + ')'))
     const ok = vm.dump(result)
 

@@ -75,8 +75,8 @@ export class TransactionDecoder {
   }
 
   decodeTransaction({ chainID, hash }: { chainID: number; hash: string }) {
-    const program = Effect.gen(function* (_) {
-      return yield* _(decodeTransactionByHash(hash as Hex, chainID))
+    const program = Effect.gen(function* () {
+      return yield* decodeTransactionByHash(hash as Hex, chainID)
     }).pipe(Logger.withMinimumLogLevel(this.logging ? LogLevel.Debug : LogLevel.Error))
 
     const runnable = Effect.provide(program, this.context)

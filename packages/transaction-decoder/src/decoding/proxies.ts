@@ -18,9 +18,9 @@ export interface GetStorageSlot extends Request.Request<Address | undefined, RPC
 export const GetStorageSlot = Request.tagged<GetStorageSlot>('GetStorageSlot')
 
 export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetStorageSlot) =>
-  Effect.gen(function* (_) {
-    const service = yield* _(PublicClient)
-    const { client: publicClient } = yield* _(service.getPublicClient(request.chainID))
+  Effect.gen(function* () {
+    const service = yield* PublicClient
+    const { client: publicClient } = yield* service.getPublicClient(request.chainID)
     // NOTE: Should we make this recursive when we have a Proxy of a Proxy?
     const effects = storageSlots.map((slot) =>
       Effect.tryPromise({
@@ -40,12 +40,11 @@ export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetSt
       }),
     )
 
-    const res = yield* _(
-      Effect.all(effects, {
-        concurrency: 'inherit',
-        batching: 'inherit',
-      }),
-    )
+    const res = yield* Effect.all(effects, {
+      concurrency: 'inherit',
+      batching: 'inherit',
+    })
+
     return res.find((x) => x != null)
   }),
 ).pipe(RequestResolver.contextFromEffect)

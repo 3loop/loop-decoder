@@ -1,19 +1,19 @@
 {
-    "extends": "tsconfig/universal-esm.json",
-    "compilerOptions": {
-        "outDir": "dist",
-        "allowJs": true,
-        "baseUrl": ".",
-        "isolatedModules": true,
-        "stripInternal": true,
-        "noErrorTruncation": true,
-        "target": "es2016",
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "skipLibCheck": true,
-        "paths": { "@/*": ["src/*"] }
-    },
-    "include": ["src"],
-    "exclude": ["dist", "example", "node_modules"]
+  "extends": "tsconfig/universal-esm.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "allowJs": true,
+    "baseUrl": ".",
+    "isolatedModules": true,
+    "stripInternal": true,
+    "noErrorTruncation": true,
+    "target": "es2016",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "paths": { "@/*": ["src/*"] }
+  },
+  "include": ["src"],
+  "exclude": ["dist", "example", "node_modules"]
 }

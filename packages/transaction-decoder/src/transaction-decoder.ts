@@ -41,13 +41,13 @@ export class FetchTransactionError {
 }
 
 export const decodeMethod = ({ transaction }: { transaction: GetTransactionReturnType }) =>
-  Effect.gen(function* (_) {
+  Effect.gen(function* () {
     if (transaction.to == null) {
-      return yield* _(Effect.die(new UnsupportedEvent('Contract creation')))
+      return yield* Effect.die(new UnsupportedEvent('Contract creation'))
     }
 
     if (!('input' in transaction)) {
-      return yield* _(Effect.die(new UnsupportedEvent('Unsupported transaction')))
+      return yield* Effect.die(new UnsupportedEvent('Unsupported transaction'))
     }
 
     const data = transaction.input
@@ -57,38 +57,34 @@ export const decodeMethod = ({ transaction }: { transaction: GetTransactionRetur
     let abiAddress = transaction.to
 
     //if contract is a proxy, get the implementation address
-    const implementation = yield* _(getProxyStorageSlot({ address: abiAddress, chainID }))
+    const implementation = yield* getProxyStorageSlot({ address: abiAddress, chainID })
 
     if (implementation) {
       abiAddress = implementation
     }
 
-    const abi_ = yield* _(
-      getAndCacheAbi({
-        address: abiAddress,
-        signature,
-        chainID,
-      }),
-    )
+    const abi_ = yield* getAndCacheAbi({
+      address: abiAddress,
+      signature,
+      chainID,
+    })
 
     if (!abi_) {
-      return yield* _(Effect.fail(new AbiDecoder.MissingABIError(abiAddress, signature, chainID)))
+      return yield* Effect.fail(new AbiDecoder.MissingABIError(abiAddress, signature, chainID))
     }
 
     const abi = JSON.parse(abi_) as Abi
 
     // TODO: Pass the error message, so we can easier debug
-    const decoded = yield* _(
-      Effect.try({
-        try: () => AbiDecoder.decodeMethod(data, abi),
-        catch: (e) => {
-          return new AbiDecoder.DecodeError(e)
-        },
-      }),
-    )
+    const decoded = yield* Effect.try({
+      try: () => AbiDecoder.decodeMethod(data, abi),
+      catch: (e) => {
+        return new AbiDecoder.DecodeError(e)
+      },
+    })
 
     if (decoded == null) {
-      return yield* _(Effect.fail(new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.input}`)))
+      return yield* Effect.fail(new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.input}`))
     }
 
     return decoded
@@ -101,23 +97,19 @@ export const decodeLogs = ({
   transaction: GetTransactionReturnType
   receipt: TransactionReceipt
 }) =>
-  Effect.gen(function* (_) {
-    return yield* _(
-      LogDecoder.decodeLogs({
-        logs: receipt.logs,
-        transaction,
-      }),
-    )
+  Effect.gen(function* () {
+    return yield* LogDecoder.decodeLogs({
+      logs: receipt.logs,
+      transaction,
+    })
   })
 
 export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transaction: GetTransactionReturnType }) =>
-  Effect.gen(function* (_) {
-    return yield* _(
-      TraceDecoder.decodeTransactionTrace({
-        trace,
-        transaction,
-      }),
-    )
+  Effect.gen(function* () {
+    return yield* TraceDecoder.decodeTransactionTrace({
+      trace,
+      transaction,
+    })
   })
 
 const collectAllAddresses = ({
@@ -159,19 +151,17 @@ export const decodeTransaction = ({
   trace: TraceLog[]
   timestamp: number
 }) =>
-  Effect.gen(function* (_) {
-    const { decodedData, decodedTrace, decodedLogs } = yield* _(
-      Effect.all(
-        {
-          decodedData: decodeMethod({ transaction }),
-          decodedTrace: decodeTrace({ trace, transaction }),
-          decodedLogs: decodeLogs({ receipt, transaction }),
-        },
-        {
-          batching: true,
-          concurrency: 'unbounded',
-        },
-      ),
+  Effect.gen(function* () {
+    const { decodedData, decodedTrace, decodedLogs } = yield* Effect.all(
+      {
+        decodedData: decodeMethod({ transaction }),
+        decodedTrace: decodeTrace({ trace, transaction }),
+        decodedLogs: decodeLogs({ receipt, transaction }),
+      },
+      {
+        batching: true,
+        concurrency: 'unbounded',
+      },
     )
 
     const decodedLogsRight = decodedLogs.filter(Either.isRight).map((r) => r.right)
@@ -179,19 +169,17 @@ export const decodeTransaction = ({
 
     const logsErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
     if (logsErrors.length > 0) {
-      yield* _(Effect.logError(`Logs decode errors: ${JSON.stringify(logsErrors)}`))
+      yield* Effect.logError(`Logs decode errors: ${JSON.stringify(logsErrors)}`)
     }
 
     const traceErrors = decodedTrace.filter(Either.isLeft).map((r) => r.left)
     if (traceErrors.length > 0) {
-      yield* _(Effect.logError(`Trace decode errors: ${JSON.stringify(traceErrors)}`))
+      yield* Effect.logError(`Trace decode errors: ${JSON.stringify(traceErrors)}`)
     }
-    const interpreterMap = yield* _(
-      getAndCacheContractMeta({
-        address: receipt.to!,
-        chainID: Number(transaction.chainId),
-      }),
-    )
+    const interpreterMap = yield* getAndCacheContractMeta({
+      address: receipt.to!,
+      chainID: Number(transaction.chainId),
+    })
 
     const interactions: Interaction[] = TraceDecoder.augmentTraceLogs(transaction, decodedLogsRight, trace)
 
@@ -232,38 +220,34 @@ export const decodeTransaction = ({
   })
 
 export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
-  Effect.gen(function* (_) {
-    const { transaction, receipt, trace } = yield* _(
-      Effect.all(
-        {
-          transaction: getTransaction(hash, chainID),
-          receipt: getTransactionReceipt(hash, chainID),
-          trace: getTrace(hash, chainID),
-        },
-        {
-          concurrency: 'unbounded',
-          batching: true,
-        },
-      ),
+  Effect.gen(function* () {
+    const { transaction, receipt, trace } = yield* Effect.all(
+      {
+        transaction: getTransaction(hash, chainID),
+        receipt: getTransactionReceipt(hash, chainID),
+        trace: getTrace(hash, chainID),
+      },
+      {
+        concurrency: 'unbounded',
+        batching: true,
+      },
     )
 
     if (!receipt || !transaction || !trace) {
-      return yield* _(Effect.fail(new FetchTransactionError({ hash, chainID })))
+      return yield* Effect.fail(new FetchTransactionError({ hash, chainID }))
     }
 
-    const timestamp = yield* _(getBlockTimestamp(receipt.blockNumber, chainID))
+    const timestamp = yield* getBlockTimestamp(receipt.blockNumber, chainID)
 
     if (!receipt.to) {
-      return yield* _(Effect.fail(new UnsupportedEvent('Contract creation')))
+      return yield* Effect.fail(new UnsupportedEvent('Contract creation'))
     } else if (transaction.input === '0x') {
-      return yield* _(Effect.sync(() => transferDecode({ transaction, receipt })))
+      return yield* Effect.sync(() => transferDecode({ transaction, receipt }))
     }
-    return yield* _(
-      decodeTransaction({
-        transaction,
-        receipt,
-        trace,
-        timestamp: Number(timestamp),
-      }),
-    )
+    return yield* decodeTransaction({
+      transaction,
+      receipt,
+      trace,
+      timestamp: Number(timestamp),
+    })
   })
