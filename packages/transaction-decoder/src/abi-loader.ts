@@ -1,4 +1,4 @@
-import { Context, Effect, Either, RequestResolver, Request, Array } from 'effect'
+import { Context, Effect, Either, RequestResolver, Request, Array, Console } from 'effect'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/request-model.js'
 
 export interface GetAbiParams {
@@ -38,7 +38,6 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
     if (requests.length === 0) return
 
     const abiStore = yield* AbiStore
-    const strategies = abiStore.strategies
     // NOTE: We can further optimize if we have match by Address by avoid extra requests for each signature
     // but might need to update the Loader public API
     const groups = Array.groupBy(requests, makeKey)
@@ -61,6 +60,7 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
     }
 
     const set = (abi: ContractABI | null) => {
+      // NOTE: Now we ignore the null value, but we might want to store it to avoid pinging the same strategy again?
       return abi ? abiStore.set(abi) : Effect.succeed(null)
     }
 
@@ -85,8 +85,10 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
       },
     )
 
+    const strategies = abiStore.strategies
+
     // Load the ABI from the strategies
-    yield* Effect.forEach(remaining, ({ chainID, address, event, signature }) => {
+    const strategyResults = yield* Effect.forEach(remaining, ({ chainID, address, event, signature }) => {
       const strategyRequest = GetContractABIStrategy({
         address,
         event,
@@ -94,46 +96,45 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
         chainID,
       })
 
-      const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
+      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
       return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
         Effect.orElseSucceed(() => null),
       )
-    }).pipe(
-      Effect.flatMap((results) =>
-        Effect.forEach(
-          results,
-          (abi, i) => {
-            const request = remaining[i]
-            const { address, event, signature } = request
+    })
 
-            let result: string | null = null
+    // Store results and resolve pending requests
+    yield* Effect.forEach(
+      strategyResults,
+      (abi, i) => {
+        const request = remaining[i]
+        const { address, event, signature } = request
 
-            const addressmatch = abi?.address?.[address]
-            if (addressmatch != null) {
-              result = addressmatch
-            }
+        let result: string | null = null
 
-            const funcmatch = signature ? abi?.func?.[signature] : null
-            if (result == null && funcmatch != null) {
-              result = `[${funcmatch}]`
-            }
+        const addressmatch = abi?.address?.[address]
+        if (addressmatch != null) {
+          result = addressmatch
+        }
 
-            const eventmatch = event ? abi?.event?.[event] : null
-            if (result == null && eventmatch != null) {
-              result = `[${eventmatch}]`
-            }
+        const funcmatch = signature ? abi?.func?.[signature] : null
+        if (result == null && funcmatch != null) {
+          result = `[${funcmatch}]`
+        }
 
-            const group = groups[makeKey(request)]
+        const eventmatch = event ? abi?.event?.[event] : null
+        if (result == null && eventmatch != null) {
+          result = `[${eventmatch}]`
+        }
 
-            return Effect.zipRight(
-              set(abi),
-              Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
-            )
-          },
-          { discard: true },
-        ),
-      ),
+        const group = groups[makeKey(request)]
+
+        return Effect.zipRight(
+          set(abi),
+          Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
+        )
+      },
+      { discard: true },
     )
   }),
 ).pipe(RequestResolver.contextFromServices(AbiStore), Effect.withRequestCaching(true))
