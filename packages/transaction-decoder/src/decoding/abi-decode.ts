@@ -1,19 +1,23 @@
 import { formatAbiItem } from 'viem/utils'
 import type { DecodeResult, MostTypes, TreeNode } from '../types.js'
 import { Hex, Abi, decodeFunctionData, AbiParameter, AbiFunction, getAbiItem } from 'viem'
+import { Data, Effect } from 'effect'
+import { messageFromUnknown } from '../helpers/error.js'
 
-export class DecodeError {
-  readonly _tag = 'DecodeError'
-  constructor(readonly error: unknown) {}
+export class DecodeError extends Data.TaggedError('DecodeError')<{ message: string }> {
+  constructor(error: unknown) {
+    super({ message: `Failed to decode ${messageFromUnknown(error)}` })
+  }
 }
 
-export class MissingABIError {
-  readonly _tag = 'MissingABIError'
+export class MissingABIError extends Data.TaggedError('DecodeError')<{ message: string }> {
   constructor(
     readonly address: string,
     readonly signature: string,
     readonly chainID: number,
-  ) {}
+  ) {
+    super({ message: `Missing ABI for ${address} with signature ${signature} on chain ${chainID}` })
+  }
 }
 
 function stringifyValue(value: MostTypes): string | string[] {
@@ -79,21 +83,28 @@ BigInt.prototype.toJSON = function () {
   return this.toString()
 }
 
-export function decodeMethod(data: Hex, abi: Abi): DecodeResult | undefined {
-  const { functionName, args = [] } = decodeFunctionData({ abi, data })
+export const decodeMethod = (data: Hex, abi: Abi): Effect.Effect<DecodeResult | undefined, DecodeError> =>
+  Effect.gen(function* () {
+    const { functionName, args = [] } = yield* Effect.try({
+      try: () => decodeFunctionData({ abi, data }),
+      catch: (error) => new DecodeError(error),
+    })
 
-  const method = getAbiItem({ abi, name: functionName, args }) as AbiFunction | undefined
+    const method = getAbiItem({ abi, name: functionName, args }) as AbiFunction | undefined
 
-  if (method != null) {
-    const signature = formatAbiItem(method)
+    if (method != null) {
+      const signature = yield* Effect.try({
+        try: () => formatAbiItem(method),
+        catch: (error) => new DecodeError(error),
+      })
 
-    const paramsTree = attachValues(method.inputs, args)
+      const paramsTree = attachValues(method.inputs, args)
 
-    return {
-      name: functionName,
-      signature,
-      type: 'function',
-      params: paramsTree,
+      return {
+        name: functionName,
+        signature,
+        type: 'function',
+        params: paramsTree,
+      }
     }
-  }
-}
+  })

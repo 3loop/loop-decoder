@@ -43,27 +43,21 @@ const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =
       })
 
       if (abi_ == null) {
-        return yield* Effect.fail(new MissingABIError(contractAddress, signature, chainID))
+        return yield* new MissingABIError(contractAddress, signature, chainID)
       }
 
       const abi = JSON.parse(abi_) as Abi
 
-      return yield* Effect.try({
-        try: () => {
-          const method = decodeMethod(input as Hex, abi)
-          return {
-            ...method,
-            from,
-            to,
-          } as DecodeTraceResult
-        },
-        catch: (e) => {
-          return new DecodeError(e)
-        },
-      })
+      const method = yield* decodeMethod(input as Hex, abi)
+
+      return {
+        ...method,
+        from,
+        to,
+      } as DecodeTraceResult
     }
 
-    return yield* Effect.fail(new DecodeError(`Could not decode trace log ${JSON.stringify(call, replacer)}`))
+    return yield* new DecodeError(`Could not decode trace log ${JSON.stringify(call, replacer)}`)
   })
 
 export const decodeTransactionTrace = ({
