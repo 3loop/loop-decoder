@@ -1,4 +1,4 @@
-import { Context, Effect, Either, RequestResolver, Request, Array, Console, pipe } from 'effect'
+import { Context, Effect, Either, RequestResolver, Request, Array, pipe } from 'effect'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/request-model.js'
 
 export interface GetAbiParams {
