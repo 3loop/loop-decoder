@@ -27,7 +27,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     })
 
     if (abiItem_ == null) {
-      return yield* Effect.fail(new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0]!, chainID))
+      return yield* new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0]!, chainID)
     }
 
     const abiItem = JSON.parse(abiItem_) as Abi[]
@@ -46,7 +46,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     })
 
     if (args_ == null || eventName == null) {
-      return yield* Effect.fail(new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`))
+      return yield* new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)
     }
 
     const args = args_ as any
@@ -54,7 +54,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     const fragment = getAbiItem({ abi: abiItem, name: eventName })
 
     if (fragment == null) {
-      return yield* Effect.fail(new AbiDecoder.DecodeError(`Could not find fragment in ABI ${abiAddress} ${eventName}`))
+      return yield* new AbiDecoder.DecodeError(`Could not find fragment in ABI ${abiAddress} ${eventName}`)
     }
 
     const decodedParams = yield* Effect.try({

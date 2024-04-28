@@ -1,4 +1,4 @@
-import { Effect, Either } from 'effect'
+import { Data, Effect, Either } from 'effect'
 import { type Hash, type GetTransactionReturnType, type TransactionReceipt, isAddress, formatEther, Abi } from 'viem'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
 import * as AbiDecoder from './decoding/abi-decode.js'
@@ -15,39 +15,27 @@ import { getAndCacheContractMeta } from './contract-meta-loader.js'
 import traverse from 'traverse'
 import { chainIdToNetwork } from './helpers/networks.js'
 
-export class UnsupportedEvent {
-  readonly _tag = 'UnsupportedEvent'
-  constructor(readonly event: string) {}
-}
+export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> {}
 
-export class UnknownContract {
-  readonly _tag = 'UnknownContract'
-  constructor(readonly address: string) {}
-}
-
-export class DecodeLogsError {
-  readonly _tag = 'DecodeLogsError'
-  constructor(readonly cause: unknown) {}
-}
-
-export class FetchTransactionError {
-  readonly _tag = 'FetchTransactionError'
+export class FetchTransactionError extends Data.TaggedError('FetchTransactionError')<{ message: string }> {
   constructor(
     readonly data: {
       hash: string
       chainID: number
     },
-  ) {}
+  ) {
+    super({ message: `Failed to fetch transaction with hash ${data.hash} on chain ${data.chainID}` })
+  }
 }
 
 export const decodeMethod = ({ transaction }: { transaction: GetTransactionReturnType }) =>
   Effect.gen(function* () {
     if (transaction.to == null) {
-      return yield* Effect.die(new UnsupportedEvent('Contract creation'))
+      return yield* Effect.die(new UnsupportedEvent({ message: 'Contract creation' }))
     }
 
     if (!('input' in transaction)) {
-      return yield* Effect.die(new UnsupportedEvent('Unsupported transaction'))
+      return yield* Effect.die(new UnsupportedEvent({ message: 'Unsupported transaction' }))
     }
 
     const data = transaction.input
@@ -70,21 +58,15 @@ export const decodeMethod = ({ transaction }: { transaction: GetTransactionRetur
     })
 
     if (!abi_) {
-      return yield* Effect.fail(new AbiDecoder.MissingABIError(abiAddress, signature, chainID))
+      return yield* new AbiDecoder.MissingABIError(abiAddress, signature, chainID)
     }
 
     const abi = JSON.parse(abi_) as Abi
 
-    // TODO: Pass the error message, so we can easier debug
-    const decoded = yield* Effect.try({
-      try: () => AbiDecoder.decodeMethod(data, abi),
-      catch: (e) => {
-        return new AbiDecoder.DecodeError(e)
-      },
-    })
+    const decoded = yield* AbiDecoder.decodeMethod(data, abi)
 
     if (decoded == null) {
-      return yield* Effect.fail(new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.input}`))
+      return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.input}`)
     }
 
     return decoded
@@ -234,13 +216,13 @@ export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
     )
 
     if (!receipt || !transaction || !trace) {
-      return yield* Effect.fail(new FetchTransactionError({ hash, chainID }))
+      return yield* new FetchTransactionError({ hash, chainID })
     }
 
     const timestamp = yield* getBlockTimestamp(receipt.blockNumber, chainID)
 
     if (!receipt.to) {
-      return yield* Effect.fail(new UnsupportedEvent('Contract creation'))
+      return yield* new UnsupportedEvent({ message: 'Contract creation' })
     } else if (transaction.input === '0x') {
       return yield* Effect.sync(() => transferDecode({ transaction, receipt }))
     }

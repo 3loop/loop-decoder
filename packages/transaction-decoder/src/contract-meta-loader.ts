@@ -35,7 +35,6 @@ function makeKey(key: ContractMetaLoader) {
 const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<ContractMetaLoader>) =>
   Effect.gen(function* () {
     const contractMetaStore = yield* ContractMetaStore
-    const strategies = contractMetaStore.strategies
 
     const groups = Array.groupBy(requests, makeKey)
     const uniqueRequests = Object.values(groups).map((group) => group[0])
@@ -79,32 +78,34 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
       },
     )
 
+    const strategies = contractMetaStore.strategies
+
     // Resolve ContractMeta from the strategies
-    yield* Effect.forEach(remaining, ({ chainID, address }) => {
+    const strategyResults = yield* Effect.forEach(remaining, ({ chainID, address }) => {
       const strategyRequest = GetContractMetaStrategy({
         address,
         chainID,
       })
-      const allAvailableStrategies = [...(strategies[chainID] ?? []), ...strategies.default]
+
+      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
       return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
         Effect.orElseSucceed(() => null),
       )
-    }).pipe(
-      Effect.flatMap((results) =>
-        Effect.forEach(
-          results,
-          (result, i) => {
-            const group = groups[makeKey(remaining[i])]
+    })
 
-            return Effect.zipRight(
-              set(remaining[i], result),
-              Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
-            )
-          },
-          { discard: true },
-        ),
-      ),
+    // Store results and resolve pending requests
+    yield* Effect.forEach(
+      strategyResults,
+      (result, i) => {
+        const group = groups[makeKey(remaining[i])]
+
+        return Effect.zipRight(
+          set(remaining[i], result),
+          Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
+        )
+      },
+      { discard: true },
     )
   }),
 ).pipe(RequestResolver.contextFromServices(ContractMetaStore), Effect.withRequestCaching(true))
