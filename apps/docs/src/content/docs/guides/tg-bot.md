@@ -212,6 +212,6 @@ Your Telegram bot is now set up and will monitor blockchain transactions and sen
 
 In this guide, you've learned how to create a Telegram bot that monitors blockchain transactions and sends human-readable alerts. By using the Loop Decoder library, you can easily set up a bot to track specific contract addresses and chains without needing in-depth knowledge of EVM transaction decoding.
 
-Let us know on Twitter ([@3loop_io](twitter.com/3loop_io)) if you encounter any problems or have any questions, we'd love to help you!
+Let us know on X/Twitter ([@3loop_io](https://x.com/3loop_io)) if you encounter any problems or have any questions, we'd love to help you!
 
 Happy coding!
