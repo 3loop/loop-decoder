@@ -78,11 +78,6 @@ function attachValues<P extends readonly AbiParameter[]>(components: P, decoded:
   })
 }
 
-// @ts-expect-error - BigInt is not defined in the global scope
-BigInt.prototype.toJSON = function () {
-  return this.toString()
-}
-
 export const decodeMethod = (data: Hex, abi: Abi): Effect.Effect<DecodeResult | undefined, DecodeError> =>
   Effect.gen(function* () {
     const { functionName, args = [] } = yield* Effect.try({

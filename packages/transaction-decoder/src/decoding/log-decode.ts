@@ -5,6 +5,7 @@ import { getProxyStorageSlot } from './proxies.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 import { getAndCacheContractMeta } from '../contract-meta-loader.js'
 import * as AbiDecoder from './abi-decode.js'
+import { stringify } from '../helpers/stringify.js'
 
 const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
   Effect.gen(function* () {
@@ -41,7 +42,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
           strict: false,
         }),
       catch: () => {
-        Effect.logWarning(`Could not decode log ${abiAddress} ${JSON.stringify(logItem)}`)
+        Effect.logWarning(`Could not decode log ${abiAddress} ${stringify(logItem)}`)
       },
     })
 
@@ -76,7 +77,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
         return []
       },
       catch: () => {
-        Effect.logError(`Could not decode log params ${JSON.stringify(logItem)}`)
+        Effect.logError(`Could not decode log params ${stringify(logItem)}`)
       },
     })
 
