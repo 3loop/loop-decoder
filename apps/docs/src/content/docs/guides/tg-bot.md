@@ -9,7 +9,7 @@ In this guide, you will learn how to create a Telegram bot that sends human-read
 
 ### Step 0: Prerequisites
 
-- A basic understanding of JavaScript
+- An installed NodeJS
 - An Alchemy account (sign up [here](https://www.alchemy.com/))
 - An Etherscan account (sign up [here](https://etherscan.io/register))
 - A Telegram account
@@ -131,7 +131,7 @@ To interpret a decoded transaction, the `interpreter.ts` file contains a `transf
 
 The bot is set to monitor AAVE V3 transactions on the Ethereum mainnet by default. Update the contract address and chain ID in the `index.ts` file:
 
-```ts
+```ts title="src/index.ts"
 const contractAddress = '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2'
 const chainID = 1
 ```
@@ -186,7 +186,7 @@ Copy and rename the `.env.example` file to `.env`, then paste the Alchemy and Et
 
 ```bash
 cp .env.example .env
-nano .env
+vim .env
 ```
 
 We use the Alchemy API key to monitor new transactions happening on the blockchain, and the Etherscan API key (from the free plan) to fetch contract ABIs and avoid hitting rate limits. The Etherscan API could be optional if the transactions you are interested in do not interact with many contracts, but since we are testing AAVE V3 it will have many interactions.
