@@ -44,6 +44,10 @@ export const TEST_TRANSACTIONS: TXS = [
   ...NFTS_BLUR,
   ...AA_TRANSACTIONS,
   {
+    hash: '0xde9f6210899218e17a3e71661ead5e16da228e168b0572b1ddc30a967968f8f6', // DAI
+    chainID: 1,
+  },
+  {
     hash: '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75',
     chainID: 5,
   },

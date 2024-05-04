@@ -4,6 +4,7 @@ import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, MissingABIError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 import { Hex, type GetTransactionReturnType, Abi } from 'viem'
+import { stringify } from '../helpers/stringify.js'
 
 function getSecondLevelCalls(trace: TraceLog[]) {
   const secondLevelCalls: TraceLog[] = []
@@ -15,17 +16,6 @@ function getSecondLevelCalls(trace: TraceLog[]) {
   }
 
   return secondLevelCalls
-}
-
-function replacer(key: unknown, value: unknown) {
-  if (typeof value === 'bigint') {
-    return {
-      type: 'bigint',
-      value: value.toString(),
-    }
-  } else {
-    return value
-  }
 }
 
 const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =>
@@ -57,7 +47,7 @@ const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =
       } as DecodeTraceResult
     }
 
-    return yield* new DecodeError(`Could not decode trace log ${JSON.stringify(call, replacer)}`)
+    return yield* new DecodeError(`Could not decode trace log ${stringify(call)}`)
   })
 
 export const decodeTransactionTrace = ({

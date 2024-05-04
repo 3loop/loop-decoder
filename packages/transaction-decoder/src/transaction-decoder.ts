@@ -14,6 +14,7 @@ import { getAndCacheAbi } from './abi-loader.js'
 import { getAndCacheContractMeta } from './contract-meta-loader.js'
 import traverse from 'traverse'
 import { chainIdToNetwork } from './helpers/networks.js'
+import { stringify } from './helpers/stringify.js'
 
 export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> {}
 
@@ -151,12 +152,12 @@ export const decodeTransaction = ({
 
     const logsErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
     if (logsErrors.length > 0) {
-      yield* Effect.logError(`Logs decode errors: ${JSON.stringify(logsErrors)}`)
+      yield* Effect.logError(`Logs decode errors: ${stringify(logsErrors)}`)
     }
 
     const traceErrors = decodedTrace.filter(Either.isLeft).map((r) => r.left)
     if (traceErrors.length > 0) {
-      yield* Effect.logError(`Trace decode errors: ${JSON.stringify(traceErrors)}`)
+      yield* Effect.logError(`Trace decode errors: ${stringify(traceErrors)}`)
     }
     const interpreterMap = yield* getAndCacheContractMeta({
       address: receipt.to!,

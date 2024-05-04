@@ -1,3 +1,4 @@
+import { stringify } from '../helpers/stringify.js'
 import { DecodedTx, Interpreter } from '@/types.js'
 import { Context, Effect } from 'effect'
 import {
@@ -70,7 +71,7 @@ const newContext = () =>
 
 export const interpretTx = ({ decodedTx, interpreter }: { decodedTx: DecodedTx; interpreter: Interpreter }) =>
   Effect.gen(function* () {
-    const input = JSON.stringify(decodedTx)
+    const input = stringify(decodedTx)
     const code = interpreter.schema
     const vm = yield* newContext()
     const result = vm.unwrapResult(vm.evalCode(code + '\n' + 'transformEvent(' + input + ')'))

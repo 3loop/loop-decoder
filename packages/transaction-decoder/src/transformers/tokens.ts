@@ -4,6 +4,7 @@ import { sameAddress } from '../helpers/address.js'
 
 const toKeys = ['to', '_to', 'dst']
 const fromKeys = ['from', '_from', 'src']
+const valueKeys = ['value', 'amount', 'wad', '_amount']
 export const ethAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 const transferEvents = ['Transfer', 'TransferBatch', 'TransferSingle']
 
@@ -14,6 +15,16 @@ export function toOrFromUser(event: InteractionEvent, direction: 'to' | 'from', 
       (key: string) => isAddress(event.params[key] as string) && sameAddress(event.params[key] as Address, userAddress),
     ).length > 0
   )
+}
+
+function findValue(params: Record<string, string>): string {
+  // Find first value that is not null
+  const match = valueKeys.find((key) => params[key] != null)
+  if (match != null) {
+    return params[match]
+  } else {
+    return ''
+  }
 }
 
 function getTokenType(interaction: Interaction): AssetType {
@@ -48,12 +59,10 @@ function getTokens(interactions: Interaction[], userAddress: string, direction: 
       const event = interaction.event
       const tokenType = getTokenType(interaction)
 
-      // event.params.wad
-      // event.params._amount
       if (tokenType === AssetType.ERC20) {
-        const params = event.params as { to: string; from: string; amount?: string; value?: string }
+        const params = event.params as { to: string; from: string } & Record<string, string>
         const decimals = interaction.decimals ?? 18
-        const value = params.amount ?? params.value ?? ''
+        const value = findValue(params)
         const amountNumber = Number(formatUnits(BigInt(value), decimals))
         const amount = amountNumber?.toFixed(12).replace(/^(\d+\.\d*?[0-9])0+$/g, '$1')
 
