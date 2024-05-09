@@ -11,7 +11,7 @@ hero:
       link: /getting-started
       icon: right-arrow
       variant: primary
-    - text: See our Playground
+    - text: Playgorund
       link: https://loop-decoder-web.vercel.app/
       icon: external
 ---
@@ -19,11 +19,16 @@ hero:
 import { Card, CardGrid } from '@astrojs/starlight/components'
 
 <CardGrid stagger>
-  <Card title="Transaction Decoder" icon="rocket">
-    Decode any EVM transaction into a human-readable format using TypeScript. Loop Decoder does not enforce any
-    infrastructure requirements, so you can use it in any environment.
+  <Card title="TypeScript" icon="seti:typescript">
+    Fully written in TypeScript, can be used on both the client side and server side in JS applications.
   </Card>
-  <Card title="Data Loaders" icon="add-document">
-    Loop Decoder provides a set of data loaders to simplify resolution of ABIs and other data required for decoding.
+  <Card title="Highly customizable" icon="puzzle">
+    Provides a set of data loaders to simplify resolution of ABIs and other data required for decoding.
+  </Card>
+  <Card title="You only need an RPC" icon="rocket">
+    Optional API providers can be used to fetch contract metadata or you can connect just your storage.
+  </Card>
+  <Card title="Flexible Intepreters" icon="setting">
+    Define any custom interpretation of EVM transactions.
   </Card>
 </CardGrid>

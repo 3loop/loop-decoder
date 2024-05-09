@@ -5,6 +5,8 @@ description: The simple way to Create a Telegram Bot for human-readable alerts
 
 In this guide, you will learn how to create a Telegram bot that sends human-readable alerts about transactions happening on-chain. You can customize this bot for any EVM-compatible blockchain, and you don't need any specific knowledge about EVM transaction decoding and interpretation.
 
+![Final result](../../../assets/tg-bot.png)
+
 ## Guide
 
 ### Step 0: Prerequisites
@@ -205,8 +207,6 @@ pnpm start
 ```
 
 Your Telegram bot is now set up and will monitor blockchain transactions and send alerts to the specified chat or channel.
-
-![Final result](../../../assets/tg-bot.png)
 
 ## Conculsion
 

@@ -1,50 +1,56 @@
-import { defineConfig } from "astro/config";
-import starlight from "@astrojs/starlight";
+import { defineConfig } from 'astro/config'
+import starlight from '@astrojs/starlight'
 
-import cloudflare from "@astrojs/cloudflare";
+import cloudflare from '@astrojs/cloudflare'
 
 // https://astro.build/config
 export default defineConfig({
   integrations: [
     starlight({
-      title: "Loop Decoder",
+      title: 'Loop Decoder',
       customCss: [
         // Relative path to your custom CSS file
-        "./src/styles/custom.css",
+        './src/styles/custom.css',
       ],
       social: {
-        github: "https://github.com/3loop/loop-decoder",
-        twitter: "https://x.com/3loop_io",
+        github: 'https://github.com/3loop/loop-decoder',
+        twitter: 'https://x.com/3loop_io',
       },
       sidebar: [
         {
-          label: "Getting Started",
+          label: 'Getting Started',
           items: [
             {
-              label: "Introduction",
-              link: "/getting-started",
+              label: 'Introduction',
+              link: '/getting-started',
             },
           ],
         },
         {
-          label: "Guides",
+          label: 'Guides',
           autogenerate: {
-            directory: "guides",
+            directory: 'guides',
           },
         },
         {
-          label: "Reference",
+          label: 'Reference',
           autogenerate: {
-            directory: "reference",
+            directory: 'reference',
           },
         },
         {
-          label: "Contribution",
-          link: "/contribution",
+          label: 'Recipes',
+          autogenerate: {
+            directory: 'recipes',
+          },
+        },
+        {
+          label: 'Contribution',
+          link: '/contribution',
         },
       ],
     }),
   ],
-  output: "server",
+  output: 'server',
   adapter: cloudflare(),
-});
+})
