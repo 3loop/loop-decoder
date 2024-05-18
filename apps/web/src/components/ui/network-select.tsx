@@ -17,7 +17,7 @@ export function NetworkSelect(props: SelectProps) {
 
   return (
     <Select onValueChange={onValueChange} value={chainID}>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="min-w-[180px]">
         <SelectValue placeholder="Select a network" />
       </SelectTrigger>
       <SelectContent>

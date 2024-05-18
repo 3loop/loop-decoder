@@ -12,7 +12,7 @@ interface CodeBlockProps {
 
 export default function CodeBlock(props: CodeBlockProps) {
   return (
-    <div className="flex-1 border rounded-md">
+    <div className="flex-1 border rounded-md overflow-hidden">
       <Editor
         language={props.language}
         value={props.value}

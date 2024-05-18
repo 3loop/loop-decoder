@@ -18,7 +18,11 @@ export function MainNav({ className, navLinks, ...props }: MainNavProps) {
 
   return (
     <nav
-      className={cn('inline-flex items-center justify-center rounded-md p-1', 'bg-gray-100 dark:bg-gray-800')}
+      className={cn(
+        'inline-flex items-center justify-center rounded-md p-1',
+        'bg-gray-100 dark:bg-gray-800',
+        className,
+      )}
       {...props}
     >
       {navLinks.map((link) => {
