@@ -1,5 +1,6 @@
 import { Data, Effect, Either } from 'effect'
-import { type Hash, type GetTransactionReturnType, type TransactionReceipt, isAddress, formatEther, Abi } from 'viem'
+import { isAddress, formatEther, Abi } from 'viem'
+import { type Hex, type Hash, type GetTransactionReturnType, type TransactionReceipt } from 'viem'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
 import * as AbiDecoder from './decoding/abi-decode.js'
 import * as LogDecoder from './decoding/log-decode.js'
@@ -17,6 +18,7 @@ import { chainIdToNetwork } from './helpers/networks.js'
 import { stringify } from './helpers/stringify.js'
 
 export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> {}
+export class InvalidArgumentError extends Data.TaggedError('InvalidArgumentError')<{ message: string }> {}
 
 export class FetchTransactionError extends Data.TaggedError('FetchTransactionError')<{ message: string }> {
   constructor(
@@ -29,37 +31,27 @@ export class FetchTransactionError extends Data.TaggedError('FetchTransactionErr
   }
 }
 
-export const decodeMethod = ({ transaction }: { transaction: GetTransactionReturnType }) =>
+const decodeMethod = ({ data, chainID, contractAddress }: { data: Hex; chainID: number; contractAddress: string }) =>
   Effect.gen(function* () {
-    if (transaction.to == null) {
-      return yield* Effect.die(new UnsupportedEvent({ message: 'Contract creation' }))
-    }
-
-    if (!('input' in transaction)) {
-      return yield* Effect.die(new UnsupportedEvent({ message: 'Unsupported transaction' }))
-    }
-
-    const data = transaction.input
-
     const signature = data.slice(0, 10)
-    const chainID = Number(transaction.chainId)
-    let abiAddress = transaction.to
 
-    //if contract is a proxy, get the implementation address
-    const implementation = yield* getProxyStorageSlot({ address: abiAddress, chainID })
+    if (isAddress(contractAddress)) {
+      //if contract is a proxy, get the implementation address
+      const implementation = yield* getProxyStorageSlot({ address: contractAddress, chainID })
 
-    if (implementation) {
-      abiAddress = implementation
+      if (implementation) {
+        contractAddress = implementation
+      }
     }
 
     const abi_ = yield* getAndCacheAbi({
-      address: abiAddress,
+      address: contractAddress,
       signature,
       chainID,
     })
 
     if (!abi_) {
-      return yield* new AbiDecoder.MissingABIError(abiAddress, signature, chainID)
+      return yield* new AbiDecoder.MissingABIError(contractAddress, signature, chainID)
     }
 
     const abi = JSON.parse(abi_) as Abi
@@ -67,7 +59,7 @@ export const decodeMethod = ({ transaction }: { transaction: GetTransactionRetur
     const decoded = yield* AbiDecoder.decodeMethod(data, abi)
 
     if (decoded == null) {
-      return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${transaction.input}`)
+      return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${data}`)
     }
 
     return decoded
@@ -135,9 +127,21 @@ export const decodeTransaction = ({
   timestamp: number
 }) =>
   Effect.gen(function* () {
+    if (transaction.to == null) {
+      return yield* Effect.die(new UnsupportedEvent({ message: 'Contract creation' }))
+    }
+
+    if (!('input' in transaction)) {
+      return yield* Effect.die(new UnsupportedEvent({ message: 'Unsupported transaction' }))
+    }
+
+    const data = transaction.input
+    const chainID = Number(transaction.chainId)
+    const contractAddress = transaction.to
+
     const { decodedData, decodedTrace, decodedLogs } = yield* Effect.all(
       {
-        decodedData: decodeMethod({ transaction }),
+        decodedData: decodeMethod({ data, chainID, contractAddress }),
         decodedTrace: decodeTrace({ trace, transaction }),
         decodedLogs: decodeLogs({ receipt, transaction }),
       },
@@ -233,4 +237,23 @@ export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
       trace,
       timestamp: Number(timestamp),
     })
+  })
+
+export const decodeCalldata = ({
+  data,
+  chainID,
+  contractAddress,
+}: {
+  data: Hex
+  chainID?: number
+  contractAddress?: string
+}) =>
+  Effect.gen(function* () {
+    if ((contractAddress && chainID === undefined) || (!contractAddress && chainID)) {
+      return yield* Effect.die(
+        new InvalidArgumentError({ message: 'chainID and contractAddress must be provided together' }),
+      )
+    }
+
+    return yield* decodeMethod({ data, chainID: chainID ?? 0, contractAddress: contractAddress ?? '' })
   })
