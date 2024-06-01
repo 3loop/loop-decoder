@@ -1,0 +1,22 @@
+{
+  "name": "mint",
+  "params": [
+    {
+      "name": "account",
+      "type": "address",
+      "value": "0xC20fc7A16FBd98C3291Cc370B603A876d3c12f41",
+    },
+    {
+      "name": "id",
+      "type": "uint256",
+      "value": "1",
+    },
+    {
+      "name": "amount",
+      "type": "uint256",
+      "value": "2",
+    },
+  ],
+  "signature": "mint(address,uint256,uint256)",
+  "type": "function",
+}

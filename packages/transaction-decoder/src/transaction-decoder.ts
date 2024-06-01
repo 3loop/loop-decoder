@@ -249,7 +249,7 @@ export const decodeCalldata = ({
   contractAddress?: string
 }) =>
   Effect.gen(function* () {
-    if ((contractAddress && chainID === undefined) || (!contractAddress && chainID)) {
+    if ((contractAddress && chainID == null) || (contractAddress == null && chainID)) {
       return yield* Effect.die(
         new InvalidArgumentError({ message: 'chainID and contractAddress must be provided together' }),
       )

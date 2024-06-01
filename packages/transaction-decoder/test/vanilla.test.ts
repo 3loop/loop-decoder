@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'vitest'
-import { mockedTransport } from './mocks/json-rpc-mock.js'
+import { MockedTransaction, mockedTransport } from './mocks/json-rpc-mock.js'
 import { TransactionDecoder } from '@/vanilla.js'
 import fs from 'fs'
 import { createPublicClient } from 'viem'
 import { goerli } from 'viem/chains'
 import { ERC20RPCStrategyResolver } from '@/effect.js'
+import { TEST_TRANSACTIONS } from './constants.js'
 
 describe('Transaction Decoder', () => {
-  test('should be able to decode using vanilla API', async () => {
+  describe('should be able to decode using vanilla API', async () => {
     const decoded = new TransactionDecoder({
       getPublicClient: (chainID) => {
         if (chainID === 5) {
@@ -74,13 +75,37 @@ describe('Transaction Decoder', () => {
       },
     })
 
-    const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
+    test('should be able to decode transaction by hash', async () => {
+      const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
 
-    const result = await decoded.decodeTransaction({
-      chainID: 5,
-      hash,
+      const result = await decoded.decodeTransaction({
+        chainID: 5,
+        hash,
+      })
+
+      await expect(result).toMatchFileSnapshot(`./snapshots/decoder/${hash}.snapshot`)
     })
 
-    await expect(result).toMatchFileSnapshot(`./snapshots/decoder/${hash}.snapshot`)
+    test('should be able to decode calldata', async () => {
+      const tx = TEST_TRANSACTIONS.find((tx) => tx.chainID === 5)
+      if (tx == null) {
+        throw new Error('Transaction not found')
+      }
+
+      const { hash, chainID } = tx
+      const { transaction } = JSON.parse(
+        fs.readFileSync(`./test/mocks/tx/${hash.toLowerCase()}.json`).toString(),
+      ) as MockedTransaction
+
+      const contractAddress = transaction?.to
+
+      const result = await decoded.decodeCalldata({
+        data: transaction?.input,
+        chainID,
+        contractAddress,
+      })
+
+      await expect(result).toMatchFileSnapshot(`./snapshots/calldata/${hash}.snapshot`)
+    })
   })
 })

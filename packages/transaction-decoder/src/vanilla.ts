@@ -1,7 +1,7 @@
 import { Effect, Context, Logger, LogLevel, RequestResolver } from 'effect'
 import { PublicClient, PublicClientObject, UnknownNetwork } from './public-client.js'
 import { ContractData } from './types.js'
-import { decodeTransactionByHash } from './transaction-decoder.js'
+import { decodeTransactionByHash, decodeCalldata } from './transaction-decoder.js'
 import { AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
 import { ContractMetaParams, ContractMetaStore as EffectContractMetaStore } from './contract-meta-loader.js'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
@@ -77,6 +77,16 @@ export class TransactionDecoder {
   decodeTransaction({ chainID, hash }: { chainID: number; hash: string }) {
     const program = Effect.gen(function* () {
       return yield* decodeTransactionByHash(hash as Hex, chainID)
+    }).pipe(Logger.withMinimumLogLevel(this.logging ? LogLevel.Debug : LogLevel.Error))
+
+    const runnable = Effect.provide(program, this.context)
+
+    return Effect.runPromise(runnable)
+  }
+
+  decodeCalldata({ data, chainID, contractAddress }: { data: Hex; chainID?: number; contractAddress?: string }) {
+    const program = Effect.gen(function* () {
+      return yield* decodeCalldata({ data, chainID, contractAddress })
     }).pipe(Logger.withMinimumLogLevel(this.logging ? LogLevel.Debug : LogLevel.Error))
 
     const runnable = Effect.provide(program, this.context)
