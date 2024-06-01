@@ -1,0 +1,22 @@
+{
+  "name": "transferFrom",
+  "params": [
+    {
+      "name": "from",
+      "type": "address",
+      "value": "0x6951AE195690E95E9f3eAfadBe241ac19Ef263E4",
+    },
+    {
+      "name": "to",
+      "type": "address",
+      "value": "0x2bF4761d2f9002c0a24fBAC3A65B794f0561BB7F",
+    },
+    {
+      "name": "tokenId",
+      "type": "uint256",
+      "value": "69",
+    },
+  ],
+  "signature": "transferFrom(address,address,uint256)",
+  "type": "function",
+}

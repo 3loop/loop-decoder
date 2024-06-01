@@ -3,8 +3,8 @@ import { PublicClient, PublicClientObject, UnknownNetwork } from '@/effect.js'
 import { Effect } from 'effect'
 import { createPublicClient, custom } from 'viem'
 
-interface MockedTransaction {
-  transaction: unknown
+export interface MockedTransaction {
+  transaction: any
   receipt: unknown
   trace: any
 }

@@ -1,0 +1,23 @@
+{
+  "name": "disperseEther",
+  "params": [
+    {
+      "name": "recipients",
+      "type": "address[]",
+      "value": [
+        "0x128a9FE670670eC9b5dc768bdb39068994C6C55e",
+        "0x9523ad2CcBbC49f578DDA0175fAE20747b6474af",
+      ],
+    },
+    {
+      "name": "values",
+      "type": "uint256[]",
+      "value": [
+        "5000000000000000",
+        "5000000000000000",
+      ],
+    },
+  ],
+  "signature": "disperseEther(address[],uint256[])",
+  "type": "function",
+}

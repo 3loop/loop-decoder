@@ -1,0 +1,17 @@
+{
+  "name": "setApprovalForAll",
+  "params": [
+    {
+      "name": "operator",
+      "type": "address",
+      "value": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+    },
+    {
+      "name": "approved",
+      "type": "bool",
+      "value": "true",
+    },
+  ],
+  "signature": "setApprovalForAll(address,bool)",
+  "type": "function",
+}

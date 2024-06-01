@@ -1,0 +1,164 @@
+{
+  "name": "takeAskSinglePool",
+  "params": [
+    {
+      "components": [
+        {
+          "components": [
+            {
+              "name": "trader",
+              "type": "address",
+              "value": "0xB20760dd8b5997358a3ad088016202f793bA32dA",
+            },
+            {
+              "name": "collection",
+              "type": "address",
+              "value": "0x524cAB2ec69124574082676e6F654a18df49A048",
+            },
+            {
+              "name": "listingsRoot",
+              "type": "bytes32",
+              "value": "0x71391d0d88ccc1ea4542eddb3b6b2731417b12fa9797118f623b7e676823dc5d",
+            },
+            {
+              "name": "numberOfListings",
+              "type": "uint256",
+              "value": "1",
+            },
+            {
+              "name": "expirationTime",
+              "type": "uint256",
+              "value": "1744011869",
+            },
+            {
+              "name": "assetType",
+              "type": "uint8",
+              "value": "0",
+            },
+            {
+              "components": [
+                {
+                  "name": "recipient",
+                  "type": "address",
+                  "value": "0x2dE038A402119bCbd49A4412c35f27670801eD4e",
+                },
+                {
+                  "name": "rate",
+                  "type": "uint16",
+                  "value": "50",
+                },
+              ],
+              "name": "makerFee",
+              "type": "tuple",
+            },
+            {
+              "name": "salt",
+              "type": "uint256",
+              "value": "307966931955150963972686900634783724830",
+            },
+          ],
+          "name": "order",
+          "type": "tuple",
+        },
+        {
+          "components": [
+            {
+              "name": "index",
+              "type": "uint256",
+              "value": "0",
+            },
+            {
+              "name": "proof",
+              "type": "bytes32[]",
+              "value": [],
+            },
+            {
+              "components": [
+                {
+                  "name": "index",
+                  "type": "uint256",
+                  "value": "0",
+                },
+                {
+                  "name": "tokenId",
+                  "type": "uint256",
+                  "value": "16614",
+                },
+                {
+                  "name": "amount",
+                  "type": "uint256",
+                  "value": "1",
+                },
+                {
+                  "name": "price",
+                  "type": "uint256",
+                  "value": "1061717990000000000",
+                },
+              ],
+              "name": "listing",
+              "type": "tuple",
+            },
+            {
+              "components": [
+                {
+                  "name": "tokenId",
+                  "type": "uint256",
+                  "value": "16614",
+                },
+                {
+                  "name": "amount",
+                  "type": "uint256",
+                  "value": "1",
+                },
+              ],
+              "name": "taker",
+              "type": "tuple",
+            },
+          ],
+          "name": "exchange",
+          "type": "tuple",
+        },
+        {
+          "components": [
+            {
+              "name": "recipient",
+              "type": "address",
+              "value": "0x0000000000000000000000000000000000000000",
+            },
+            {
+              "name": "rate",
+              "type": "uint16",
+              "value": "0",
+            },
+          ],
+          "name": "takerFee",
+          "type": "tuple",
+        },
+        {
+          "name": "signature",
+          "type": "bytes",
+          "value": "0xc370f025f59e22f02c330dc4ba9320b85b89a06eb69d766dcc57844bf2d573fe277f4e38e9f0e40ebd87f0f41b9808c642bc7355483ee81039c0cc3b9c04060d1b",
+        },
+        {
+          "name": "tokenRecipient",
+          "type": "address",
+          "value": "0xAffca680e6dcbb1bb336108D5aCcA9c545885260",
+        },
+      ],
+      "name": "inputs",
+      "type": "tuple",
+    },
+    {
+      "name": "oracleSignature",
+      "type": "bytes",
+      "value": "0x7e083266f71c3da3c82269c164291d91ff5f5acdcc98b12b06347cdf5706ac874273d780ae751921f04bdaff0a55b16d2900f5023ffa7a15f67ce68e98cd50f61c012b1c106af68e5d010513ff70a3aaed9afeb8661116e6ce",
+    },
+    {
+      "name": "amountToWithdraw",
+      "type": "uint256",
+      "value": "1061717990000000000",
+    },
+  ],
+  "signature": "takeAskSinglePool(((address,address,bytes32,uint256,uint256,uint8,(address,uint16),uint256),(uint256,bytes32[],(uint256,uint256,uint256,uint256),(uint256,uint256)),(address,uint16),bytes,address),bytes,uint256)",
+  "type": "function",
+}

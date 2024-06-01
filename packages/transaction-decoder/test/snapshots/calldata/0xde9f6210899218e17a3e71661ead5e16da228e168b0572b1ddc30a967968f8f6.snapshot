@@ -1,0 +1,32 @@
+{
+  "name": "borrow",
+  "params": [
+    {
+      "name": "asset",
+      "type": "address",
+      "value": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    },
+    {
+      "name": "amount",
+      "type": "uint256",
+      "value": "100000000000000000000",
+    },
+    {
+      "name": "interestRateMode",
+      "type": "uint256",
+      "value": "2",
+    },
+    {
+      "name": "referralCode",
+      "type": "uint16",
+      "value": "0",
+    },
+    {
+      "name": "onBehalfOf",
+      "type": "address",
+      "value": "0x955fe53fF029d6a0503C0b101E109036475e580b",
+    },
+  ],
+  "signature": "borrow(address,uint256,uint256,uint16,address)",
+  "type": "function",
+}
