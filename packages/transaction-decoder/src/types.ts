@@ -71,20 +71,29 @@ export interface Interaction {
   event: InteractionEvent
 }
 
-export interface InteractionEvent {
-  eventName: string | null
-  nativeTransfer?: true
-  logIndex: number | null
-  params: InteractionEventParams
-  decoded?: boolean
+export interface NativeEventTransferParams {
+  from: string
+  to: string
+  value: string
 }
 
-export interface InteractionEventParams {
-  to?: string | null
-  from?: string | null
-  dst?: string | null
-  src?: string | null
-  tokenId?: string | null // ERC721
+export interface NativeEventTransfer {
+  eventName: string
+  logIndex: number | null
+  params: NativeEventTransferParams
+  nativeTransfer: true
+}
+
+export type InteractionEvent =
+  | NativeEventTransfer
+  | {
+      eventName: string | null
+      logIndex: number | null
+      params: EventParams
+      decoded?: boolean
+    }
+
+export interface EventParams {
   [key: string]: string | string[] | undefined | null | number | boolean
 }
 
@@ -107,8 +116,7 @@ export interface DecodedTx {
   gasUsed: string
   gasPaid: string
   effectiveGasPrice: string | null
-  assetsReceived: Asset[]
-  assetsSent: Asset[]
+  transfers: Asset[]
   interactedAddresses: string[]
 }
 
@@ -135,6 +143,8 @@ export const enum AssetType {
 
 export interface Asset {
   type: AssetType
+  from: string
+  to: string
   name: string | null
   symbol: string | null
   address: string
@@ -144,22 +154,6 @@ export interface Asset {
   pair?: string // "RARE-WETH"
   tokenId?: string
 }
-
-export interface InternalEvent {
-  txHash: string
-  userAddress: string
-  contractName: string | null
-  contractAddress: string | null
-  assetsSent: Asset[]
-  assetsReceived: Asset[]
-  chainSymbol: string
-  reverted: boolean
-  gasPaid: string
-  timestamp: number | null
-  methodName?: string
-  eventName?: string
-}
-
 export interface Interpreter {
   id: string
   schema: string

@@ -9,7 +9,7 @@ import { transferDecode } from './decoding/transfer-decode.js'
 import type { DecodeResult, DecodedTx, Interaction } from './types.js'
 import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
-import { getAssetsReceived, getAssetsSent } from './transformers/tokens.js'
+import { getAssetsTransfers } from './transformers/tokens.js'
 import { getProxyStorageSlot } from './decoding/proxies.js'
 import { getAndCacheAbi } from './abi-loader.js'
 import { getAndCacheContractMeta } from './contract-meta-loader.js'
@@ -197,9 +197,8 @@ export const decodeTransaction = ({
       timestamp,
       txIndex: receipt.transactionIndex,
       reverted: receipt.status === 'reverted', // will return true if status==undefined
+      transfers: getAssetsTransfers(interactions, value, receipt.from, receipt.to!),
       // NOTE: Explore how to set assets for more flexible tracking of the in and out addresses
-      assetsReceived: getAssetsReceived(interactions, receipt.from),
-      assetsSent: getAssetsSent(interactions, value, receipt.from, receipt.from),
       interactedAddresses: collectAllAddresses({ interactions, decodedData }),
     }
 
