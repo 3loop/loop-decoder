@@ -1,22 +1,4 @@
 {
-  "assetsReceived": [
-    {
-      "address": "0x0000000000A39bb272e79075ade125fd351887Ac",
-      "amount": "0.44",
-      "name": "Mock ERC20 Contract",
-      "symbol": "ERC20",
-      "type": "ERC20",
-    },
-  ],
-  "assetsSent": [
-    {
-      "address": "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
-      "amount": "0.0",
-      "name": "Mock ERC20 Contract",
-      "symbol": "ERC20",
-      "type": "ERC20",
-    },
-  ],
   "chainID": 1,
   "chainSymbol": "mainnet",
   "contractName": "Mock ERC20 Contract",
@@ -415,6 +397,26 @@
       "signature": "takeBidSingle(((address,address,bytes32,uint256,uint256,uint8,(address,uint16),uint256),(uint256,bytes32[],(uint256,uint256,uint256,uint256),(uint256,uint256)),(address,uint16),bytes),bytes)",
       "to": "0x5fa60726e62c50af45ff2f6280c468da438a7837",
       "type": "function",
+    },
+  ],
+  "transfers": [
+    {
+      "address": "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B",
+      "amount": "0",
+      "from": "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+      "type": "ERC20",
+    },
+    {
+      "address": "0x0000000000A39bb272e79075ade125fd351887Ac",
+      "amount": "0.44",
+      "from": "0x48BAF3dA3BED7ED1bC547e260c058254B3AC4c3D",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
+      "type": "ERC20",
     },
   ],
   "txHash": "0x02a4dda78f1452772d87aa080d65ed7c34785b9d0f4c20aa6c91c51a63ee1fa4",

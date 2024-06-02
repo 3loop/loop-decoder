@@ -1,6 +1,4 @@
 {
-  "assetsReceived": [],
-  "assetsSent": [],
   "chainID": 5,
   "chainSymbol": "goerli",
   "contractName": "Mock ERC721 Contract",
@@ -53,6 +51,7 @@
   "timestamp": 1692818220,
   "toAddress": "0xc3e4214dd442136079df06bb2529bae276d37564",
   "traceCalls": [],
+  "transfers": [],
   "txHash": "0x0235fc6d0c91f40bcbe627069be612464027913b2e95b23dcf2e647f330a22b4",
   "txIndex": 153,
   "txType": "contract interaction",

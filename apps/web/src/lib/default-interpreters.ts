@@ -11,7 +11,6 @@ function assetsReceived(transfers, fromAddress) {
 }
 `
 
-
 export const defaultInterpreters: Interpreter[] = [
   {
     id: 'contract:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9,chain:1',

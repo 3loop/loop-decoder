@@ -1,6 +1,4 @@
 {
-  "assetsReceived": [],
-  "assetsSent": [],
   "chainID": 5,
   "chainSymbol": "goerli",
   "contractName": "Mock ERC1155 Contract",
@@ -61,6 +59,18 @@
   "timestamp": 1691435796,
   "toAddress": "0x58c3c2547084cc1c94130d6fd750a3877c7ca5d2",
   "traceCalls": [],
+  "transfers": [
+    {
+      "address": "0x58c3c2547084CC1C94130D6fd750A3877c7Ca5D2",
+      "amount": "2",
+      "from": "0x0000000000000000000000000000000000000000",
+      "name": "Mock ERC1155 Contract",
+      "symbol": "ERC1155",
+      "to": "0xC20fc7A16FBd98C3291Cc370B603A876d3c12f41",
+      "tokenId": "1",
+      "type": "ERC1155",
+    },
+  ],
   "txHash": "0x1cf9beb600427c0fef7b4b5794f0f3eccef6a75cec1f1680b9295187effa3788",
   "txIndex": 58,
   "txType": "contract interaction",

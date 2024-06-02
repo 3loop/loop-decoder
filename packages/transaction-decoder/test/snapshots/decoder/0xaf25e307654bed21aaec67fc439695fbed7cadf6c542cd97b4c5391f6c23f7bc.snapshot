@@ -1,6 +1,4 @@
 {
-  "assetsReceived": [],
-  "assetsSent": [],
   "chainID": 5,
   "chainSymbol": "goerli",
   "contractName": "Mock ERC1155 Contract",
@@ -73,6 +71,7 @@
       "type": "function",
     },
   ],
+  "transfers": [],
   "txHash": "0xaf25e307654bed21aaec67fc439695fbed7cadf6c542cd97b4c5391f6c23f7bc",
   "txIndex": 40,
   "txType": "contract interaction",
