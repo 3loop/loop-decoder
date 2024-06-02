@@ -1008,15 +1008,6 @@
     },
     {
       "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      "amount": "0.285",
-      "from": "0x22b81a596d3a1f727801bac52fc1b6c258765f48",
-      "name": "Ethereum",
-      "symbol": "ETH",
-      "to": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
-      "type": "native",
-    },
-    {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "amount": "0.094525",
       "from": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
       "name": "Ethereum",

@@ -1,5 +1,6 @@
 import { formatEther, formatUnits } from 'viem'
 import { Asset, AssetType, EventParams, Interaction } from '../types.js'
+import { sameAddress } from '../helpers/address.js'
 
 const toKeys = ['to', '_to', 'dst']
 const fromKeys = ['from', '_from', 'src']
@@ -112,9 +113,14 @@ function getTokens(interactions: Interaction[]): Asset[] {
     .flat()
 }
 
-function getNativeTokenValueEvents(interactions: Interaction[]): Asset[] {
+function getNativeTokenValueEvents(interactions: Interaction[], from: string): Asset[] {
   return interactions.reduce((acc, interaction) => {
-    if ('nativeTransfer' in interaction.event && interaction.event.nativeTransfer) {
+    if (
+      'nativeTransfer' in interaction.event &&
+      interaction.event.nativeTransfer &&
+      // NOTE: We already have native transfer from receipt, thus we ignore the one from trace
+      !sameAddress(interaction.event.params.from, from)
+    ) {
       const eventParams = interaction.event.params
       return [
         ...acc,
@@ -143,7 +149,7 @@ function getNativeTokenValueSent(nativeValueSent: string | undefined): string {
 export function getAssetsTransfers(interactions: Interaction[], value: string, from: string, to: string): Asset[] {
   const assets = getTokens(interactions)
   const ethValueSent = getNativeTokenValueSent(value)
-  const nativeTransfer = getNativeTokenValueEvents(interactions)
+  const nativeTransfer = getNativeTokenValueEvents(interactions, from)
 
   if (Number(ethValueSent)) {
     assets.push({
