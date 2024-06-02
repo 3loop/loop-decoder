@@ -62,7 +62,6 @@ export const mockedTransport = custom({
 
       // AAVE
       if (params[0] === '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2') {
-        console.log('storage slot', params)
         return Promise.resolve('0x00000000000000000000000005FAab9E1adbddaD0a08734BE8a52185Fd6558E14')
       }
       return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')

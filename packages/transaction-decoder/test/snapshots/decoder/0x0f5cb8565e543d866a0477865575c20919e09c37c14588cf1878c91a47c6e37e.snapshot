@@ -1,6 +1,4 @@
 {
-  "assetsReceived": [],
-  "assetsSent": [],
   "chainID": 1,
   "chainSymbol": "mainnet",
   "contractName": "Mock ERC20 Contract",
@@ -107,6 +105,7 @@
       "type": "function",
     },
   ],
+  "transfers": [],
   "txHash": "0x0f5cb8565e543d866a0477865575c20919e09c37c14588cf1878c91a47c6e37e",
   "txIndex": 37,
   "txType": "contract interaction",

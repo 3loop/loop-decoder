@@ -75,7 +75,7 @@ const NavigationBar = () => {
         </div>
 
         <div className="block lg:hidden">
-          <DropdownMenu >
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">Menu</Button>
             </DropdownMenuTrigger>

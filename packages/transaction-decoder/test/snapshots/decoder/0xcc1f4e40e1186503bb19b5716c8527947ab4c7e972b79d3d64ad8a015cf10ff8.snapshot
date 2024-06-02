@@ -1,14 +1,4 @@
 {
-  "assetsReceived": [
-    {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      "amount": "0.0016019694280262791",
-      "name": "Ethereum",
-      "symbol": "ETH",
-      "type": "native",
-    },
-  ],
-  "assetsSent": [],
   "chainID": 1,
   "chainSymbol": "mainnet",
   "contractName": "Mock ERC20 Contract",
@@ -337,6 +327,17 @@
       "signature": "innerHandleOp(bytes,((address,uint256,uint256,uint256,uint256,address,uint256,uint256),bytes32,uint256,uint256,uint256),bytes)",
       "to": "0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789",
       "type": "function",
+    },
+  ],
+  "transfers": [
+    {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "amount": "0.001601969428026279",
+      "from": "0x5ff137d4b0fdcd49dca30c7cf57e578a026d2789",
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "to": "0x65c51459258464020e850fba27b427bd708da638",
+      "type": "native",
     },
   ],
   "txHash": "0xcc1f4e40e1186503bb19b5716c8527947ab4c7e972b79d3d64ad8a015cf10ff8",
