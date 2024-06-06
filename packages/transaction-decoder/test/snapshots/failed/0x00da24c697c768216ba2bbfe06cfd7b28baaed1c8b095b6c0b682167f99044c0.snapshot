@@ -1,0 +1,41 @@
+{
+  "chainID": 1,
+  "chainSymbol": "mainnet",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "25539153492",
+  "errors": [
+    {
+      "error": "Reverted",
+      "message": null,
+    },
+  ],
+  "fromAddress": "0x4a7f29ef087930b88fedec1df7678bf8e6f875b1",
+  "gasPaid": "0.00090357525054696",
+  "gasUsed": "35380",
+  "interactedAddresses": [],
+  "interactions": [],
+  "methodCall": {
+    "arguments": [],
+    "name": "0x8a8c523c",
+  },
+  "nativeValueSent": "44444000000000000",
+  "reverted": true,
+  "timestamp": 1717675583,
+  "toAddress": "0xc2c3d2bd014da92aa3c562520a6c23fc474d990b",
+  "traceCalls": [],
+  "transfers": [
+    {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "amount": "0.044444",
+      "from": "0x4a7f29ef087930b88fedec1df7678bf8e6f875b1",
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "to": "0xc2c3d2bd014da92aa3c562520a6c23fc474d990b",
+      "type": "native",
+    },
+  ],
+  "txHash": "0x00da24c697c768216ba2bbfe06cfd7b28baaed1c8b095b6c0b682167f99044c0",
+  "txIndex": 14,
+  "txType": "contract interaction",
+}

@@ -4,6 +4,7 @@
   "contractName": "Mock ERC721 Contract",
   "contractType": "ERC721",
   "effectiveGasPrice": "2500000021",
+  "errors": null,
   "fromAddress": "0xdc75e8c3ae765d8947adbc6698a2403a6141d439",
   "gasPaid": "0.000219745001845858",
   "gasUsed": "87898",

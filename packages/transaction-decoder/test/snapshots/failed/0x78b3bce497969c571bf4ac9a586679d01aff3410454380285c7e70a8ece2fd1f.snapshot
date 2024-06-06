@@ -1,0 +1,84 @@
+{
+  "chainID": 1,
+  "chainSymbol": "mainnet",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "18216288587",
+  "errors": [
+    {
+      "error": "Reverted",
+      "message": "Slippage Limit Exceeded",
+    },
+  ],
+  "fromAddress": "0x26de224cbe06fd4321ce5747a176cbbd24773beb",
+  "gasPaid": "0.005569830614649707",
+  "gasUsed": "305761",
+  "interactedAddresses": [],
+  "interactions": [],
+  "methodCall": {
+    "arguments": [],
+    "name": "0x83bd37f9",
+  },
+  "nativeValueSent": "0",
+  "reverted": true,
+  "timestamp": 1717675571,
+  "toAddress": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+  "traceCalls": [
+    {
+      "from": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+      "name": "transferFrom",
+      "params": [
+        {
+          "name": "_from",
+          "type": "address",
+          "value": "0x26de224CBE06fd4321Ce5747a176CBBD24773BEb",
+        },
+        {
+          "name": "_to",
+          "type": "address",
+          "value": "0x6c2b607bF0A8edE629d58Ba5e05d0448fF7f890A",
+        },
+        {
+          "name": "_value",
+          "type": "uint256",
+          "value": "120590351223008",
+        },
+      ],
+      "signature": "transferFrom(address,address,uint256)",
+      "to": "0x1ae7e1d0ce06364ced9ad58225a1705b3e5db92b",
+      "type": "function",
+    },
+    {
+      "from": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "_owner",
+          "type": "address",
+          "value": "0xCf5540fFFCdC3d510B18bFcA6d2b9987b0772559",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0xc785698504a70be37d0e939a4c5326f8eddd5beb",
+      "type": "function",
+    },
+    {
+      "from": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "_owner",
+          "type": "address",
+          "value": "0xCf5540fFFCdC3d510B18bFcA6d2b9987b0772559",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0xc785698504a70be37d0e939a4c5326f8eddd5beb",
+      "type": "function",
+    },
+  ],
+  "transfers": [],
+  "txHash": "0x78b3bce497969c571bf4ac9a586679d01aff3410454380285c7e70a8ece2fd1f",
+  "txIndex": 72,
+  "txType": "contract interaction",
+}

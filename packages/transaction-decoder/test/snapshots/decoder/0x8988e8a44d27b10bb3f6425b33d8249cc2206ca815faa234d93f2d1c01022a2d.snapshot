@@ -4,6 +4,7 @@
   "contractName": "Mock ERC1155 Contract",
   "contractType": "ERC1155",
   "effectiveGasPrice": "1500000008",
+  "errors": null,
   "fromAddress": "0xbdddd277583dcae0b501046ba86714feea71b03f",
   "gasPaid": "0.00295564501576344",
   "gasUsed": "1970430",

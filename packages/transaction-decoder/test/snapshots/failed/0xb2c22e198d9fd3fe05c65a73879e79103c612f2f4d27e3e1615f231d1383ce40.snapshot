@@ -1,0 +1,51 @@
+{
+  "chainID": 1,
+  "chainSymbol": "mainnet",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "17179793817",
+  "errors": [
+    {
+      "error": "Reverted",
+      "message": "TransactionDeadlinePassed()",
+    },
+  ],
+  "fromAddress": "0x5554d2bddee2019885594802ba751942c8735b55",
+  "gasPaid": "0.000453941692026591",
+  "gasUsed": "26423",
+  "interactedAddresses": [],
+  "interactions": [],
+  "methodCall": {
+    "arguments": [
+      {
+        "name": "commands",
+        "type": "bytes",
+        "value": "0x08060c",
+      },
+      {
+        "name": "inputs",
+        "type": "bytes[]",
+        "value": [
+          "0x000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000d2c0ddc5b81a5882150c8710000000000000000000000000000000000000000000000000162414faa45b4ff00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002000000000000000000000000a0bbbe391b0d0957f1d013381b643041d2ca4022000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000000000000000000000000000000fee13a103a10d593b9ae06b3e05f2e7e1c0000000000000000000000000000000000000000000000000000000000000019",
+          "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000001615e968186d010",
+        ],
+      },
+      {
+        "name": "deadline",
+        "type": "uint256",
+        "value": "1717675379",
+      },
+    ],
+    "name": "execute",
+  },
+  "nativeValueSent": "0",
+  "reverted": true,
+  "timestamp": 1717675559,
+  "toAddress": "0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad",
+  "traceCalls": [],
+  "transfers": [],
+  "txHash": "0xb2c22e198d9fd3fe05c65a73879e79103c612f2f4d27e3e1615f231d1383ce40",
+  "txIndex": 194,
+  "txType": "contract interaction",
+}
