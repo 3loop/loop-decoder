@@ -11,7 +11,11 @@ export class DecodeError extends Data.TaggedError('DecodeError')<{ message: stri
 }
 
 export class MissingABIError extends Data.TaggedError('DecodeError')<{ message: string }> {
-  constructor(readonly address: string, readonly signature: string, readonly chainID: number) {
+  constructor(
+    readonly address: string,
+    readonly signature: string,
+    readonly chainID: number,
+  ) {
     super({ message: `Missing ABI for ${address} with signature ${signature} on chain ${chainID}` })
   }
 }
