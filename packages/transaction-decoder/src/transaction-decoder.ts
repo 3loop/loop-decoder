@@ -1,21 +1,20 @@
 import { Data, Effect, Either } from 'effect'
-import { isAddress, formatEther, Abi } from 'viem'
+import { isAddress, formatEther } from 'viem'
 import { type Hex, type Hash, type GetTransactionReturnType, type TransactionReceipt } from 'viem'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
-import * as AbiDecoder from './decoding/abi-decode.js'
 import * as LogDecoder from './decoding/log-decode.js'
 import * as TraceDecoder from './decoding/trace-decode.js'
+import * as CalldataDecode from './decoding/calldata-decode.js'
 import { transferDecode } from './decoding/transfer-decode.js'
 import type { DecodeResult, DecodedTx, Interaction } from './types.js'
 import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
 import { getAssetsTransfers } from './transformers/tokens.js'
-import { getProxyStorageSlot } from './decoding/proxies.js'
-import { getAndCacheAbi } from './abi-loader.js'
 import { getAndCacheContractMeta } from './contract-meta-loader.js'
 import traverse from 'traverse'
 import { chainIdToNetwork } from './helpers/networks.js'
 import { stringify } from './helpers/stringify.js'
+import { decodeErrorTrace } from './decoding/trace-decode.js'
 
 export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> {}
 export class InvalidArgumentError extends Data.TaggedError('InvalidArgumentError')<{ message: string }> {}
@@ -30,40 +29,6 @@ export class FetchTransactionError extends Data.TaggedError('FetchTransactionErr
     super({ message: `Failed to fetch transaction with hash ${data.hash} on chain ${data.chainID}` })
   }
 }
-
-const decodeMethod = ({ data, chainID, contractAddress }: { data: Hex; chainID: number; contractAddress: string }) =>
-  Effect.gen(function* () {
-    const signature = data.slice(0, 10)
-
-    if (isAddress(contractAddress)) {
-      //if contract is a proxy, get the implementation address
-      const implementation = yield* getProxyStorageSlot({ address: contractAddress, chainID })
-
-      if (implementation) {
-        contractAddress = implementation
-      }
-    }
-
-    const abi_ = yield* getAndCacheAbi({
-      address: contractAddress,
-      signature,
-      chainID,
-    })
-
-    if (!abi_) {
-      return yield* new AbiDecoder.MissingABIError(contractAddress, signature, chainID)
-    }
-
-    const abi = JSON.parse(abi_) as Abi
-
-    const decoded = yield* AbiDecoder.decodeMethod(data, abi)
-
-    if (decoded == null) {
-      return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${data}`)
-    }
-
-    return decoded
-  })
 
 export const decodeLogs = ({
   transaction,
@@ -92,7 +57,7 @@ const collectAllAddresses = ({
   decodedData,
 }: {
   interactions: Interaction[]
-  decodedData: DecodeResult
+  decodedData?: DecodeResult
 }) => {
   const addresses = new Set<string>()
   for (const interaction of interactions) {
@@ -104,7 +69,7 @@ const collectAllAddresses = ({
     })
   }
 
-  if (decodedData.params) {
+  if (decodedData?.params) {
     for (const param of decodedData.params) {
       if (typeof param.value === 'string' && isAddress(param.value)) {
         addresses.add(param.value)
@@ -139,11 +104,12 @@ export const decodeTransaction = ({
     const chainID = Number(transaction.chainId)
     const contractAddress = transaction.to
 
-    const { decodedData, decodedTrace, decodedLogs } = yield* Effect.all(
+    const { decodedData, decodedTrace, decodedLogs, decodedErrorTrace } = yield* Effect.all(
       {
-        decodedData: decodeMethod({ data, chainID, contractAddress }),
+        decodedData: Effect.either(CalldataDecode.decodeMethod({ data, chainID, contractAddress })),
         decodedTrace: decodeTrace({ trace, transaction }),
         decodedLogs: decodeLogs({ receipt, transaction }),
+        decodedErrorTrace: decodeErrorTrace({ trace }),
       },
       {
         batching: true,
@@ -153,16 +119,28 @@ export const decodeTransaction = ({
 
     const decodedLogsRight = decodedLogs.filter(Either.isRight).map((r) => r.right)
     const decodedTraceRight = decodedTrace.filter(Either.isRight).map((r) => r.right)
+    const decodedDataRight = Either.isRight(decodedData) ? decodedData.right : undefined
+    const decodedErrorTraceRight = decodedErrorTrace.filter(Either.isRight).map((r) => r.right)
 
     const logsErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
     if (logsErrors.length > 0) {
       yield* Effect.logError(`Logs decode errors: ${stringify(logsErrors)}`)
     }
 
+    if (Either.isLeft(decodedData)) {
+      yield* Effect.logError(`Data decode error: ${decodedData.left}`)
+    }
+
     const traceErrors = decodedTrace.filter(Either.isLeft).map((r) => r.left)
     if (traceErrors.length > 0) {
       yield* Effect.logError(`Trace decode errors: ${stringify(traceErrors)}`)
     }
+
+    const errorTraceErrors = decodedErrorTrace.filter(Either.isLeft).map((r) => r.left)
+    if (errorTraceErrors.length > 0) {
+      yield* Effect.logError(`ErrorTrace decode errors: ${stringify(errorTraceErrors)}`)
+    }
+
     const interpreterMap = yield* getAndCacheContractMeta({
       address: receipt.to!,
       chainID: Number(transaction.chainId),
@@ -183,8 +161,8 @@ export const decodeTransaction = ({
       contractName: interpreterMap?.contractName ?? null,
       contractType: interpreterMap?.type ?? 'OTHER',
       methodCall: {
-        name: decodedData?.name ?? 'unknown',
-        arguments: decodedData?.params ?? [],
+        name: decodedDataRight?.name ?? data.slice(0, 10),
+        arguments: decodedDataRight?.params ?? [],
       },
       traceCalls: decodedTraceRight,
       nativeValueSent: value,
@@ -199,7 +177,8 @@ export const decodeTransaction = ({
       reverted: receipt.status === 'reverted', // will return true if status==undefined
       transfers: getAssetsTransfers(interactions, value, receipt.from, receipt.to!),
       // NOTE: Explore how to set assets for more flexible tracking of the in and out addresses
-      interactedAddresses: collectAllAddresses({ interactions, decodedData }),
+      interactedAddresses: collectAllAddresses({ interactions, decodedData: decodedDataRight }),
+      errors: decodedErrorTraceRight.length > 0 ? decodedErrorTraceRight : null,
     }
 
     return decodedTx
@@ -254,5 +233,5 @@ export const decodeCalldata = ({
       )
     }
 
-    return yield* decodeMethod({ data, chainID: chainID ?? 0, contractAddress: contractAddress ?? '' })
+    return yield* CalldataDecode.decodeMethod({ data, chainID: chainID ?? 0, contractAddress: contractAddress ?? '' })
   })

@@ -42,7 +42,7 @@ const EthTraceResult = Schema.Struct({
 })
 
 const EthTraceBase = Schema.Struct({
-  result: Schema.optional(EthTraceResult),
+  result: Schema.NullOr(EthTraceResult),
   subtraces: Schema.Number,
   traceAddress: Schema.Array(Schema.Number),
   error: Schema.optional(Schema.String),
@@ -99,6 +99,8 @@ export const EthDebugTraceBase = Schema.Struct({
   type: DebugCallType,
   value: Schema.optional(Schema.String),
   output: Schema.String,
+  error: Schema.optional(Schema.String),
+  revertReason: Schema.optional(Schema.String),
 })
 
 type DebugTraceLog = Schema.Schema.Type<typeof EthDebugTraceBase>
