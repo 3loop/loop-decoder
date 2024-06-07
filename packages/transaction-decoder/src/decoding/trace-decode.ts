@@ -195,16 +195,12 @@ export function augmentTraceLogs(
 
 export const decodeErrorTrace = ({ trace }: { trace: TraceLog[] }) =>
   Effect.gen(function* () {
-    if (trace.length === 0) {
-      return []
-    }
-
-    const errorCalls = trace.filter((call) => call.error != null)
+    const errorCalls = trace?.filter((call) => call.error != null)
     if (errorCalls.length === 0) {
       return []
     }
 
-    //filter error calls with dublicate error and output field
+    //filter error trace calls with dublicate `error` and `output` field
     const uniqueErrorCalls = errorCalls.filter(
       (call, index, self) =>
         index ===
@@ -215,17 +211,24 @@ export const decodeErrorTrace = ({ trace }: { trace: TraceLog[] }) =>
 
     const getErrorObject = (call: TraceLog) =>
       Effect.gen(function* () {
-        const decodedOutput = call.result?.output ? yield* decodeTraceLogOutput(call) : null
+        if (call.result?.output == null) {
+          return {
+            error: call.error as string,
+            message: null,
+          }
+        }
+        const decodedOutput = yield* decodeTraceLogOutput(call)
         const value = decodedOutput?.params?.[0]?.value?.toString()
         let message: string | null = null
 
         if (decodedOutput?.name === 'Error') {
           //if it is standart error function, use function params as error reason
-          message = value ? value.toString() : null
+          message = value ?? null
         } else if (decodedOutput?.name === 'Panic') {
+          //if it is panic error, use panicReasons as error message
           message = value ? panicReasons[Number(value) as keyof typeof panicReasons] : null
         } else if (decodedOutput?.signature) {
-          //if it is custom error function, use signature as error reason
+          //if it is custom error function, use signature as error message
           message = decodedOutput.signature
         }
 
