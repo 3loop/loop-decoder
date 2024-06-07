@@ -1,0 +1,64 @@
+{
+  "chainID": 1,
+  "chainSymbol": "mainnet",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "14634156689",
+  "errors": [
+    {
+      "error": "Reverted",
+      "message": null,
+    },
+    {
+      "error": "out of gas",
+      "message": null,
+    },
+  ],
+  "fromAddress": "0x27d377547da6beee6ec254a6be22868b4a418708",
+  "gasPaid": "0.003837719786750116",
+  "gasUsed": "262244",
+  "interactedAddresses": [],
+  "interactions": [],
+  "methodCall": {
+    "arguments": [],
+    "name": "0x7cfb0a7e",
+  },
+  "nativeValueSent": "0",
+  "reverted": true,
+  "timestamp": 1712818187,
+  "toAddress": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
+  "traceCalls": [
+    {
+      "from": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "_owner",
+          "type": "address",
+          "value": "0x9c8648Bf415e4f49381C42757A4eEf1C566D6Ed8",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "type": "function",
+    },
+    {
+      "from": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "_owner",
+          "type": "address",
+          "value": "0x9c8648Bf415e4f49381C42757A4eEf1C566D6Ed8",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "type": "function",
+    },
+  ],
+  "transfers": [],
+  "txHash": "0x0ec3122d1113c7159d653c4637dbd6af2f4696dde00761229c7e21801e48046b",
+  "txIndex": 87,
+  "txType": "contract interaction",
+}

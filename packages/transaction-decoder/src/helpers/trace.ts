@@ -28,6 +28,7 @@ export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | u
           input: node.input,
           value: BigInt(node.value ?? '0x0'),
         },
+        ...(node.error != null && { error: node.error }),
       }
       break
     case 'CREATE':

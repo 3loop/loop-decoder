@@ -1,6 +1,7 @@
 import { Effect, Layer } from 'effect'
 import fs from 'node:fs'
 import { AbiStore } from '@/abi-loader.js'
+// import { FourByteStrategyResolver } from '@/effect.js'
 // import { EtherscanStrategyResolver } from '@/abi-strategy/index.js'
 
 export const MockedAbiStoreLive = Layer.succeed(
@@ -10,6 +11,7 @@ export const MockedAbiStoreLive = Layer.succeed(
       default: [
         // Run only when adding a new test case
         // EtherscanStrategyResolver()
+        // FourByteStrategyResolver(),
       ],
     },
     set: ({ address = {}, func = {}, event = {} }) =>

@@ -33,6 +33,29 @@ const NFTS_BLUR = [
   },
 ] as const
 
+export const FAILED_TRANSACTIONS = [
+  {
+    //standart error message
+    hash: '0x78b3bce497969c571bf4ac9a586679d01aff3410454380285c7e70a8ece2fd1f',
+    chainID: 1,
+  },
+  {
+    //without error message
+    hash: '0x00da24c697c768216ba2bbfe06cfd7b28baaed1c8b095b6c0b682167f99044c0',
+    chainID: 1,
+  },
+  {
+    //custom error message
+    hash: '0xb2c22e198d9fd3fe05c65a73879e79103c612f2f4d27e3e1615f231d1383ce40',
+    chainID: 1,
+  },
+  {
+    //out of gas
+    hash: '0x0ec3122d1113c7159d653c4637dbd6af2f4696dde00761229c7e21801e48046b',
+    chainID: 1,
+  },
+] as const
+
 const AA_TRANSACTIONS = [
   {
     hash: '0xcc1f4e40e1186503bb19b5716c8527947ab4c7e972b79d3d64ad8a015cf10ff8',
@@ -53,11 +76,6 @@ export const TEST_TRANSACTIONS: TXS = [
   },
   {
     hash: '0x7f040d831f20b530b42bb1ad1e1a8493e34f16b526fd324dc02e5ef5afad7c1e',
-    chainID: 5,
-  },
-  {
-    // NOTE: Failed transaction
-    hash: '0xae500d717f8b7b646b1e5e66b3f3674eeca3535a54e3212fad613cce31fd2e27',
     chainID: 5,
   },
   {
@@ -97,3 +115,5 @@ export const TEST_TRANSACTIONS: TXS = [
     chainID: 1,
   },
 ] as const
+
+export const CALLDATA_TRANSACTIONS: TXS = [...TEST_TRANSACTIONS.slice(-5)] as const

@@ -97,6 +97,11 @@ export interface EventParams {
   [key: string]: string | string[] | undefined | null | number | boolean
 }
 
+export interface DecodedError {
+  error: string
+  message: string | null
+}
+
 export interface DecodedTx {
   txHash: string
   txType: TxType
@@ -118,6 +123,7 @@ export interface DecodedTx {
   effectiveGasPrice: string | null
   transfers: Asset[]
   interactedAddresses: string[]
+  errors: DecodedError[] | null
 }
 
 export interface MethodCall {

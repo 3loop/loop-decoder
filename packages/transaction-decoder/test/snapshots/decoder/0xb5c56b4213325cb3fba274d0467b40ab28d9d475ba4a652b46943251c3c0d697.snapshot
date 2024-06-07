@@ -4,6 +4,7 @@
   "contractName": "Mock ERC20 Contract",
   "contractType": "ERC20",
   "effectiveGasPrice": "13538434193",
+  "errors": null,
   "fromAddress": "0x79e105407826df488c0e715372fc858b8fcf8ee3",
   "gasPaid": "0.01105859920186819",
   "gasUsed": "816830",
