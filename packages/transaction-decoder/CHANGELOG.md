@@ -1,5 +1,16 @@
 # @3loop/transaction-decoder
 
+## 0.9.0
+
+### Minor Changes
+
+- 91e8563: Remove assetsSent and assetsReceived in favor of all transfers
+- 126cd9b: Add errors array to the decoded transaction object
+
+### Patch Changes
+
+- e89aa70: Fix DAI transfer amount value
+
 ## 0.8.0
 
 ### Minor Changes
