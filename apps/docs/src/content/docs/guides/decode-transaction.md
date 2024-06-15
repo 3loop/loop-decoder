@@ -89,7 +89,7 @@ const getPublicClient = (chainId: number) => {
 
 ### ABI loader
 
-To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache. We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/abi-loaders/) reference.
+To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache. We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
 
 Create a cache for contract ABI:
 

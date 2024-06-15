@@ -9,6 +9,10 @@ A library to transform any EVM transaction into a human-readable format. It cons
 - [Transaction decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder)
 - Customizable transaction interpreter
 
+## Documentation
+
+[Head to the documentation](https://loop-decoder.3loop.io/) to read and learn more about the Loop Decoder, or check out our [playground](https://loop-decoder-web.vercel.app/) to see it in action.
+
 ## Why
 
 Transaction decoding is a crucial component of many dApps. Our goal is to create a library that can be integrated into any application without introducing any external infrastructure dependencies. This will allow developers to integrate decoding and interpretation into their stack without enforcing any data sources.
