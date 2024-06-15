@@ -160,7 +160,3 @@ export interface Asset {
   pair?: string // "RARE-WETH"
   tokenId?: string
 }
-export interface Interpreter {
-  id: string
-  schema: string
-}

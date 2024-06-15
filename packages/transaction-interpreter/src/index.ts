@@ -1,5 +1,5 @@
-import { stringify } from '../helpers/stringify.js'
-import { DecodedTx, Interpreter } from '@/types.js'
+import { stringify } from './helpers/stringify.js'
+import { DecodedTx } from '@3loop/transaction-decoder'
 import { Context, Effect } from 'effect'
 import {
   shouldInterruptAfterDeadline,
@@ -10,6 +10,7 @@ import {
   newQuickJSWASMModuleFromVariant,
   QuickJSContext,
 } from 'quickjs-emscripten'
+import { Interpreter } from './types.js'
 
 interface RuntimeConfig {
   timeout?: number
