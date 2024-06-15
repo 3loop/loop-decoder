@@ -18,11 +18,15 @@ export default defineConfig({
       },
       sidebar: [
         {
-          label: 'Getting Started',
+          label: 'Welcome',
           items: [
             {
-              label: 'Introduction',
-              link: '/getting-started',
+              label: 'Getting Started',
+              link: 'welcome/getting-started',
+            },
+            {
+              label: 'Overview',
+              link: 'welcome/overview',
             },
           ],
         },
