@@ -61,9 +61,9 @@ export const supportedChains = [
     rpcUrl: (process.env.MAINNET_RPC_URL as string) ?? 'https://rpc.ankr.com/eth',
   },
   {
-    name: 'Goerli Testnet',
-    chainID: 5,
-    rpcUrl: (process.env.GOERLI_RPC_URL as string) ?? 'https://rpc.ankr.com/eth_goerli',
+    name: 'Sepolia Testnet',
+    chainID: 11155111,
+    rpcUrl: (process.env.SEPOLIA_RPC_URL as string) ?? 'https://rpc.ankr.com/eth_sepolia',
   },
   {
     name: 'Base mainnet',
@@ -71,6 +71,24 @@ export const supportedChains = [
     rpcUrl: process.env.BASE_RPC_URL as string,
     supportTraceAPI: false,
     batchMaxCount: 1,
+  },
+  {
+    name: 'Polygon Mainnet',
+    chainID: 137,
+    rpcUrl: (process.env.POLYGON_RPC_URL as string) ?? 'https://rpc.ankr.com/polygon',
+    suppurtTraceAPI: true,
+  },
+  {
+    name: 'Optimism Mainnet',
+    chainID: 10,
+    rpcUrl: process.env.OPTIMISM_RPC_URL as string,
+    supportTraceAPI: false,
+  },
+  {
+    name: 'Arbitrum One',
+    chainID: 42161,
+    rpcUrl: process.env.ARBITRUM_RPC_URL as string,
+    supportTraceAPI: false,
   },
   {
     name: 'Manta pacific',

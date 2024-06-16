@@ -16,10 +16,10 @@ import { PublicClient, PublicClientObject } from '@3loop/transaction-decoder'
 import { Effect } from 'effect'
 
 const getPublicClient = (chainID: number): Effect.Effect<PublicClientObject, UnknownNetwork> => {
-  if (chainID === 5) {
+  if (chainID === 1) {
     return Effect.succeed({
       client: createPublicClient({
-        transport: http(GOERLI_RPC),
+        transport: http(ETHEREUM_RPC),
       }),
     })
   }
@@ -107,8 +107,8 @@ const MainLayer = Layer.provideMerge(PublicClientLive, LoadersLayer)
 
 ```ts
 const program = Effect.gen(function* () {
-  const hash = '0xab701677e5003fa029164554b81e01bede20b97eda0e2595acda81acf5628f75'
-  const chainID = 5
+  const hash = '0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7'
+  const chainID = 1
 
   return yield* decodeTransactionByHash(hash, chainID)
 })
