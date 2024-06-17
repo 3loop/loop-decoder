@@ -91,7 +91,7 @@ LoopDecoder instances provide a public method, `decodeTransaction`, which fetche
 
 ```ts
 const result = await decoded.decodeTransaction({
-  chainID: 5,
+  chainID: 1,
   hash: '0x...',
 })
 ```
