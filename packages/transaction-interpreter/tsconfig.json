@@ -4,5 +4,5 @@
     "types": ["node"],
     "declaration": true
   },
-  "include": ["src/**/*", "test/**/*", "interpreters/**/*", "scripts/**/*"]
+  "include": ["src/**/*", "test/**/*", "interpreters/**/*", "scripts/**/*", "tsup.config.ts"]
 }

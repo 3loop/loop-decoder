@@ -5,7 +5,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import chalk from 'chalk'
 import { parse } from '@babel/parser'
-import traverse, { NodePath } from '@babel/traverse'
+import traverse from '@babel/traverse'
 import * as t from '@babel/types'
 import generate from '@babel/generator'
 import * as esbuild from 'esbuild'
@@ -16,25 +16,23 @@ function log(message: string) {
 
 // Folder names
 const SOURCE_FOLDER_NAME = 'interpreters'
-const DESTINATION_FOLDER_NAME = 'build'
+const OUTPUT_FILE_NAME = 'src/interpreters.ts'
 
-function getInterpretationName(p: path.ParsedPath) {
+function getInterpreterName(p: path.ParsedPath) {
   return `${p.dir}/${p.name}`.replace(/^interpreters\//, '')
 }
 
-interface Interpretation {
+interface Interpreter {
   name: string
   output: string
   contracts: string[]
 }
 
-/**
- * Generate index file with the mapping of the interpretations
- */
-async function generateIndex(outdir: string, interpretations: Interpretation[]) {
-  await fs.mkdir(outdir, { recursive: true })
+async function generateMappings(interpreters: Interpreter[]) {
+  const filepath = `${SOURCE_FOLDER_NAME}/index.ts`
+  const template = await fs.readFile(filepath, 'utf-8')
 
-  const contractToName = interpretations.reduce(
+  const contractToName = interpreters.reduce(
     (acc, { name, contracts }) => {
       contracts.forEach((contract) => {
         acc[contract] = name
@@ -44,42 +42,25 @@ async function generateIndex(outdir: string, interpretations: Interpretation[]) 
     {} as Record<string, string>,
   )
 
-  const nameToCode = interpretations.reduce(
+  const nameToCode = interpreters.reduce(
     (acc, { name, output }) => {
-      acc[name] = output
+      acc[name] = output.replaceAll('export ', '')
       return acc
     },
     {} as Record<string, string>,
   )
 
-  const indexContent = `var n=${JSON.stringify(contractToName)},m=${JSON.stringify(nameToCode)};
- function getInterpretorForContract({ address, chain }) {
-    const contract = chain + ':' + address;
-    const id = n[contract];
-    if (!id) {
-      return undefined;
-    }
+  const contractMap = JSON.stringify(contractToName).slice(1, -1)
+  const interpreterMap = JSON.stringify(nameToCode).slice(1, -1)
 
-    return m[id];
-  };
-  export{ getInterpretorForContract };`
+  const content = template
+    .replace('/**PLACE_CONTRACT_MAPPING**/', contractMap)
+    .replace('/**PLACE_INTEPRETATIONS**/', interpreterMap)
 
-  Promise.all([
-    // index.js
-    await fs.writeFile(path.join(outdir, 'index.js'), indexContent),
-    // index.d.ts
-    fs.writeFile(
-      path.join(outdir, 'index.d.ts'),
-      `declare const interpretations: Record<string, string>
-declare const contractToName: Record<string, string>
-declare function getInterpretorForContract({ address, chain }: { address: string, chain: string }): string | undefined
-export { getInterpretorForContract }
-  `,
-    ),
-  ])
+  await fs.writeFile(OUTPUT_FILE_NAME, content)
 }
 
-async function processInterpretation(file: string, isDev?: boolean) {
+async function processInterpreter(file: string, isDev?: boolean) {
   let contracts: string[] = []
 
   const tsCode = await fs.readFile(file, 'utf-8')
@@ -112,7 +93,7 @@ async function processInterpretation(file: string, isDev?: boolean) {
 
   const output = generate(ast).code
 
-  const name = getInterpretationName(path.parse(file))
+  const name = getInterpreterName(path.parse(file))
 
   return {
     contracts,
@@ -126,20 +107,20 @@ async function processInterpretation(file: string, isDev?: boolean) {
  * @param specs Array of filepaths
  */
 async function processFiles(files: string[], isDev?: boolean) {
-  const fileName = files.length === 1 ? files[0] : `${files.length} interpretations`
+  const fileName = files.length === 1 ? files[0] : `${files.length} interpreters`
 
-  const transfoms = files.map((file) => processInterpretation(file, isDev))
+  const transfoms = files.map((file) => processInterpreter(file, isDev))
 
-  const interpretations = await Promise.all(transfoms)
+  const interpreters = await Promise.all(transfoms)
 
-  await generateIndex(DESTINATION_FOLDER_NAME, interpretations)
+  await generateMappings(interpreters)
 
   log(`Built ${fileName}`)
 }
 
 export async function runCompiler({ watch }: { watch: boolean }) {
   const SOURCE_FILE_GLOB = `${SOURCE_FOLDER_NAME}/**/*.ts`
-  const files = await glob(SOURCE_FILE_GLOB)
+  const files = (await glob(SOURCE_FILE_GLOB)).filter((file) => !file.includes('index.ts'))
 
   await processFiles(files, undefined)
 
@@ -153,7 +134,7 @@ export async function runCompiler({ watch }: { watch: boolean }) {
 }
 
 const program = new Command('build')
-  .description('build all the interpretations in the current directory')
+  .description('build all the interpreters in the current directory')
   .option('-w, --watch', 'Watch files and re-compile on change')
   .action(runCompiler)
 

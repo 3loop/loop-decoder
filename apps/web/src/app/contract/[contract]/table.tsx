@@ -1,9 +1,10 @@
 'use client'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import React from 'react'
-import { DecodedTx, Interpreter } from '@3loop/transaction-decoder'
+import { DecodedTx } from '@3loop/transaction-decoder'
 import { findAndRunInterpreter, Interpretation } from '@/lib/interpreter'
 import { defaultInterpreters } from '@/lib/default-interpreters'
+import { Interpreter } from '@3loop/transaction-interpreter'
 
 function getAvaliableinterpreters() {
   if (typeof window === 'undefined') return undefined

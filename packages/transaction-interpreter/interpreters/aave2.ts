@@ -41,7 +41,4 @@ export function transformEvent(event: DecodedTx) {
   return newEvent
 }
 
-export const contracts = [
-  '1:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9',
-  '2:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9',
-]
+export const contracts = ['1:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9']
