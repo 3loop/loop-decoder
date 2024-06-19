@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.10.0
+
+### Minor Changes
+
+- 0589145: The initial release of the transaction interpreter with QuickJS.
+
 ## 0.9.0
 
 ### Minor Changes
