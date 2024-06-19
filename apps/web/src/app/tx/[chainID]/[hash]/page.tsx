@@ -14,7 +14,7 @@ export default async function TransactionPage({ params }: { params: { hash: stri
     return <DecodingForm currentHash={params.hash} currentChainID={params.chainID} />
   }
 
-  const interpreter = await findInterpreter({
+  const interpreter = findInterpreter({
     decodedTx: decoded,
     interpreters: defaultInterpreters,
   })

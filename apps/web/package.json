@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@3loop/transaction-decoder": "workspace:*",
+    "@3loop/transaction-interpreter": "workspace:*",
     "@jitl/quickjs-singlefile-browser-release-sync": "^0.29.1",
     "@monaco-editor/react": "^4.6.0",
     "@prisma/client": "^5.2.0",

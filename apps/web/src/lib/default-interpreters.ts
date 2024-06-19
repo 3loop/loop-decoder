@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Interpreter } from '@3loop/transaction-decoder'
+import { Interpreter } from '@3loop/transaction-interpreter'
 
 const helpers = `
 function assetsSent(transfers, fromAddress) {

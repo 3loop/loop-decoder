@@ -1,17 +1,19 @@
-import { Interpreter, interpretTx, DecodedTx, initQuickJSVM, QuickJSVM } from '@3loop/transaction-decoder'
+import type { DecodedTx } from '@3loop/transaction-decoder'
+import {
+  Interpreter,
+  QuickjsInterpreterLive,
+  QuickjsConfig,
+  TransactionInterpreter,
+} from '@3loop/transaction-interpreter'
 import { Effect, Layer } from 'effect'
 import variant from '@jitl/quickjs-singlefile-browser-release-sync'
 
-const layer = Layer.effect(
-  QuickJSVM,
-  Effect.tryPromise(async () => ({
-    _tag: 'QuickJSVM' as const,
-    runtime: await initQuickJSVM({
-      variant: variant,
-      runtimeConfig: { timeout: 1000 },
-    }),
-  })),
-)
+const config = Layer.succeed(QuickjsConfig, {
+  variant: variant,
+  runtimeConfig: { timeout: 1000 },
+})
+
+const layer = Layer.provide(QuickjsInterpreterLive, config)
 
 export interface Interpretation {
   tx: DecodedTx
@@ -20,15 +22,23 @@ export interface Interpretation {
 }
 
 export const emptyInterpreter: Interpreter = {
-  id: 'default',
   schema: `function transformEvent(event){
     return event;
 };
 `,
+  id: 'empty',
 }
 
 export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
-  const runnable = Effect.provide(interpretTx({ decodedTx, interpreter }), layer)
+  const runnable = Effect.scoped(
+    Effect.gen(function* () {
+      const interpreterService = yield* TransactionInterpreter
+
+      const interpretation = yield* interpreterService.interpretTx(decodedTx, interpreter)
+
+      return interpretation
+    }).pipe(Effect.provide(layer)),
+  )
 
   return Effect.runPromise(runnable)
     .then((interpretation) => {

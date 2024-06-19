@@ -1,7 +1,6 @@
 export * from './abi-loader.js'
 export * from './abi-strategy/index.js'
 export * from './contract-meta-loader.js'
-export * from './interpreters/index.js'
 export * from './meta-strategy/index.js'
 export * from './public-client.js'
 export * from './transaction-decoder.js'
