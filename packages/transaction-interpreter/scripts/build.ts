@@ -5,10 +5,14 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import chalk from 'chalk'
 import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
+import _traverse from '@babel/traverse'
 import * as t from '@babel/types'
-import generate from '@babel/generator'
+import _generator from '@babel/generator'
 import * as esbuild from 'esbuild'
+
+// See https://github.com/babel/babel/issues/13855
+const traverse = (_traverse as any).default
+const generate = (_generator as any).default
 
 function log(message: string) {
   console.log(chalk.blue(message))

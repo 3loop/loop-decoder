@@ -58,13 +58,13 @@ return Effect.runPromise(runnable)
 
 All interpreters are stored in the `interpreters` directory. Each interpreter must export a function `transformEvent` and an array `contracts` that contains the concatenated chainid and contract address (`${chainId}:${address}`).
 
-We use `bun` to run the script which compiles all interpreters into a format that can be consumed by the loop interpreter.
+Before using the library, we need compiles all interpreters into a format that can be consumed by the loop interpreter.
 
 ```bash
 pnpm run build:intepreters
 ```
 
-Then you can compile the library with
+You can compile the library with the following command:
 
 ```bash
 pnpm run build

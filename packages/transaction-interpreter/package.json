@@ -29,8 +29,8 @@
     "README.md"
   ],
   "scripts": {
-    "build:interpreters": "bun ./scripts/index.ts build",
-    "build": "rm -rf dist && tsup",
+    "build:interpreters": "tsx ./scripts/index.ts build",
+    "build": "rm -rf dist && pnpm build:interpreters && tsup",
     "check": "tsc --noEmit",
     "dev": "tsup --watch",
     "lint": "eslint --exit-on-fatal-error --ignore-path .eslintignore --ext .ts .",
@@ -68,6 +68,7 @@
     "quickjs-emscripten": "^0.29.1",
     "tsconfig": "workspace:*",
     "tsup": "^7.2.0",
+    "tsx": "^4.15.6",
     "typescript": "5.1.3"
   },
   "publishConfig": {
