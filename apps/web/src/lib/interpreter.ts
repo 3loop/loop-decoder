@@ -30,15 +30,13 @@ export const emptyInterpreter: Interpreter = {
 }
 
 export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
-  const runnable = Effect.scoped(
-    Effect.gen(function* () {
-      const interpreterService = yield* TransactionInterpreter
+  const runnable = Effect.gen(function* () {
+    const interpreterService = yield* TransactionInterpreter
 
-      const interpretation = yield* interpreterService.interpretTx(decodedTx, interpreter)
+    const interpretation = yield* interpreterService.interpretTx(decodedTx, interpreter)
 
-      return interpretation
-    }).pipe(Effect.provide(layer)),
-  )
+    return interpretation
+  }).pipe(Effect.provide(layer))
 
   return Effect.runPromise(runnable)
     .then((interpretation) => {
