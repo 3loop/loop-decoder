@@ -42,4 +42,4 @@ export const make = Effect.gen(function* () {
   }
 })
 
-export const QuickjsInterpreterLive = Layer.effect(TransactionInterpreter, make)
+export const QuickjsInterpreterLive = Layer.scoped(TransactionInterpreter, make)
