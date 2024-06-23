@@ -40,8 +40,12 @@ async function fetchContractABI({ address, chainID }: RequestModel.GetContractAB
 
 export const SourcifyStrategyResolver = () =>
   RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
-    Effect.tryPromise({
-      try: () => fetchContractABI(req),
-      catch: () => new RequestModel.ResolveStrategyABIError('sourcify', req.address, req.chainID),
-    }),
+    Effect.withSpan(
+      Effect.tryPromise({
+        try: () => fetchContractABI(req),
+        catch: () => new RequestModel.ResolveStrategyABIError('sourcify', req.address, req.chainID),
+      }),
+      'AbiStrategy.SourcifyStrategyResolver',
+      { attributes: { chainID: req.chainID, address: req.address } },
+    ),
   )

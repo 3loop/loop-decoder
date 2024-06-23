@@ -148,5 +148,9 @@ export const getAndCacheContractMeta = ({
   readonly chainID: number
   readonly address: Address
 }) => {
-  return Effect.request(ContractMetaLoader({ chainID, address }), ContractMetaLoaderRequestResolver)
+  return Effect.withSpan(
+    Effect.request(ContractMetaLoader({ chainID, address }), ContractMetaLoaderRequestResolver),
+    'GetAndCacheContractMeta',
+    { attributes: { chainID, address } },
+  )
 }

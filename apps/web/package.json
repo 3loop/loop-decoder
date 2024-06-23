@@ -30,7 +30,7 @@
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "effect": "^3.0.5",
+    "effect": "^3.4.0",
     "eslint": "^8.47.0",
     "eslint-config-next": "13.4.19",
     "jsonata": "^2.0.3",

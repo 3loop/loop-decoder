@@ -50,7 +50,7 @@ export const ERC20RPCStrategyResolver = (publicClientLive: PublicClient) =>
       }
 
       return meta
-    }),
+    }).pipe(Effect.withSpan('MetaStrategy.ERC20RPCStrategyResolver', { attributes: { chainID, address } })),
   ).pipe(
     RequestResolver.contextFromServices(PublicClient),
     Effect.provideService(PublicClient, publicClientLive),

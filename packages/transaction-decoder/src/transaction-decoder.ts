@@ -37,20 +37,28 @@ export const decodeLogs = ({
   transaction: GetTransactionReturnType
   receipt: TransactionReceipt
 }) =>
-  Effect.gen(function* () {
-    return yield* LogDecoder.decodeLogs({
-      logs: receipt.logs,
-      transaction,
-    })
-  })
+  LogDecoder.decodeLogs({
+    logs: receipt.logs,
+    transaction,
+  }).pipe(
+    Effect.withSpan('TransactionDecoder.decodeLogs', {
+      attributes: {
+        logsCount: receipt.logs.length,
+      },
+    }),
+  )
 
 export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transaction: GetTransactionReturnType }) =>
-  Effect.gen(function* () {
-    return yield* TraceDecoder.decodeTransactionTrace({
-      trace,
-      transaction,
-    })
-  })
+  TraceDecoder.decodeTransactionTrace({
+    trace,
+    transaction,
+  }).pipe(
+    Effect.withSpan('TransactionDecoder.decodeTrace', {
+      attributes: {
+        traceCount: trace.length,
+      },
+    }),
+  )
 
 const collectAllAddresses = ({
   interactions,
@@ -182,7 +190,14 @@ export const decodeTransaction = ({
     }
 
     return decodedTx
-  })
+  }).pipe(
+    Effect.withSpan('TransactionDecoder.decodeTransaction', {
+      attributes: {
+        chainID: Number(transaction.chainId),
+        txHash: transaction.hash,
+      },
+    }),
+  )
 
 export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
   Effect.gen(function* () {
@@ -215,7 +230,14 @@ export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
       trace,
       timestamp: Number(timestamp),
     })
-  })
+  }).pipe(
+    Effect.withSpan('TransactionDecoder.decodeTransactionByHash', {
+      attributes: {
+        chainID,
+        txHash: hash,
+      },
+    }),
+  )
 
 export const decodeCalldata = ({
   data,
