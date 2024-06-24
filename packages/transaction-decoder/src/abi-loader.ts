@@ -1,6 +1,7 @@
 import { Context, Effect, Either, RequestResolver, Request, Array, pipe } from 'effect'
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/request-model.js'
 
+const STRATEGY_TIMEOUT = 5000
 export interface GetAbiParams {
   chainID: number
   address: string
@@ -8,11 +9,27 @@ export interface GetAbiParams {
   signature?: string | undefined
 }
 
-type ChainOrDefault = number | 'default'
+export interface ContractAbiSuccess {
+  status: 'success'
+  result: ContractABI
+}
 
-export interface AbiStore<Key = GetAbiParams, SetValue = ContractABI, Value = string | null> {
+export interface ContractAbiNotFound {
+  status: 'not-found'
+  result: null
+}
+
+export interface ContractAbiEmpty {
+  status: 'empty'
+  result: null
+}
+
+export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | ContractAbiEmpty
+
+type ChainOrDefault = number | 'default'
+export interface AbiStore<Key = GetAbiParams, Value = ContractAbiResult> {
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
-  readonly set: (value: SetValue) => Effect.Effect<void, never>
+  readonly set: (value: Value) => Effect.Effect<void, never>
   readonly get: (arg: Key) => Effect.Effect<Value, never>
   readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value>, never>
 }
@@ -50,36 +67,20 @@ const getMany = (requests: Array<GetAbiParams>) =>
     }
   })
 
-const setOnValue = (abi: ContractABI | null) =>
+const setValue = (abi: ContractABI | null) =>
   Effect.gen(function* () {
     const { set } = yield* AbiStore
-    // NOTE: Now we ignore the null value, but we might want to store it to avoid pinging the same strategy again?
-    if (abi) yield* set(abi)
+    yield* set(abi == null ? { status: 'not-found', result: null } : { status: 'success', result: abi })
   })
 
-const getBestMatch = (abi: ContractABI | null, request: AbiLoader) => {
+const getBestMatch = (abi: ContractABI | null) => {
   if (abi == null) return null
 
-  const { address, event, signature } = request
-
-  let result: string | null = null
-
-  const addressmatch = abi.address?.[address]
-  if (addressmatch != null) {
-    result = addressmatch
+  if (abi.type === 'address') {
+    return abi.abi
   }
 
-  const funcmatch = signature ? abi.func?.[signature] : null
-  if (result == null && funcmatch != null) {
-    result = `[${funcmatch}]`
-  }
-
-  const eventmatch = event ? abi.event?.[event] : null
-  if (result == null && eventmatch != null) {
-    result = `[${eventmatch}]`
-  }
-
-  return result
+  return `[${abi.abi}]`
 }
 
 /**
@@ -133,7 +134,9 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
       getMany(uniqueRequests),
       Effect.map(
         Array.partitionMap((resp, i) => {
-          return resp == null ? Either.left(uniqueRequests[i]) : Either.right([uniqueRequests[i], resp] as const)
+          return resp.status === 'empty'
+            ? Either.left(uniqueRequests[i])
+            : Either.right([uniqueRequests[i], resp.result] as const)
         }),
       ),
       Effect.orElseSucceed(() => [uniqueRequests, []] as const),
@@ -144,7 +147,8 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
       results,
       ([request, result]) => {
         const group = groups[makeKey(request)]
-        return Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true })
+        const abi = result?.abi ?? null
+        return Effect.forEach(group, (req) => Request.succeed(req, abi), { discard: true })
       },
       {
         discard: true,
@@ -162,7 +166,9 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
 
       const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
+      // TODO: Distinct the errors and missing data, so we can retry on errors
       return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
+        Effect.timeout(STRATEGY_TIMEOUT),
         Effect.orElseSucceed(() => null),
       )
     })
@@ -172,12 +178,12 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
       strategyResults,
       (abi, i) => {
         const request = remaining[i]
-        const result = getBestMatch(abi, request)
+        const result = getBestMatch(abi)
 
         const group = groups[makeKey(request)]
 
         return Effect.zipRight(
-          setOnValue(abi),
+          setValue(abi),
           Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
         )
       },
@@ -186,11 +192,12 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
   }),
 ).pipe(RequestResolver.contextFromServices(AbiStore), Effect.withRequestCaching(true))
 
+// TODO: When failing to decode with one ABI, we should retry with other resolved ABIs
 export const getAndCacheAbi = (params: GetAbiParams) => {
   if (params.event === '0x' || params.signature === '0x') {
     return Effect.succeed(null)
   }
-  return Effect.withSpan(Effect.request(AbiLoader(params), AbiLoaderRequestResolver), 'GetAndCacheAbi', {
+  return Effect.withSpan(Effect.request(AbiLoader(params), AbiLoaderRequestResolver), 'AbiLoader.GetAndCacheAbi', {
     attributes: {
       chainID: params.chainID,
       address: params.address,

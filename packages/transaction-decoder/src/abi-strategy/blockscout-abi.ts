@@ -4,7 +4,7 @@ import * as RequestModel from './request-model.js'
 async function fetchContractABI(
   { address, chainID }: RequestModel.GetContractABIStrategy,
   config: { apikey?: string; endpoint: string },
-) {
+): Promise<RequestModel.ContractABI> {
   const endpoint = config.endpoint
 
   const params: Record<string, string> = {
@@ -24,9 +24,10 @@ async function fetchContractABI(
 
   if (json.status === '1') {
     return {
-      address: {
-        [address]: json.result,
-      },
+      chainID,
+      address,
+      abi: json.result,
+      type: 'address',
     }
   }
 

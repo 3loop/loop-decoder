@@ -32,21 +32,25 @@ async function fetchABI({
       const json = (await full_match.json()) as FourBytesResponse
 
       return {
-        func: {
-          [signature]: parseFunctionSignature(json.results[0]?.text_signature),
-        },
+        type: 'func',
+        address,
+        chainID,
+        abi: parseFunctionSignature(json.results[0]?.text_signature),
+        signature,
       }
     }
   }
 
   if (event != null) {
-    const partial_match = await fetch(`${endpoint}/event-signatures/?hex_signature=${signature}`)
+    const partial_match = await fetch(`${endpoint}/event-signatures/?hex_signature=${event}`)
     if (partial_match.status === 200) {
       const json = (await partial_match.json()) as FourBytesResponse
       return {
-        event: {
-          [event]: parseEventSignature(json.results[0]?.text_signature),
-        },
+        type: 'event',
+        address,
+        chainID,
+        abi: parseEventSignature(json.results[0]?.text_signature),
+        event,
       }
     }
   }

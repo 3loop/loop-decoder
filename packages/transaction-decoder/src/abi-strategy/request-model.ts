@@ -16,13 +16,32 @@ export class ResolveStrategyABIError {
   ) {}
 }
 
-//NOTE: we store address as key to be able to know adddress to abi mapping for caching
-export interface ContractABI {
-  address?: Record<string, string>
-  func?: Record<string, string>
-  event?: Record<string, string>
+interface FunctionFragmentABI {
+  type: 'func'
+  abi: string
+  address: string
+  chainID: number
+  signature: string
 }
 
+interface EventFragmentABI {
+  type: 'event'
+  abi: string
+  address: string
+  chainID: number
+  event: string
+}
+
+interface AddressABI {
+  type: 'address'
+  abi: string
+  address: string
+  chainID: number
+}
+
+export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI
+
+// NOTE: We might want to return a list of ABIs, this might be helpful when fetching for signature
 export interface GetContractABIStrategy extends Request.Request<ContractABI, ResolveStrategyABIError>, FetchABIParams {
   readonly _tag: 'GetContractABIStrategy'
 }

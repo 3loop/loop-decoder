@@ -1,4 +1,4 @@
-import { Effect, RequestResolver, pipe } from 'effect'
+import { Effect, RequestResolver } from 'effect'
 import * as RequestModel from './request-model.js'
 
 const endpoints: { [k: number]: string } = {
@@ -50,7 +50,7 @@ const endpoints: { [k: number]: string } = {
 async function fetchContractABI(
   { address, chainID }: RequestModel.GetContractABIStrategy,
   config?: { apikey?: string; endpoint?: string },
-) {
+): Promise<RequestModel.ContractABI> {
   const endpoint = config?.endpoint ?? endpoints[chainID]
 
   const params: Record<string, string> = {
@@ -70,9 +70,10 @@ async function fetchContractABI(
 
   if (json.status === '1') {
     return {
-      address: {
-        [address]: json.result,
-      },
+      type: 'address',
+      address,
+      chainID,
+      abi: json.result,
     }
   }
 

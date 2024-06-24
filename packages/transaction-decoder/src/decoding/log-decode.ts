@@ -41,8 +41,8 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
           data: logItem.data,
           strict: false,
         }),
-      catch: () => {
-        Effect.logWarning(`Could not decode log ${abiAddress} ${stringify(logItem)}`)
+      catch: (err) => {
+        console.error(`Could not decode log ${abiAddress} ${stringify(logItem)}`, err)
       },
     })
 

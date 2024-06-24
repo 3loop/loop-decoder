@@ -10,7 +10,10 @@ interface SourcifyResponse {
 
 const endpoint = 'https://repo.sourcify.dev/contracts/'
 
-async function fetchContractABI({ address, chainID }: RequestModel.GetContractABIStrategy) {
+async function fetchContractABI({
+  address,
+  chainID,
+}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI> {
   const normalisedAddress = getAddress(address)
 
   const full_match = await fetch(`${endpoint}/full_match/${chainID}/${normalisedAddress}/metadata.json`)
@@ -19,9 +22,10 @@ async function fetchContractABI({ address, chainID }: RequestModel.GetContractAB
     const json = (await full_match.json()) as SourcifyResponse
 
     return {
-      address: {
-        [address]: JSON.stringify(json.output.abi),
-      },
+      type: 'address',
+      address,
+      chainID,
+      abi: JSON.stringify(json.output.abi),
     }
   }
 
@@ -29,9 +33,10 @@ async function fetchContractABI({ address, chainID }: RequestModel.GetContractAB
   if (partial_match.status === 200) {
     const json = (await partial_match.json()) as SourcifyResponse
     return {
-      address: {
-        [address]: JSON.stringify(json.output.abi),
-      },
+      type: 'address',
+      address,
+      chainID,
+      abi: JSON.stringify(json.output.abi),
     }
   }
 

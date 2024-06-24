@@ -3,19 +3,49 @@ import { ContractData } from './types.js'
 import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'
 
+const STRATEGY_TIMEOUT = 5000
+
 export interface ContractMetaParams {
   address: string
   chainID: number
 }
 
+interface ContractMetaSuccess {
+  status: 'success'
+  result: ContractData
+}
+
+interface ContractMetaNotFound {
+  status: 'not-found'
+  result: null
+}
+
+interface ContractMetaEmpty {
+  status: 'empty'
+  result: null
+}
+
+export type ContractMetaResult = ContractMetaSuccess | ContractMetaNotFound | ContractMetaEmpty
+
 type ChainOrDefault = number | 'default'
 
-// NOTE: Maybe we can avoid passing RPCProvider and let the user provide it?
-export interface ContractMetaStore<Key = ContractMetaParams, Value = ContractData> {
+export interface ContractMetaStore<Key = ContractMetaParams, Value = ContractMetaResult> {
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractMetaStrategy>[]>
   readonly set: (arg: Key, value: Value) => Effect.Effect<void, never>
-  readonly get: (arg: Key) => Effect.Effect<Value | null, never>
-  readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value | null>, never>
+  /**
+   * The `get` function might return 3 states:
+   * 1. `ContractMetaSuccess` - The contract metadata is found in the store
+   * 2. `ContractMetaNotFound` - The contract metadata is found in the store, but is missing value
+   * 3. `ContractMetaEmpty` - The contract metadata is not found in the store
+   *
+   *  We have state 2 to be able to skip the meta strategy in case we know that it's not available
+   *  this can significantly reduce the number of requests to the strategies, and improve performance.
+   *
+   * Some strategies might be able to add the data later, because of that we encurage to store a timestamp
+   * and remove the NotFound state to be able to check again.
+   */
+  readonly get: (arg: Key) => Effect.Effect<Value, never>
+  readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value>, never>
 }
 
 export const ContractMetaStore = Context.GenericTag<ContractMetaStore>('@3loop-decoder/ContractMetaStore')
@@ -49,10 +79,13 @@ const getMany = (requests: Array<ContractMetaLoader>) =>
     }
   })
 
-const setOnValue = ({ chainID, address }: ContractMetaLoader, result: ContractData | null) =>
+const setValue = ({ chainID, address }: ContractMetaLoader, result: ContractData | null) =>
   Effect.gen(function* () {
     const { set } = yield* ContractMetaStore
-    if (result) yield* set({ chainID, address }, result)
+    yield* set(
+      { chainID, address },
+      result == null ? { status: 'not-found', result: null } : { status: 'success', result },
+    )
   })
 
 /**
@@ -93,7 +126,9 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
       getMany(uniqueRequests),
       Effect.map(
         Array.partitionMap((resp, i) => {
-          return resp == null ? Either.left(uniqueRequests[i]) : Either.right([uniqueRequests[i], resp] as const)
+          return resp.status === 'empty'
+            ? Either.left(uniqueRequests[i])
+            : Either.right([uniqueRequests[i], resp.result] as const)
         }),
       ),
       Effect.orElseSucceed(() => [uniqueRequests, []] as const),
@@ -120,7 +155,9 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
 
       const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
+      // TODO: Distinct the errors and missing data, so we can retry on errors
       return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
+        Effect.timeout(STRATEGY_TIMEOUT),
         Effect.orElseSucceed(() => null),
       )
     })
@@ -132,7 +169,7 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
         const group = groups[makeKey(remaining[i])]
 
         return Effect.zipRight(
-          setOnValue(remaining[i], result),
+          setValue(remaining[i], result),
           Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
         )
       },

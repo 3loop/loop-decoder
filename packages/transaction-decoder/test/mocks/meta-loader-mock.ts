@@ -14,46 +14,58 @@ export const MockedMetaStoreLive = Layer.succeed(
       Effect.sync(() => {
         if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === address.toLowerCase()) {
           return {
-            address,
-            chainID,
-            contractName: 'Wrapped Ether',
-            contractAddress: address,
-            tokenSymbol: 'WETH',
-            decimals: 18,
-            type: 'WETH',
+            status: 'success',
+            result: {
+              address,
+              chainID,
+              contractName: 'Wrapped Ether',
+              contractAddress: address,
+              tokenSymbol: 'WETH',
+              decimals: 18,
+              type: 'WETH',
+            },
           }
         }
 
         if (ERC1155_CONTRACTS.includes(address.toLowerCase())) {
           return {
-            address,
-            chainID,
-            contractName: 'Mock ERC1155 Contract',
-            contractAddress: address,
-            tokenSymbol: 'ERC1155',
-            type: 'ERC1155',
+            status: 'success',
+            result: {
+              address,
+              chainID,
+              contractName: 'Mock ERC1155 Contract',
+              contractAddress: address,
+              tokenSymbol: 'ERC1155',
+              type: 'ERC1155',
+            },
           }
         }
 
         if (ERC721_CONTRACTS.includes(address.toLowerCase())) {
           return {
-            address,
-            chainID,
-            contractName: 'Mock ERC721 Contract',
-            contractAddress: address,
-            tokenSymbol: 'ERC721',
-            type: 'ERC721',
+            status: 'success',
+            result: {
+              address,
+              chainID,
+              contractName: 'Mock ERC721 Contract',
+              contractAddress: address,
+              tokenSymbol: 'ERC721',
+              type: 'ERC721',
+            },
           }
         }
 
         return {
-          address,
-          chainID,
-          contractName: 'Mock ERC20 Contract',
-          contractAddress: address,
-          tokenSymbol: 'ERC20',
-          decimals: 18,
-          type: 'ERC20',
+          status: 'success',
+          result: {
+            address,
+            chainID,
+            contractName: 'Mock ERC20 Contract',
+            contractAddress: address,
+            tokenSymbol: 'ERC20',
+            decimals: 18,
+            type: 'ERC20',
+          },
         }
       }),
     set: () =>
