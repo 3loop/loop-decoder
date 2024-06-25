@@ -70,7 +70,7 @@ export const MockedMetaStoreLive = Layer.succeed(
       }),
     set: () =>
       Effect.sync(() => {
-        console.error('MockedMetaStoreLive.set not implemented in tests')
+        console.debug('MockedMetaStoreLive.set not implemented in tests')
       }),
   }),
 )
