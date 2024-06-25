@@ -26,23 +26,53 @@ describe('Transaction Decoder', () => {
           const addressExists = fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`)
 
           if (addressExists) {
-            return fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString()
+            return {
+              status: 'success',
+              result: {
+                type: 'address',
+                abi: fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
+                address,
+                chainID: 5,
+              },
+            }
           }
 
           const sig = signature ?? event
           if (sig != null) {
-            const signatureExists = fs.existsSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)
+            const signatureAbi = fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString()
 
-            if (signatureExists) {
-              const signatureAbi = fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString()
-              return `[${signatureAbi}]`
+            if (signature) {
+              return {
+                status: 'success',
+                result: {
+                  type: 'func',
+                  abi: `[${signatureAbi}]`,
+                  address,
+                  chainID: 1,
+                  signature,
+                },
+              }
+            } else if (event) {
+              return {
+                status: 'success',
+                result: {
+                  type: 'event',
+                  abi: `[${signatureAbi}]`,
+                  address,
+                  chainID: 1,
+                  event,
+                },
+              }
             }
           }
 
-          return null
+          return {
+            status: 'empty',
+            result: null,
+          }
         },
         set: async () => {
-          console.error('Not implemented')
+          console.debug('Not implemented')
         },
       },
       contractMetaStore: {
@@ -50,27 +80,33 @@ describe('Transaction Decoder', () => {
         get: async (request) => {
           if ('0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6' === request.address.toLowerCase()) {
             return {
-              address: request.address,
-              chainID: request.chainID,
-              contractName: 'Wrapped Ether',
-              contractAddress: request.address,
-              tokenSymbol: 'WETH',
-              decimals: 18,
-              type: 'WETH',
+              status: 'success',
+              result: {
+                address: request.address,
+                chainID: request.chainID,
+                contractName: 'Wrapped Ether',
+                contractAddress: request.address,
+                tokenSymbol: 'WETH',
+                decimals: 18,
+                type: 'WETH',
+              },
             }
           }
           return {
-            address: request.address,
-            chainID: request.chainID,
-            contractName: 'Mock ERC20 Contract',
-            contractAddress: request.address,
-            tokenSymbol: 'ERC20',
-            decimals: 18,
-            type: 'ERC20',
+            status: 'success',
+            result: {
+              address: request.address,
+              chainID: request.chainID,
+              contractName: 'Mock ERC20 Contract',
+              contractAddress: request.address,
+              tokenSymbol: 'ERC20',
+              decimals: 18,
+              type: 'ERC20',
+            },
           }
         },
         set: async () => {
-          console.error('Not implemented')
+          console.debug('Not implemented')
         },
       },
     })

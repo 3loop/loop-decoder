@@ -1,10 +1,13 @@
 import { Effect, Context, Logger, LogLevel, RequestResolver } from 'effect'
 import { PublicClient, PublicClientObject, UnknownNetwork } from './public-client.js'
-import { ContractData } from './types.js'
 import { decodeTransactionByHash, decodeCalldata } from './transaction-decoder.js'
-import { AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
-import { ContractMetaParams, ContractMetaStore as EffectContractMetaStore } from './contract-meta-loader.js'
-import { ContractABI, GetContractABIStrategy } from './abi-strategy/index.js'
+import { ContractAbiResult, AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
+import {
+  ContractMetaParams,
+  ContractMetaResult,
+  ContractMetaStore as EffectContractMetaStore,
+} from './contract-meta-loader.js'
+import { GetContractABIStrategy } from './abi-strategy/index.js'
 import { Hex } from 'viem'
 import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 
@@ -17,16 +20,16 @@ export interface TransactionDecoderOptions {
 
 export interface VanillaAbiStore {
   strategies?: readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]
-  get: (key: GetAbiParams) => Promise<string | null>
-  set: (val: ContractABI) => Promise<void>
+  get: (key: GetAbiParams) => Promise<ContractAbiResult>
+  set: (val: ContractAbiResult) => Promise<void>
 }
 
 type VanillaContractMetaStategy = (client: PublicClient) => RequestResolver.RequestResolver<GetContractMetaStrategy>
 
 export interface VanillaContractMetaStore {
   strategies?: readonly VanillaContractMetaStategy[]
-  get: (key: ContractMetaParams) => Promise<ContractData | null>
-  set: (key: ContractMetaParams, val: ContractData) => Promise<void>
+  get: (key: ContractMetaParams) => Promise<ContractMetaResult>
+  set: (key: ContractMetaParams, val: ContractMetaResult) => Promise<void>
 }
 
 // TODO: allow adding custom strategies to vanilla API

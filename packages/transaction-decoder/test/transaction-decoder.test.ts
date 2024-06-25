@@ -9,7 +9,7 @@ import { MockedMetaStoreLive } from './mocks/meta-loader-mock.js'
 import fs from 'fs'
 
 describe('Transaction Decoder', () => {
-  test.each(TEST_TRANSACTIONS)('Resolve and decode transaction', async ({ hash, chainID }) => {
+  test.each(TEST_TRANSACTIONS)('Resolve and decode transaction %', async ({ hash, chainID }) => {
     const program = Effect.gen(function* () {
       return yield* decodeTransactionByHash(hash, chainID)
     })

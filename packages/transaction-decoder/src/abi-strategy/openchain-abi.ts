@@ -50,21 +50,25 @@ async function fetchABI({
       const json = (await response.json()) as OpenchainResponse
 
       return {
-        func: {
-          [signature]: parseFunctionSignature(json.result.function[signature][0].name),
-        },
+        type: 'func',
+        address,
+        chainID,
+        abi: parseFunctionSignature(json.result.function[signature][0].name),
+        signature,
       }
     }
   }
   if (event != null) {
-    const response = await fetch(`${endpoint}?event=${signature}`, options)
+    const response = await fetch(`${endpoint}?event=${event}`, options)
     if (response.status === 200) {
       const json = (await response.json()) as OpenchainResponse
 
       return {
-        event: {
-          [event]: parseEventSignature(json.result.event[event][0].name),
-        },
+        type: 'event',
+        address,
+        chainID,
+        abi: parseEventSignature(json.result.event[event][0].name),
+        event,
       }
     }
   }

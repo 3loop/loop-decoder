@@ -32,34 +32,28 @@ export const AbiStoreLive = Layer.succeed(
         }),
       ],
     },
-    set: ({ address = {} }) =>
+    set: (value) =>
       Effect.gen(function* () {
-        const addressMatches = Object.entries(address)
+        if (value.status !== 'success' || value.result.type !== 'address') {
+          // TODO: Store it to avoid fetching again
+          return
+        }
 
-        // Cache all addresses
-        yield* Effect.all(
-          addressMatches.map(([key, value]) =>
-            Effect.promise(() =>
-              prisma.contractAbi
-                .create({
-                  data: {
-                    address: key,
-                    abi: value,
-                  },
-                })
-                .catch((e) => {
-                  console.error('Failed to cache abi', e)
-                  return null
-                }),
-            ),
-          ),
-          {
-            concurrency: 'inherit',
-            batching: 'inherit',
-          },
+        yield* Effect.promise(() =>
+          prisma.contractAbi
+            .create({
+              data: {
+                address: value.result.address.toLowerCase(),
+                abi: value.result.abi,
+              },
+            })
+            .catch((e) => {
+              console.error('Failed to cache abi', e)
+              return null
+            }),
         )
       }),
-    get: ({ address }) =>
+    get: ({ address, chainID }) =>
       Effect.gen(function* () {
         const normAddress = address.toLowerCase()
         const cached = yield* Effect.promise(() =>
@@ -71,9 +65,21 @@ export const AbiStoreLive = Layer.succeed(
         )
 
         if (cached != null) {
-          return cached.abi
+          return {
+            status: 'success',
+            result: {
+              type: 'address',
+              address: address,
+              abi: cached.abi,
+              chainID: chainID,
+            },
+          }
         }
-        return null
+
+        return {
+          status: 'empty',
+          result: null,
+        }
       }),
   }),
 )
@@ -103,17 +109,32 @@ export const ContractMetaStoreLive = Layer.effect(
               }) as Promise<ContractData | null>,
           ).pipe(Effect.catchAll((_) => Effect.succeed(null)))
 
-          return data
+          if (data == null) {
+            return {
+              status: 'empty',
+              result: null,
+            }
+          } else {
+            return {
+              status: 'success',
+              result: data,
+            }
+          }
         }),
       set: ({ address, chainID }, contractMeta) =>
         Effect.gen(function* () {
           const normAddress = address.toLowerCase()
 
+          if (contractMeta.result == null) {
+            // TODO: Store it to avoid fetching again
+            return
+          }
+
           yield* Effect.tryPromise(() =>
             prisma.contractMeta.create({
               data: {
-                ...contractMeta,
-                decimals: contractMeta.decimals ?? 0,
+                ...contractMeta.result,
+                decimals: contractMeta.result.decimals ?? 0,
                 address: normAddress,
                 chainID: chainID,
               },

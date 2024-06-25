@@ -1,4 +1,4 @@
-import { Effect, pipe } from 'effect'
+import { Effect } from 'effect'
 import * as Schema from '@effect/schema/Schema'
 import { RPCFetchError, PublicClient } from './public-client.js'
 import type { TraceLog, TraceLogTree } from './schema/trace.js'

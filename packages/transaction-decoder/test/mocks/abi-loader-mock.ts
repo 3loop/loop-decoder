@@ -1,4 +1,4 @@
-import { Effect, Layer } from 'effect'
+import { Effect, Layer, Match } from 'effect'
 import fs from 'node:fs'
 import { AbiStore } from '@/abi-loader.js'
 // import { FourByteStrategyResolver } from '@/effect.js'
@@ -14,32 +14,48 @@ export const MockedAbiStoreLive = Layer.succeed(
         // FourByteStrategyResolver(),
       ],
     },
-    set: ({ address = {}, func = {}, event = {} }) =>
+    set: (response) =>
       Effect.gen(function* () {
-        const addressMatches = Object.entries(address)
-        const sigMatches = Object.entries(func).concat(Object.entries(event))
+        if (response.status !== 'success') return
 
-        // Cache all addresses
-        yield* Effect.all(
-          addressMatches.map(([key, value]) =>
-            Effect.sync(() => fs.writeFileSync(`./test/mocks/abi/${key.toLowerCase()}.json`, value)),
-          ),
+        const { key, value } = Match.value(response.result).pipe(
+          Match.when({ type: 'address' } as const, (value) => ({
+            key: value.address.toLowerCase(),
+            value: value.abi,
+          })),
+          Match.when({ type: 'func' } as const, (value) => ({
+            key: value.signature.toLowerCase(),
+            value: value.abi,
+          })),
+          Match.when({ type: 'event' } as const, (value) => ({
+            key: value.event.toLowerCase(),
+            value: value.abi,
+          })),
+          Match.exhaustive,
         )
 
-        // Cache all signatures
-        yield* Effect.all(
-          sigMatches.map(([key, value]) =>
-            Effect.sync(() => fs.writeFileSync(`./test/mocks/abi/${key.toLowerCase()}.json`, value)),
-          ),
-        )
+        yield* Effect.sync(() => fs.writeFileSync(`./test/mocks/abi/${key}.json`, JSON.stringify(value)))
       }),
     get: ({ address, signature, event }) =>
       Effect.gen(function* () {
         const addressExists = yield* Effect.sync(() => fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`))
 
         if (addressExists) {
-          return yield* Effect.sync(() => fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString())
+          const abi = yield* Effect.sync(
+            () => fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
+          )
+
+          return {
+            status: 'success',
+            result: {
+              type: 'address',
+              abi,
+              address,
+              chainID: 1,
+            },
+          }
         }
+
         const sig = signature ?? event
 
         if (sig != null) {
@@ -50,11 +66,36 @@ export const MockedAbiStoreLive = Layer.succeed(
               () => fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString(),
             )
 
-            return `[${signatureAbi}]`
+            if (signature) {
+              return {
+                status: 'success',
+                result: {
+                  type: 'func',
+                  abi: `[${signatureAbi}]`,
+                  address,
+                  chainID: 1,
+                  signature,
+                },
+              }
+            } else if (event) {
+              return {
+                status: 'success',
+                result: {
+                  type: 'event',
+                  abi: `[${signatureAbi}]`,
+                  address,
+                  chainID: 1,
+                  event,
+                },
+              }
+            }
           }
         }
 
-        return null
+        return {
+          status: 'empty',
+          result: null,
+        }
       }),
   }),
 )
