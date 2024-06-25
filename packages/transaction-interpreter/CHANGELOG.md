@@ -1,5 +1,14 @@
 # @3loop/transaction-interpreter
 
+## 0.2.1
+
+### Patch Changes
+
+- af5093d: Add otel tracing spans
+- Updated dependencies [d169992]
+- Updated dependencies [af5093d]
+  - @3loop/transaction-decoder@0.11.0
+
 ## 0.2.0
 
 ### Minor Changes
