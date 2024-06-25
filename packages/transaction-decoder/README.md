@@ -33,33 +33,19 @@ const decoded = new TransactionDecoder({
         }
     },
     abiStore: {
-        get: async (req: {
-            chainID: number
-            address: string
-            event?: string | undefined
-            signature?: string | undefined
-        }) => {
+        get: async (req: GetAbiParams) => {
             return db.getContractAbi(req)
         },
-        set: async (req: {
-            address?: Record<string, string>
-            signature?: Record<string, string>
-        }) => {
+        set: async (req: ContractAbiResult) => {
             await db.setContractAbi(req)
         },
     },
     contractMetaStore: {
-        get: async (req: {
-            address: string
-            chainID: number
-        }) => {
+        get: async (req: ContractMetaParams) => {
             return db.getContractMeta(req)
         },
-        set: async (req: {
-            address: string
-            chainID: number
-        }) {
-            // NOTE: not yet called as we do not have any automatic resolve strategy
+        set: async (req: ContractMetaParams, val: ContractMetaResult) {
+            await db.setContractMeta(req, val)
         },
     },
 })
@@ -113,11 +99,11 @@ const AbiStoreLive = Layer.succeed(
   AbiStore,
   AbiStore.of({
     strategies: { default: [] },
-    set: ({ address = {}, func = {}, event = {} }) =>
+    set: (result: ContractAbiResult) =>
       Effect.sync(() => {
         // NOTE: Ignore caching as we relay only on local abis
       }),
-    get: ({ address, signature, event }) =>
+    get: ({ address, signature, event, chainID }) =>
       Effect.sync(() => {
         const signatureAbiMap = {
           '0x3593564c': 'execute(bytes,bytes[],uint256)',
@@ -131,10 +117,19 @@ const AbiStoreLive = Layer.succeed(
         const abi = signatureAbiMap[signature]
 
         if (abi) {
-          return abi
+          return {
+            type: 'func',
+            abi: `[${abi}]`,
+            address,
+            chainID: chainID,
+            signature,
+          }
         }
 
-        return null
+        return {
+          status: 'empty',
+          result: null,
+        }
       }),
   }),
 )
@@ -150,6 +145,8 @@ export const MetaStoreLive = Layer.succeed(
     ContractMetaStore.of({
         get: ({ address, chainID }) => Effect.sync(() => {
             return {
+              status: 'success',
+              result: {
                 address: request.address,
                 chainID: request.chainID,
                 contractName: 'Mock Contract',
@@ -157,9 +154,10 @@ export const MetaStoreLive = Layer.succeed(
                 tokenSymbol: 'MOCK',
                 decimals: 18,
                 type: ContractType.ERC20,
+              },
             }
         }),
-        set: ({ address, chainID }) => Effect.sync(() => {
+        set: () => Effect.sync(() => {
             // NOTE: Ignore for now
         }),
     })
