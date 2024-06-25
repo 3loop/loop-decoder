@@ -33,12 +33,11 @@ export const make = Effect.gen(function* () {
     },
     interpretTx: (decodedTx: DecodedTx, interpreter: Interpreter) =>
       Effect.gen(function* () {
-        if (!decodedTx.toAddress) return Effect.fail('Not supported')
         const input = stringify(decodedTx)
         const code = interpreter.schema
         const result = yield* vm.eval(code + '\n' + 'transformEvent(' + input + ')')
         return result
-      }),
+      }).pipe(Effect.withSpan('TransactionInterpreter.interpretTx')),
   }
 })
 

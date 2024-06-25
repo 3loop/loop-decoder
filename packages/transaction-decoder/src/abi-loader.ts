@@ -190,5 +190,12 @@ export const getAndCacheAbi = (params: GetAbiParams) => {
   if (params.event === '0x' || params.signature === '0x') {
     return Effect.succeed(null)
   }
-  return Effect.request(AbiLoader(params), AbiLoaderRequestResolver)
+  return Effect.withSpan(Effect.request(AbiLoader(params), AbiLoaderRequestResolver), 'GetAndCacheAbi', {
+    attributes: {
+      chainID: params.chainID,
+      address: params.address,
+      event: params.event,
+      signature: params.signature,
+    },
+  })
 }

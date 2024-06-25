@@ -73,7 +73,7 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
       }
 
       return meta
-    }),
+    }).pipe(Effect.withSpan('MetaStrategy.NFTRPCStrategyResolver', { attributes: { chainID, address } })),
   ).pipe(
     RequestResolver.contextFromServices(PublicClient),
     Effect.provideService(PublicClient, publicClientLive),

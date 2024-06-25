@@ -246,4 +246,10 @@ export const decodeErrorTrace = ({ trace }: { trace: TraceLog[] }) =>
     })
 
     return result
-  })
+  }).pipe(
+    Effect.withSpan('decodeErrorTrace', {
+      attributes: {
+        traceCount: trace.length,
+      },
+    }),
+  )

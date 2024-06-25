@@ -56,8 +56,12 @@ async function fetchABI({
 
 export const FourByteStrategyResolver = () =>
   RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
-    Effect.tryPromise({
-      try: () => fetchABI(req),
-      catch: () => new RequestModel.ResolveStrategyABIError('4byte.directory', req.address, req.chainID),
-    }),
+    Effect.withSpan(
+      Effect.tryPromise({
+        try: () => fetchABI(req),
+        catch: () => new RequestModel.ResolveStrategyABIError('4byte.directory', req.address, req.chainID),
+      }),
+      'AbiStrategy.FourByteStrategyResolver',
+      { attributes: { chainID: req.chainID, address: req.address } },
+    ),
   )

@@ -124,8 +124,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       effect:
-        specifier: ^3.0.5
-        version: 3.0.5
+        specifier: ^3.4.2
+        version: 3.4.2
       eslint:
         specifier: ^8.47.0
         version: 8.47.0
@@ -208,7 +208,7 @@ importers:
     devDependencies:
       '@effect/schema':
         specifier: ^0.66.8
-        version: 0.66.8(effect@3.0.5)(fast-check@3.15.0)
+        version: 0.66.8(effect@3.4.2)(fast-check@3.15.0)
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -228,8 +228,8 @@ importers:
         specifier: 0.34.2
         version: 0.34.2(vitest@0.34.2)
       effect:
-        specifier: 3.0.5
-        version: 3.0.5
+        specifier: ^3.4.2
+        version: 3.4.2
       eslint:
         specifier: ^8.49.0
         version: 8.49.0
@@ -322,8 +322,8 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       effect:
-        specifier: 3.0.5
-        version: 3.0.5
+        specifier: ^3.4.2
+        version: 3.4.2
       esbuild:
         specifier: ^0.21.5
         version: 0.21.5
@@ -1158,13 +1158,13 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /@effect/schema@0.66.8(effect@3.0.5)(fast-check@3.15.0):
+  /@effect/schema@0.66.8(effect@3.4.2)(fast-check@3.15.0):
     resolution: {integrity: sha512-TJ2wGt1O4WqNrZtz9bRd+Mo8sitS33Ifj1u9TqXAg8FlWn7OA+MtULQmktdDVAlWw18QmamKX7grKeatL+0iCg==}
     peerDependencies:
       effect: ^3.0.5
       fast-check: ^3.13.2
     dependencies:
-      effect: 3.0.5
+      effect: 3.4.2
       fast-check: 3.15.0
     dev: true
 
@@ -5326,8 +5326,8 @@ packages:
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  /effect@3.0.5:
-    resolution: {integrity: sha512-cXAKns46iWEQkZHgRU+ehgfV2Au34HopVIBkWwTbD+iRR50zMOHNEHEjXGnyJPtWyYlLBQtB9AZXFoc72ChwPA==}
+  /effect@3.4.2:
+    resolution: {integrity: sha512-y20gL/fMqm4mUL71Tcuu3pYQ7Phm8RMX/hUt6vVfkg4Iac/RvMjP5DrJxT6RI0j0VNRLhTgb6pyL3oXeqxTeRg==}
 
   /electron-to-chromium@1.4.498:
     resolution: {integrity: sha512-4LODxAzKGVy7CJyhhN5mebwe7U2L29P+0G+HUriHnabm0d7LSff8Yn7t+Wq+2/9ze2Fu1dhX7mww090xfv7qXQ==}

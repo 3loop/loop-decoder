@@ -44,4 +44,11 @@ export const decodeMethod = ({
     }
 
     return decoded
-  })
+  }).pipe(
+    Effect.withSpan('CalldataDecode.decodeMethod', {
+      attributes: {
+        chainID,
+        contractAddress,
+      },
+    }),
+  )
