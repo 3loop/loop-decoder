@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.12.0
+
+### Minor Changes
+
+- fff83bc: Modify `set` in AbiStore to accept 2 parameters, key and value
+
 ## 0.11.0
 
 ### Minor Changes
