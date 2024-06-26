@@ -14,7 +14,7 @@ export const MockedAbiStoreLive = Layer.succeed(
         // FourByteStrategyResolver(),
       ],
     },
-    set: (response) =>
+    set: (key, response) =>
       Effect.gen(function* () {
         if (response.status !== 'success') return
 

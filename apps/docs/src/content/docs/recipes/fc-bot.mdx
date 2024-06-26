@@ -115,14 +115,25 @@ const abiStore = {
     FourByteStrategyResolver(),
   ],
   get: async (req: { address: string }) => {
-    return Promise.resolve(abiCache.get(req.address.toLowerCase()) ?? null)
-  },
-  set: async (req: { address?: Record<string, string> }) => {
-    const addresses = Object.keys(req.address ?? {})
+    const abi = abiCache.get(req.address.toLowerCase()) ?? null
 
-    addresses.forEach((address) => {
-      abiCache.set(address.toLowerCase(), req.address?.[address] ?? '')
-    })
+    if (abi !=null ){
+      return {
+        status: 'success',
+        result: {
+          //...other params
+          abi: abi,
+        }
+      }
+    }
+
+    return {
+        status: 'empty'
+        reult: null
+    }
+  },
+  set: async (key, req) => {
+    abiCache.set(key.address.toLowerCase(), req.result?.abi ?? '')
   },
 }
 ```

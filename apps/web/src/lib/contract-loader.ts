@@ -32,7 +32,7 @@ export const AbiStoreLive = Layer.succeed(
         }),
       ],
     },
-    set: (value) =>
+    set: (_key, value) =>
       Effect.gen(function* () {
         if (value.status !== 'success' || value.result.type !== 'address') {
           // TODO: Store it to avoid fetching again
