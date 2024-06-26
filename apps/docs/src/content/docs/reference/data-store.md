@@ -16,7 +16,7 @@ A store also requires a set of strategies that we cover separately in the [Data 
 ABI Store Interface requires 2 methods `set` and `get` to store and retrieve the ABI of a contract. Optionally you can provide a batch get method `getMany` for further optimization. Because our API supports ABI fragments, the get method will receive both the contract address and the fragment signature.
 
 ```typescript
-interface GetAbiParams {
+interface AbiParams {
   chainID: number
   address: string
   event?: string | undefined // event signature
@@ -44,8 +44,8 @@ The full interface looks as follows:
 interface AbiStore {
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
   readonly set: (value: ContractABI) => Effect.Effect<void, never>
-  readonly get: (arg: GetAbiParams) => Effect.Effect<string | null, never>
-  readonly getMany?: (arg: Array<GetAbiParams>) => Effect.Effect<Array<string | null>, never>
+  readonly get: (arg: AbiParams) => Effect.Effect<string | null, never>
+  readonly getMany?: (arg: Array<AbiParams>) => Effect.Effect<Array<string | null>, never>
 }
 ```
 

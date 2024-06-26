@@ -2,7 +2,7 @@ import { Context, Effect, Either, RequestResolver, Request, Array, pipe } from '
 import { ContractABI, GetContractABIStrategy } from './abi-strategy/request-model.js'
 
 const STRATEGY_TIMEOUT = 5000
-export interface GetAbiParams {
+export interface AbiParams {
   chainID: number
   address: string
   event?: string | undefined
@@ -27,9 +27,9 @@ export interface ContractAbiEmpty {
 export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | ContractAbiEmpty
 
 type ChainOrDefault = number | 'default'
-export interface AbiStore<Key = GetAbiParams, Value = ContractAbiResult> {
+export interface AbiStore<Key = AbiParams, Value = ContractAbiResult> {
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
-  readonly set: (value: Value) => Effect.Effect<void, never>
+  readonly set: (key: Key, value: Value) => Effect.Effect<void, never>
   readonly get: (arg: Key) => Effect.Effect<Value, never>
   readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value>, never>
 }
@@ -50,7 +50,7 @@ function makeKey(key: AbiLoader) {
   return `abi::${key.chainID}:${key.address}:${key.event}:${key.signature}`
 }
 
-const getMany = (requests: Array<GetAbiParams>) =>
+const getMany = (requests: Array<AbiParams>) =>
   Effect.gen(function* () {
     const { getMany, get } = yield* AbiStore
 
@@ -67,10 +67,18 @@ const getMany = (requests: Array<GetAbiParams>) =>
     }
   })
 
-const setValue = (abi: ContractABI | null) =>
+const setValue = (key: AbiLoader, abi: ContractABI | null) =>
   Effect.gen(function* () {
     const { set } = yield* AbiStore
-    yield* set(abi == null ? { status: 'not-found', result: null } : { status: 'success', result: abi })
+    yield* set(
+      {
+        chainID: key.chainID,
+        address: key.address,
+        event: key.event,
+        signature: key.signature,
+      },
+      abi == null ? { status: 'not-found', result: null } : { status: 'success', result: abi },
+    )
   })
 
 const getBestMatch = (abi: ContractABI | null) => {
@@ -183,7 +191,7 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
         const group = groups[makeKey(request)]
 
         return Effect.zipRight(
-          setValue(abi),
+          setValue(request, abi),
           Effect.forEach(group, (req) => Request.succeed(req, result), { discard: true }),
         )
       },
@@ -193,7 +201,7 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
 ).pipe(RequestResolver.contextFromServices(AbiStore), Effect.withRequestCaching(true))
 
 // TODO: When failing to decode with one ABI, we should retry with other resolved ABIs
-export const getAndCacheAbi = (params: GetAbiParams) => {
+export const getAndCacheAbi = (params: AbiParams) => {
   if (params.event === '0x' || params.signature === '0x') {
     return Effect.succeed(null)
   }

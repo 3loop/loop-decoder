@@ -33,7 +33,7 @@ const decoded = new TransactionDecoder({
         }
     },
     abiStore: {
-        get: async (req: GetAbiParams) => {
+        get: async (req: AbiParams) => {
             return db.getContractAbi(req)
         },
         set: async (req: ContractAbiResult) => {

@@ -1,7 +1,7 @@
 import { Effect, Context, Logger, LogLevel, RequestResolver } from 'effect'
 import { PublicClient, PublicClientObject, UnknownNetwork } from './public-client.js'
 import { decodeTransactionByHash, decodeCalldata } from './transaction-decoder.js'
-import { ContractAbiResult, AbiStore as EffectAbiStore, GetAbiParams } from './abi-loader.js'
+import { ContractAbiResult, AbiStore as EffectAbiStore, AbiParams } from './abi-loader.js'
 import {
   ContractMetaParams,
   ContractMetaResult,
@@ -20,8 +20,8 @@ export interface TransactionDecoderOptions {
 
 export interface VanillaAbiStore {
   strategies?: readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]
-  get: (key: GetAbiParams) => Promise<ContractAbiResult>
-  set: (val: ContractAbiResult) => Promise<void>
+  get: (key: AbiParams) => Promise<ContractAbiResult>
+  set: (key: AbiParams, val: ContractAbiResult) => Promise<void>
 }
 
 type VanillaContractMetaStategy = (client: PublicClient) => RequestResolver.RequestResolver<GetContractMetaStrategy>
@@ -59,7 +59,7 @@ export class TransactionDecoder {
     const AbiStoreLive = EffectAbiStore.of({
       strategies: { default: abiStore.strategies ?? [] },
       get: (key) => Effect.promise(() => abiStore.get(key)),
-      set: (val) => Effect.promise(() => abiStore.set(val)),
+      set: (key, val) => Effect.promise(() => abiStore.set(key, val)),
     })
 
     const contractMetaStrategies = contractMetaStore.strategies?.map((strategy) => strategy(PublicClientLive))

@@ -104,19 +104,13 @@ const abiStore = {
     }),
     FourByteStrategyResolver(),
   ],
-  get: async (req: {
-    chainID: number
-    address: string
-    event?: string | undefined
-    signature?: string | undefined
-  }) => {
+  get: async (req) => {
     return Promise.resolve(abiCache.get(req.address.toLowerCase()) ?? null)
   },
-  set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
-    const addresses = Object.keys(req.address ?? {})
-    addresses.forEach((address) => {
-      abiCache.set(address.toLowerCase(), req.address?.[address] ?? '')
-    })
+  set: async (key, value) => {
+    if (value.status === 'success' && value.result.type ==='address) {
+      abiCache.set(key.address.toLowerCase(), result.data)
+    }
   },
 }
 ```
@@ -133,11 +127,17 @@ const contractMetaCache = new Map<string, ContractData>()
 
 const contractMetaStore = {
   strategies: [ERC20RPCStrategyResolver],
-  get: async (req: { address: string; chainID: number }) => {
-    return contractMetaCache.get(req.address.toLowerCase()) ?? null
+  get: async (req) => {
+    const value = contractMetaCache.get(req.address.toLowerCase())
+    return {
+      status: value ? 'success' : 'empty',
+      result: value,
+    }
   },
-  set: async (req: { address: string; chainID: number }, data: ContractData) => {
-    contractMetaCache.set(req.address.toLowerCase(), data)
+  set: async (req, data) => {
+    if (data.status === 'success') {
+      contractMetaCache.set(req.address.toLowerCase(), data.result)
+    }
   },
 }
 ```
