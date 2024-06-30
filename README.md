@@ -29,6 +29,10 @@ Currently, the available EVM transaction decoders require developers to use spec
 ## Examples
 
 - [Decoder HTTP Server](https://github.com/3loop/decoder-api) - A simple HTTP server that exposes an REST API to decode transactions.
+- [Firebase Push Notifications](https://github.com/3loop/example-push-notifications) - Firebase Cloud Function that sends push notifications with decoded transactions.
+- [Farcaster Bot](https://loop-decoder.3loop.io/recipes/fc-bot/) - Farcaster Bot for human-readable transaction alerts
+- [Telegram Bot](https://loop-decoder.3loop.io/recipes/tg-bot/) - Telegram Bot for human-readable transaction alerts
+- [Next.JS Playground](https://github.com/3loop/loop-decoder/tree/main/apps/web) - Interactive playground to decode and interpret transactions
 
 ## Monorepo Structure
 
@@ -38,7 +42,6 @@ Currently, the available EVM transaction decoders require developers to use spec
 - `packages`
   - [transaction-decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder) - Transaction decoder package
   - [transaction-interpreter](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter) - Transaction interpreters
-  -
 
 ## Looking for feedback
 
