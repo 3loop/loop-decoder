@@ -24,28 +24,60 @@ interface AbiParams {
 }
 ```
 
-The `set` method will receive a map of ABIs indexed by the contract address, event signature, and function signature. You can choose to store the data in the best format that fits your database.
+The `set` method will receive a key of the type `AbiParams` and and `ContractAbiResult`. You can choose to store the data in the best format that fits your database.
 
 ```typescript
-type Address = string
-type Signature = string
-type ABI = string // JSON stringified ABI
-
-interface ContractABI {
-  address?: Record<Address, ABI>
-  func?: Record<Signature, ABI>
-  event?: Record<Signature, ABI>
+interface FunctionFragmentABI {
+  type: 'func'
+  abi: string
+  address: string
+  chainID: number
+  signature: string
 }
+
+interface EventFragmentABI {
+  type: 'event'
+  abi: string
+  address: string
+  chainID: number
+  event: string
+}
+
+interface AddressABI {
+  type: 'address'
+  abi: string
+  address: string
+  chainID: number
+}
+
+export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI
+
+export interface ContractAbiSuccess {
+  status: 'success'
+  result: ContractABI
+}
+
+export interface ContractAbiNotFound {
+  status: 'not-found'
+  result: null
+}
+
+export interface ContractAbiEmpty {
+  status: 'empty'
+  result: null
+}
+
+export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | ContractAbiEmpty
 ```
 
 The full interface looks as follows:
 
 ```typescript
-interface AbiStore {
+export interface AbiStore {
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
-  readonly set: (value: ContractABI) => Effect.Effect<void, never>
-  readonly get: (arg: AbiParams) => Effect.Effect<string | null, never>
-  readonly getMany?: (arg: Array<AbiParams>) => Effect.Effect<Array<string | null>, never>
+  readonly set: (key: AbiParams, value: ContractAbiResult) => Effect.Effect<void, never>
+  readonly get: (arg: AbiParams) => Effect.Effect<ContractAbiResult, never>
+  readonly getMany?: (arg: Array<AbiParams>) => Effect.Effect<Array<ContractAbiResult>, never>
 }
 ```
 
@@ -62,7 +94,26 @@ interface ContractMetaParams {
 }
 ```
 
-And, the `set` method will be called with 2 pramaters, the key in the same format as the `get` method, and the metadata value.
+And, the `set` method will be called with 2 pramaters, the key in the same format as the `get` method, and the metadata in a format of `ContractMetaResult`.
+
+```typescript
+interface ContractMetaSuccess {
+  status: 'success'
+  result: ContractData
+}
+
+interface ContractMetaNotFound {
+  status: 'not-found'
+  result: null
+}
+
+interface ContractMetaEmpty {
+  status: 'empty'
+  result: null
+}
+
+export type ContractMetaResult = ContractMetaSuccess | ContractMetaNotFound | ContractMetaEmpty
+```
 
 Contract metadata is a map of the following interface:
 
@@ -83,8 +134,18 @@ The full interface looks as follows:
 ```typescript
 interface ContractMetaStore {
   readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractMetaStrategy>[]>
-  readonly set: (arg: ContractMetaParams, value: ContractData) => Effect.Effect<void, never>
-  readonly get: (arg: ContractMetaParams) => Effect.Effect<ContractData | null, never>
-  readonly getMany?: (arg: Array<ContractMetaParams>) => Effect.Effect<Array<ContractData | null>, never>
+  readonly set: (arg: ContractMetaParams, value: ContractMetaResult) => Effect.Effect<void, never>
+  readonly get: (arg: ContractMetaParams) => Effect.Effect<ContractMetaResult, never>
+  readonly getMany?: (arg: Array<ContractMetaParams>) => Effect.Effect<Array<ContractMetaResult>, never>
 }
 ```
+
+You can notice that the `AbiStore` and `ContractMetadataStore` interfaces are very similar, and both have a status for the set and get methods. Both stores can return three states:
+
+1.  `success` - The requested data is found in the store.
+2.  `not-found` - The requested data is found in the store, but is missing a value. This means that we have tried to resolve it from a third party, but it was missing there.
+3.  `empty` - The requested data is not found in the store, which means that it has never been requested before.
+
+We have two states that can return an empty result. We want to be able to skip the meta strategy in cases where we know it's not available, as this can significantly reduce the number of requests to the strategies and improve performance.
+
+Some strategies may be able to add the data later. Therefore, we encourage storing a timestamp and removing the "not-found" state to be able to check again.

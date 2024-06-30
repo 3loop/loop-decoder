@@ -3,6 +3,10 @@ title: How to decode an Ethereum Transaction
 description: On this page you will provide a step-by-step guide on how to decode and interpret an Ethereum transaction using Loop Decoder.
 ---
 
+import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
+import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
+import { Content as RpcProvider } from '../../components/rpc-provider.md'
+
 In this guide, we will go through the process of decoding an Ethereum transaction using Loop Decoder. For the simplicity of the example, we assume that that contract ABIs involved in the transaction are verified on Etherscan.
 
 We recomend to copy all snipepts to a typescript project and run it at the end of this guide.
@@ -71,21 +75,7 @@ Loop Decoder requires some data sources to be able to decode transactions. We wi
 
 We will start by creating a function which will return an object with PublicClient based on the chain ID. For the sake of this example, we will only support mainnet.
 
-```ts
-import { createPublicClient, http } from 'viem'
-
-const getPublicClient = (chainId: number) => {
-  if (chainId !== 1) {
-    throw new Error(`Missing RPC provider for chain ID ${chainId}`)
-  }
-
-  return {
-    client: createPublicClient({
-      transport: http('https://rpc.ankr.com/eth'),
-    }),
-  }
-}
-```
+<RpcProvider />
 
 ### ABI loader
 
@@ -93,54 +83,13 @@ To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API t
 
 Create a cache for contract ABI:
 
-```ts
-import { EtherscanStrategyResolver, FourByteStrategyResolver } from '@3loop/transaction-decoder'
-const abiCache = new Map<string, string>()
-
-const abiStore = {
-  strategies: [
-    EtherscanStrategyResolver({
-      apikey: 'YourApiKeyToken',
-    }),
-    FourByteStrategyResolver(),
-  ],
-  get: async (req) => {
-    return Promise.resolve(abiCache.get(req.address.toLowerCase()) ?? null)
-  },
-  set: async (key, value) => {
-    if (value.status === 'success' && value.result.type ==='address) {
-      abiCache.set(key.address.toLowerCase(), result.data)
-    }
-  },
-}
-```
+<MemoryAbiLoader />
 
 ### Contract Metadata loader
 
-Create a cache for contract meta-information, such as token name, decimals, symbol, etc.:
+Create an in-memory cache for contract meta-information. Using `ERC20RPCStrategyResolver` we will automatically retrieve token meta information from the contract such as token name, decimals, symbol, etc.
 
-```ts
-import type { ContractData } from '@3loop/transaction-decoder'
-import { ERC20RPCStrategyResolver } from '@3loop/transaction-decoder'
-
-const contractMetaCache = new Map<string, ContractData>()
-
-const contractMetaStore = {
-  strategies: [ERC20RPCStrategyResolver],
-  get: async (req) => {
-    const value = contractMetaCache.get(req.address.toLowerCase())
-    return {
-      status: value ? 'success' : 'empty',
-      result: value,
-    }
-  },
-  set: async (req, data) => {
-    if (data.status === 'success') {
-      contractMetaCache.set(req.address.toLowerCase(), data.result)
-    }
-  },
-}
-```
+<MemoryContractLoader />
 
 Finally, you can create a new instance of the LoopDecoder class:
 

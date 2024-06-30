@@ -38,7 +38,7 @@ const AbiStoreLive = Layer.succeed(
   AbiStore,
   AbiStore.of({
     strategies: { default: [] },
-    set: ({ address = {}, func = {}, event = {} }) =>
+    set: () =>
       Effect.sync(() => {
         // NOTE: Ignore caching as we relay only on local abis
       }),
@@ -56,10 +56,21 @@ const AbiStoreLive = Layer.succeed(
         const abi = signatureAbiMap[signature]
 
         if (abi) {
-          return abi
+          return {
+            status: 'success',
+            result: {
+              type: 'func',
+              address: address,
+              abi: cached.abi,
+              chainID: chainID,
+            },
+          }
         }
 
-        return null
+        return {
+          stauts: 'empty',
+          resutl: null,
+        }
       }),
   }),
 )
@@ -85,7 +96,7 @@ export const MetaStoreLive = Layer.succeed(
                 type: ContractType.ERC20,
             }
         }),
-        set: ({ address, chainID }) => Effect.sync(() => {
+        set: () => Effect.sync(() => {
             // NOTE: Ignore for now
         }),
     })
