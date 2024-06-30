@@ -2,6 +2,10 @@
 
 [![Action status](https://github.com/3loop/loop-decoder/actions/workflows/pull-request.yml/badge.svg)](https://github.com/3loop/loop-decoder/actions/workflows/pull-request.yml)
 
+## Examples
+
+- [Decoder HTTP Server](https://github.com/3loop/decoder-api) - A simple HTTP server that exposes an REST API to decode transactions.
+
 ## Decode and interpret any EVM-based transactions
 
 A library to transform any EVM transaction into a human-readable format. It consists of 2 parts:
