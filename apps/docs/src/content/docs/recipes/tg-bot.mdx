@@ -3,6 +3,10 @@ title: Build a Telegram Bot for human-readable alerts
 description: The simple way to Create a Telegram Bot for human-readable alerts
 ---
 
+import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
+import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
+import { Content as RpcProvider } from '../../components/rpc-provider.md'
+
 In this guide, you will learn how to create a Telegram bot that sends human-readable alerts about transactions happening on-chain. You can customize this bot for any EVM-compatible blockchain, and you don't need any specific knowledge about EVM transaction decoding and interpretation.
 
 ![Final result](../../../assets/tg-bot.png)
@@ -34,69 +38,19 @@ To begin using the Loop Decoder, we need to set up the following components:
 
 We'll create a function that returns an object with a `PublicClient` based on the chain ID. For this example, we'll only support the Ethereum mainnet.
 
-```ts
-import { createPublicClient, http } from 'viem'
-
-const getPublicClient = (chainId: number) => {
-  //...
-
-  return {
-    client: createPublicClient({
-      transport: http('https://rpc.ankr.com/eth'),
-    }),
-  }
-}
-```
+<RpcProvider />
 
 #### ABI Loader
 
 We'll use an in-memory cache and strategies to download contract ABIs from Etherscan and 4byte.directory. Note that we pass the `EtherscanStrategyResolver` the `ETHERSCAN_API_KEY` environment variable, which we'll explain how to setup in [Step 6](#step-6-add-etherescan-and-alchemy-api-keys).
 
-```ts
-import { EtherscanStrategyResolver, FourByteStrategyResolver } from '@3loop/transaction-decoder'
-
-const abiCache = new Map<string, string>()
-
-const abiStore = {
-  strategies: [
-    EtherscanStrategyResolver({
-      apikey: process.env.ETHERSCAN_API_KEY || '',
-    }),
-    FourByteStrategyResolver(),
-  ],
-  get: async (req: { address: string }) => {
-    return Promise.resolve(abiCache.get(req.address.toLowerCase()) ?? null)
-  },
-  set: async (req: { address?: Record<string, string> }) => {
-    const addresses = Object.keys(req.address ?? {})
-
-    addresses.forEach((address) => {
-      abiCache.set(address.toLowerCase(), req.address?.[address] ?? '')
-    })
-  },
-}
-```
+<MemoryAbiLoader />
 
 #### Contract Metadata Loader
 
 We'll create an in-memory cache for contract meta-information. Using `ERC20RPCStrategyResolver` we will automatically retrieve token meta information from the contract such as token name, decimals, symbol, etc.
 
-```ts
-import type { ContractData } from '@3loop/transaction-decoder'
-import { ERC20RPCStrategyResolver } from '@3loop/transaction-decoder'
-
-const contractMetaCache = new Map<string, ContractData>()
-
-const contractMetaStore = {
-  strategies: [ERC20RPCStrategyResolver],
-  get: async (req: { address: string }) => {
-    return contractMetaCache.get(req.address.toLowerCase()) ?? null
-  },
-  set: async (req: { address: string }, data: ContractData) => {
-    contractMetaCache.set(req.address.toLowerCase(), data)
-  },
-}
-```
+<MemoryAbiLoader />
 
 #### Loop Decoder instance
 

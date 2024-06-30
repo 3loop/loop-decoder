@@ -2,29 +2,16 @@
 
 [![Action status](https://github.com/3loop/loop-decoder/actions/workflows/pull-request.yml/badge.svg)](https://github.com/3loop/loop-decoder/actions/workflows/pull-request.yml)
 
-## Examples
-
-- [Decoder HTTP Server](https://github.com/3loop/decoder-api) - A simple HTTP server that exposes an REST API to decode transactions.
-
 ## Decode and interpret any EVM-based transactions
 
 A library to transform any EVM transaction into a human-readable format. It consists of 2 parts:
 
 - [Transaction decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder)
-- Customizable transaction interpreter
+- [Transaction interpreter](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter)
 
 ## Documentation
 
 [Head to the documentation](https://loop-decoder.3loop.io/) to read and learn more about the Loop Decoder, or check out our [playground](https://loop-decoder-web.vercel.app/) to see it in action.
-
-## Monorepo Structure
-
-- `apps`
-  - [docs](https://github.com/3loop/loop-decoder/tree/main/apps/docs) - Documentation website using astro starlight.
-  - [web](https://github.com/3loop/loop-decoder/tree/main/apps/docs) - Interactive playground based on Next.js.
-- `packages`
-  - [transaction-decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder) - Transaction decoder package
-  - [transaction-interpreter](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter) - Transaction interpreters
 
 ## Why
 
@@ -38,6 +25,20 @@ Currently, the available EVM transaction decoders require developers to use spec
 - [x] Minimal external dependencies - connect your own storage
 - [x] Predefined ABI and Contract metadata resolvers
 - [x] Flexible interpreter that allows you to define any custom interpretation of EVM transactions.
+
+## Examples
+
+- [Decoder HTTP Server](https://github.com/3loop/decoder-api) - A simple HTTP server that exposes an REST API to decode transactions.
+
+## Monorepo Structure
+
+- `apps`
+  - [docs](https://github.com/3loop/loop-decoder/tree/main/apps/docs) - Documentation website using astro starlight.
+  - [web](https://github.com/3loop/loop-decoder/tree/main/apps/docs) - Interactive playground based on Next.js.
+- `packages`
+  - [transaction-decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder) - Transaction decoder package
+  - [transaction-interpreter](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter) - Transaction interpreters
+  -
 
 ## Looking for feedback
 

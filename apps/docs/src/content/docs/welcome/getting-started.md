@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: A guide in my new Starlight docs site.
+description: Quick start guide on using the Loop Decoder
 ---
 
 ### Requirements
@@ -32,43 +32,78 @@ const getPublicClient = (chainId: number) => {
 }
 ```
 
-2. `contractMetaStore`: This object has 2 properties `get` and `set` that returns and caches contract meta-information. See the `ContractData` type for the required properties.
+2. `contractMetaStore`: This object has two required properties, `get` and `set`, which return and cache contract meta-information. Optionally, you can provide a list of `strategies` that will resolve data when it is missing in the cache. See the `ContractData` type for the required properties of the contract meta-information.
 
 ```ts
-const db = {}; // Your data source
+const db = new Map()
 
-const contractMetaStore = {
-  get: async (req: {
-    address: string
-    chainID: number
-  }) => {
-    return db.getContractMeta(req)
+const contractMetaStore: VanillaContractMetaStore = {
+  strategies: [], // NOTE: We will cover stragies later
+  get: async ({ address, chainID }) => {
+    const key = `${address}-${chainID}`
+    if (db.has(key)) {
+      return {
+        status: 'success',
+        result: db.get(key),
+      }
+    }
+    return {
+      status: 'empty',
+      result: null,
+    }
   },
-  set: async (req: {
-    address: string
-    chainID: number
-  }) {
-    // NOTE: ignore for now
+  set: async ({ address, chainID }, result) => {
+    const key = `${address}-${chainID}`
+
+    if (result.status === 'success') {
+      db.set(key, result.result)
+    }
   },
 }
 ```
 
-3. `abiStore`: Similarly, this object has 2 properties `get` and `set` that returns and cache the contract or fragment ABI based on the chain ID, address, and/or signature.
+1. `abiStore`: Similarly, this object has two required properties, `get` and `set`, which return and cache the contract or fragment ABI based on the chain ID, address, function, or event signature. Additionally, it includes strategies to resolve the data from third parties when it is missing in the cache.
+
+In the following example we will cache all types of ABIs into the same Map.
 
 ```ts
-const db = {} // Your data source
+const db = new Map()
 
-const abiStore = {
-  get: async (req: {
-    chainID: number
-    address: string
-    event?: string | undefined
-    signature?: string | undefined
-  }) => {
-    return db.getContractAbi(req)
+const abiStore: VanillaAbiStore = {
+  strategies: [], // NOTE: We will cover stragies later
+  get: async ({ address, event, signature }) => {
+    if (db.has(address)) {
+      return {
+        status: 'success',
+        result: db.get(address),
+      }
+    } else if (event != null && db.has(event)) {
+      return {
+        status: 'success',
+        result: db.get(event),
+      }
+    } else if (signature != null && db.has(signature)) {
+      return {
+        status: 'success',
+        result: db.get(signature),
+      }
+    }
+
+    return {
+      status: 'empty',
+      result: null,
+    }
   },
-  set: async (req: { address?: Record<string, string>; signature?: Record<string, string> }) => {
-    await db.setContractAbi(req)
+  set: async (_key, value) => {
+    if (value.status === 'success') {
+      if (value.result.type === 'address') {
+        db.set(value.result.address, value.result)
+      } else if (value.result.type === 'event') {
+        db.set(value.result.event, value.result)
+      } else if (value.result.type === 'func') {
+        db.set(value.result.signature, value.result)
+      }
+    }
   },
 }
 ```
