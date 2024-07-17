@@ -19,11 +19,19 @@ Transaction decoding is a crucial component of many dApps. Our goal is to create
 
 Currently, the available EVM transaction decoders require developers to use specific databases or provide a lower-level API that requires maintenance. The Loop Decoder, however, can be used as a plug-and-play component in any layer of dApp infrastructure.
 
+The open-source nature of the Loop Decoder allows developers to also integrate new chains as they see fit. While using a third party closed-source decoder, developers are limited to the chains that the provider supports. This can be a significant burden for developers who want to support multiple emerging chains.
+
+### Glossary
+
+- **Transaction Decoder**: Decoder automates the decoding of any transaction data, event log and trace, in a unified format. We leverage multiple data sources for contract metadata and ABI resolution. With an unified interface to decode transactions across any protocol, developers don't have to manually understand and decode each individual transactions.
+- **Transaction Interpreter**: Interpreter is a flexible layer that allows developers to define custom interpretation of a decoded transactions. In context of this library, an interpretation is a transformation from a decoded transaction to a human-readable format. It is used to extract the most significant information that can be directly displayed to a non techincal user.
+
 ## Features
 
 - [x] Can be used in any JavaScript environment
 - [x] Minimal external dependencies - connect your own storage
 - [x] Predefined ABI and Contract metadata resolvers
+- [x] Automatically resolves contract proxise and multicalls
 - [x] Flexible interpreter that allows you to define any custom interpretation of EVM transactions.
 
 ## Examples
