@@ -10,7 +10,14 @@ interface Address {
   name: string | null
 }
 
-type TransactionType = 'repay-loan' | 'deposit-collateral' | 'borrow' | 'withdraw-collateral' | string
+type TransactionType =
+  | 'repay-loan'
+  | 'deposit-collateral'
+  | 'borrow'
+  | 'withdraw-collateral'
+  | 'swap'
+  | 'unknown'
+  | string
 
 export interface Asset {
   address: string
