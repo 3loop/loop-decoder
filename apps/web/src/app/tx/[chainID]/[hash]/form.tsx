@@ -22,10 +22,10 @@ interface FormProps {
 
 export default function DecodingForm({ decoded, currentHash, currentChainID }: FormProps) {
   const [result, setResult] = React.useState<Interpretation>()
-  const [persistedSchema, setSchema] = useLocalStorage(decoded?.toAddress ?? 'unknown', null)
+  const [persistedSchema, setSchema] = useLocalStorage(decoded?.toAddress ?? 'unknown', '')
 
   const schema = React.useMemo(() => {
-    if (persistedSchema != null) return persistedSchema
+    if (persistedSchema !== '') return persistedSchema
 
     if (decoded?.toAddress == null) return null
 

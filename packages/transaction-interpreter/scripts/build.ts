@@ -88,6 +88,7 @@ async function generateMappings(interpreters: Interpreter[], isDev = false) {
     processInterpreter(`${SOURCE_FOLDER_NAME}/${FALLBACK_FILE_NAME}`, isDev),
   ])
 
+  // TODO: Use a template enigine like ejs
   const content = template
     .replace('/**PLACE_CONTRACT_MAPPING**/', contractMap)
     .replace('/**PLACE_INTEPRETATIONS**/', interpreterMap)
@@ -135,9 +136,7 @@ async function processInterpreter(file: string, _isDev?: boolean) {
     },
   })
 
-  const output = generate(ast, {}, { [file]: jsCode.code })
-    .code.replaceAll('export ', '')
-    .replaceAll('`', '`')
+  const output = generate(ast, {}, { [file]: jsCode.code }).code.replaceAll('export ', '')
 
   const name = getInterpreterName(path.parse(file))
 
