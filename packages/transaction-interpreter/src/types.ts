@@ -16,6 +16,10 @@ type TransactionType =
   | 'borrow'
   | 'withdraw-collateral'
   | 'swap'
+  | 'wrap'
+  | 'unwrap'
+  | 'approve'
+  | 'transfer'
   | 'unknown'
   | string
 

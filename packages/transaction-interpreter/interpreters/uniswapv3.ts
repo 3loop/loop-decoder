@@ -1,31 +1,6 @@
-import { AssetTransfer, InterpretedTransaction } from '@/types.js'
-import { Asset, DecodedTx } from '@3loop/transaction-decoder'
-
-export function assetsSent(transfers: Asset[], fromAddress: string): AssetTransfer[] {
-  return transfers
-    .filter((t) => t.from.toLowerCase() === fromAddress.toLowerCase())
-    .map((t) => {
-      return {
-        from: { address: t.from, name: null },
-        to: { address: t.to, name: null },
-        amount: t.amount ?? '0',
-        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type },
-      }
-    })
-}
-
-export function assetsReceived(transfers: Asset[], fromAddress: string): AssetTransfer[] {
-  return transfers
-    .filter((t) => t.to.toLowerCase() === fromAddress.toLowerCase())
-    .map((t) => {
-      return {
-        from: { address: t.from, name: null },
-        to: { address: t.to, name: null },
-        amount: t.amount ?? '0',
-        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type },
-      }
-    })
-}
+import { assetsReceived, assetsSent } from './std.js'
+import type { AssetTransfer, InterpretedTransaction } from '@/types.js'
+import type { DecodedTx } from '@3loop/transaction-decoder'
 
 function displayAsset(asset: AssetTransfer): string {
   return asset.amount + ' ' + asset.asset.symbol
