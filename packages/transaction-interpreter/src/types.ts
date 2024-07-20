@@ -18,8 +18,8 @@ type TransactionType =
   | 'swap'
   | 'wrap'
   | 'unwrap'
-  | 'approve'
-  | 'transfer'
+  | 'approve-token'
+  | 'transfer-token'
   | 'unknown'
   | string
 

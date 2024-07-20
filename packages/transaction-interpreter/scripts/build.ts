@@ -9,6 +9,7 @@ import _traverse, { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 import _generator from '@babel/generator'
 import * as esbuild from 'esbuild'
+import template from '@babel/template'
 
 // See https://github.com/babel/babel/issues/13855
 const traverse = (_traverse as any).default
@@ -23,6 +24,7 @@ const SOURCE_FOLDER_NAME = 'interpreters'
 const OUTPUT_FILE_NAME = 'src/interpreters.ts'
 const STD_FILE_NAME = 'std.ts'
 const ENTRY_POINT_FILE_NAME = 'index.ts'
+const FALLBACK_FILE_NAME = 'fallback.ts'
 
 function getInterpreterName(p: path.ParsedPath) {
   return `${p.dir}/${p.name}`.replace(/^interpreters\//, '')
@@ -72,7 +74,7 @@ async function generateMappings(interpreters: Interpreter[], isDev = false) {
 
   const nameToCode = interpreters.reduce(
     (acc, { name, output }) => {
-      acc[name] = output.replaceAll('export ', '')
+      acc[name] = output
       return acc
     },
     {} as Record<string, string>,
@@ -81,12 +83,16 @@ async function generateMappings(interpreters: Interpreter[], isDev = false) {
   const contractMap = JSON.stringify(contractToName).slice(1, -1)
   const interpreterMap = JSON.stringify(nameToCode).slice(1, -1)
 
-  const stdContent = await compileStd(isDev)
+  const [stdContent, fallbackContent] = await Promise.all([
+    compileStd(isDev),
+    processInterpreter(`${SOURCE_FOLDER_NAME}/${FALLBACK_FILE_NAME}`, isDev),
+  ])
 
   const content = template
     .replace('/**PLACE_CONTRACT_MAPPING**/', contractMap)
     .replace('/**PLACE_INTEPRETATIONS**/', interpreterMap)
     .replace(`'/**PLACE_STD_CONTENT**/'`, `\`${stdContent}\``)
+    .replace(`'/**PLACE_FALLBACK_CONTENT**/'`, JSON.stringify(fallbackContent.output))
 
   await fs.writeFile(OUTPUT_FILE_NAME, content)
 }
@@ -129,7 +135,9 @@ async function processInterpreter(file: string, _isDev?: boolean) {
     },
   })
 
-  const output = generate(ast, {}, { [file]: jsCode.code }).code
+  const output = generate(ast, {}, { [file]: jsCode.code })
+    .code.replaceAll('export ', '')
+    .replaceAll('`', '`')
 
   const name = getInterpreterName(path.parse(file))
 
@@ -159,7 +167,8 @@ async function processFiles(files: string[], isDev?: boolean) {
 export async function runCompiler({ watch }: { watch: boolean }) {
   const SOURCE_FILE_GLOB = `${SOURCE_FOLDER_NAME}/**/*.ts`
   const files = (await glob(SOURCE_FILE_GLOB)).filter(
-    (file) => !file.includes(ENTRY_POINT_FILE_NAME) && !file.includes(STD_FILE_NAME),
+    (file) =>
+      !file.includes(ENTRY_POINT_FILE_NAME) && !file.includes(STD_FILE_NAME) && !file.includes(FALLBACK_FILE_NAME),
   )
 
   await processFiles(files, watch)

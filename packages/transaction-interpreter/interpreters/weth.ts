@@ -26,12 +26,15 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
         action: 'Unwrapped ' + newEvent.assetsReceived[0]?.amount + ' ' + newEvent.assetsReceived[0]?.asset.symbol,
         ...newEvent,
       }
-    case 'approve':
+    case 'approve': {
+      const approvalInteraction = event.interactions.find((i) => i.event.eventName === 'Approval')
+
       return {
-        type: 'approve',
-        action: 'Approved ' + newEvent.assetsSent[0]?.amount + ' ' + newEvent.assetsSent[0]?.asset.symbol,
+        type: 'approve-token',
+        action: 'Approved ' + approvalInteraction?.contractSymbol,
         ...newEvent,
       }
+    }
     case 'transfer':
       return {
         type: 'transfer',
