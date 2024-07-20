@@ -4,6 +4,7 @@ import {
   QuickjsInterpreterLive,
   QuickjsConfig,
   TransactionInterpreter,
+  fallbackInterpreter,
 } from '@3loop/transaction-interpreter'
 import { Effect, Layer } from 'effect'
 import variant from '@jitl/quickjs-singlefile-browser-release-sync'
@@ -20,14 +21,6 @@ export interface Interpretation {
   tx: DecodedTx
   interpretation: any
   error?: string
-}
-
-export const emptyInterpreter: Interpreter = {
-  schema: `function transformEvent(event){
-    return event;
-};
-`,
-  id: 'empty',
 }
 
 export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
@@ -56,16 +49,13 @@ export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interp
 }
 
 export async function findAndRunInterpreter(decodedTx: DecodedTx): Promise<Interpretation> {
-  const interpreter = getInterpreterForContract({
+  let interpreter = getInterpreterForContract({
     address: decodedTx.toAddress ?? '',
     chain: decodedTx.chainID,
   })
 
   if (!interpreter) {
-    return {
-      tx: decodedTx,
-      interpretation: null,
-    }
+    interpreter = fallbackInterpreter
   }
 
   const res = await applyInterpreter(decodedTx, {
