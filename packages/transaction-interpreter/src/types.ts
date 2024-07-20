@@ -20,6 +20,8 @@ type TransactionType =
   | 'unwrap'
   | 'approve-token'
   | 'transfer-token'
+  | 'send-to-bridge'
+  | 'receive-from-bridge'
   | 'unknown'
   | string
 
