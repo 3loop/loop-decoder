@@ -52,7 +52,7 @@ async function fetchContractABI(
   config?: { apikey?: string; endpoint?: string },
 ): Promise<RequestModel.ContractABI> {
   const endpoint = config?.endpoint ?? endpoints[chainID]
-
+  console.log('fetchContractABI', address)
   const params: Record<string, string> = {
     module: 'contract',
     action: 'getabi',
@@ -80,14 +80,21 @@ async function fetchContractABI(
   throw new Error(`Failed to fetch ABI for ${address} on chain ${chainID}`)
 }
 
-export const EtherscanStrategyResolver = (config?: { apikey?: string; endpoint?: string }) =>
-  RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
-    Effect.withSpan(
-      Effect.tryPromise({
-        try: () => fetchContractABI(req, config),
-        catch: () => new RequestModel.ResolveStrategyABIError('etherscan', req.address, req.chainID),
-      }),
-      'AbiStrategy.EtherscanStrategyResolver',
-      { attributes: { chainID: req.chainID, address: req.address } },
+export const EtherscanStrategyResolver = (config?: {
+  apikey?: string
+  endpoint?: string
+}): RequestModel.ContractAbiResolverStrategy => {
+  return {
+    type: 'address',
+    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+      Effect.withSpan(
+        Effect.tryPromise({
+          try: () => fetchContractABI(req, config),
+          catch: () => new RequestModel.ResolveStrategyABIError('etherscan', req.address, req.chainID),
+        }),
+        'AbiStrategy.EtherscanStrategyResolver',
+        { attributes: { chainID: req.chainID, address: req.address } },
+      ),
     ),
-  )
+  }
+}

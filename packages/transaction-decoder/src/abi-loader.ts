@@ -1,5 +1,5 @@
 import { Context, Effect, Either, RequestResolver, Request, Array, pipe } from 'effect'
-import { ContractABI, GetContractABIStrategy } from './abi-strategy/request-model.js'
+import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
 
 const STRATEGY_TIMEOUT = 5000
 export interface AbiParams {
@@ -28,7 +28,7 @@ export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | Contr
 
 type ChainOrDefault = number | 'default'
 export interface AbiStore<Key = AbiParams, Value = ContractAbiResult> {
-  readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractABIStrategy>[]>
+  readonly strategies: Record<ChainOrDefault, readonly ContractAbiResolverStrategy[]>
   readonly set: (key: Key, value: Value) => Effect.Effect<void, never>
   readonly get: (arg: Key) => Effect.Effect<Value, never>
   readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value>, never>
@@ -46,7 +46,7 @@ export interface AbiLoader extends Request.Request<string | null, unknown> {
 
 const AbiLoader = Request.tagged<AbiLoader>('AbiLoader')
 
-function makeKey(key: AbiLoader) {
+function makeRequestKey(key: AbiLoader) {
   return `abi::${key.chainID}:${key.address}:${key.event}:${key.signature}`
 }
 
@@ -121,7 +121,7 @@ const getBestMatch = (abi: ContractABI | null) => {
  * To optimize concurrent requests, the AbiLoader uses the RequestResolver
  * to batch and cache requests. However, out-of-the-box, the RequestResolver does not
  * perform request deduplication. To address this, we implement request deduplication
- * inside the resolver's body. We use the `makeKey` function to generate a unique key
+ * inside the resolver's body. We use the `makeRequestKey` function to generate a unique key
  * for each request and group them by that key. We then load the ABI for the unique
  * requests and resolve the pending requests in a group with the same result.
  *
@@ -133,12 +133,11 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
     if (requests.length === 0) return
 
     const { strategies } = yield* AbiStore
-    // NOTE: We can further optimize if we have match by Address by avoid extra requests for each signature
-    // but might need to update the Loader public API
-    const groups = Array.groupBy(requests, makeKey)
-    const uniqueRequests = Object.values(groups).map((group) => group[0])
 
-    const [remaining, results] = yield* pipe(
+    const requestGroups = Array.groupBy(requests, makeRequestKey)
+    const uniqueRequests = Object.values(requestGroups).map((group) => group[0])
+
+    const [remaining, cachedResults] = yield* pipe(
       getMany(uniqueRequests),
       Effect.map(
         Array.partitionMap((resp, i) => {
@@ -152,9 +151,9 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
 
     //  Resolve ABI from the store
     yield* Effect.forEach(
-      results,
+      cachedResults,
       ([request, result]) => {
-        const group = groups[makeKey(request)]
+        const group = requestGroups[makeRequestKey(request)]
         const abi = result?.abi ?? null
         return Effect.forEach(group, (req) => Request.succeed(req, abi), { discard: true })
       },
@@ -163,23 +162,55 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
       },
     )
 
-    // Load the ABI from the strategies
-    const strategyResults = yield* Effect.forEach(remaining, ({ chainID, address, event, signature }) => {
+    // NOTE: Firstly we batch strategies by address because in a transaction most of events and traces are from the same abi
+    const response = yield* Effect.forEach(remaining, (req) => {
       const strategyRequest = GetContractABIStrategy({
-        address,
-        event,
-        signature,
-        chainID,
+        address: req.address,
+        chainID: req.chainID,
       })
 
-      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
+      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? []).filter(
+        (strategy) => strategy.type === 'address',
+      )
 
-      // TODO: Distinct the errors and missing data, so we can retry on errors
-      return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
-        Effect.timeout(STRATEGY_TIMEOUT),
-        Effect.orElseSucceed(() => null),
+      return Effect.validateFirst(allAvailableStrategies, (strategy) =>
+        pipe(
+          Effect.request(strategyRequest, strategy.resolver),
+          Effect.withRequestCaching(true),
+          Effect.timeout(STRATEGY_TIMEOUT),
+        ),
+      ).pipe(
+        Effect.map(Either.left),
+        Effect.orElseSucceed(() => Either.right(req)),
       )
     })
+
+    const [addressStrategyResults, notFound] = Array.partitionMap(response, (res) => res)
+
+    // NOTE: Secondly we request strategies to fetch fragments
+    const fragmentStrategyResults = yield* Effect.forEach(notFound, ({ chainID, address, event, signature }) => {
+      const strategyRequest = GetContractABIStrategy({
+        address,
+        chainID,
+        event,
+        signature,
+      })
+
+      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? []).filter(
+        (strategy) => strategy.type === 'fragment',
+      )
+
+      // TODO: Distinct the errors and missing data, so we can retry on errors
+      return Effect.validateFirst(allAvailableStrategies, (strategy) =>
+        pipe(
+          Effect.request(strategyRequest, strategy.resolver),
+          Effect.withRequestCaching(true),
+          Effect.timeout(STRATEGY_TIMEOUT),
+        ),
+      ).pipe(Effect.orElseSucceed(() => null))
+    })
+
+    const strategyResults = Array.appendAll(addressStrategyResults, fragmentStrategyResults)
 
     // Store results and resolve pending requests
     yield* Effect.forEach(
@@ -188,7 +219,7 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
         const request = remaining[i]
         const result = getBestMatch(abi)
 
-        const group = groups[makeKey(request)]
+        const group = requestGroups[makeRequestKey(request)]
 
         return Effect.zipRight(
           setValue(request, abi),
