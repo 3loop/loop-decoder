@@ -12,7 +12,7 @@ import { QuickjsConfig, RuntimeConfig } from './QuickjsConfig.js'
 
 export interface QuickJSVM {
   readonly runtime: QuickJSRuntime
-  readonly eval: (code: string) => Effect.Effect<InterpretedTransaction, unknown, never>
+  readonly eval: (code: string) => Effect.Effect<InterpretedTransaction, never, never>
   readonly dispose: () => void
 }
 

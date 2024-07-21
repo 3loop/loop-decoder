@@ -12,18 +12,32 @@ import { DecodedTx } from '@3loop/transaction-decoder'
 import { Interpretation, applyInterpreter } from '@/lib/interpreter'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
-import { Interpreter } from '@3loop/transaction-interpreter'
+import { fallbackInterpreter, getInterpreterForContract } from '@3loop/transaction-interpreter'
 
 interface FormProps {
   currentChainID: number
   decoded?: DecodedTx
-  defaultInterpreter?: Interpreter
   currentHash?: string
 }
 
-export default function DecodingForm({ decoded, defaultInterpreter, currentHash, currentChainID }: FormProps) {
+export default function DecodingForm({ decoded, currentHash, currentChainID }: FormProps) {
   const [result, setResult] = React.useState<Interpretation>()
-  const [schema, setSchema] = useLocalStorage(defaultInterpreter?.id ?? 'unknown', defaultInterpreter?.schema)
+  const [persistedSchema, setSchema] = useLocalStorage(decoded?.toAddress ?? 'unknown', '')
+
+  const schema = React.useMemo(() => {
+    if (persistedSchema !== '') return persistedSchema
+
+    if (decoded?.toAddress == null) return null
+
+    const schema = getInterpreterForContract({
+      address: decoded.toAddress,
+      chain: decoded.chainID,
+    })
+
+    if (schema != null) return schema
+
+    return fallbackInterpreter
+  }, [decoded?.chainID, decoded?.toAddress, persistedSchema])
 
   const router = useRouter()
 
@@ -34,9 +48,9 @@ export default function DecodingForm({ decoded, defaultInterpreter, currentHash,
   }
 
   const onRun = React.useCallback(() => {
-    if (schema && defaultInterpreter != null && decoded != null) {
+    if (schema && decoded != null) {
       const newInterpreter = {
-        ...defaultInterpreter,
+        id: decoded.toAddress ?? 'unknown',
         schema: schema,
       }
 
@@ -44,14 +58,14 @@ export default function DecodingForm({ decoded, defaultInterpreter, currentHash,
         setResult(res)
       })
     }
-  }, [schema, decoded, defaultInterpreter])
+  }, [schema, decoded])
 
   // Run the interpreter on page load
   React.useEffect(() => {
-    if (schema && defaultInterpreter != null && decoded != null && result == null) {
+    if (schema && decoded != null && result == null) {
       onRun()
     }
-  }, [schema, decoded, defaultInterpreter, result, onRun])
+  }, [schema, decoded, result, onRun])
 
   return (
     <div className="grid h-full items-stretch gap-6 grid-cols-1 lg:grid-cols-[1fr_200px]">
@@ -86,7 +100,7 @@ export default function DecodingForm({ decoded, defaultInterpreter, currentHash,
 
             <CodeBlock
               language="javascript"
-              value={schema}
+              value={schema ?? ''}
               onChange={(value) => setSchema(value)}
               lineNumbers={true}
               readonly={false}

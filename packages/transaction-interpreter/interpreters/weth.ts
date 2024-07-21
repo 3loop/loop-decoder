@@ -4,7 +4,6 @@ import type { DecodedTx } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const methodName = event.methodCall.name
-
   const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
     chain: event.chainID,
     txHash: event.txHash,
@@ -15,40 +14,40 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
   }
 
   switch (methodName) {
-    case 'repay':
-      return {
-        type: 'repay-loan',
-        action: 'User repaid ' + newEvent.assetsSent[1]?.amount + ' ' + newEvent.assetsSent[1]?.asset.symbol,
-        ...newEvent,
-      }
-
     case 'deposit':
       return {
-        type: 'deposit-collateral',
-        action: 'User deposited ' + newEvent.assetsReceived[0]?.amount + ' ' + newEvent.assetsReceived[0]?.asset.symbol,
+        type: 'wrap',
+        action: 'Wrapped ' + newEvent.assetsSent[0]?.amount + ' ' + newEvent.assetsSent[0]?.asset.symbol,
         ...newEvent,
       }
-
-    case 'borrow':
-      return {
-        type: 'borrow',
-        action: 'User borrowed ' + newEvent.assetsReceived[0]?.amount + ' ' + newEvent.assetsReceived[0]?.asset.symbol,
-        ...newEvent,
-      }
-
     case 'withdraw':
       return {
-        type: 'withdraw-collateral',
-        action: 'User withdrew ' + newEvent.assetsSent[0]?.amount + ' ' + newEvent.assetsSent[0]?.asset.symbol,
+        type: 'unwrap',
+        action: 'Unwrapped ' + newEvent.assetsReceived[0]?.amount + ' ' + newEvent.assetsReceived[0]?.asset.symbol,
+        ...newEvent,
+      }
+    case 'approve': {
+      const approvalInteraction = event.interactions.find((i) => i.event.eventName === 'Approval')
+
+      return {
+        type: 'approve-token',
+        action: 'Approved ' + approvalInteraction?.contractSymbol,
+        ...newEvent,
+      }
+    }
+    case 'transfer':
+      return {
+        type: 'transfer',
+        action: 'Transferred ' + newEvent.assetsSent[0]?.amount + ' ' + newEvent.assetsSent[0]?.asset.symbol,
         ...newEvent,
       }
   }
 
   return {
-    ...newEvent,
     type: 'unknown',
-    action: 'Unknown action',
+    action: `Called method '${methodName}'`,
+    ...newEvent,
   }
 }
 
-export const contracts = ['1:0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9']
+export const contracts = ['1:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']

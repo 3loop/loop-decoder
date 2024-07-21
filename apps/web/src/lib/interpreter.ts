@@ -4,9 +4,11 @@ import {
   QuickjsInterpreterLive,
   QuickjsConfig,
   TransactionInterpreter,
+  fallbackInterpreter,
 } from '@3loop/transaction-interpreter'
 import { Effect, Layer } from 'effect'
 import variant from '@jitl/quickjs-singlefile-browser-release-sync'
+import { getInterpreterForContract } from '@3loop/transaction-interpreter'
 
 const config = Layer.succeed(QuickjsConfig, {
   variant: variant,
@@ -19,14 +21,6 @@ export interface Interpretation {
   tx: DecodedTx
   interpretation: any
   error?: string
-}
-
-export const emptyInterpreter: Interpreter = {
-  schema: `function transformEvent(event){
-    return event;
-};
-`,
-  id: 'empty',
 }
 
 export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
@@ -54,44 +48,20 @@ export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interp
     })
 }
 
-export function findInterpreter({
-  decodedTx,
-  interpreters,
-}: {
-  decodedTx: DecodedTx
-  interpreters: Interpreter[]
-}): Interpreter | undefined {
-  try {
-    const { toAddress: contractAddress, chainID } = decodedTx
-
-    if (!contractAddress) {
-      return undefined
-    }
-
-    const id = `contract:${contractAddress.toLowerCase()},chain:${chainID}`
-
-    const contractTransformation = interpreters.find((interpreter) => interpreter.id.toLowerCase() === id)
-
-    return contractTransformation
-  } catch (e) {
-    throw new Error(`Failed to find tx interpreter: ${e}`)
-  }
-}
-
-export async function findAndRunInterpreter(
-  decodedTx: DecodedTx,
-  interpreters: Interpreter[],
-): Promise<Interpretation> {
-  const interpreter = findInterpreter({ decodedTx, interpreters })
+export async function findAndRunInterpreter(decodedTx: DecodedTx): Promise<Interpretation> {
+  let interpreter = getInterpreterForContract({
+    address: decodedTx.toAddress ?? '',
+    chain: decodedTx.chainID,
+  })
 
   if (!interpreter) {
-    return {
-      tx: decodedTx,
-      interpretation: null,
-    }
+    interpreter = fallbackInterpreter
   }
 
-  const res = await applyInterpreter(decodedTx, interpreter)
+  const res = await applyInterpreter(decodedTx, {
+    id: 'default',
+    schema: interpreter,
+  })
 
   return res
 }

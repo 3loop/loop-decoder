@@ -5,10 +5,11 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import chalk from 'chalk'
 import { parse } from '@babel/parser'
-import _traverse from '@babel/traverse'
+import _traverse, { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 import _generator from '@babel/generator'
 import * as esbuild from 'esbuild'
+import template from '@babel/template'
 
 // See https://github.com/babel/babel/issues/13855
 const traverse = (_traverse as any).default
@@ -21,6 +22,9 @@ function log(message: string) {
 // Folder names
 const SOURCE_FOLDER_NAME = 'interpreters'
 const OUTPUT_FILE_NAME = 'src/interpreters.ts'
+const STD_FILE_NAME = 'std.ts'
+const ENTRY_POINT_FILE_NAME = 'index.ts'
+const FALLBACK_FILE_NAME = 'fallback.ts'
 
 function getInterpreterName(p: path.ParsedPath) {
   return `${p.dir}/${p.name}`.replace(/^interpreters\//, '')
@@ -32,8 +36,30 @@ interface Interpreter {
   contracts: string[]
 }
 
-async function generateMappings(interpreters: Interpreter[]) {
-  const filepath = `${SOURCE_FOLDER_NAME}/index.ts`
+function testMatches(importName?: string, test?: RegExp | string) {
+  const tests = Array.isArray(test) ? test : [test]
+
+  return tests.some((regex) => {
+    if (typeof regex === 'string') {
+      regex = new RegExp(regex)
+    }
+    return regex.test(importName || '')
+  })
+}
+
+async function compileStd(isDev: boolean) {
+  const tsCode = await fs.readFile(`${SOURCE_FOLDER_NAME}/${STD_FILE_NAME}`, 'utf-8')
+  const jsCode = await esbuild.transform(tsCode, {
+    loader: 'ts',
+    minify: !isDev,
+  })
+
+  // Remove export keyword as the file gets prepended to the interpeters
+  return jsCode.code.replaceAll('export ', '')
+}
+
+async function generateMappings(interpreters: Interpreter[], isDev = false) {
+  const filepath = `${SOURCE_FOLDER_NAME}/${ENTRY_POINT_FILE_NAME}`
   const template = await fs.readFile(filepath, 'utf-8')
 
   const contractToName = interpreters.reduce(
@@ -48,7 +74,7 @@ async function generateMappings(interpreters: Interpreter[]) {
 
   const nameToCode = interpreters.reduce(
     (acc, { name, output }) => {
-      acc[name] = output.replaceAll('export ', '')
+      acc[name] = output
       return acc
     },
     {} as Record<string, string>,
@@ -57,21 +83,29 @@ async function generateMappings(interpreters: Interpreter[]) {
   const contractMap = JSON.stringify(contractToName).slice(1, -1)
   const interpreterMap = JSON.stringify(nameToCode).slice(1, -1)
 
+  const [stdContent, fallbackContent] = await Promise.all([
+    compileStd(isDev),
+    processInterpreter(`${SOURCE_FOLDER_NAME}/${FALLBACK_FILE_NAME}`, isDev),
+  ])
+
+  // TODO: Use a template enigine like ejs
   const content = template
     .replace('/**PLACE_CONTRACT_MAPPING**/', contractMap)
     .replace('/**PLACE_INTEPRETATIONS**/', interpreterMap)
+    .replace(`'/**PLACE_STD_CONTENT**/'`, `\`${stdContent}\``)
+    .replace(`'/**PLACE_FALLBACK_CONTENT**/'`, JSON.stringify(fallbackContent.output))
 
   await fs.writeFile(OUTPUT_FILE_NAME, content)
 }
 
-async function processInterpreter(file: string, isDev?: boolean) {
+async function processInterpreter(file: string, _isDev?: boolean) {
   let contracts: string[] = []
 
   const tsCode = await fs.readFile(file, 'utf-8')
 
   const jsCode = await esbuild.transform(tsCode, {
     loader: 'ts',
-    minify: !isDev,
+    minify: false, // !isDev, NOTE: not minifying for now to keep the std import names
   })
 
   const ast = parse(jsCode.code, {
@@ -79,7 +113,7 @@ async function processInterpreter(file: string, isDev?: boolean) {
   })
 
   traverse(ast, {
-    ExportNamedDeclaration(path) {
+    ExportNamedDeclaration(path: NodePath) {
       const node = path.node
       if (
         t.isExportNamedDeclaration(node) &&
@@ -93,14 +127,21 @@ async function processInterpreter(file: string, isDev?: boolean) {
         path.stop()
       }
     },
+    ImportDeclaration(path: NodePath<t.ImportDeclaration>) {
+      const importName = path.node?.source && path.node?.source.value ? path.node?.source.value : undefined
+      const isMatch = testMatches(importName, 'std.js')
+      if (importName && isMatch) {
+        path.remove()
+      }
+    },
   })
 
-  const output = generate(ast).code
+  const output = generate(ast, {}, { [file]: jsCode.code }).code.replaceAll('export ', '')
 
   const name = getInterpreterName(path.parse(file))
 
   return {
-    contracts,
+    contracts: contracts.map((c) => c.toLowerCase()),
     output,
     name,
   }
@@ -117,16 +158,19 @@ async function processFiles(files: string[], isDev?: boolean) {
 
   const interpreters = await Promise.all(transfoms)
 
-  await generateMappings(interpreters)
+  await generateMappings(interpreters, isDev)
 
   log(`Built ${fileName}`)
 }
 
 export async function runCompiler({ watch }: { watch: boolean }) {
   const SOURCE_FILE_GLOB = `${SOURCE_FOLDER_NAME}/**/*.ts`
-  const files = (await glob(SOURCE_FILE_GLOB)).filter((file) => !file.includes('index.ts'))
+  const files = (await glob(SOURCE_FILE_GLOB)).filter(
+    (file) =>
+      !file.includes(ENTRY_POINT_FILE_NAME) && !file.includes(STD_FILE_NAME) && !file.includes(FALLBACK_FILE_NAME),
+  )
 
-  await processFiles(files, undefined)
+  await processFiles(files, watch)
 
   if (watch) {
     const watcher = chokidar.watch(SOURCE_FILE_GLOB, { ignoreInitial: true })

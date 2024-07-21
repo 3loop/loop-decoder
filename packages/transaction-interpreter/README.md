@@ -61,7 +61,7 @@ All interpreters are stored in the `interpreters` directory. Each interpreter mu
 Before using the library, we need compiles all interpreters into a format that can be consumed by the loop interpreter.
 
 ```bash
-pnpm run build:intepreters
+pnpm run build:interpreters
 ```
 
 You can compile the library with the following command:
