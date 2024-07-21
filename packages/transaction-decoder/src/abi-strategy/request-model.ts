@@ -1,4 +1,4 @@
-import { Request } from 'effect'
+import { Request, RequestResolver } from 'effect'
 
 export interface FetchABIParams {
   readonly chainID: number
@@ -47,3 +47,8 @@ export interface GetContractABIStrategy extends Request.Request<ContractABI, Res
 }
 
 export const GetContractABIStrategy = Request.tagged<GetContractABIStrategy>('GetContractABIStrategy')
+
+export interface ContractAbiResolverStrategy {
+  type: 'address' | 'fragment'
+  resolver: RequestResolver.RequestResolver<GetContractABIStrategy, never>
+}

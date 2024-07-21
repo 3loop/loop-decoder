@@ -34,14 +34,21 @@ async function fetchContractABI(
   throw new Error(`Failed to fetch ABI for ${address} on chain ${chainID}`)
 }
 
-export const BlockscoutStrategyResolver = (config: { apikey?: string; endpoint: string }) =>
-  RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
-    Effect.withSpan(
-      Effect.tryPromise({
-        try: () => fetchContractABI(req, config),
-        catch: () => new RequestModel.ResolveStrategyABIError('Blockscout', req.address, req.chainID),
-      }),
-      'AbiStrategy.BlockscoutStrategyResolver',
-      { attributes: { chainID: req.chainID, address: req.address } },
+export const BlockscoutStrategyResolver = (config: {
+  apikey?: string
+  endpoint: string
+}): RequestModel.ContractAbiResolverStrategy => {
+  return {
+    type: 'address',
+    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+      Effect.withSpan(
+        Effect.tryPromise({
+          try: () => fetchContractABI(req, config),
+          catch: () => new RequestModel.ResolveStrategyABIError('Blockscout', req.address, req.chainID),
+        }),
+        'AbiStrategy.BlockscoutStrategyResolver',
+        { attributes: { chainID: req.chainID, address: req.address } },
+      ),
     ),
-  )
+  }
+}
