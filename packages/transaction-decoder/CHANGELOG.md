@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.13.0
+
+### Minor Changes
+
+- 32af229: Separate ABI resolvers into fragment and full address abi
+
 ## 0.12.0
 
 ### Minor Changes

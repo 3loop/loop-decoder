@@ -1,5 +1,16 @@
 # @3loop/transaction-interpreter
 
+## 0.3.0
+
+### Minor Changes
+
+- 215e045: Add a common data type to return it from all interpreters. Additionally added a couple of more examples of interpretators and a fallback interpretator.
+
+### Patch Changes
+
+- Updated dependencies [32af229]
+  - @3loop/transaction-decoder@0.13.0
+
 ## 0.2.1
 
 ### Patch Changes
