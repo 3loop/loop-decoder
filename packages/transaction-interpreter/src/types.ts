@@ -20,6 +20,8 @@ type TransactionType =
   | 'unwrap'
   | 'approve-token'
   | 'transfer-token'
+  | 'approve-nft'
+  | 'transfer-nft'
   | 'send-to-bridge'
   | 'receive-from-bridge'
   | 'unknown'
@@ -30,6 +32,7 @@ export interface Asset {
   name: string | null
   symbol: string | null
   type: AssetType
+  tokenId?: string
 }
 
 export type AssetTransfer = {

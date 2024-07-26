@@ -9,7 +9,7 @@ export function assetsSent(transfers: Asset[], fromAddress: string): AssetTransf
         from: { address: t.from, name: null },
         to: { address: t.to, name: null },
         amount: t.amount ?? '0',
-        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type },
+        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type, tokenId: t.tokenId },
       }
     })
 }
@@ -22,7 +22,7 @@ export function assetsReceived(transfers: Asset[], fromAddress: string): AssetTr
         from: { address: t.from, name: null },
         to: { address: t.to, name: null },
         amount: t.amount ?? '0',
-        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type },
+        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type, tokenId: t.tokenId },
       }
     })
 }

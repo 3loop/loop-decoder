@@ -12,7 +12,7 @@ import { DecodedTx } from '@3loop/transaction-decoder'
 import { Interpretation, applyInterpreter } from '@/lib/interpreter'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
-import { fallbackInterpreter, getInterpreterForContract } from '@3loop/transaction-interpreter'
+import { fallbackInterpreter, getInterpreter } from '@3loop/transaction-interpreter'
 
 interface FormProps {
   currentChainID: number
@@ -29,15 +29,12 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
 
     if (decoded?.toAddress == null) return null
 
-    const schema = getInterpreterForContract({
-      address: decoded.toAddress,
-      chain: decoded.chainID,
-    })
+    const schema = getInterpreter(decoded)
 
     if (schema != null) return schema
 
     return fallbackInterpreter
-  }, [decoded?.chainID, decoded?.toAddress, persistedSchema])
+  }, [decoded, persistedSchema])
 
   const router = useRouter()
 
