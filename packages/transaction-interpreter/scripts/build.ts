@@ -9,7 +9,6 @@ import _traverse, { NodePath } from '@babel/traverse'
 import * as t from '@babel/types'
 import _generator from '@babel/generator'
 import * as esbuild from 'esbuild'
-import template from '@babel/template'
 
 // See https://github.com/babel/babel/issues/13855
 const traverse = (_traverse as any).default
@@ -34,6 +33,7 @@ interface Interpreter {
   name: string
   output: string
   contracts: string[]
+  type: string | null
 }
 
 function testMatches(importName?: string, test?: RegExp | string) {
@@ -80,8 +80,19 @@ async function generateMappings(interpreters: Interpreter[], isDev = false) {
     {} as Record<string, string>,
   )
 
+  const typeToName = interpreters.reduce(
+    (acc, { name, type }) => {
+      if (type) {
+        acc[type] = name
+      }
+      return acc
+    },
+    {} as Record<string, string>,
+  )
+
   const contractMap = JSON.stringify(contractToName).slice(1, -1)
   const interpreterMap = JSON.stringify(nameToCode).slice(1, -1)
+  const typeMap = JSON.stringify(typeToName).slice(1, -1)
 
   const [stdContent, fallbackContent] = await Promise.all([
     compileStd(isDev),
@@ -94,12 +105,14 @@ async function generateMappings(interpreters: Interpreter[], isDev = false) {
     .replace('/**PLACE_INTEPRETATIONS**/', interpreterMap)
     .replace(`'/**PLACE_STD_CONTENT**/'`, `\`${stdContent}\``)
     .replace(`'/**PLACE_FALLBACK_CONTENT**/'`, JSON.stringify(fallbackContent.output))
+    .replace('/**PLACE_CONTRACT_TYPE_MAPPING**/', typeMap)
 
   await fs.writeFile(OUTPUT_FILE_NAME, content)
 }
 
 async function processInterpreter(file: string, _isDev?: boolean) {
   let contracts: string[] = []
+  let type: string | null = null
 
   const tsCode = await fs.readFile(file, 'utf-8')
 
@@ -126,6 +139,18 @@ async function processInterpreter(file: string, _isDev?: boolean) {
         path.remove()
         path.stop()
       }
+
+      if (
+        t.isExportNamedDeclaration(node) &&
+        t.isVariableDeclaration(node.declaration) &&
+        'name' in node.declaration.declarations[0].id &&
+        node.declaration?.declarations?.[0]?.id.name === 'contractType' &&
+        t.isStringLiteral(node.declaration.declarations[0].init)
+      ) {
+        type = node.declaration.declarations[0].init?.value
+        path.remove()
+        path.stop()
+      }
     },
     ImportDeclaration(path: NodePath<t.ImportDeclaration>) {
       const importName = path.node?.source && path.node?.source.value ? path.node?.source.value : undefined
@@ -144,6 +169,7 @@ async function processInterpreter(file: string, _isDev?: boolean) {
     contracts: contracts.map((c) => c.toLowerCase()),
     output,
     name,
+    type,
   }
 }
 

@@ -38,7 +38,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     case 'transfer':
       return {
         type: 'transfer',
-        action: 'Transferred ' + newEvent.assetsSent[0]?.amount + ' ' + newEvent.assetsSent[0]?.asset.symbol,
+        action: 'Sent ' + newEvent.assetsSent[0]?.amount + ' ' + newEvent.assetsSent[0]?.asset.symbol,
         ...newEvent,
       }
   }

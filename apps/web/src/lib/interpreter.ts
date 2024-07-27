@@ -8,7 +8,7 @@ import {
 } from '@3loop/transaction-interpreter'
 import { Effect, Layer } from 'effect'
 import variant from '@jitl/quickjs-singlefile-browser-release-sync'
-import { getInterpreterForContract } from '@3loop/transaction-interpreter'
+import { getInterpreter } from '@3loop/transaction-interpreter'
 
 const config = Layer.succeed(QuickjsConfig, {
   variant: variant,
@@ -49,10 +49,7 @@ export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interp
 }
 
 export async function findAndRunInterpreter(decodedTx: DecodedTx): Promise<Interpretation> {
-  let interpreter = getInterpreterForContract({
-    address: decodedTx.toAddress ?? '',
-    chain: decodedTx.chainID,
-  })
+  let interpreter = getInterpreter(decodedTx)
 
   if (!interpreter) {
     interpreter = fallbackInterpreter

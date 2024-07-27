@@ -2,7 +2,7 @@ import { stringify } from './helpers/stringify.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 import { Context, Effect, Layer } from 'effect'
 import { InterpretedTransaction, Interpreter } from './types.js'
-import { getInterpreterForContract } from './interpreters.js'
+import { getInterpreter } from './interpreters.js'
 import { QuickjsVM } from './quickjs.js'
 
 export interface TransactionInterpreter {
@@ -23,7 +23,7 @@ export const make = Effect.gen(function* () {
     findInterpreter: (decodedTx: DecodedTx) => {
       if (!decodedTx.toAddress) return undefined
 
-      const code = getInterpreterForContract({ address: decodedTx.toAddress, chain: decodedTx.chainID })
+      const code = getInterpreter(decodedTx)
       if (!code) return undefined
 
       return {
