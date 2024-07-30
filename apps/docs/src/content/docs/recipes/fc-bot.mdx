@@ -129,7 +129,7 @@ const decoder = new TransactionDecoder({
 })
 ```
 
-### Step 3: Decode and Interpret a Transaction
+### Step 5: Decode and Interpret a Transaction
 
 After creating the `decoder` object in the `decoder.ts` file, we can use its `decodeTransaction` method to decode transactions by hash:
 
@@ -146,7 +146,7 @@ To interpret a decoded transaction, the `interpreter.ts` file contains a `transf
 
 ![Playground](../../../assets/friend-tech.png)
 
-### Step 4: Create a Contract Subscription
+### Step 6: Create a Contract Subscription
 
 The bot is set to monitor Friend.tech transactions on the Base Mainnet. The configuration variables are located in the `constants.ts` file:
 
@@ -181,7 +181,7 @@ async function createSubscription(address: string) {
 createSubscription(CONTRACT_ADDRESS)
 ```
 
-### Step 5: Handle a new Transaction
+### Step 7: Handle a new Transaction
 
 The `handleTransaction` function is responsible for decoding incoming alerts and publishing them as Farcaster casts.
 

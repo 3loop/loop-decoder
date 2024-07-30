@@ -23,11 +23,15 @@ To begin using the Loop Decoder, you need to create an instance of the LoopDecod
 1. `getPublicClient`: This function returns an object with [Viem](https://viem.sh/) `PublicClient` based on the chain ID.
 
 ```ts
+import { createPublicClient, http } from 'viem'
+
 const getPublicClient = (chainId: number) => {
-  return {
-    client: createPublicClient({
-      transport: http(RPC_URL[chainId]),
-    }),
+  if (chainId === 1) {
+    return {
+      client: createPublicClient({
+        transport: http('https://rpc.ankr.com/eth'),
+      }),
+    }
   }
 }
 ```
@@ -35,6 +39,8 @@ const getPublicClient = (chainId: number) => {
 2. `contractMetaStore`: This object has two required properties, `get` and `set`, which return and cache contract meta-information. Optionally, you can provide a list of `strategies` that will resolve data when it is missing in the cache. See the `ContractData` type for the required properties of the contract meta-information.
 
 ```ts
+import type { VanillaContractMetaStore } from '@3loop/transaction-decoder'
+
 const db = new Map()
 
 const contractMetaStore: VanillaContractMetaStore = {
@@ -67,6 +73,8 @@ const contractMetaStore: VanillaContractMetaStore = {
 In the following example we will cache all types of ABIs into the same Map.
 
 ```ts
+import type { VanillaAbiStore } from '@3loop/transaction-decoder'
+
 const db = new Map()
 
 const abiStore: VanillaAbiStore = {
@@ -114,7 +122,7 @@ Finally, you can create a new instance of the LoopDecoder class:
 import { TransactionDecoder } from '@3loop/transaction-decoder'
 
 const decoded = new TransactionDecoder({
-  getProvider: getPublicClient,
+  getPublicClient: getPublicClient,
   abiStore: abiStore,
   contractMetaStore: contractMetaStore,
 })
