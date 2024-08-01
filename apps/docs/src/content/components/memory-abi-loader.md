@@ -5,6 +5,7 @@ import {
   VanillaAbiStore,
   ContractABI,
 } from '@3loop/transaction-decoder'
+
 const abiCache = new Map<string, ContractABI>()
 
 const abiStore: VanillaAbiStore = {
@@ -15,20 +16,21 @@ const abiStore: VanillaAbiStore = {
     FourByteStrategyResolver(),
   ],
   get: async ({ address, event, signature }) => {
-    if (abiCache.has(address)) {
+    const value = abiCache.get(address)
+    if (value) {
       return {
         status: 'success',
-        result: abiCache.get(address),
+        result: value,
       }
-    } else if (event != null && abiCache.has(event)) {
+    } else if (event != null && value) {
       return {
         status: 'success',
-        result: abiCache.get(event),
+        result: value,
       }
-    } else if (signature != null && abiCache.has(signature)) {
+    } else if (signature != null && value) {
       return {
         status: 'success',
-        result: abiCache.get(signature),
+        result: value,
       }
     }
 
