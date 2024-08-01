@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.4.0
+
+### Minor Changes
+
+- d1579f1: Add default interpreters for erc20, erc721 and erc1155 contracts
+
 ## 0.3.0
 
 ### Minor Changes
