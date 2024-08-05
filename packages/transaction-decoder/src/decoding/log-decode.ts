@@ -41,12 +41,14 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
           data: logItem.data,
           strict: false,
         }),
-      catch: (err) => {
-        console.error(`Could not decode log ${abiAddress} ${stringify(logItem)}`, err)
-      },
+      catch: (err) =>
+        Effect.gen(function* () {
+          yield* Effect.logError(`Could not decode log ${abiAddress} ${stringify(logItem)}`, err)
+          return new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)
+        }),
     })
 
-    if (args_ == null || eventName == null) {
+    if (eventName == null) {
       return yield* new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)
     }
 

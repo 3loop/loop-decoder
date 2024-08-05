@@ -16,8 +16,8 @@ import { chainIdToNetwork } from './helpers/networks.js'
 import { stringify } from './helpers/stringify.js'
 import { decodeErrorTrace } from './decoding/trace-decode.js'
 
-export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> { }
-export class InvalidArgumentError extends Data.TaggedError('InvalidArgumentError')<{ message: string }> { }
+export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> {}
+export class InvalidArgumentError extends Data.TaggedError('InvalidArgumentError')<{ message: string }> {}
 
 export class FetchTransactionError extends Data.TaggedError('FetchTransactionError')<{ message: string }> {
   constructor(
