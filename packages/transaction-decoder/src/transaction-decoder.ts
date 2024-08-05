@@ -16,8 +16,8 @@ import { chainIdToNetwork } from './helpers/networks.js'
 import { stringify } from './helpers/stringify.js'
 import { decodeErrorTrace } from './decoding/trace-decode.js'
 
-export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> {}
-export class InvalidArgumentError extends Data.TaggedError('InvalidArgumentError')<{ message: string }> {}
+export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> { }
+export class InvalidArgumentError extends Data.TaggedError('InvalidArgumentError')<{ message: string }> { }
 
 export class FetchTransactionError extends Data.TaggedError('FetchTransactionError')<{ message: string }> {
   constructor(
@@ -108,6 +108,10 @@ export const decodeTransaction = ({
       return yield* Effect.die(new UnsupportedEvent({ message: 'Unsupported transaction' }))
     }
 
+    if (transaction.input === '0x') {
+      return yield* Effect.sync(() => transferDecode({ transaction, receipt }))
+    }
+
     const data = transaction.input
     const chainID = Number(transaction.chainId)
     const contractAddress = transaction.to
@@ -131,6 +135,7 @@ export const decodeTransaction = ({
     const decodedErrorTraceRight = decodedErrorTrace.filter(Either.isRight).map((r) => r.right)
 
     const logsErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
+
     if (logsErrors.length > 0) {
       yield* Effect.logError(`Logs decode errors: ${stringify(logsErrors)}`)
     }
@@ -184,7 +189,6 @@ export const decodeTransaction = ({
       txIndex: receipt.transactionIndex,
       reverted: receipt.status === 'reverted', // will return true if status==undefined
       transfers: getAssetsTransfers(interactions, value, receipt.from, receipt.to!),
-      // NOTE: Explore how to set assets for more flexible tracking of the in and out addresses
       interactedAddresses: collectAllAddresses({ interactions, decodedData: decodedDataRight }),
       errors: decodedErrorTraceRight.length > 0 ? decodedErrorTraceRight : null,
     }
@@ -213,17 +217,12 @@ export const decodeTransactionByHash = (hash: Hash, chainID: number) =>
       },
     )
 
-    if (!receipt || !transaction || !trace) {
+    if (!receipt || !transaction) {
       return yield* new FetchTransactionError({ hash, chainID })
     }
 
     const timestamp = yield* getBlockTimestamp(receipt.blockNumber, chainID)
 
-    if (!receipt.to) {
-      return yield* new UnsupportedEvent({ message: 'Contract creation' })
-    } else if (transaction.input === '0x') {
-      return yield* Effect.sync(() => transferDecode({ transaction, receipt }))
-    }
     return yield* decodeTransaction({
       transaction,
       receipt,

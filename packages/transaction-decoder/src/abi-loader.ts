@@ -125,8 +125,6 @@ const getBestMatch = (abi: ContractABI | null) => {
  * for each request and group them by that key. We then load the ABI for the unique
  * requests and resolve the pending requests in a group with the same result.
  *
- * Further improvements can be made by extra grouping by address, to avoid extra
- * requests for each signature.
  */
 const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
   Effect.gen(function* () {

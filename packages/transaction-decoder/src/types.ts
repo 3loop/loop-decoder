@@ -49,7 +49,7 @@ export interface RawDecodedLog {
   decoded: boolean
 }
 
-export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'Gnosis Safe' | 'OTHER'
+export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'OTHER' | string
 
 export interface ContractData {
   address: string
@@ -87,11 +87,11 @@ export interface NativeEventTransfer {
 export type InteractionEvent =
   | NativeEventTransfer
   | {
-      eventName: string | null
-      logIndex: number | null
-      params: EventParams
-      decoded?: boolean
-    }
+    eventName: string | null
+    logIndex: number | null
+    params: EventParams
+    decoded?: boolean
+  }
 
 export interface EventParams {
   [key: string]: string | string[] | undefined | null | number | boolean
