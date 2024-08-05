@@ -32,7 +32,7 @@
     "build:interpreters": "tsx ./scripts/index.ts build",
     "build": "rm -rf dist && pnpm build:interpreters && tsup",
     "check": "tsc --noEmit",
-    "dev": "tsup --watch",
+    "dev": "pnpm build:interpreters && tsup --watch",
     "lint": "eslint --exit-on-fatal-error --ignore-path .eslintignore --ext .ts .",
     "fix": "eslint --ignore-path .eslintignore --ext .ts . --fix"
   },
