@@ -87,11 +87,11 @@ export interface NativeEventTransfer {
 export type InteractionEvent =
   | NativeEventTransfer
   | {
-    eventName: string | null
-    logIndex: number | null
-    params: EventParams
-    decoded?: boolean
-  }
+      eventName: string | null
+      logIndex: number | null
+      params: EventParams
+      decoded?: boolean
+    }
 
 export interface EventParams {
   [key: string]: string | string[] | undefined | null | number | boolean
