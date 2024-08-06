@@ -49,7 +49,7 @@ export interface RawDecodedLog {
   decoded: boolean
 }
 
-export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'Gnosis Safe' | 'OTHER'
+export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'OTHER' | string
 
 export interface ContractData {
   address: string

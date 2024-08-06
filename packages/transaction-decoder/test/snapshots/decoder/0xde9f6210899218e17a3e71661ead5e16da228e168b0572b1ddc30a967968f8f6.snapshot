@@ -9,12 +9,50 @@
   "gasPaid": "0.004708065739055784",
   "gasUsed": "303142",
   "interactedAddresses": [
+    "0xcF8d0c70c850859266f5C338b38F9D663181C314",
+    "0x0000000000000000000000000000000000000000",
+    "0x955fe53fF029d6a0503C0b101E109036475e580b",
     "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
     "0x6B175474E89094C44Da98b954EedeAC495271d0F",
     "0x018008bfb33d285247A21d44E50697654f754e63",
-    "0x955fe53fF029d6a0503C0b101E109036475e580b",
   ],
   "interactions": [
+    {
+      "chainID": 1,
+      "contractAddress": "0xcF8d0c70c850859266f5C338b38F9D663181C314",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 365,
+        "params": {
+          "from": "0x0000000000000000000000000000000000000000",
+          "to": "0x955fe53fF029d6a0503C0b101E109036475e580b",
+          "value": "100000000000000000000",
+        },
+      },
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0xcF8d0c70c850859266f5C338b38F9D663181C314",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Mint",
+        "logIndex": 366,
+        "params": {
+          "balanceIncrease": "0",
+          "caller": "0x955fe53fF029d6a0503C0b101E109036475e580b",
+          "index": "1082995711969802729186045067",
+          "onBehalfOf": "0x955fe53fF029d6a0503C0b101E109036475e580b",
+          "value": "100000000000000000000",
+        },
+      },
+    },
     {
       "chainID": 1,
       "contractAddress": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
@@ -145,6 +183,15 @@
     },
   ],
   "transfers": [
+    {
+      "address": "0xcF8d0c70c850859266f5C338b38F9D663181C314",
+      "amount": "100",
+      "from": "0x0000000000000000000000000000000000000000",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0x955fe53fF029d6a0503C0b101E109036475e580b",
+      "type": "ERC20",
+    },
     {
       "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
       "amount": "100",
