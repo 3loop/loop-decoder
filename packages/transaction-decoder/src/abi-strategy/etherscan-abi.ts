@@ -52,7 +52,6 @@ async function fetchContractABI(
   config?: { apikey?: string; endpoint?: string },
 ): Promise<RequestModel.ContractABI> {
   const endpoint = config?.endpoint ?? endpoints[chainID]
-  console.log('fetchContractABI', address)
   const params: Record<string, string> = {
     module: 'contract',
     action: 'getabi',
