@@ -1,10 +1,7 @@
-import type { AssetTransfer, InterpretedTransaction } from '@/types.js'
+import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
-import { assetsReceived, assetsSent } from './std.js'
+import { assetsReceived, assetsSent, displayAsset } from './std.js'
 
-function displayAsset(asset: AssetTransfer): string {
-  return asset.amount + ' ' + asset.asset.symbol
-}
 export function transformEvent(tx: DecodedTx): InterpretedTransaction {
   const methodName = tx.methodCall.name
 

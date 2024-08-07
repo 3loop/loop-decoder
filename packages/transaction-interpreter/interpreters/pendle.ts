@@ -1,9 +1,9 @@
-import { assetsReceived, assetsSent, displayAsset } from './std.js'
+import { assetsReceived, assetsSent, displayAsset, getPayments, isSwap } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
-  const methodName = event.methodCall.name
+  const methodName = event.methodCall.name || 'unknown'
 
   const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
     chain: event.chainID,
@@ -14,32 +14,31 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     assetsReceived: assetsReceived(event.transfers, event.fromAddress),
   }
 
-  const hasSwap = event.traceCalls.some((call) => call.name === 'swap')
+  const netSent = getPayments({
+    transfers: event.transfers,
+    fromAddresses: [event.fromAddress],
+  })
 
-  if (hasSwap) {
-    const from = displayAsset(newEvent.assetsSent[0])
-    const to = displayAsset(newEvent.assetsReceived[0])
+  const netReceived = getPayments({
+    transfers: event.transfers,
+    toAddresses: [event.fromAddress],
+  })
 
+  if (isSwap(event)) {
     return {
       type: 'swap',
-      action: 'Swapped ' + from + ' for ' + to,
+      action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
       ...newEvent,
     }
   }
 
   return {
     type: 'unknown',
-    action: 'Unknown action',
+    action: `Called method '${methodName}'`,
     ...newEvent,
   }
 }
 
 export const contracts = [
-  // Mainnet
-  '1:0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b',
-  '1:0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad',
-  '1:0x76d631990d505e4e5b432eedb852a60897824d68',
-  // Sepolia
-  '11155111:0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad',
-  '11155111:0x5302086a3a25d473aabbd0356eff8dd811a4d89b',
+  '1:0x888888888889758F76e7103c6CbF23ABbF58F946', // Pendle Router v4
 ]

@@ -1,4 +1,4 @@
-import { assetsReceived, assetsSent } from './std.js'
+import { assetsReceived, assetsSent, formatNumber } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 
@@ -32,7 +32,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
           action = `Revoked approval for ${name} to be spent`
         } else {
           const amount = formatAmount(approvalValue, approval?.decimals || 18)
-          action = `Approved ${amount}${name} to be spent`
+          action = `Approved ${formatNumber(amount)}${name} to be spent`
         }
       }
 
@@ -43,25 +43,25 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       }
     }
     case 'transfer': {
-      const amount = newEvent.assetsSent?.[0]?.amount || event.methodCall?.arguments?.[1]?.value
+      const amount = newEvent.assetsSent?.[0]?.amount || event.methodCall?.arguments?.[1]?.value || '0'
       const symbol = newEvent.assetsSent?.[0]?.asset?.symbol || event.contractName || 'unknown'
 
       return {
         type: 'transfer-token',
-        action: `Sent ${amount} ${symbol}`,
+        action: `Sent ${formatNumber(amount.toString())} ${symbol}`,
         ...newEvent,
       }
     }
     case 'transferFrom': {
       const from = event.methodCall?.arguments?.[0]?.value as string
-      const amount = event.transfers[0]?.amount || event.methodCall?.arguments?.[2]?.value
+      const amount = event.transfers[0]?.amount || event.methodCall?.arguments?.[2]?.value || '0'
       const symbol = event.transfers[0]?.symbol || event.contractName || 'unknown'
 
       if (!from) break
 
       return {
         type: 'transfer-token',
-        action: `Sent ${amount} ${symbol}`,
+        action: `Sent ${formatNumber(amount.toString())} ${symbol}`,
         ...newEvent,
         assetsSent: assetsSent(event.transfers, from),
         assetsReceived: assetsReceived(event.transfers, from),
