@@ -24,6 +24,9 @@ type TransactionType =
   | 'transfer-nft'
   | 'send-to-bridge'
   | 'receive-from-bridge'
+  | 'account-abstraction'
+  | 'stake-token'
+  | 'unstake-token'
   | 'unknown'
   | string
 
@@ -41,6 +44,8 @@ export type AssetTransfer = {
   amount: string
   asset: Asset
 }
+
+export type Payment = Omit<AssetTransfer, 'to' | 'from'>
 
 export type InterpretedTransaction = {
   chain: number
