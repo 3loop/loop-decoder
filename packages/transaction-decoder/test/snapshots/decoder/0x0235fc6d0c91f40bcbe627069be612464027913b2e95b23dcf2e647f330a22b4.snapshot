@@ -1,4 +1,32 @@
 {
+  "addressesMeta": {
+    "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052": {
+      "address": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+      "chainID": 5,
+      "contractAddress": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
+      "contractName": "Mock ERC20 Contract",
+      "decimals": 18,
+      "tokenSymbol": "ERC20",
+      "type": "ERC20",
+    },
+    "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e": {
+      "address": "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+      "chainID": 5,
+      "contractAddress": "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
+      "contractName": "Mock ERC20 Contract",
+      "decimals": 18,
+      "tokenSymbol": "ERC20",
+      "type": "ERC20",
+    },
+    "0xC3E4214dd442136079dF06bb2529Bae276d37564": {
+      "address": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
+      "chainID": 5,
+      "contractAddress": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
+      "contractName": "Mock ERC721 Contract",
+      "tokenSymbol": "ERC721",
+      "type": "ERC721",
+    },
+  },
   "chainID": 5,
   "chainSymbol": "goerli",
   "contractName": "Mock ERC721 Contract",
@@ -9,6 +37,8 @@
   "gasPaid": "0.00000134085519894",
   "gasUsed": "46740",
   "interactedAddresses": [
+    "0x997162a6beb886655d3e355b190fe0c8f0c37f0e",
+    "0xc3e4214dd442136079df06bb2529bae276d37564",
     "0xC3E4214dd442136079dF06bb2529Bae276d37564",
     "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
     "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",

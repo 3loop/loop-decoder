@@ -12,6 +12,7 @@ export function transferDecode({
   const value = transaction.value.toString()
   const effectiveGasPrice = receipt.effectiveGasPrice ?? BigInt(0)
   const gasPaid = formatEther(receipt.gasUsed * effectiveGasPrice)
+  const interactedAddresses = [receipt.from, receipt.to].filter(Boolean)
 
   const decodedTx: DecodedTx = {
     contractName: null,
@@ -36,7 +37,8 @@ export function transferDecode({
     txIndex: receipt.transactionIndex,
     reverted: receipt.status === 'reverted', // will return true if status==undefined
     transfers: [], // TDOO: display the eth sent
-    interactedAddresses: [receipt.from, receipt.to].filter(Boolean),
+    interactedAddresses,
+    addressesMeta: {}, // TODO: get address metadata
     errors: null, //TODO: add error decoding
   }
 

@@ -1,20 +1,20 @@
 import { Data, Effect, Either } from 'effect'
-import { isAddress, formatEther } from 'viem'
+import { Address, formatEther, getAddress } from 'viem'
 import { type Hex, type Hash, type GetTransactionReturnType, type TransactionReceipt } from 'viem'
 import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } from './transaction-loader.js'
 import * as LogDecoder from './decoding/log-decode.js'
 import * as TraceDecoder from './decoding/trace-decode.js'
 import * as CalldataDecode from './decoding/calldata-decode.js'
 import { transferDecode } from './decoding/transfer-decode.js'
-import type { DecodeResult, DecodedTx, Interaction } from './types.js'
+import type { DecodedTx, Interaction, ContractData } from './types.js'
 import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
 import { getAssetsTransfers } from './transformers/tokens.js'
 import { getAndCacheContractMeta } from './contract-meta-loader.js'
-import traverse from 'traverse'
 import { chainIdToNetwork } from './helpers/networks.js'
 import { stringify } from './helpers/stringify.js'
 import { decodeErrorTrace } from './decoding/trace-decode.js'
+import { collectAllAddresses } from './transformers/addresses.js'
 
 export class UnsupportedEvent extends Data.TaggedError('UnsupportedEvent')<{ message: string }> {}
 export class InvalidArgumentError extends Data.TaggedError('InvalidArgumentError')<{ message: string }> {}
@@ -60,34 +60,6 @@ export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transac
     }),
   )
 
-const collectAllAddresses = ({
-  interactions,
-  decodedData,
-}: {
-  interactions: Interaction[]
-  decodedData?: DecodeResult
-}) => {
-  const addresses = new Set<string>()
-  for (const interaction of interactions) {
-    addresses.add(interaction.contractAddress)
-    traverse(interaction.event).forEach(function (value: string) {
-      if (this.isLeaf && isAddress(value)) {
-        addresses.add(value)
-      }
-    })
-  }
-
-  if (decodedData?.params) {
-    for (const param of decodedData.params) {
-      if (typeof param.value === 'string' && isAddress(param.value)) {
-        addresses.add(param.value)
-      }
-    }
-  }
-
-  return [...addresses]
-}
-
 export const decodeTransaction = ({
   transaction,
   receipt,
@@ -114,7 +86,7 @@ export const decodeTransaction = ({
 
     const data = transaction.input
     const chainID = Number(transaction.chainId)
-    const contractAddress = transaction.to
+    const contractAddress = getAddress(transaction.to)
 
     const { decodedData, decodedTrace, decodedLogs, decodedErrorTrace } = yield* Effect.all(
       {
@@ -154,25 +126,44 @@ export const decodeTransaction = ({
       yield* Effect.logError(`ErrorTrace decode errors: ${stringify(errorTraceErrors)}`)
     }
 
-    const interpreterMap = yield* getAndCacheContractMeta({
-      address: receipt.to!,
-      chainID: Number(transaction.chainId),
-    })
-
     const interactions: Interaction[] = TraceDecoder.augmentTraceLogs(transaction, decodedLogsRight, trace)
 
     const value = transaction.value.toString()
 
     const effectiveGasPrice = receipt.effectiveGasPrice ?? BigInt(0)
     const gasPaid = formatEther(receipt.gasUsed * effectiveGasPrice)
+    const interactedAddresses = collectAllAddresses({ interactions, decodedData: decodedDataRight, receipt })
+
+    const contractMetaResult = yield* Effect.all(
+      interactedAddresses.map((address) => getAndCacheContractMeta({ address, chainID })),
+      {
+        concurrency: 'unbounded',
+        batching: true,
+      },
+    ).pipe(
+      Effect.withSpan('TransactionDecoder.getAndCacheContractMeta', {
+        attributes: {
+          addressesCount: interactedAddresses.length,
+        },
+      }),
+    )
+
+    const contractsMeta = contractMetaResult.reduce(
+      (acc, meta) => {
+        return meta ? { ...acc, [getAddress(meta.address)]: meta } : acc
+      },
+      {} as Record<Address, ContractData>,
+    )
+
+    const contractMeta = contractsMeta[contractAddress]
 
     const decodedTx: DecodedTx = {
       txHash: transaction.hash,
       txType: TxType.CONTRACT_INTERACTION,
       fromAddress: receipt.from,
       toAddress: receipt.to,
-      contractName: interpreterMap?.contractName ?? null,
-      contractType: interpreterMap?.type ?? 'OTHER',
+      contractName: contractMeta?.contractName ?? null,
+      contractType: contractMeta?.type ?? 'OTHER',
       methodCall: {
         name: decodedDataRight?.name ?? data.slice(0, 10),
         arguments: decodedDataRight?.params ?? [],
@@ -189,7 +180,8 @@ export const decodeTransaction = ({
       txIndex: receipt.transactionIndex,
       reverted: receipt.status === 'reverted', // will return true if status==undefined
       transfers: getAssetsTransfers(interactions, value, receipt.from, receipt.to!),
-      interactedAddresses: collectAllAddresses({ interactions, decodedData: decodedDataRight }),
+      interactedAddresses,
+      addressesMeta: contractsMeta,
       errors: decodedErrorTraceRight.length > 0 ? decodedErrorTraceRight : null,
     }
 

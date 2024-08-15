@@ -1,3 +1,4 @@
+import { Address } from 'viem'
 import type { TraceLog } from './schema/trace.js'
 
 export interface RawTxData {
@@ -64,7 +65,7 @@ export interface ContractData {
 export interface Interaction {
   contractName: string | null
   contractSymbol: string | null
-  contractAddress: string
+  contractAddress: Address
   decimals: number | null
   chainID: number
   contractType: ContractType
@@ -114,8 +115,8 @@ export interface DecodedTx {
   chainSymbol: string
   chainID: number
   txIndex: number
-  fromAddress: string
-  toAddress: string | null
+  fromAddress: Address
+  toAddress: Address | null
   reverted: boolean
   timestamp: number
   gasUsed: string
@@ -124,6 +125,7 @@ export interface DecodedTx {
   transfers: Asset[]
   interactedAddresses: string[]
   errors: DecodedError[] | null
+  addressesMeta: Record<Address, ContractData>
 }
 
 export interface MethodCall {
