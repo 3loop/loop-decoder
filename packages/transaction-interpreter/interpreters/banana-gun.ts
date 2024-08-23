@@ -1,10 +1,6 @@
-import { assetsReceived, assetsSent } from './std.js'
-import type { AssetTransfer, InterpretedTransaction } from '@/types.js'
+import { assetsReceived, assetsSent, displayAsset, getPayments, isSwap } from './std.js'
+import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
-
-function displayAsset(asset: AssetTransfer): string {
-  return asset.amount + ' ' + asset.asset.symbol
-}
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const methodName = event.methodCall.name
@@ -18,15 +14,22 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     assetsReceived: assetsReceived(event.transfers, event.fromAddress),
   }
 
-  switch (methodName) {
-    case 'uniswapV3Swap':
-    case 'swap':
-    case 'unoswap':
-      return {
-        type: 'swap',
-        action: 'Swapped ' + displayAsset(newEvent.assetsSent[0]) + ' for ' + displayAsset(newEvent.assetsReceived[0]),
-        ...newEvent,
-      }
+  const netSent = getPayments({
+    transfers: event.transfers,
+    fromAddresses: [event.fromAddress],
+  })
+
+  const netReceived = getPayments({
+    transfers: event.transfers,
+    toAddresses: [event.fromAddress],
+  })
+
+  if (isSwap(event)) {
+    return {
+      type: 'swap',
+      action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
+      ...newEvent,
+    }
   }
 
   return {
@@ -36,4 +39,4 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
   }
 }
 
-export const contracts = ['1:0x1111111254EEB25477B68fb85Ed929f73A960582']
+export const contracts = ['1:0x3328f7f4a1d1c57c35df56bbf0c9dcafca309c49']
