@@ -1,4 +1,4 @@
-import { Effect, Context, Logger, LogLevel, RequestResolver } from 'effect'
+import { Effect, Logger, LogLevel, RequestResolver, ManagedRuntime, Layer } from 'effect'
 import { PublicClient, PublicClientObject, UnknownNetwork } from './public-client.js'
 import { decodeTransactionByHash, decodeCalldata } from './transaction-decoder.js'
 import { ContractAbiResult, AbiStore as EffectAbiStore, AbiParams } from './abi-loader.js'
@@ -15,7 +15,7 @@ export interface TransactionDecoderOptions {
   getPublicClient: (chainID: number) => PublicClientObject | undefined
   abiStore: VanillaAbiStore
   contractMetaStore: VanillaContractMetaStore
-  logging?: boolean
+  logLevel?: LogLevel.Literal
 }
 
 export interface VanillaAbiStore {
@@ -34,12 +34,14 @@ export interface VanillaContractMetaStore {
 
 // TODO: allow adding custom strategies to vanilla API
 export class TransactionDecoder {
-  private readonly context: Context.Context<EffectAbiStore | EffectContractMetaStore | PublicClient>
-  private readonly logging: boolean
+  private readonly runtime: ManagedRuntime.ManagedRuntime<
+    | PublicClient
+    | EffectAbiStore<AbiParams, ContractAbiResult>
+    | EffectContractMetaStore<ContractMetaParams, ContractMetaResult>,
+    never
+  >
 
-  constructor({ getPublicClient, abiStore, contractMetaStore, logging = false }: TransactionDecoderOptions) {
-    this.logging = logging
-
+  constructor({ getPublicClient, abiStore, contractMetaStore, logLevel = 'Error' }: TransactionDecoderOptions) {
     const PublicClientLive = PublicClient.of({
       _tag: 'PublicClient',
       getPublicClient: (chainID) => {
@@ -56,44 +58,47 @@ export class TransactionDecoder {
       },
     })
 
-    const AbiStoreLive = EffectAbiStore.of({
-      strategies: { default: abiStore.strategies ?? [] },
-      get: (key) => Effect.promise(() => abiStore.get(key)),
-      set: (key, val) => Effect.promise(() => abiStore.set(key, val)),
-    })
+    const AbiStoreLive = Layer.succeed(
+      EffectAbiStore,
+      EffectAbiStore.of({
+        strategies: { default: abiStore.strategies ?? [] },
+        get: (key) => Effect.promise(() => abiStore.get(key)),
+        set: (key, val) => Effect.promise(() => abiStore.set(key, val)),
+      }),
+    )
 
     const contractMetaStrategies = contractMetaStore.strategies?.map((strategy) => strategy(PublicClientLive))
 
-    const MetaStoreLive = EffectContractMetaStore.of({
-      strategies: { default: contractMetaStrategies ?? [] },
-      get: (key) => Effect.promise(() => contractMetaStore.get(key)),
-      set: (key, val) => Effect.promise(() => contractMetaStore.set(key, val)),
-    })
-
-    this.context = Context.empty().pipe(
-      Context.add(PublicClient, PublicClientLive),
-      Context.add(EffectAbiStore, AbiStoreLive),
-      Context.add(EffectContractMetaStore, MetaStoreLive),
+    const MetaStoreLive = Layer.succeed(
+      EffectContractMetaStore,
+      EffectContractMetaStore.of({
+        strategies: { default: contractMetaStrategies ?? [] },
+        get: (key) => Effect.promise(() => contractMetaStore.get(key)),
+        set: (key, val) => Effect.promise(() => contractMetaStore.set(key, val)),
+      }),
     )
+
+    const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
+    const MainLayer = Layer.provideMerge(Layer.succeed(PublicClient, PublicClientLive), LoadersLayer).pipe(
+      Layer.provide(Logger.minimumLogLevel(LogLevel.fromLiteral(logLevel))),
+    )
+
+    this.runtime = ManagedRuntime.make(MainLayer)
   }
 
   decodeTransaction({ chainID, hash }: { chainID: number; hash: string }) {
     const program = Effect.gen(function* () {
       return yield* decodeTransactionByHash(hash as Hex, chainID)
-    }).pipe(Logger.withMinimumLogLevel(this.logging ? LogLevel.Debug : LogLevel.Error))
+    })
 
-    const runnable = Effect.provide(program, this.context)
-
-    return Effect.runPromise(runnable)
+    return this.runtime.runPromise(program)
   }
 
   decodeCalldata({ data, chainID, contractAddress }: { data: Hex; chainID?: number; contractAddress?: string }) {
     const program = Effect.gen(function* () {
       return yield* decodeCalldata({ data, chainID, contractAddress })
-    }).pipe(Logger.withMinimumLogLevel(this.logging ? LogLevel.Debug : LogLevel.Error))
+    })
 
-    const runnable = Effect.provide(program, this.context)
-
-    return Effect.runPromise(runnable)
+    return this.runtime.runPromise(program)
   }
 }
