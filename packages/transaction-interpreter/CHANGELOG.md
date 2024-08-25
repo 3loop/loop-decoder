@@ -1,5 +1,19 @@
 # @3loop/transaction-interpreter
 
+## 0.4.0
+
+### Minor Changes
+
+- 797da0f: Add more default interpreters and std functions
+- d1579f1: Add default interpreters for erc20, erc721 and erc1155 contracts
+
+### Patch Changes
+
+- Updated dependencies [1e55653]
+- Updated dependencies [68e2034]
+- Updated dependencies [102fda3]
+  - @3loop/transaction-decoder@0.14.0
+
 ## 0.3.0
 
 ### Minor Changes

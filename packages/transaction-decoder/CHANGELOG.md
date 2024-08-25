@@ -1,5 +1,13 @@
 # @3loop/transaction-decoder
 
+## 0.14.0
+
+### Minor Changes
+
+- 1e55653: Add all interacted addresses metadata to decoded transaction
+- 68e2034: Use managed runtime inside vanilla api and allow passing a custom log level
+- 102fda3: Fix decoding of logs that do not have parameters or if we could not decode their params
+
 ## 0.13.0
 
 ### Minor Changes
