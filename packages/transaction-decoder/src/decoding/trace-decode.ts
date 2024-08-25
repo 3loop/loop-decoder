@@ -3,7 +3,7 @@ import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, MissingABIError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
-import { Hex, type GetTransactionReturnType, Abi } from 'viem'
+import { Hex, type GetTransactionReturnType, Abi, Address } from 'viem'
 import { stringify } from '../helpers/stringify.js'
 import { errorFunctionSignatures, panicReasons, solidityError, solidityPanic } from '../helpers/error.js'
 
@@ -181,7 +181,7 @@ export function augmentTraceLogs(
 ): Interaction[] {
   const nativeTransfers = filterToNativeTransfers(traceLogs).map(
     (log): Interaction => ({
-      contractAddress: log.action.from,
+      contractAddress: log.action.from as Address,
       contractName: null,
       contractSymbol: null,
       contractType: 'OTHER',

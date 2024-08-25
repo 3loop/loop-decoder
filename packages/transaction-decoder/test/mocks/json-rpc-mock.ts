@@ -49,19 +49,19 @@ export const mockedTransport = custom({
     // TODO: add mocks for storage slots
     if (method === 'eth_getStorageAt') {
       // NOTE: mock for BLUR
-      if (params[0] === '0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5') {
+      if (params[0].toLowerCase() === '0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5') {
         return Promise.resolve('0x0000000000000000000000005fa60726E62c50Af45Ff2F6280C468DA438A7837')
       }
-      if (params[0] === '0x0000000000a39bb272e79075ade125fd351887ac') {
+      if (params[0].toLowerCase() === '0x0000000000a39bb272e79075ade125fd351887ac') {
         return Promise.resolve('0x00000000000000000000000001a656024de4B89e2D0198BF4D468E8fd2358b17')
       }
 
-      if (params[0] === '0x2e175f748976cd5cdb98f12d1abc5d137d6c9379') {
+      if (params[0].toLowerCase() === '0x2e175f748976cd5cdb98f12d1abc5d137d6c9379') {
         return Promise.resolve('0x00000000000000000000000001a656024de4B89e2D0198BF4D468E8fd2358b17')
       }
 
       // AAVE
-      if (params[0] === '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2') {
+      if (params[0].toLowerCase() === '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2') {
         return Promise.resolve('0x00000000000000000000000005FAab9E1adbddaD0a08734BE8a52185Fd6558E14')
       }
       return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')

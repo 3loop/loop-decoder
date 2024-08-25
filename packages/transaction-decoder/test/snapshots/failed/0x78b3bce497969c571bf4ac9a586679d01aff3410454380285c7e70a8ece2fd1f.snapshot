@@ -1,4 +1,24 @@
 {
+  "addressesMeta": {
+    "0x26de224CBE06fd4321Ce5747a176CBBD24773BEb": {
+      "address": "0x26de224cbe06fd4321ce5747a176cbbd24773beb",
+      "chainID": 1,
+      "contractAddress": "0x26de224cbe06fd4321ce5747a176cbbd24773beb",
+      "contractName": "Mock ERC20 Contract",
+      "decimals": 18,
+      "tokenSymbol": "ERC20",
+      "type": "ERC20",
+    },
+    "0xCf5540fFFCdC3d510B18bFcA6d2b9987b0772559": {
+      "address": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+      "chainID": 1,
+      "contractAddress": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+      "contractName": "Mock ERC20 Contract",
+      "decimals": 18,
+      "tokenSymbol": "ERC20",
+      "type": "ERC20",
+    },
+  },
   "chainID": 1,
   "chainSymbol": "mainnet",
   "contractName": "Mock ERC20 Contract",
@@ -13,7 +33,10 @@
   "fromAddress": "0x26de224cbe06fd4321ce5747a176cbbd24773beb",
   "gasPaid": "0.005569830614649707",
   "gasUsed": "305761",
-  "interactedAddresses": [],
+  "interactedAddresses": [
+    "0x26de224cbe06fd4321ce5747a176cbbd24773beb",
+    "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+  ],
   "interactions": [],
   "methodCall": {
     "arguments": [],
