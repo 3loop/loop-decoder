@@ -63,7 +63,7 @@ export interface ContractData {
 }
 
 export interface Interaction {
-  contractName: string | null
+  contractName: Address | null
   contractSymbol: string | null
   contractAddress: Address
   decimals: number | null
@@ -73,8 +73,8 @@ export interface Interaction {
 }
 
 export interface NativeEventTransferParams {
-  from: string
-  to: string
+  from: Address
+  to: Address
   value: string
 }
 

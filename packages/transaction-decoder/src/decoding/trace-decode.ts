@@ -3,7 +3,7 @@ import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, MissingABIError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
-import { Hex, type GetTransactionReturnType, Abi, Address } from 'viem'
+import { type Hex, type GetTransactionReturnType, Abi, getAddress } from 'viem'
 import { stringify } from '../helpers/stringify.js'
 import { errorFunctionSignatures, panicReasons, solidityError, solidityPanic } from '../helpers/error.js'
 
@@ -123,8 +123,8 @@ function traceLogToEvent(nativeTransfer: TraceLog): InteractionEvent {
       return {
         eventName: 'NativeTransfer',
         params: {
-          from: action.from,
-          to: action.to,
+          from: getAddress(action.from),
+          to: getAddress(action.to),
           value: action.value.toString(),
         },
         ...generalNativeEvent,
@@ -133,7 +133,7 @@ function traceLogToEvent(nativeTransfer: TraceLog): InteractionEvent {
       return {
         eventName: 'NativeCreate',
         params: {
-          from: action.from,
+          from: getAddress(action.from),
           value: action.value.toString(),
         },
         ...generalNativeEvent,
@@ -142,8 +142,8 @@ function traceLogToEvent(nativeTransfer: TraceLog): InteractionEvent {
       return {
         eventName: 'NativeSuicide',
         params: {
-          from: action.address,
-          refundAddress: action.refundAddress,
+          from: getAddress(action.address),
+          refundAddress: getAddress(action.refundAddress),
           balance: action.balance.toString(),
         },
         ...generalNativeEvent,
@@ -181,7 +181,7 @@ export function augmentTraceLogs(
 ): Interaction[] {
   const nativeTransfers = filterToNativeTransfers(traceLogs).map(
     (log): Interaction => ({
-      contractAddress: log.action.from as Address,
+      contractAddress: getAddress(log.action.from),
       contractName: null,
       contractSymbol: null,
       contractType: 'OTHER',
