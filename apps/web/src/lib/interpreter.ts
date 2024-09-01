@@ -26,9 +26,7 @@ export interface Interpretation {
 export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
   const runnable = Effect.gen(function* () {
     const interpreterService = yield* TransactionInterpreter
-
     const interpretation = yield* interpreterService.interpretTx(decodedTx, interpreter)
-
     return interpretation
   }).pipe(Effect.provide(layer))
 
