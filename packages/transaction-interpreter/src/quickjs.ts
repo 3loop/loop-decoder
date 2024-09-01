@@ -1,4 +1,4 @@
-import { Effect } from 'effect'
+import { Data, Effect } from 'effect'
 import {
   shouldInterruptAfterDeadline,
   QuickJSRuntime,
@@ -10,9 +10,19 @@ import {
 import { InterpretedTransaction } from './types.js'
 import { QuickjsConfig, RuntimeConfig } from './QuickjsConfig.js'
 
+export class InterpreterError extends Data.TaggedError('InterpreterError')<{
+  message: string
+}> {
+  constructor(error: unknown) {
+    super({
+      message: (error as Error).message,
+    })
+  }
+}
+
 export interface QuickJSVM {
   readonly runtime: QuickJSRuntime
-  readonly eval: (code: string) => Effect.Effect<InterpretedTransaction, never, never>
+  readonly eval: (code: string) => Effect.Effect<InterpretedTransaction, InterpreterError, never>
   readonly dispose: () => void
 }
 
@@ -57,11 +67,23 @@ const acquire = Effect.gen(function* () {
   return {
     runtime,
     eval: (code: string) =>
-      Effect.sync(() => {
-        const result = vm.unwrapResult(vm.evalCode(code))
-        const ok = vm.dump(result)
-        result.dispose()
-        return ok
+      Effect.try({
+        try: () => {
+          const result = vm.evalCode(code)
+          if (result.error) {
+            const errorObj = vm.dump(result.error)
+            result.error.dispose()
+            const error = new Error(errorObj.message)
+            error.stack = errorObj.stack
+            throw error
+          }
+          const ok = vm.dump(result.value)
+          result.value.dispose()
+          return ok
+        },
+        catch: (error: unknown) => {
+          return new InterpreterError(error)
+        },
       }),
     dispose: () => {
       vm.runtime.executePendingJobs(-1)
