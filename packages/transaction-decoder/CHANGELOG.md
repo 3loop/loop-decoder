@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.15.1
+
+### Patch Changes
+
+- bb52260: Update all deps
+
 ## 0.15.0
 
 ### Minor Changes
