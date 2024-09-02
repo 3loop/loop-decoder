@@ -17,8 +17,8 @@
     "eslint": "^8.47.0",
     "prettier": "^3.0.2",
     "tsconfig": "workspace:*",
-    "turbo": "latest"
+    "turbo": "2.1.1"
   },
-  "packageManager": "pnpm@8.6.10",
+  "packageManager": "pnpm@9.9.0",
   "name": "@3loop/decoder-monorepo"
 }
