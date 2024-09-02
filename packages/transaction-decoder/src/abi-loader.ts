@@ -152,7 +152,8 @@ const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<Ab
       cachedResults,
       ([request, result]) => {
         const group = requestGroups[makeRequestKey(request)]
-        const abi = result?.abi ?? null
+        const abi = getBestMatch(result)
+
         return Effect.forEach(group, (req) => Request.succeed(req, abi), { discard: true })
       },
       {

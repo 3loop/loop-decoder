@@ -27,7 +27,7 @@ jobs:
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: 9.9.0
           run_install: false
 
       - name: Get pnpm store directory
@@ -56,8 +56,8 @@ jobs:
         with:
           version: pnpm run version
           publish: pnpm exec changeset publish
-          commit: "[ci] release"
-          title: "[ci] release"
+          commit: '[ci] release'
+          title: '[ci] release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

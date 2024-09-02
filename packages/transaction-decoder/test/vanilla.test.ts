@@ -46,7 +46,7 @@ describe('Transaction Decoder', () => {
                 status: 'success',
                 result: {
                   type: 'func',
-                  abi: `[${signatureAbi}]`,
+                  abi: signatureAbi,
                   address,
                   chainID: 1,
                   signature,
@@ -57,7 +57,7 @@ describe('Transaction Decoder', () => {
                 status: 'success',
                 result: {
                   type: 'event',
-                  abi: `[${signatureAbi}]`,
+                  abi: signatureAbi,
                   address,
                   chainID: 1,
                   event,
