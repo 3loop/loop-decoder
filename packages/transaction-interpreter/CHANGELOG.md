@@ -1,5 +1,13 @@
 # @3loop/transaction-interpreter
 
+## 0.5.1
+
+### Patch Changes
+
+- bb52260: Update all deps
+- Updated dependencies [bb52260]
+  - @3loop/transaction-decoder@0.15.1
+
 ## 0.5.0
 
 ### Minor Changes
