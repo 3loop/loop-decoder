@@ -4,7 +4,7 @@ import { RPCFetchError, PublicClient } from './public-client.js'
 import type { TraceLog, TraceLogTree } from './schema/trace.js'
 import { EthTrace } from './schema/trace.js'
 import { transformTraceTree } from './helpers/trace.js'
-import { type Hash } from 'viem'
+import { GetTransactionReturnType, type Hash } from 'viem'
 import { ParseError } from '@effect/schema/ParseResult'
 
 export const getTransaction = (hash: Hash, chainID: number) =>
@@ -13,7 +13,7 @@ export const getTransaction = (hash: Hash, chainID: number) =>
     const { client } = yield* service.getPublicClient(chainID)
     return yield* Effect.withSpan(
       Effect.tryPromise({
-        try: () => client.getTransaction({ hash }),
+        try: () => client.getTransaction({ hash }) as Promise<GetTransactionReturnType>,
         catch: () => new RPCFetchError('Get transaction'),
       }),
       'TransactionLoader.Transaction',

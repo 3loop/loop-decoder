@@ -9,15 +9,10 @@ import {
   BlockscoutStrategyResolver,
   PublicClient,
   ERC20RPCStrategyResolver,
-  VanillaContractMetaStore,
-  VanillaAbiStore,
-  ContractAbiResult,
-  ContractABI,
 } from '@3loop/transaction-decoder'
 import { Effect, Layer } from 'effect'
 import prisma from './prisma'
 import { NFTRPCStrategyResolver } from '@3loop/transaction-decoder'
-import { status } from 'effect/Fiber'
 
 export const AbiStoreLive = Layer.succeed(
   AbiStore,
