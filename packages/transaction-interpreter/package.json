@@ -37,30 +37,30 @@
     "fix": "eslint --ignore-path .eslintignore --ext .ts . --fix"
   },
   "dependencies": {
-    "@3loop/transaction-decoder": "*",
-    "quickjs-emscripten": "^0.29.1"
+    "@3loop/transaction-decoder": "workspace:^",
+    "quickjs-emscripten": "^0.29.2"
   },
   "peerDependencies": {
     "effect": "^3.4.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.7",
-    "@babel/generator": "^7.24.7",
-    "@babel/parser": "^7.24.7",
-    "@babel/traverse": "^7.24.7",
-    "@babel/types": "^7.24.7",
+    "@babel/core": "^7.25.2",
+    "@babel/generator": "^7.25.6",
+    "@babel/parser": "^7.25.6",
+    "@babel/traverse": "^7.25.6",
+    "@babel/types": "^7.25.6",
     "@types/babel-traverse": "^6.25.10",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__traverse": "^7.20.6",
-    "@types/node": "^20.14.2",
-    "@typescript-eslint/eslint-plugin": "^5.59.6",
-    "@typescript-eslint/parser": "^5.59.6",
+    "@types/node": "^20.16.3",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "chalk": "^5.3.0",
     "chokidar": "^3.6.0",
     "commander": "^12.1.0",
-    "effect": "^3.4.2",
+    "effect": "^3.7.0",
     "esbuild": "^0.21.5",
-    "eslint": "^8.49.0",
+    "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
     "eslint-config-prettier": "^8.10.0",
     "fast-glob": "^3.3.2",
@@ -68,7 +68,7 @@
     "quickjs-emscripten": "^0.29.1",
     "tsconfig": "workspace:*",
     "tsup": "^7.2.0",
-    "tsx": "^4.15.6",
+    "tsx": "^4.19.0",
     "typescript": "5.1.3"
   },
   "publishConfig": {
