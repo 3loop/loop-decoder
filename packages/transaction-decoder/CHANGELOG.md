@@ -1,5 +1,12 @@
 # @3loop/transaction-decoder
 
+## 0.15.0
+
+### Minor Changes
+
+- 03306a6: Fix store abi loader for fragments needs wrapping in square brakets to act as array
+- 76badf6: Make trace and log addresses hexed
+
 ## 0.14.0
 
 ### Minor Changes
