@@ -119,7 +119,7 @@ const AbiStoreLive = Layer.succeed(
         if (abi) {
           return {
             type: 'func',
-            abi: `[${abi}]`,
+            abi: abi,
             address,
             chainID: chainID,
             signature,

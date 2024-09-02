@@ -71,7 +71,7 @@ export const MockedAbiStoreLive = Layer.succeed(
                 status: 'success',
                 result: {
                   type: 'func',
-                  abi: `[${signatureAbi}]`,
+                  abi: signatureAbi,
                   address,
                   chainID: 1,
                   signature,
@@ -82,7 +82,7 @@ export const MockedAbiStoreLive = Layer.succeed(
                 status: 'success',
                 result: {
                   type: 'event',
-                  abi: `[${signatureAbi}]`,
+                  abi: signatureAbi,
                   address,
                   chainID: 1,
                   event,
