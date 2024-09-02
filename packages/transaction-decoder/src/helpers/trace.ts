@@ -1,5 +1,9 @@
 import type { TraceLogTree, TraceLog, CallType } from '../schema/trace.js'
 
+/*
+  Transform Geth trace to Parity trace
+  https://github.com/blockchain-etl/ethereum-etl/blob/develop/docs/schema.md#differences-between-geth-and-parity-tracescsv
+*/
 export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | undefined {
   let traceLog: TraceLog | undefined
 

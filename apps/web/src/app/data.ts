@@ -25,22 +25,12 @@ export const EXAMPLE_TXS = {
   ],
   'NFTS BLUR': [
     {
-      name: 'takeBidSingle',
-      hash: '0x02a4dda78f1452772d87aa080d65ed7c34785b9d0f4c20aa6c91c51a63ee1fa4',
-      chainID: 1,
-    },
-    {
-      name: 'takeAskSingle',
-      hash: '0x26260ddb60e640ee8cee513b3b6a6491ac1ba40fbb459cb2437e080d3143f313',
-      chainID: 1,
-    },
-    {
-      name: 'takeBid',
+      name: 'Sell',
       hash: '0xb5c56b4213325cb3fba274d0467b40ab28d9d475ba4a652b46943251c3c0d697',
       chainID: 1,
     },
     {
-      name: 'takeAsk',
+      name: 'Buy',
       hash: '0x9ed41e3d626605673c282dc8a0f7429e7abcab112d6529b0c77ee43954202cab',
       chainID: 1,
     },
@@ -50,6 +40,47 @@ export const EXAMPLE_TXS = {
       name: 'handleOps',
       hash: '0xcc1f4e40e1186503bb19b5716c8527947ab4c7e972b79d3d64ad8a015cf10ff8',
       chainID: 1,
+    },
+  ],
+  'Swap Transactions': [
+    {
+      name: '1inch',
+      hash: '0x8e36953374f7b71fe4c20898c8ade628cf71d5d0303ec8ad368b254629db2985',
+      chainID: 1,
+    },
+    {
+      name: 'Kyberswap',
+      hash: '0xfe429c6acf3c372270374122fe922282311bea31e09419f7fb167c6d8912372d',
+      chainID: 1,
+    },
+    {
+      name: 'Metamask Router',
+      hash: '0xcb2b8448a1f5dc7a29dc4ab3e79051e7460a4602b82ee5af2b3202c2e8b614de',
+      chainID: 1,
+    },
+    {
+      name: 'OKX',
+      hash: '0xf30013e82cd1197cb867f89ac33480699827282ca19ff49f0810a75e138ec869',
+      chainID: 1,
+    },
+  ],
+  'Bridge Transactions': [
+    {
+      name: 'Hop Protocol',
+      hash: '0x7a7f39aee8c68f9be272b093f613280a8122291923edba83cc3f1f1754a70ecd',
+      chainID: 1,
+    },
+  ],
+  'Friend.Tech (Base mainnet)': [
+    {
+      name: 'Sell',
+      hash: '0x9e18a3ab3faed1b13412e5cca532e083761410bb58e0423a5cd865a18a8e49a3',
+      chainID: 8453,
+    },
+    {
+      name: 'Buy',
+      hash: '0x24067751e1bb553b8f5ccd6958edc3fa27489f9836bc0cd477383b143825dca5',
+      chainID: 8453,
     },
   ],
 }

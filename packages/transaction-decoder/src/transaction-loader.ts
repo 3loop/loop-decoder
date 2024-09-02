@@ -35,6 +35,11 @@ export const getTransactionReceipt = (hash: Hash, chainID: number) =>
     )
   })
 
+/*
+ * Trace API is supported by parity tracer
+ * If it does not support it, it is geth tracer
+ * https://github.com/paradigmxyz/ultimate_evm_tracing_reference
+ */
 export const getTrace = (hash: Hash, chainID: number) =>
   Effect.gen(function* () {
     const service = yield* PublicClient

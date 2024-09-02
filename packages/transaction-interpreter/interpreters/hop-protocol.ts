@@ -4,29 +4,32 @@ import { assetsReceived, assetsSent, displayAsset } from './std.js'
 
 export function transformEvent(tx: DecodedTx): InterpretedTransaction {
   const methodName = tx.methodCall.name
+  const userAddress = tx.methodCall.arguments.find((arg) => arg.name === 'recipient')?.value as string
 
   const event = {
     chain: tx.chainID,
     txHash: tx.txHash,
-    user: { address: tx.fromAddress, name: null },
+    user: { address: userAddress, name: null },
     method: methodName,
-    assetsSent: assetsSent(tx.transfers, tx.fromAddress),
-    assetsReceived: assetsReceived(tx.transfers, tx.fromAddress),
+    assetsSent: assetsSent(tx.transfers, userAddress),
+    assetsReceived: assetsReceived(tx.transfers, userAddress),
   }
 
-  switch (methodName) {
-    case 'bondWithdrawal':
-      return {
-        type: 'receive-from-bridge',
-        action: 'Received ' + displayAsset(event.assetsReceived[0]) + ' from bridge',
-        ...event,
-      }
-    case 'sendToL2':
-      return {
-        type: 'send-to-bridge',
-        action: 'Sent ' + displayAsset(event.assetsSent[0]) + ' to bridge',
-        ...event,
-      }
+  if (userAddress) {
+    switch (methodName) {
+      case 'bondWithdrawal':
+        return {
+          type: 'receive-from-bridge',
+          action: 'Received ' + displayAsset(event.assetsReceived[0]) + ' from bridge',
+          ...event,
+        }
+      case 'sendToL2':
+        return {
+          type: 'send-to-bridge',
+          action: 'Sent ' + displayAsset(event.assetsSent[0]) + ' to bridge',
+          ...event,
+        }
+    }
   }
 
   return {

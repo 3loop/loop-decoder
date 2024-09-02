@@ -182,9 +182,17 @@ export function displayPayments(erc20Payments: Payment[], nativePayments: Paymen
     const amount = (erc20Payments.length + 1).toString()
     return amount + ' assets'
   } else if (erc20Payments.length > 0) {
-    return erc20Payments[0].amount + ' ' + erc20Payments[0].asset.symbol
+    return (
+      erc20Payments[0].amount +
+      ' ' +
+      (erc20Payments[0].asset?.symbol || erc20Payments[0].asset?.name + ' tokens' || 'ERCC20 tokens')
+    )
   } else if (nativePayments.length > 0) {
-    return nativePayments[0].amount + ' ' + nativePayments[0].asset.symbol
+    return (
+      nativePayments[0].amount +
+      ' ' +
+      (nativePayments[0].asset?.symbol || nativePayments[0].asset?.name + ' tokens' || 'native tokens')
+    )
   } else {
     return ''
   }
