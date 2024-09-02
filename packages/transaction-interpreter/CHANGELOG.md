@@ -1,5 +1,17 @@
 # @3loop/transaction-interpreter
 
+## 0.5.0
+
+### Minor Changes
+
+- f7efaff: Throw InterpreterError during interpretation
+
+### Patch Changes
+
+- Updated dependencies [03306a6]
+- Updated dependencies [76badf6]
+  - @3loop/transaction-decoder@0.15.0
+
 ## 0.4.0
 
 ### Minor Changes
