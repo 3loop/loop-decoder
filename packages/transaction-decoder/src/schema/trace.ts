@@ -105,12 +105,14 @@ export const EthDebugTraceBase = Schema.Struct({
 
 type DebugTraceLog = Schema.Schema.Type<typeof EthDebugTraceBase>
 
+//TraceLogTree represents the type returned by geth tracer (debug_traceTransaction method)
 export type TraceLogTree = {
   calls?: Array<TraceLogTree>
 } & DebugTraceLog
 
 export const EthTrace = Schema.Union(CallTrace, CreateTrace, RewardTrace, SuicideTrace)
 
+//TraceLog represents the type returned by parity tracer (trace_transaction method)
 export type TraceLog = Schema.Schema.Type<typeof EthTrace>
 export type CallTraceLog = Schema.Schema.Type<typeof CallTrace>
 export type CallType = Schema.Schema.Type<typeof CallType>
