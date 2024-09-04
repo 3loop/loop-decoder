@@ -67,7 +67,15 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
             if (input.name == null) return null
 
             const arg = Array.isArray(args) ? args[i] : args[input.name]
-            const value = Array.isArray(arg) ? arg.map((item) => item?.toString()) : arg.toString()
+
+            let value
+            if (arg == null) {
+              value = null
+            } else if (Array.isArray(arg)) {
+              value = arg.map((item) => item?.toString())
+            } else {
+              value = arg.toString()
+            }
 
             return {
               type: input.type,
