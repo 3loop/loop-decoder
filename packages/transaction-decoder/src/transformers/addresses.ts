@@ -1,4 +1,4 @@
-import { Address, isAddress, TransactionReceipt } from 'viem'
+import { Address, getAddress, isAddress, TransactionReceipt } from 'viem'
 import traverse from 'traverse'
 import type { DecodeResult, Interaction } from '../types.js'
 
@@ -14,11 +14,11 @@ export const collectAllAddresses = ({
   const addresses = new Set<Address>()
 
   if (receipt?.from != null) {
-    addresses.add(receipt.from)
+    addresses.add(getAddress(receipt.from))
   }
 
   if (receipt?.to != null) {
-    addresses.add(receipt.to)
+    addresses.add(getAddress(receipt.to))
   }
 
   for (const interaction of interactions) {
