@@ -37,10 +37,8 @@
   "gasPaid": "0.00000000009225909",
   "gasUsed": "66565",
   "interactedAddresses": [
-    "0x75dd23ba3ba67f9663cbf6f9bdc7ab4923dd91d7",
-    "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
-    "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
     "0x75dD23ba3BA67f9663CbF6F9bdc7aB4923dD91D7",
+    "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
     "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
   ],
   "interactions": [

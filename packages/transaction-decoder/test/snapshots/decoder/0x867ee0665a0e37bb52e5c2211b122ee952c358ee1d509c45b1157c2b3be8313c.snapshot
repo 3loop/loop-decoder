@@ -10,9 +10,9 @@
       "type": "ERC20",
     },
     "0x63c640dE6f9963A90AFdFa64fD44Ee97e2169a18": {
-      "address": "0x63c640de6f9963a90afdfa64fd44ee97e2169a18",
+      "address": "0x63c640dE6f9963A90AFdFa64fD44Ee97e2169a18",
       "chainID": 5,
-      "contractAddress": "0x63c640de6f9963a90afdfa64fd44ee97e2169a18",
+      "contractAddress": "0x63c640dE6f9963A90AFdFa64fD44Ee97e2169a18",
       "contractName": "Mock ERC20 Contract",
       "decimals": 18,
       "tokenSymbol": "ERC20",
@@ -46,8 +46,7 @@
   "gasPaid": "0.00043732950291553",
   "gasUsed": "291553",
   "interactedAddresses": [
-    "0x63c640de6f9963a90afdfa64fd44ee97e2169a18",
-    "0xc3e4214dd442136079df06bb2529bae276d37564",
+    "0x63c640dE6f9963A90AFdFa64fD44Ee97e2169a18",
     "0xC3E4214dd442136079dF06bb2529Bae276d37564",
     "0x0000000000000000000000000000000000000000",
     "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
