@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.15.2
+
+### Patch Changes
+
+- a0336e2: Use hex addresses in interacted addresses list
+
 ## 0.15.1
 
 ### Patch Changes
