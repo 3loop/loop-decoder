@@ -18,13 +18,16 @@ export const AbiStoreLive = Layer.succeed(
   AbiStore,
   AbiStore.of({
     strategies: {
-      default: [
+      default: [SourcifyStrategyResolver(), OpenchainStrategyResolver(), FourByteStrategyResolver()],
+      1: [
         EtherscanStrategyResolver({
           apikey: process.env.ETHERSCAN_API_KEY,
         }),
-        SourcifyStrategyResolver(),
-        OpenchainStrategyResolver(),
-        FourByteStrategyResolver(),
+      ],
+      8453: [
+        EtherscanStrategyResolver({
+          apikey: process.env.BASESCAN_API_KEY,
+        }),
       ],
       169: [
         BlockscoutStrategyResolver({
