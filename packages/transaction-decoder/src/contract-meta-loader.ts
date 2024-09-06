@@ -50,7 +50,7 @@ export interface ContractMetaStore<Key = ContractMetaParams, Value = ContractMet
 
 export const ContractMetaStore = Context.GenericTag<ContractMetaStore>('@3loop-decoder/ContractMetaStore')
 
-export interface ContractMetaLoader extends Request.Request<ContractData | null, unknown> {
+export interface ContractMetaLoader extends Request.Request<ContractData | null, never> {
   _tag: 'ContractMetaLoader'
   address: Address
   chainID: number

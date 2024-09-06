@@ -73,11 +73,11 @@ export const decodeTransaction = ({
 }) =>
   Effect.gen(function* () {
     if (transaction.to == null) {
-      return yield* Effect.die(new UnsupportedEvent({ message: 'Contract creation' }))
+      return yield* Effect.fail(new UnsupportedEvent({ message: 'Contract creation' }))
     }
 
     if (!('input' in transaction)) {
-      return yield* Effect.die(new UnsupportedEvent({ message: 'Unsupported transaction' }))
+      return yield* Effect.fail(new UnsupportedEvent({ message: 'Unsupported transaction' }))
     }
 
     if (transaction.input === '0x') {

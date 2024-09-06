@@ -113,5 +113,5 @@ export const getBlockTimestamp = (blockNumber: bigint, chainID: number) =>
       return block.timestamp
     }
 
-    return 0
+    return BigInt(0)
   })

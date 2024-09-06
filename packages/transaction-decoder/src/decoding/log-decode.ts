@@ -27,10 +27,6 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       chainID,
     })
 
-    if (abiItem_ == null) {
-      return yield* new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0]!, chainID)
-    }
-
     const abiItem = JSON.parse(abiItem_) as Abi[]
 
     const { eventName, args: args_ } = yield* Effect.try({
@@ -43,7 +39,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
         }),
       catch: (err) =>
         Effect.gen(function* () {
-          yield* Effect.logError(`Could not decode log ${abiAddress} ${stringify(logItem)}`, err)
+          yield* Effect.logError(`Could not decode log ${abiAddress} `, err)
           return new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)
         }),
     })

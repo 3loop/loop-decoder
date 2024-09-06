@@ -31,10 +31,6 @@ export const decodeMethod = ({
       chainID,
     })
 
-    if (!abi_) {
-      return yield* new AbiDecoder.MissingABIError(contractAddress, signature, chainID)
-    }
-
     const abi = JSON.parse(abi_) as Abi
 
     const decoded = yield* AbiDecoder.decodeMethod(data, abi)

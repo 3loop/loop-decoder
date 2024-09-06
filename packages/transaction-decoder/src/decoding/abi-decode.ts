@@ -10,16 +10,6 @@ export class DecodeError extends Data.TaggedError('DecodeError')<{ message: stri
   }
 }
 
-export class MissingABIError extends Data.TaggedError('DecodeError')<{ message: string }> {
-  constructor(
-    readonly address: string,
-    readonly signature: string,
-    readonly chainID: number,
-  ) {
-    super({ message: `Missing ABI for ${address} with signature ${signature} on chain ${chainID}` })
-  }
-}
-
 function stringifyValue(value: MostTypes): string | string[] {
   if (Array.isArray(value)) {
     return value.map((v) => v.toString())
