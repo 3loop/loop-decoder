@@ -242,8 +242,9 @@ const AbiLoaderRequestResolver: Effect.Effect<
     // Store results and resolve pending requests
     yield* Effect.forEach(
       strategyResults,
-      (abi, i) => {
+      (abis, i) => {
         const request = remaining[i]
+        const abi = abis?.[0] ?? null
         const bestMatch = getBestMatch(abi)
         const result = bestMatch ? Effect.succeed(bestMatch) : Effect.fail(new MissingABIError(request))
         const group = requestGroups[makeRequestKey(request)]
@@ -259,6 +260,11 @@ const AbiLoaderRequestResolver: Effect.Effect<
 ).pipe(RequestResolver.contextFromServices(AbiStore), Effect.withRequestCaching(true))
 
 // TODO: When failing to decode with one ABI, we should retry with other resolved ABIs
+// We can decode with Effect.validateFirst(abis, (abi) => decodeMethod(input as Hex, abi)) and to find the first ABIs
+// that decodes successfully. We might enforce a sorted array to prioritize the address match. We will have to think
+// how to handle the strategy resolver in this case. Currently, we stop at first successful strategy, which might result
+// in a missing Fragment. We treat this issue as a minor one for now, as we epect it to occur rarely on contracts that
+// are not verified and with a non standard events structure.
 export const getAndCacheAbi = (params: AbiParams) =>
   Effect.gen(function* () {
     if (params.event === '0x' || params.signature === '0x') {

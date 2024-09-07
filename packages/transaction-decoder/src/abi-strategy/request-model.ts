@@ -42,7 +42,9 @@ interface AddressABI {
 export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI
 
 // NOTE: We might want to return a list of ABIs, this might be helpful when fetching for signature
-export interface GetContractABIStrategy extends Request.Request<ContractABI, ResolveStrategyABIError>, FetchABIParams {
+export interface GetContractABIStrategy
+  extends Request.Request<ContractABI[], ResolveStrategyABIError>,
+    FetchABIParams {
   readonly _tag: 'GetContractABIStrategy'
 }
 

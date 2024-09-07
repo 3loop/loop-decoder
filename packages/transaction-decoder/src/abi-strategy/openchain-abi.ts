@@ -43,19 +43,19 @@ async function fetchABI({
   chainID,
   signature,
   event,
-}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI> {
+}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI[]> {
   if (signature != null) {
     const response = await fetch(`${endpoint}?function=${signature}`, options)
     if (response.status === 200) {
       const json = (await response.json()) as OpenchainResponse
 
-      return {
+      return json.result.function[signature].map((f) => ({
         type: 'func',
         address,
         chainID,
-        abi: parseFunctionSignature(json.result.function[signature][0].name),
+        abi: parseFunctionSignature(f.name),
         signature,
-      }
+      }))
     }
   }
   if (event != null) {
@@ -63,13 +63,13 @@ async function fetchABI({
     if (response.status === 200) {
       const json = (await response.json()) as OpenchainResponse
 
-      return {
+      return json.result.event[event].map((e) => ({
         type: 'event',
         address,
         chainID,
-        abi: parseEventSignature(json.result.event[event][0].name),
+        abi: parseEventSignature(e.name),
         event,
-      }
+      }))
     }
   }
 

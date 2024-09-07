@@ -50,7 +50,7 @@ const endpoints: { [k: number]: string } = {
 async function fetchContractABI(
   { address, chainID }: RequestModel.GetContractABIStrategy,
   config?: { apikey?: string; endpoint?: string },
-): Promise<RequestModel.ContractABI> {
+): Promise<RequestModel.ContractABI[]> {
   const endpoint = config?.endpoint ?? endpoints[chainID]
   const params: Record<string, string> = {
     module: 'contract',
@@ -68,12 +68,14 @@ async function fetchContractABI(
   const json = (await response.json()) as { status: string; result: string }
 
   if (json.status === '1') {
-    return {
-      type: 'address',
-      address,
-      chainID,
-      abi: json.result,
-    }
+    return [
+      {
+        type: 'address',
+        address,
+        chainID,
+        abi: json.result,
+      },
+    ]
   }
 
   throw new Error(`Failed to fetch ABI for ${address} on chain ${chainID}`)

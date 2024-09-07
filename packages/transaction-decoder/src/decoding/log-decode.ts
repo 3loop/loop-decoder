@@ -1,4 +1,4 @@
-import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, type Abi, getAddress } from 'viem'
+import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, getAddress } from 'viem'
 import { Effect } from 'effect'
 import type { DecodedLogEvent, Interaction, RawDecodedLog } from '../types.js'
 import { getProxyStorageSlot } from './proxies.js'

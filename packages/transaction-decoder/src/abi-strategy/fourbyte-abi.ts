@@ -25,19 +25,19 @@ async function fetchABI({
   event,
   signature,
   chainID,
-}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI> {
+}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI[]> {
   if (signature != null) {
     const full_match = await fetch(`${endpoint}/signatures/?hex_signature=${signature}`)
     if (full_match.status === 200) {
       const json = (await full_match.json()) as FourBytesResponse
 
-      return {
+      return json.results.map((result) => ({
         type: 'func',
         address,
         chainID,
-        abi: parseFunctionSignature(json.results[0]?.text_signature),
+        abi: parseFunctionSignature(result.text_signature),
         signature,
-      }
+      }))
     }
   }
 
@@ -45,13 +45,13 @@ async function fetchABI({
     const partial_match = await fetch(`${endpoint}/event-signatures/?hex_signature=${event}`)
     if (partial_match.status === 200) {
       const json = (await partial_match.json()) as FourBytesResponse
-      return {
+      return json.results.map((result) => ({
         type: 'event',
         address,
         chainID,
-        abi: parseEventSignature(json.results[0]?.text_signature),
+        abi: parseEventSignature(result.text_signature),
         event,
-      }
+      }))
     }
   }
 
