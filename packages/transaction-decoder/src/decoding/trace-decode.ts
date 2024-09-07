@@ -1,7 +1,7 @@
 import { Effect } from 'effect'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
-import { DecodeError, MissingABIError, decodeMethod } from './abi-decode.js'
+import { DecodeError, decodeMethod } from './abi-decode.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 import { type Hex, type GetTransactionReturnType, Abi, getAddress } from 'viem'
 import { stringify } from '../helpers/stringify.js'
@@ -29,17 +29,11 @@ const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =
       const signature = call.action.input.slice(0, 10)
       const contractAddress = to
 
-      const abi_ = yield* getAndCacheAbi({
+      const abi = yield* getAndCacheAbi({
         address: contractAddress,
         signature,
         chainID,
       })
-
-      if (abi_ == null) {
-        return yield* new MissingABIError(contractAddress, signature, chainID)
-      }
-
-      const abi = JSON.parse(abi_) as Abi
 
       const method = yield* decodeMethod(input as Hex, abi)
 
@@ -70,11 +64,7 @@ const decodeTraceLogOutput = (call: TraceLog) =>
           chainID: 0,
         })
 
-        if (abi_ == null) {
-          return yield* new MissingABIError('', signature, 0)
-        }
-
-        abi = [...abi, ...(JSON.parse(abi_) as Abi)]
+        abi = [...abi, ...abi_]
       }
 
       return yield* decodeMethod(data as Hex, abi)

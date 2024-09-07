@@ -1,4 +1,4 @@
-import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, type Abi, getAddress } from 'viem'
+import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, getAddress } from 'viem'
 import { Effect } from 'effect'
 import type { DecodedLogEvent, Interaction, RawDecodedLog } from '../types.js'
 import { getProxyStorageSlot } from './proxies.js'
@@ -21,17 +21,11 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       abiAddress = implementation
     }
 
-    const abiItem_ = yield* getAndCacheAbi({
+    const abiItem = yield* getAndCacheAbi({
       address: abiAddress,
       event: logItem.topics[0],
       chainID,
     })
-
-    if (abiItem_ == null) {
-      return yield* new AbiDecoder.MissingABIError(abiAddress, logItem.topics[0]!, chainID)
-    }
-
-    const abiItem = JSON.parse(abiItem_) as Abi[]
 
     const { eventName, args: args_ } = yield* Effect.try({
       try: () =>
@@ -43,7 +37,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
         }),
       catch: (err) =>
         Effect.gen(function* () {
-          yield* Effect.logError(`Could not decode log ${abiAddress} ${stringify(logItem)}`, err)
+          yield* Effect.logError(`Could not decode log ${abiAddress} `, err)
           return new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)
         }),
     })
