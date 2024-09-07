@@ -1,5 +1,6 @@
 import { Context, Effect, Either, RequestResolver, Request, Array, pipe, Data } from 'effect'
 import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
+import { Abi } from 'viem'
 
 const STRATEGY_TIMEOUT = 5000
 export interface AbiParams {
@@ -62,7 +63,7 @@ export class EmptyCalldataError extends Data.TaggedError('DecodeError')<
   }
 }
 
-export interface AbiLoader extends Request.Request<string, MissingABIError>, LoadParameters {
+export interface AbiLoader extends Request.Request<Abi, MissingABIError>, LoadParameters {
   _tag: 'AbiLoader'
 }
 
@@ -107,10 +108,10 @@ const getBestMatch = (abi: ContractABI | null) => {
   if (abi == null) return null
 
   if (abi.type === 'address') {
-    return abi.abi
+    return JSON.parse(abi.abi) as Abi
   }
 
-  return `[${abi.abi}]`
+  return JSON.parse(`[${abi.abi}]`) as Abi
 }
 
 /**

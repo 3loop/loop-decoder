@@ -29,13 +29,11 @@ const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =
       const signature = call.action.input.slice(0, 10)
       const contractAddress = to
 
-      const abi_ = yield* getAndCacheAbi({
+      const abi = yield* getAndCacheAbi({
         address: contractAddress,
         signature,
         chainID,
       })
-
-      const abi = JSON.parse(abi_) as Abi
 
       const method = yield* decodeMethod(input as Hex, abi)
 
@@ -66,7 +64,7 @@ const decodeTraceLogOutput = (call: TraceLog) =>
           chainID: 0,
         })
 
-        abi = [...abi, ...(JSON.parse(abi_) as Abi)]
+        abi = [...abi, ...abi_]
       }
 
       return yield* decodeMethod(data as Hex, abi)

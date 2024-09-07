@@ -21,13 +21,11 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       abiAddress = implementation
     }
 
-    const abiItem_ = yield* getAndCacheAbi({
+    const abiItem = yield* getAndCacheAbi({
       address: abiAddress,
       event: logItem.topics[0],
       chainID,
     })
-
-    const abiItem = JSON.parse(abiItem_) as Abi[]
 
     const { eventName, args: args_ } = yield* Effect.try({
       try: () =>
