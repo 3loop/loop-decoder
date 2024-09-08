@@ -1,5 +1,16 @@
 # @3loop/transaction-decoder
 
+## 0.16.0
+
+### Minor Changes
+
+- fddbd89: Add support for decoding calldata recursively for Multicall3 contract
+- ff61db4: Return array of ABIs from AbiStrategy, this will allow us to match over multiple fragments when we have multiple matches for the same signature
+
+### Patch Changes
+
+- ff61db4: Propagate errors from loading ABIs up to the decoding
+
 ## 0.15.2
 
 ### Patch Changes
