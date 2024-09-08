@@ -56,7 +56,7 @@
       "name": "balanceOf",
       "params": [
         {
-          "name": "_owner",
+          "name": "",
           "type": "address",
           "value": "0x9c8648Bf415e4f49381C42757A4eEf1C566D6Ed8",
         },
@@ -70,7 +70,7 @@
       "name": "balanceOf",
       "params": [
         {
-          "name": "_owner",
+          "name": "",
           "type": "address",
           "value": "0x9c8648Bf415e4f49381C42757A4eEf1C566D6Ed8",
         },

@@ -28,7 +28,7 @@ describe('Transaction Decoder', () => {
 })
 
 describe('Calldata Decoder', () => {
-  test.each(CALLDATA_TRANSACTIONS)('Resolve and decode transaction', async ({ hash, chainID }) => {
+  test.each(CALLDATA_TRANSACTIONS)('Resolve and decode transaction %', async ({ hash, chainID }) => {
     const program = Effect.gen(function* () {
       const { transaction } = JSON.parse(
         fs.readFileSync(`./test/mocks/tx/${hash.toLowerCase()}.json`).toString(),
@@ -48,7 +48,7 @@ describe('Calldata Decoder', () => {
 })
 
 describe('Failed tx Decoder', () => {
-  test.each(FAILED_TRANSACTIONS)('Resolve and decode failed transaction', async ({ hash, chainID }) => {
+  test.each(FAILED_TRANSACTIONS)('Resolve and decode failed transaction %', async ({ hash, chainID }) => {
     const program = Effect.gen(function* () {
       return yield* decodeTransactionByHash(hash, chainID)
     })
