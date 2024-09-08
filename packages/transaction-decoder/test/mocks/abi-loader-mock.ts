@@ -34,7 +34,7 @@ export const MockedAbiStoreLive = Layer.succeed(
           Match.exhaustive,
         )
 
-        yield* Effect.sync(() => fs.writeFileSync(`./test/mocks/abi/${key}.json`, JSON.stringify(value)))
+        yield* Effect.sync(() => fs.writeFileSync(`./test/mocks/abi/${key}.json`, value))
       }),
     get: ({ address, signature, event }) =>
       Effect.gen(function* () {

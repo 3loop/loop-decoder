@@ -40,7 +40,7 @@
   "interactions": [],
   "methodCall": {
     "arguments": [],
-    "name": "0x83bd37f9",
+    "name": "swapCompact",
   },
   "nativeValueSent": "0",
   "reverted": true,

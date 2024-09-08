@@ -63,9 +63,29 @@ const AA_TRANSACTIONS = [
   },
 ] as const
 
+const MULTICALL3_TRANSACTIONS = [
+  {
+    hash: '0x548af97ffad9b36b4ec40b403299dda5fac222c130cf4a3e2c4d438d88fe2280',
+    chainID: 1,
+  },
+  {
+    hash: '0xd83d86917c0a4b67b73bebce6822bd2545ea69e98e15a054bf4458258fd6d068',
+    chainID: 1,
+  },
+  {
+    hash: '0xf821984218cb5f28807cbcf08c7b08bff1bd397d078af437905718a6cad93b50',
+    chainID: 1,
+  },
+  {
+    hash: '0xea1f1d20b3a22301f8c2c4191b6e85d9659a308e4fd877bfa6576434ba4c1451',
+    chainID: 1,
+  },
+] as const
+
 export const TEST_TRANSACTIONS: TXS = [
   ...NFTS_BLUR,
   ...AA_TRANSACTIONS,
+  ...MULTICALL3_TRANSACTIONS,
   {
     hash: '0xde9f6210899218e17a3e71661ead5e16da228e168b0572b1ddc30a967968f8f6', // DAI
     chainID: 1,

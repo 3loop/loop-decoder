@@ -46,7 +46,16 @@
   "reverted": true,
   "timestamp": 1717675583,
   "toAddress": "0xc2c3d2bd014da92aa3c562520a6c23fc474d990b",
-  "traceCalls": [],
+  "traceCalls": [
+    {
+      "from": "0xc2c3d2bd014da92aa3c562520a6c23fc474d990b",
+      "name": "getReserves",
+      "params": [],
+      "signature": "getReserves()",
+      "to": "0xb4268ce03b9d9d87c7d76781598e0d54bdb4503d",
+      "type": "function",
+    },
+  ],
   "transfers": [
     {
       "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
