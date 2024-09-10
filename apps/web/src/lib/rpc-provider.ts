@@ -25,7 +25,7 @@ export function getProvider(chainID: number): PublicClientObject | null {
         transport: http(url),
       }),
       config: {
-        supportTraceAPI: providerConfigs[chainID]?.supportTraceAPI,
+        traceAPI: providerConfigs[chainID]?.traceAPI,
       },
     }
 

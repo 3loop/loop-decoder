@@ -73,7 +73,7 @@ The `constants.ts` file contains the RPC URL and configuration. The Base RPCs do
 export const RPC = {
   8453: {
     url: `wss://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    supportTraceAPI: false,
+    traceAPI: 'none',
   },
 }
 ```
@@ -95,7 +95,7 @@ const getPublicClient = (chainId: number) => {
       transport: webSocket(rpc.url),
     }),
     config: {
-      supportTraceAPI: rpc.supportTraceAPI,
+      traceAPI: rpc.traceAPI,
     },
   }
 }

@@ -85,7 +85,13 @@ export const EXAMPLE_TXS = {
   ],
 }
 
-export const supportedChains = [
+export const supportedChains: {
+  name: string
+  chainID: number
+  rpcUrl: string
+  traceAPI?: 'parity' | 'geth' | 'none'
+  batchMaxCount?: number
+}[] = [
   {
     name: 'Ethereum Mainnet',
     chainID: 1,
@@ -100,32 +106,32 @@ export const supportedChains = [
     name: 'Base mainnet',
     chainID: 8453,
     rpcUrl: process.env.BASE_RPC_URL as string,
-    supportTraceAPI: false,
+    traceAPI: 'geth',
     batchMaxCount: 1,
   },
   {
     name: 'Polygon Mainnet',
     chainID: 137,
     rpcUrl: (process.env.POLYGON_RPC_URL as string) ?? 'https://rpc.ankr.com/polygon',
-    suppurtTraceAPI: true,
+    traceAPI: 'geth',
   },
   {
     name: 'Optimism Mainnet',
     chainID: 10,
     rpcUrl: process.env.OPTIMISM_RPC_URL as string,
-    supportTraceAPI: false,
+    traceAPI: 'geth',
   },
   {
     name: 'Arbitrum One',
     chainID: 42161,
     rpcUrl: process.env.ARBITRUM_RPC_URL as string,
-    supportTraceAPI: false,
+    traceAPI: 'geth',
   },
   {
     name: 'Manta pacific',
     chainID: 169,
     rpcUrl: (process.env.MANTA_RPC_URL as string) ?? 'https://pacific-rpc.manta.network/http',
-    supportTraceAPI: false,
+    traceAPI: 'geth',
   },
 ]
 
