@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.17.0
+
+### Minor Changes
+
+- 1e074ac: Allow disabling tracer for an RPC client thus relaying only on logs and receipt
+
 ## 0.16.0
 
 ### Minor Changes
