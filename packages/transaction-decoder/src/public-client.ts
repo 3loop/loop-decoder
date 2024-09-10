@@ -12,7 +12,7 @@ export class RPCFetchError {
 }
 
 export interface PublicClientConfig {
-  readonly supportTraceAPI?: boolean
+  readonly traceAPI?: 'parity' | 'geth' | 'none'
 }
 
 export interface PublicClientObject {

@@ -43,10 +43,10 @@ export const getTransactionReceipt = (hash: Hash, chainID: number) =>
 export const getTrace = (hash: Hash, chainID: number) =>
   Effect.gen(function* () {
     const service = yield* PublicClient
-    const { client, config } = yield* service.getPublicClient(chainID)
-    const traceAPISupport = config?.supportTraceAPI ?? true
+    const { client, config = {} } = yield* service.getPublicClient(chainID)
+    const traceAPI = config.traceAPI ?? 'parity'
 
-    if (traceAPISupport) {
+    if (traceAPI === 'parity') {
       const trace = yield* Effect.withSpan(
         Effect.tryPromise({
           try: async () => {
@@ -60,7 +60,7 @@ export const getTrace = (hash: Hash, chainID: number) =>
           catch: () => new RPCFetchError('Get trace'),
         }),
         'TransactionLoader.Trace',
-        { attributes: { hash, chainID, traceAPISupport } },
+        { attributes: { hash, chainID, traceAPI } },
       )
 
       const effects: Effect.Effect<TraceLog, ParseError>[] = trace.map((log: string) => {
@@ -73,7 +73,7 @@ export const getTrace = (hash: Hash, chainID: number) =>
       })
 
       return results
-    } else {
+    } else if (traceAPI === 'geth') {
       const trace = yield* Effect.withSpan(
         Effect.tryPromise({
           try: async () => {
@@ -87,13 +87,15 @@ export const getTrace = (hash: Hash, chainID: number) =>
           catch: (e) => new RPCFetchError(e),
         }),
         'TransactionLoader.Trace',
-        { attributes: { hash, chainID, traceAPISupport } },
+        { attributes: { hash, chainID, traceAPI } },
       )
 
       const transformedTrace = transformTraceTree(trace as unknown as TraceLogTree)
 
       return transformedTrace
     }
+
+    return []
   })
 
 export const getBlockTimestamp = (blockNumber: bigint, chainID: number) =>
