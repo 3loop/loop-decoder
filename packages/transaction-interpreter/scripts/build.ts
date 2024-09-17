@@ -33,6 +33,7 @@ interface Interpreter {
   name: string
   output: string
   contracts: string[]
+  events: string[]
   type: string | null
 }
 
@@ -90,9 +91,20 @@ async function generateMappings(interpreters: Interpreter[], isDev = false) {
     {} as Record<string, string>,
   )
 
+  const eventToName = interpreters.reduce(
+    (acc, { name, events }) => {
+      events.forEach((event) => {
+        acc[event] = name
+      })
+      return acc
+    },
+    {} as Record<string, string>,
+  )
+
   const contractMap = JSON.stringify(contractToName).slice(1, -1)
   const interpreterMap = JSON.stringify(nameToCode).slice(1, -1)
   const typeMap = JSON.stringify(typeToName).slice(1, -1)
+  const eventMap = JSON.stringify(eventToName).slice(1, -1)
 
   const [stdContent, fallbackContent] = await Promise.all([
     compileStd(isDev),
@@ -106,12 +118,14 @@ async function generateMappings(interpreters: Interpreter[], isDev = false) {
     .replace(`'/**PLACE_STD_CONTENT**/'`, `\`${stdContent}\``)
     .replace(`'/**PLACE_FALLBACK_CONTENT**/'`, JSON.stringify(fallbackContent.output))
     .replace('/**PLACE_CONTRACT_TYPE_MAPPING**/', typeMap)
+    .replace('/**PLACE_EVENT_MAPPING**/', eventMap)
 
   await fs.writeFile(OUTPUT_FILE_NAME, content)
 }
 
 async function processInterpreter(file: string, _isDev?: boolean) {
   let contracts: string[] = []
+  let events: string[] = []
   let type: string | null = null
 
   const tsCode = await fs.readFile(file, 'utf-8')
@@ -151,6 +165,18 @@ async function processInterpreter(file: string, _isDev?: boolean) {
         path.remove()
         path.stop()
       }
+
+      if (
+        t.isExportNamedDeclaration(node) &&
+        t.isVariableDeclaration(node.declaration) &&
+        'name' in node.declaration.declarations[0].id &&
+        node.declaration?.declarations?.[0]?.id.name === 'events' &&
+        t.isArrayExpression(node.declaration.declarations[0].init)
+      ) {
+        events = node.declaration.declarations[0].init?.elements.map((e: any) => e.value)
+        path.remove()
+        path.stop()
+      }
     },
     ImportDeclaration(path: NodePath<t.ImportDeclaration>) {
       const importName = path.node?.source && path.node?.source.value ? path.node?.source.value : undefined
@@ -167,6 +193,7 @@ async function processInterpreter(file: string, _isDev?: boolean) {
 
   return {
     contracts: contracts.map((c) => c.toLowerCase()),
+    events: events.map((e) => e.toLowerCase()),
     output,
     name,
     type,

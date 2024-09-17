@@ -83,6 +83,23 @@ export const EXAMPLE_TXS = {
       chainID: 8453,
     },
   ],
+  'Moxie (Base mainnet)': [
+    {
+      name: 'Sell',
+      hash: '0x0f2540f5936228704cf94348085fb16fde87bfb554a76f0234dc8d5a804b0a7b',
+      chainID: 8453,
+    },
+    {
+      name: 'Buy',
+      hash: '0xc355f63566a9407d9a610b13f5e4e7fc64ce526f34503af18666904b63e0556f',
+      chainID: 8453,
+    },
+    {
+      name: 'Burn',
+      hash: '0x88833e8e873c09b3def62c2fe82f5ac3a20cdb936acce5ba27a5e4ab20417831',
+      chainID: 8453,
+    },
+  ],
 }
 
 export const supportedChains: {
@@ -106,7 +123,7 @@ export const supportedChains: {
     name: 'Base mainnet',
     chainID: 8453,
     rpcUrl: process.env.BASE_RPC_URL as string,
-    traceAPI: 'geth',
+    traceAPI: 'parity',
     batchMaxCount: 1,
   },
   {

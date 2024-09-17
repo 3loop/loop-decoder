@@ -178,6 +178,7 @@ export function augmentTraceLogs(
       event: traceLogToEvent(log),
       decimals: null,
       chainID: Number(transaction.chainId),
+      signature: null,
     }),
   )
   return [...interactionsWithoutNativeTransfers, ...nativeTransfers]

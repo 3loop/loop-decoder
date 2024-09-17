@@ -48,6 +48,7 @@ export interface RawDecodedLog {
   logIndex: number
   events: DecodedLogEvent[]
   decoded: boolean
+  signature: string
 }
 
 export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'OTHER' | string
@@ -69,6 +70,7 @@ export interface Interaction {
   decimals: number | null
   chainID: number
   contractType: ContractType
+  signature: string | null
   event: InteractionEvent
 }
 
