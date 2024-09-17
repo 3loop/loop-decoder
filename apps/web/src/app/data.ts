@@ -6,21 +6,25 @@ export const EXAMPLE_TXS = {
       name: 'Repay',
       hash: '0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7',
       chainID: 1,
+      interpreter: 'aave',
     },
     {
       name: 'Deposit',
       hash: '0xe61092c0ce50d7cf7c43a060c3ca023f16f99729ccae7a6d011e408d93d6f93f',
       chainID: 1,
+      interpreter: 'aave',
     },
     {
       name: 'Borrow',
       hash: '0x1fc39eea9247cd9aa9d311bf83666afa6c9b30d66515d313e4d04dcb07a73a8f',
       chainID: 1,
+      interpreter: 'aave',
     },
     {
       name: 'Withdraw',
       hash: '0xf42e5d28e2fea319cf3675c57c57849ad5d178f17f8a17c94c7607321cf1b959',
       chainID: 1,
+      interpreter: 'aave',
     },
   ],
   'NFTS BLUR': [
@@ -28,11 +32,13 @@ export const EXAMPLE_TXS = {
       name: 'Sell',
       hash: '0xb5c56b4213325cb3fba274d0467b40ab28d9d475ba4a652b46943251c3c0d697',
       chainID: 1,
+      interpreter: 'blur',
     },
     {
       name: 'Buy',
       hash: '0x9ed41e3d626605673c282dc8a0f7429e7abcab112d6529b0c77ee43954202cab',
       chainID: 1,
+      interpreter: 'blur',
     },
   ],
   'Account Abstraction': [
@@ -40,6 +46,7 @@ export const EXAMPLE_TXS = {
       name: 'handleOps',
       hash: '0xcc1f4e40e1186503bb19b5716c8527947ab4c7e972b79d3d64ad8a015cf10ff8',
       chainID: 1,
+      interpreter: 'aa',
     },
   ],
   'Swap Transactions': [
@@ -47,21 +54,25 @@ export const EXAMPLE_TXS = {
       name: '1inch',
       hash: '0x8e36953374f7b71fe4c20898c8ade628cf71d5d0303ec8ad368b254629db2985',
       chainID: 1,
+      interpreter: '1inch',
     },
     {
       name: 'Kyberswap',
       hash: '0xfe429c6acf3c372270374122fe922282311bea31e09419f7fb167c6d8912372d',
       chainID: 1,
+      interpreter: 'kyberswap',
     },
     {
       name: 'Metamask Router',
       hash: '0xcb2b8448a1f5dc7a29dc4ab3e79051e7460a4602b82ee5af2b3202c2e8b614de',
       chainID: 1,
+      interpreter: 'metamaskRouter',
     },
     {
       name: 'OKX',
       hash: '0xf30013e82cd1197cb867f89ac33480699827282ca19ff49f0810a75e138ec869',
       chainID: 1,
+      interpreter: 'okx',
     },
   ],
   'Bridge Transactions': [
@@ -69,6 +80,7 @@ export const EXAMPLE_TXS = {
       name: 'Hop Protocol',
       hash: '0x7a7f39aee8c68f9be272b093f613280a8122291923edba83cc3f1f1754a70ecd',
       chainID: 1,
+      interpreter: 'hop-protocol',
     },
   ],
   'Friend.Tech (Base mainnet)': [
@@ -76,11 +88,13 @@ export const EXAMPLE_TXS = {
       name: 'Sell',
       hash: '0x9e18a3ab3faed1b13412e5cca532e083761410bb58e0423a5cd865a18a8e49a3',
       chainID: 8453,
+      interpreter: 'friend-tech',
     },
     {
       name: 'Buy',
       hash: '0x24067751e1bb553b8f5ccd6958edc3fa27489f9836bc0cd477383b143825dca5',
       chainID: 8453,
+      interpreter: 'friend-tech',
     },
   ],
   'Moxie (Base mainnet)': [
@@ -88,16 +102,19 @@ export const EXAMPLE_TXS = {
       name: 'Sell',
       hash: '0x0f2540f5936228704cf94348085fb16fde87bfb554a76f0234dc8d5a804b0a7b',
       chainID: 8453,
+      interpreter: 'moxie',
     },
     {
       name: 'Buy',
       hash: '0xc355f63566a9407d9a610b13f5e4e7fc64ce526f34503af18666904b63e0556f',
       chainID: 8453,
+      interpreter: 'moxie',
     },
     {
       name: 'Burn',
       hash: '0x88833e8e873c09b3def62c2fe82f5ac3a20cdb936acce5ba27a5e4ab20417831',
       chainID: 8453,
+      interpreter: 'moxie',
     },
   ],
 }
@@ -166,3 +183,5 @@ const generateNavItems = (transactions: any) => {
 export const sidebarNavItems = Object.fromEntries(
   Object.entries(EXAMPLE_TXS).map(([key, value]) => [key, generateNavItems(value)]),
 )
+
+export const INTERPRETER_REPO = 'https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter'

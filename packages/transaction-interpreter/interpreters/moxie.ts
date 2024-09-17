@@ -2,6 +2,16 @@ import { assetsReceived, assetsSent, displayAsset, formatNumber, NULL_ADDRESS } 
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 
+/**
+ * Moxie is a community-governed Farcaster economic engine on the Base blockchain. It aims to grow the
+ * Farcaster GDP and help members and communities prosper. The protocol facilitates efficient onchain
+ * economies through fan tokens, rewards, earning mechanisms, and automated payouts. Moxie enables
+ * paid memberships, monetization, member-only features, Farcaster-native advertising, and revenue sharing.
+ *
+ * For more information, see: https://build.moxie.xyz/the-moxie-protocol/moxie-protocol
+ * and https://developer.moxie.xyz/
+ */
+
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const methodName = event.methodCall.name
 
@@ -23,9 +33,6 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       _spender: string
       _beneficiary: string
       _buyToken: string
-      _buyAmount: string
-      _sellToken: string
-      _sellAmount: string
     }
     const spender = params._spender
     const beneficiary = params._beneficiary
