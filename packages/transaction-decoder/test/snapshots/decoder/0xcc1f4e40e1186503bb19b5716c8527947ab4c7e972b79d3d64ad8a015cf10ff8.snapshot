@@ -85,6 +85,7 @@
         "logIndex": 36,
         "params": {},
       },
+      "signature": "BeforeExecution()",
     },
     {
       "chainID": 1,
@@ -102,6 +103,7 @@
           "value": "3132061852949192475",
         },
       },
+      "signature": "Approval(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -123,6 +125,7 @@
           "userOpHash": "0xb07c37137a08bb4d8212c3f583473a5824e4cd8831107adf99107b6c181b3685",
         },
       },
+      "signature": "UserOperationEvent(bytes32,address,address,uint256,bool,uint256,uint256)",
     },
     {
       "chainID": 1,
@@ -141,6 +144,7 @@
           "value": "1601969428026279",
         },
       },
+      "signature": null,
     },
   ],
   "methodCall": {

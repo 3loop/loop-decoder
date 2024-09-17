@@ -50,6 +50,7 @@
           "user": "0xbbDd1b3C87c211E482CdA98eA14fa8bF50022CA0",
         },
       },
+      "signature": "CancelTrade(address,bytes32,uint256,uint256)",
     },
   ],
   "methodCall": {

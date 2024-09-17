@@ -99,6 +99,7 @@
           "to": "0x0000000000000000000000000000000000000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -116,6 +117,7 @@
           "tokenId": "16614",
         },
       },
+      "signature": "Approval(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -133,6 +135,7 @@
           "tokenId": "16614",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -151,6 +154,7 @@
           "tokenIdListingIndexTrader": "6216036396234499587370781978356137519542707324274225882",
         },
       },
+      "signature": "Execution721MakerFeePacked(bytes32,uint256,uint256,uint256)",
     },
     {
       "chainID": 1,
@@ -169,6 +173,7 @@
           "value": "1061717990000000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 1,
@@ -187,6 +192,7 @@
           "value": "5308589950000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 1,
@@ -205,6 +211,7 @@
           "value": "1056409400050000000",
         },
       },
+      "signature": null,
     },
   ],
   "methodCall": {

@@ -89,6 +89,7 @@
           "value": "100000000000000000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -108,6 +109,7 @@
           "value": "100000000000000000000",
         },
       },
+      "signature": "Mint(address,address,uint256,uint256,uint256)",
     },
     {
       "chainID": 1,
@@ -128,6 +130,7 @@
           "variableBorrowRate": "111511710140402321590047489",
         },
       },
+      "signature": "ReserveDataUpdated(address,uint256,uint256,uint256,uint256,uint256)",
     },
     {
       "chainID": 1,
@@ -145,6 +148,7 @@
           "wad": "100000000000000000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -166,6 +170,7 @@
           "user": "0x955fe53fF029d6a0503C0b101E109036475e580b",
         },
       },
+      "signature": "Borrow(address,address,address,uint256,uint8,uint256,uint16)",
     },
   ],
   "methodCall": {

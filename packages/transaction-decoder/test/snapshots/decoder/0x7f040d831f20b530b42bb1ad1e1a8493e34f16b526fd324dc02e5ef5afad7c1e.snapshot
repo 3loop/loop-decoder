@@ -88,6 +88,7 @@
           "wad": "1000000000000000000",
         },
       },
+      "signature": "Deposit(address,uint256)",
     },
     {
       "chainID": 5,
@@ -105,6 +106,7 @@
           "wad": "700000000000000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 5,
@@ -122,6 +124,7 @@
           "value": "89796956803981834174",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 5,
@@ -138,6 +141,7 @@
           "reserve1": "195914503164705586971",
         },
       },
+      "signature": "Sync(uint112,uint112)",
     },
     {
       "chainID": 5,
@@ -158,6 +162,7 @@
           "to": "0x607E064d6D9DC45D4109b835B915d9c75780103e",
         },
       },
+      "signature": "Swap(address,uint256,uint256,uint256,uint256,address)",
     },
     {
       "chainID": 5,
@@ -175,6 +180,7 @@
           "value": "38669742058431670805",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 5,
@@ -192,6 +198,7 @@
           "wad": "300000000000000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 5,
@@ -213,6 +220,7 @@
           "tick": "-48659",
         },
       },
+      "signature": "Swap(address,address,int256,int256,uint160,uint128,int24)",
     },
     {
       "chainID": 5,
@@ -231,6 +239,7 @@
           "value": "1000000000000000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 5,
@@ -249,6 +258,7 @@
           "value": "1000000000000000000",
         },
       },
+      "signature": null,
     },
   ],
   "methodCall": {

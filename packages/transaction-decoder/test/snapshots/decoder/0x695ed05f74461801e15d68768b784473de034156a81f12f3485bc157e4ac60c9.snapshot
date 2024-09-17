@@ -70,6 +70,7 @@
           "value": "3000",
         },
       },
+      "signature": "TransferSingle(address,address,address,uint256,uint256)",
     },
     {
       "chainID": 5,
@@ -89,6 +90,7 @@
           "tokenId": "1",
         },
       },
+      "signature": "TokensClaimed(uint256,address,address,uint256,uint256)",
     },
     {
       "chainID": 5,
@@ -107,6 +109,7 @@
           "value": "3000000000000000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 5,
@@ -125,6 +128,7 @@
           "value": "3000000000000000000",
         },
       },
+      "signature": null,
     },
   ],
   "methodCall": {

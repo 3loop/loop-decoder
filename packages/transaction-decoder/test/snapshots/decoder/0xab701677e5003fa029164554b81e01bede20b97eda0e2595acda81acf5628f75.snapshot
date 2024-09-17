@@ -79,6 +79,7 @@
           "value": "79750558819434799",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 5,
@@ -96,6 +97,7 @@
           "wad": "600000000000000003058",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 5,
@@ -112,6 +114,7 @@
           "reserve1": "37607848279482287436",
         },
       },
+      "signature": "Sync(uint112,uint112)",
     },
     {
       "chainID": 5,
@@ -132,6 +135,7 @@
           "to": "0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD",
         },
       },
+      "signature": "Swap(address,uint256,uint256,uint256,uint256,address)",
     },
     {
       "chainID": 5,
@@ -148,6 +152,7 @@
           "wad": "600000000000000003058",
         },
       },
+      "signature": "Withdrawal(address,uint256)",
     },
     {
       "chainID": 5,
@@ -166,6 +171,7 @@
           "value": "600000000000000003058",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 5,
@@ -184,6 +190,7 @@
           "value": "600000000000000003058",
         },
       },
+      "signature": null,
     },
   ],
   "methodCall": {

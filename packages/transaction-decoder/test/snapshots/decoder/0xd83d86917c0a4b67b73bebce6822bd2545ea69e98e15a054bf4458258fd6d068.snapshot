@@ -279,6 +279,7 @@
           "wad": "83740613700212678762",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -296,6 +297,7 @@
           "value": "171910193",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -334,6 +336,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -351,6 +354,7 @@
           "wad": "89807000000000000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -368,6 +372,7 @@
           "wad": "2463138795422015135",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -385,6 +390,7 @@
           "wad": "1377004684268966607",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -402,6 +408,7 @@
           "wad": "474988814999790843",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -419,6 +426,7 @@
           "wad": "335293606379000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -436,6 +444,7 @@
           "wad": "102808538947921057",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -453,6 +462,7 @@
           "wad": "40521157449086777",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -470,6 +480,7 @@
           "wad": "30981256229962394",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -487,6 +498,7 @@
           "value": "171910193",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -529,6 +541,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -546,6 +559,7 @@
           "id": "2958268",
         },
       },
+      "signature": "StateSynced(uint256,address,bytes)",
     },
     {
       "chainID": 1,
@@ -584,6 +598,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -618,6 +633,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -656,6 +672,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -690,6 +707,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -732,6 +750,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -770,6 +789,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -804,6 +824,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -842,6 +863,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -859,6 +881,7 @@
           "wad": "450000000000000000",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -889,6 +912,7 @@
           ],
         },
       },
+      "signature": "RootBundleExecuted(uint256,uint256,uint256,address[],uint256[],int256[],int256[],address)",
     },
     {
       "chainID": 1,
@@ -907,6 +931,7 @@
           "value": "557570752000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 1,
@@ -925,6 +950,7 @@
           "value": "557570752000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 1,
@@ -943,6 +969,7 @@
           "value": "20000000000000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 1,
@@ -961,6 +988,7 @@
           "value": "20000000000000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 1,
@@ -979,6 +1007,7 @@
           "value": "76478452000000",
         },
       },
+      "signature": null,
     },
     {
       "chainID": 1,
@@ -997,6 +1026,7 @@
           "value": "76478452000000",
         },
       },
+      "signature": null,
     },
   ],
   "methodCall": {
