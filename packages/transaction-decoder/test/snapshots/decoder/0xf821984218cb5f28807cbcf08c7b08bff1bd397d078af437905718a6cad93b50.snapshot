@@ -69,6 +69,7 @@
           "value": "7746725625564379370",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
   ],
   "methodCall": {

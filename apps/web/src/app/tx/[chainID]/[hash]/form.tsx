@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react'
 import { Label } from '@/components/ui/label'
-import { DEFAULT_CHAIN_ID, sidebarNavItems } from '@/app/data'
+import { DEFAULT_CHAIN_ID, sidebarNavItems, EXAMPLE_TXS, INTERPRETER_REPO } from '@/app/data'
 import { useLocalStorage } from 'usehooks-ts'
 import { SidebarNav } from '@/components/ui/sidebar-nav'
 import { PlayIcon } from '@radix-ui/react-icons'
@@ -64,6 +64,16 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
     }
   }, [schema, decoded, result, onRun])
 
+  const interpreterSourceLink = React.useMemo(() => {
+    const matchingExample = Object.values(EXAMPLE_TXS)
+      .flatMap((categoryTxs) => categoryTxs)
+      .find((tx) => tx.hash.toLowerCase() === currentHash?.toLowerCase())
+
+    return matchingExample?.interpreter
+      ? `${INTERPRETER_REPO}/interpreters/${matchingExample?.interpreter}.ts`
+      : INTERPRETER_REPO
+  }, [currentHash])
+
   return (
     <div className="grid h-full items-stretch gap-6 grid-cols-1 lg:grid-cols-[1fr_200px]">
       <div className="md:order-1 flex flex-col space-y-4">
@@ -93,7 +103,17 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
 
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 h-full">
           <div className="flex flex-col gap-2 lg:col-span-2 min-h-[40vh] lg:min-h-[initial]">
-            <Label>Interpretation:</Label>
+            <Label>
+              Interpretation:{' '}
+              <a
+                href={interpreterSourceLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-500 hover:underline"
+              >
+                (Source Code)
+              </a>
+            </Label>
 
             <CodeBlock
               language="javascript"

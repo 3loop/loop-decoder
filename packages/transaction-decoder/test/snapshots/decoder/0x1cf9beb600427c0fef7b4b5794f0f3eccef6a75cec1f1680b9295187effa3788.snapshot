@@ -70,6 +70,7 @@
           "value": "2",
         },
       },
+      "signature": "TransferSingle(address,address,address,uint256,uint256)",
     },
   ],
   "methodCall": {

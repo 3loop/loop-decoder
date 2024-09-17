@@ -6,6 +6,7 @@ import { getAndCacheAbi } from '../abi-loader.js'
 import { getAndCacheContractMeta } from '../contract-meta-loader.js'
 import * as AbiDecoder from './abi-decode.js'
 import { stringify } from '../helpers/stringify.js'
+import { formatAbiItem } from 'viem/utils'
 
 const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
   Effect.gen(function* () {
@@ -85,11 +86,14 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       },
     })
 
+    const textSignature = formatAbiItem(fragment)
+
     const rawLog: RawDecodedLog = {
       events: decodedParams.filter((x) => x != null) as DecodedLogEvent[],
       name: eventName,
       address,
       logIndex: logItem.logIndex ?? -1,
+      signature: textSignature,
       decoded: true,
     }
 
@@ -115,6 +119,7 @@ const transformLog = (transaction: GetTransactionReturnType, log: RawDecodedLog)
       decimals: contractData?.decimals || null,
       chainID: Number(transaction.chainId),
       contractType: contractData?.type ?? 'OTHER',
+      signature: log.signature,
       event: {
         eventName: log.name,
         logIndex: log.logIndex,

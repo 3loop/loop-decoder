@@ -58,6 +58,7 @@
           "owner": "0x997162a6BEB886655d3e355B190fe0C8f0c37F0e",
         },
       },
+      "signature": "ApprovalForAll(address,address,bool)",
     },
   ],
   "methodCall": {

@@ -89,6 +89,7 @@
           "tokenId": "9912",
         },
       },
+      "signature": "Approval(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -106,6 +107,7 @@
           "tokenId": "9912",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -123,6 +125,7 @@
           "to": "0xde02FFFb824720E25674a604BaF2277f21c66a0F",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
     {
       "chainID": 1,
@@ -140,6 +143,7 @@
           "tokenIdListingIndexTrader": "3708519897897837542598287020838563106149287084151295037",
         },
       },
+      "signature": "Execution721Packed(bytes32,uint256,uint256)",
     },
   ],
   "methodCall": {

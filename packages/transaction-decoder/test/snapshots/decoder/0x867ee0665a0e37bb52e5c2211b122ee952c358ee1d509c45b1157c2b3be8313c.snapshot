@@ -68,6 +68,7 @@
           "tokenId": "173",
         },
       },
+      "signature": "Transfer(address,address,uint256)",
     },
   ],
   "methodCall": {

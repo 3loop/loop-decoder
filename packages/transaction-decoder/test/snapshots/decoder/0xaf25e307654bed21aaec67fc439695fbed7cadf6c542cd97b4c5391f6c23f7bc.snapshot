@@ -58,6 +58,7 @@
           "operator": "0x21B0B84FfAB5A8c48291f5eC9D9FDb9aef574052",
         },
       },
+      "signature": "ApprovalForAll(address,address,bool)",
     },
   ],
   "methodCall": {
