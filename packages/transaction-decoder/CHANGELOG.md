@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.18.0
+
+### Minor Changes
+
+- dfeba79: Add human redable signature to decoded transaciton events
+
 ## 0.17.0
 
 ### Minor Changes

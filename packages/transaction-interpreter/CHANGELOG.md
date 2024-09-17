@@ -1,5 +1,16 @@
 # @3loop/transaction-interpreter
 
+## 0.6.0
+
+### Minor Changes
+
+- dfeba79: Add option to specify interpreters based on event signature. Add new event-based interpreter.
+
+### Patch Changes
+
+- Updated dependencies [dfeba79]
+  - @3loop/transaction-decoder@0.18.0
+
 ## 0.5.4
 
 ### Patch Changes

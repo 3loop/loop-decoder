@@ -1,5 +1,14 @@
 # web
 
+## 0.1.23
+
+### Patch Changes
+
+- Updated dependencies [dfeba79]
+- Updated dependencies [dfeba79]
+  - @3loop/transaction-decoder@0.18.0
+  - @3loop/transaction-interpreter@0.6.0
+
 ## 0.1.22
 
 ### Patch Changes
