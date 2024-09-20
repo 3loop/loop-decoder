@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.7.0
+
+### Minor Changes
+
+- 4204de7: Add transfer interpretations to fallback interpreter
+
 ## 0.6.0
 
 ### Minor Changes
