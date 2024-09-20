@@ -41,11 +41,15 @@ function getInterpreter(tx: DecodedTx): string | undefined {
     return `${standardLibrary}\n${interpretations[eventInterpreter]}`
   }
 
-  //if there is a contract type mapping, return the contract type interpreter
-  const contractTypes = ['ERC20', 'ERC721', 'ERC1155']
-  if (contractTypes.includes(contractType)) {
+  // Check for contract type mapping and return the corresponding interpreter
+  if (contractType && contractTypeToName[contractType.toLowerCase()]) {
     const typeId = contractTypeToName[contractType.toLowerCase()]
-    return `${standardLibrary} \n ${interpretations[typeId]}`
+    return `${standardLibrary}\n${interpretations[typeId]}`
+  }
+
+  // Fallback to transfer interpreter if there are some transfers
+  if (tx.transfers.length > 0) {
+    return `${standardLibrary} \n ${interpretations['transfer']}`
   }
 
   return undefined

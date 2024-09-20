@@ -27,6 +27,7 @@ type TransactionType =
   | 'account-abstraction'
   | 'stake-token'
   | 'unstake-token'
+  | 'burn'
   | 'unknown'
   | string
 
