@@ -9,8 +9,9 @@ interface Address {
   address: string
   name: string | null
 }
+type StringWithAutocompleteOptions<TOptions extends string> = (string & Record<string, never>) | TOptions
 
-type TransactionType =
+type TransactionType = StringWithAutocompleteOptions<
   | 'repay-loan'
   | 'deposit-collateral'
   | 'borrow'
@@ -27,8 +28,9 @@ type TransactionType =
   | 'account-abstraction'
   | 'stake-token'
   | 'unstake-token'
+  | 'burn'
   | 'unknown'
-  | string
+>
 
 export interface Asset {
   address: string

@@ -45,7 +45,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     if (eventType === 'buy' && isSwap) {
       return {
         type: 'swap',
-        action: `Bought ${formatNumber(received[0].amount)} shares of ${received[0].asset?.name} for ${displayAsset(
+        action: `Bought ${formatNumber(received[0].amount)} Fan Tokens of ${received[0].asset?.name} for ${displayAsset(
           sent[0],
         )}`,
         ...newEvent,
@@ -57,7 +57,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     if (eventType === 'sell' && isSwap) {
       return {
         type: 'swap',
-        action: `Sold ${formatNumber(sent[0].amount)} shares of ${sent[0].asset?.name} for ${displayAsset(
+        action: `Sold ${formatNumber(sent[0].amount)} Fan Tokens of ${sent[0].asset?.name} for ${displayAsset(
           received[0],
         )}`,
         ...newEvent,
@@ -72,7 +72,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
 
       return {
         type: 'burn',
-        action: `Burned ${displayAsset(sent[0])} for ${buyTokenMetadata?.contractName} fan holders`,
+        action: `Burned ${displayAsset(sent[0])} for ${buyTokenMetadata?.contractName} Fan Tokens holders`,
         ...newEvent,
         assetsSent: sent,
         assetsReceived: [],

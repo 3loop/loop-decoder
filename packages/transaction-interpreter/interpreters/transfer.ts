@@ -1,7 +1,10 @@
+import { assetsReceived, assetsSent, displayAsset, NULL_ADDRESS } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
-import { assetsReceived, assetsSent, displayAsset, NULL_ADDRESS } from './std.js'
 
+/**
+ * Fallback interpretator to display transfers.
+ */
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const methodName = event.methodCall.name
 
@@ -18,7 +21,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     const fromAddress = transfers[0].from
     const assetSent = assetsSent(transfers, fromAddress)
     return {
-      type: 'unknown',
+      type: 'transfer-token',
       action: `Sent ${displayAsset(assetSent[0])}`,
       ...newEvent,
       assetsReceived: [],
@@ -26,11 +29,15 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     }
   }
 
+  // TODO: handle multiple transfers
+
   return {
     type: 'unknown',
     action: `Called method '${methodName}'`,
     ...newEvent,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
+    assetsReceived: assetsReceived(transfers, event.fromAddress),
+    assetsSent: assetsSent(transfers, event.fromAddress),
   }
 }
+
+export const contractType = 'transfer'
