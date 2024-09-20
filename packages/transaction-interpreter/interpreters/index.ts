@@ -47,11 +47,6 @@ function getInterpreter(tx: DecodedTx): string | undefined {
     return `${standardLibrary}\n${interpretations[typeId]}`
   }
 
-  // Fallback to transfer interpreter if there are some transfers
-  if (tx.transfers.length > 0) {
-    return `${standardLibrary} \n ${interpretations['transfer']}`
-  }
-
   return undefined
 }
 
