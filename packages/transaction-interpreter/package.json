@@ -1,6 +1,6 @@
 {
   "name": "@3loop/transaction-interpreter",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "",
   "license": "GPL-3.0-only",
   "type": "module",

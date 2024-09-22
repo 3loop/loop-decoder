@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.7.1
+
+### Patch Changes
+
+- 4c5813e: Filter zero transfers from interpreted tx
+
 ## 0.7.0
 
 ### Minor Changes
