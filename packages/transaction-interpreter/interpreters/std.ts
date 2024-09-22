@@ -3,8 +3,12 @@ import { Asset, DecodedTx } from '@3loop/transaction-decoder'
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
+function filterZeroTransfers(transfers: Asset[]): Asset[] {
+  return transfers.filter((t) => t.amount != null && t.amount !== '0')
+}
+
 export function assetsSent(transfers: Asset[], address: string): AssetTransfer[] {
-  return transfers
+  return filterZeroTransfers(transfers)
     .filter((t) => t.from.toLowerCase() === address.toLowerCase())
     .map((t) => {
       return {
@@ -17,7 +21,7 @@ export function assetsSent(transfers: Asset[], address: string): AssetTransfer[]
 }
 
 export function assetsReceived(transfers: Asset[], address: string): AssetTransfer[] {
-  return transfers
+  return filterZeroTransfers(transfers)
     .filter((t) => t.to.toLowerCase() === address.toLowerCase())
     .map((t) => {
       return {
@@ -45,9 +49,7 @@ export function isSwap(event: DecodedTx): boolean {
     transfers.filter((t) => t.to.toLowerCase() === event.fromAddress.toLowerCase()).map((t) => t.address),
   )
 
-  if (sent.size !== 1 || received.size !== 1) return false
-
-  if (sent.values() === received.values()) return false
+  if (sent.size !== 1 || received.size !== 1 || sent.values() === received.values()) return false
 
   return true
 }
