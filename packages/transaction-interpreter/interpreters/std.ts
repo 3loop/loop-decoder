@@ -4,7 +4,7 @@ import { Asset, DecodedTx } from '@3loop/transaction-decoder'
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 function filterZeroTransfers(transfers: Asset[]): Asset[] {
-  return transfers.filter((t) => t.amount !== '0')
+  return transfers.filter((t) => t.amount != null && t.amount !== '0')
 }
 
 export function assetsSent(transfers: Asset[], address: string): AssetTransfer[] {
