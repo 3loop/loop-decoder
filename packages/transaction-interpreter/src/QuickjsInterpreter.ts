@@ -1,21 +1,12 @@
 import { stringify } from './helpers/stringify.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
-import { Context, Effect, Layer } from 'effect'
-import { InterpretedTransaction, Interpreter } from './types.js'
+import { Effect, Layer } from 'effect'
+import { Interpreter } from './types.js'
 import { getInterpreter } from './interpreters.js'
-import { InterpreterError, QuickjsVM } from './quickjs.js'
+import { QuickjsVM } from './quickjs.js'
+import { TransactionInterpreter } from './interpreter.js'
 
-export interface TransactionInterpreter {
-  readonly findInterpreter: (decodedTx: DecodedTx) => Interpreter | undefined
-  readonly interpretTx: (
-    decodedTx: DecodedTx,
-    interpreter: Interpreter,
-  ) => Effect.Effect<InterpretedTransaction, InterpreterError, never>
-}
-
-export const TransactionInterpreter = Context.GenericTag<TransactionInterpreter>('@3loop/TransactionInterpreter')
-
-export const make = Effect.gen(function* () {
+const make = Effect.gen(function* () {
   const vm = yield* QuickjsVM
 
   return {
