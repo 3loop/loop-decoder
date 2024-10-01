@@ -1,5 +1,5 @@
 import { Effect } from 'effect'
-import { isAddress, Hex } from 'viem'
+import { isAddress, Hex, getAddress } from 'viem'
 import { getProxyStorageSlot } from './proxies.js'
 import { AbiParams, AbiStore, ContractAbiResult, getAndCacheAbi, MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
@@ -96,7 +96,7 @@ export const decodeMethod = ({
 
     if (isAddress(contractAddress)) {
       //if contract is a proxy, get the implementation address
-      const implementation = yield* getProxyStorageSlot({ address: contractAddress, chainID })
+      const implementation = yield* getProxyStorageSlot({ address: getAddress(contractAddress), chainID })
 
       if (implementation) {
         contractAddress = implementation
