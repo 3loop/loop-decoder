@@ -1,4 +1,4 @@
-import { Effect, Request, RequestResolver } from 'effect'
+import { Effect, Request, RequestResolver, Schedule } from 'effect'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { Address, Hex } from 'viem'
 
@@ -40,12 +40,16 @@ export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetSt
       }),
     )
 
+    const policy = Schedule.addDelay(
+      Schedule.recurs(2), // Retry for a maximum of 2 times
+      () => '100 millis', // Add a delay of 100 milliseconds between retries
+    )
     const res = yield* Effect.all(effects, {
       concurrency: 'inherit',
       batching: 'inherit',
-    })
+    }).pipe(Effect.retryOrElse(policy, () => Effect.fail(new RPCFetchError('Get storage'))))
 
-    return res.find((x) => x != null)
+    return res?.find((x) => x != null)
   }),
 ).pipe(RequestResolver.contextFromEffect)
 

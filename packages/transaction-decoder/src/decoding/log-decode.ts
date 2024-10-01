@@ -15,7 +15,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     const address = logItem.address
     let abiAddress = address
 
-    const implementation = yield* getProxyStorageSlot({ address: abiAddress, chainID })
+    const implementation = yield* getProxyStorageSlot({ address: getAddress(abiAddress), chainID })
 
     if (implementation) {
       yield* Effect.logDebug(`Proxy implementation found for ${abiAddress} at ${implementation}`)
