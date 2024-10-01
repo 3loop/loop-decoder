@@ -2,7 +2,7 @@
 title: Proxy Resolution
 description: Proxy resolution is the process of resolving the address of a proxy contract to the address of the implementation contract.
 sidebar:
-  order: 1
+  order: 3
 ---
 
 Proxies are smart contracts that delegate calls to another contract, typically referred to as the implementation or logic contract. They allow the implementation to be updated without changing the proxy's address, ensuring that users continue interacting with the same address.

@@ -31,6 +31,10 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Contribution',
+          link: 'contribution',
+        },
+        {
           label: 'Guides',
           autogenerate: {
             directory: 'guides',
@@ -47,10 +51,6 @@ export default defineConfig({
           autogenerate: {
             directory: 'recipes',
           },
-        },
-        {
-          label: 'Contribution',
-          link: '/contribution',
         },
       ],
     }),

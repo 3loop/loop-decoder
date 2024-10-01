@@ -13,6 +13,10 @@ A library to transform any EVM transaction into a human-readable format. It cons
 
 [Head to the documentation](https://loop-decoder.3loop.io/) to read and learn more about the Loop Decoder, or check out our [playground](https://loop-decoder-web.vercel.app/) to see it in action.
 
+## Contribution to Interpretations
+
+If you're familiar with a specific contract or protocol, or want your own contracts to appear in human-readable interpretations, please contribute to Transaction Interpreter! Check out our [Contribution Guide](https://loop-decoder.3loop.io/contribution/) to learn how to get started.
+
 ## Why
 
 Transaction decoding is a crucial component of many dApps. Our goal is to create a library that can be integrated into any application without introducing any external infrastructure dependencies. This will allow developers to integrate decoding and interpretation into their stack without enforcing any data sources.
@@ -31,7 +35,7 @@ The open-source nature of the Loop Decoder allows developers to also integrate n
 - [x] Can be used in any JavaScript environment
 - [x] Minimal external dependencies - connect your own storage
 - [x] Predefined ABI and Contract metadata resolvers
-- [x] Automatically resolves contract proxise and multicalls
+- [x] Resolves contract proxise and multicalls
 - [x] Flexible interpreter that allows you to define any custom interpretation of EVM transactions.
 
 ## Examples

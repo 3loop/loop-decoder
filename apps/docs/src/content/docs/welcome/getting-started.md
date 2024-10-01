@@ -6,7 +6,7 @@ description: Quick start guide on using the Loop Decoder
 ### Requirements
 
 - TypeScript 5.x
-- `exactOptionalPropertyTypes` and `strict` enabled in your tsconfig.json
+- `exactOptionalPropertyTypes` and `strict` enabled in your `tsconfig.json`
 
 ### Dependencies
 
