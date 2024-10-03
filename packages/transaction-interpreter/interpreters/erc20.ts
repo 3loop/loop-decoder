@@ -1,17 +1,10 @@
-import { assetsReceived, assetsSent, formatNumber } from './std.js'
+import { assetsReceived, assetsSent, formatNumber, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const methodName = event.methodCall.name
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-  }
+  const newEvent = defaultEvent(event)
 
   switch (methodName) {
     case 'approve': {
@@ -37,9 +30,9 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       }
 
       return {
+        ...newEvent,
         type: 'approve-token',
         action,
-        ...newEvent,
       }
     }
     case 'transfer': {
@@ -47,9 +40,9 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       const symbol = newEvent.assetsSent?.[0]?.asset?.symbol || event.contractName || 'unknown'
 
       return {
+        ...newEvent,
         type: 'transfer-token',
         action: `Sent ${formatNumber(amount.toString())} ${symbol}`,
-        ...newEvent,
       }
     }
     case 'transferFrom': {
@@ -60,20 +53,16 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       if (!from) break
 
       return {
+        ...newEvent,
         type: 'transfer-token',
         action: `Sent ${formatNumber(amount.toString())} ${symbol}`,
-        ...newEvent,
         assetsSent: assetsSent(event.transfers, from),
         assetsReceived: assetsReceived(event.transfers, from),
       }
     }
   }
 
-  return {
-    type: 'unknown',
-    action: `Called method '${methodName}'`,
-    ...newEvent,
-  }
+  return newEvent
 }
 
 export const contractType = 'erc20'

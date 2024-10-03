@@ -1,36 +1,21 @@
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
-import { assetsReceived, assetsSent, displayAsset, NULL_ADDRESS } from './std.js'
+import { assetsSent, displayAsset, filterNullTransfers, defaultEvent } from './std.js'
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
-  const methodName = event.methodCall.name
-
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type' | 'assetsSent' | 'assetsReceived'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-  }
-
-  const transfers = event.transfers.filter((t) => t.from !== NULL_ADDRESS && t.to !== NULL_ADDRESS)
+  const newEvent = defaultEvent(event)
+  const transfers = filterNullTransfers(event.transfers)
 
   if (transfers.length === 1) {
     const fromAddress = transfers[0].from
-    const assetSent = assetsSent(transfers, fromAddress)
+    const assetSent = assetsSent(event.transfers, fromAddress)
     return {
-      type: 'unknown',
-      action: `Sent ${displayAsset(assetSent[0])}`,
       ...newEvent,
-      assetsReceived: [],
+      type: 'transfer-token',
+      action: `Sent ${displayAsset(assetSent[0])}`,
       assetsSent: assetSent,
     }
   }
 
-  return {
-    type: 'unknown',
-    action: `Called method '${methodName}'`,
-    ...newEvent,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-  }
+  return newEvent
 }

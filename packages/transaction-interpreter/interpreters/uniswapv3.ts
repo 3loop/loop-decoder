@@ -1,19 +1,9 @@
-import { assetsReceived, assetsSent, displayAsset } from './std.js'
+import { displayAsset, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
-  const methodName = event.methodCall.name
-
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-  }
-
+  const newEvent = defaultEvent(event)
   const hasSwap = event.traceCalls.some((call) => call.name === 'swap')
 
   if (hasSwap) {
@@ -21,25 +11,23 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     const to = displayAsset(newEvent.assetsReceived[0])
 
     return {
+      ...newEvent,
       type: 'swap',
       action: 'Swapped ' + from + ' for ' + to,
-      ...newEvent,
     }
   }
 
-  return {
-    type: 'unknown',
-    action: 'Unknown action',
-    ...newEvent,
-  }
+  return newEvent
 }
 
 export const contracts = [
-  // Mainnet
-  '1:0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b',
+  //Universal Router
   '1:0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad',
-  '1:0x76d631990d505e4e5b432eedb852a60897824d68',
-  // Sepolia
+  '1:0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b',
+  '8453:0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad',
+  '8453:0xeC8B0F7Ffe3ae75d7FfAb09429e3675bb63503e4',
+  '8453:0x4752ba5dbc23f44d87826276bf6fd6b1c372ad24',
+  '8453:0x2626664c2603336e57b271c5c0b26f421741e481',
   '11155111:0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad',
   '11155111:0x5302086a3a25d473aabbd0356eff8dd811a4d89b',
 ]

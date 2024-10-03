@@ -58,4 +58,6 @@ export type InterpretedTransaction = {
   type: TransactionType
   assetsSent: AssetTransfer[]
   assetsReceived: AssetTransfer[]
+  assetsMinted?: AssetTransfer[]
+  assetsBurned?: AssetTransfer[]
 }

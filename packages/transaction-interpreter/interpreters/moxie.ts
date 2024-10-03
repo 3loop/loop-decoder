@@ -1,4 +1,4 @@
-import { assetsReceived, assetsSent, displayAsset, formatNumber, NULL_ADDRESS } from './std.js'
+import { displayAsset, formatNumber, NULL_ADDRESS, defaultEvent, toAssetTransfer } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 
@@ -14,13 +14,7 @@ import type { DecodedTx } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const methodName = event.methodCall.name
-
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type' | 'assetsSent' | 'assetsReceived'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-  }
+  const newEvent = defaultEvent(event)
 
   const purchaseOrSaleEvent = event.interactions.find(
     (i) => i.event.eventName === 'SubjectSharePurchased' || i.event.eventName === 'SubjectShareSold',
@@ -29,72 +23,64 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const eventType = purchaseOrSaleEvent?.event.eventName === 'SubjectSharePurchased' ? 'buy' : 'sell'
 
   if (purchaseOrSaleEvent) {
-    const params = purchaseOrSaleEvent.event.params as {
+    const { _spender, _beneficiary, _buyToken, _sellToken } = purchaseOrSaleEvent.event.params as {
       _spender: string
       _beneficiary: string
       _buyToken: string
+      _sellToken: string
     }
-    const spender = params._spender
-    const beneficiary = params._beneficiary
-    const sent = assetsSent(event.transfers, spender)
-    const received = assetsReceived(event.transfers, beneficiary)
-
-    const isSwap = sent.length === 1 && received.length === 1
-    const isBurn = beneficiary === NULL_ADDRESS
+    const sold = event.transfers.filter((t) => t.address === _sellToken && t.from === _spender).map(toAssetTransfer)
+    const bougt = event.transfers.filter((t) => t.address === _buyToken && t.to === _beneficiary).map(toAssetTransfer)
+    const isBurn = _beneficiary === NULL_ADDRESS
+    const isSwap = sold.length === 1 && bougt.length === 1
 
     if (eventType === 'buy' && isSwap) {
       return {
-        type: 'swap',
-        action: `Bought ${formatNumber(received[0].amount)} Fan Tokens of ${received[0].asset?.name} for ${displayAsset(
-          sent[0],
-        )}`,
         ...newEvent,
-        assetsSent: sent,
-        assetsReceived: received,
+        type: 'swap',
+        action: `Bought ${formatNumber(bougt[0].amount)} Fan Tokens of ${bougt[0].asset?.name} for ${displayAsset(
+          sold[0],
+        )}`,
+        assetsSent: sold,
+        assetsReceived: bougt,
       }
     }
 
     if (eventType === 'sell' && isSwap) {
       return {
-        type: 'swap',
-        action: `Sold ${formatNumber(sent[0].amount)} Fan Tokens of ${sent[0].asset?.name} for ${displayAsset(
-          received[0],
-        )}`,
         ...newEvent,
-        assetsSent: sent,
-        assetsReceived: received,
+        type: 'swap',
+        action: `Sold ${formatNumber(sold[0].amount)} Fan Tokens of ${sold[0].asset?.name} for ${displayAsset(
+          bougt[0],
+        )}`,
+        assetsSent: sold,
+        assetsReceived: bougt,
       }
     }
 
     if (eventType === 'buy' && isBurn) {
-      const buyTokenAddress = params._buyToken
+      const buyTokenAddress = _buyToken
       const buyTokenMetadata = event.addressesMeta[buyTokenAddress as keyof typeof event.addressesMeta]
 
       return {
-        type: 'burn',
-        action: `Burned ${displayAsset(sent[0])} for ${buyTokenMetadata?.contractName} Fan Tokens holders`,
         ...newEvent,
-        assetsSent: sent,
+        type: 'burn',
+        action: `Burned ${displayAsset(sold[0])} for ${buyTokenMetadata?.contractName} Fan Tokens holders`,
+        assetsSent: sold,
         assetsReceived: [],
       }
     }
 
     return {
+      ...newEvent,
       type: 'unknown',
       action: `Called method '${methodName}'`,
-      ...newEvent,
-      assetsSent: sent,
-      assetsReceived: received,
+      assetsSent: sold,
+      assetsReceived: bougt,
     }
   }
 
-  return {
-    type: 'unknown',
-    action: `Called method '${methodName}'`,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-    ...newEvent,
-  }
+  return newEvent
 }
 
 export const events = [

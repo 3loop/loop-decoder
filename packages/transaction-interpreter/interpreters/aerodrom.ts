@@ -26,7 +26,4 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
   return newEvent
 }
 
-export const contracts = [
-  '1:0xF3dE3C0d654FDa23daD170f0f320a92172509127', // OKX Aggregation Router
-  '1:0xF3dE3C0d654FDa23daD170f0f320a92172509127', // OKX Router
-]
+export const contracts = ['8453:0x6cb442acf35158d5eda88fe602221b67b400be3e']
