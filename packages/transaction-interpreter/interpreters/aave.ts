@@ -1,8 +1,8 @@
 import { displayAsset, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
 
   const newEvent = defaultEvent(event)
@@ -49,8 +49,8 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
     }
 
     case 'setUserUseReserveAsCollateral': {
-      const assetAddress = event.methodCall.arguments[0].value as string
-      const enabled = event.methodCall.arguments[1].value === 'true'
+      const assetAddress = event.methodCall.params?.[0]?.value as string
+      const enabled = event.methodCall.params?.[1]?.value === 'true'
       return {
         ...newEvent,
         type: 'unknown',

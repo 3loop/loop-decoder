@@ -27,6 +27,26 @@ export const EXAMPLE_TXS = {
       interpreter: 'aave',
     },
   ],
+  'Gnosis Safe': [
+    {
+      name: 'MultiTransfer',
+      hash: '0xffc998f7f5765b475b91dfcffa609cef30ecee599703681d64b7c18aed60119b',
+      chainID: 1,
+      interpreter: 'gnosis-safe',
+    },
+    {
+      name: 'Transfer',
+      hash: '0x22a244794f155ce4a5765588353cf82dfc842c33ee3ed98e95ef488f6964f4fb',
+      chainID: 1,
+      interpreter: 'gnosis-safe',
+    },
+    {
+      name: 'MultiSend',
+      hash: '0x1ef9c179cf86d166437e4e214611ed3353590e0b65da48b20b3a2c717760066b',
+      chainID: 1,
+      interpreter: 'gnosis-safe',
+    },
+  ],
   'NFTS BLUR': [
     {
       name: 'Sell',
@@ -81,20 +101,6 @@ export const EXAMPLE_TXS = {
       hash: '0x7a7f39aee8c68f9be272b093f613280a8122291923edba83cc3f1f1754a70ecd',
       chainID: 1,
       interpreter: 'hop-protocol',
-    },
-  ],
-  'Friend.Tech (Base mainnet)': [
-    {
-      name: 'Sell',
-      hash: '0x9e18a3ab3faed1b13412e5cca532e083761410bb58e0423a5cd865a18a8e49a3',
-      chainID: 8453,
-      interpreter: 'friend-tech',
-    },
-    {
-      name: 'Buy',
-      hash: '0x24067751e1bb553b8f5ccd6958edc3fa27489f9836bc0cd477383b143825dca5',
-      chainID: 8453,
-      interpreter: 'friend-tech',
     },
   ],
   'Moxie (Base mainnet)': [

@@ -90,7 +90,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "transferFrom",
+    "params": [
       {
         "name": "from",
         "type": "address",
@@ -107,7 +108,8 @@
         "value": "69",
       },
     ],
-    "name": "transferFrom",
+    "signature": "transferFrom(address,address,uint256)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

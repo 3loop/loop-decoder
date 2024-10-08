@@ -235,7 +235,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "takeAsk",
+    "params": [
       {
         "components": [
           {
@@ -636,7 +637,8 @@
         "value": "0x9fa17ad0a2027124df5973784affd34583879b139db1d7b1cac0a57fd5d3809575abf64023f247decef8a5f3ad50679692d37901af1b1fa3ea8eb98bbc6ddf1c1b012be76a6af68e5d010513ff70a3aaed9afeb8661116e6ce",
       },
     ],
-    "name": "takeAsk",
+    "signature": "takeAsk(((address,address,bytes32,uint256,uint256,uint8,(address,uint16),uint256)[],(uint256,bytes32[],(uint256,uint256,uint256,uint256),(uint256,uint256))[],(address,uint16),bytes,address),bytes)",
+    "type": "function",
   },
   "nativeValueSent": "285000000000000000",
   "reverted": false,

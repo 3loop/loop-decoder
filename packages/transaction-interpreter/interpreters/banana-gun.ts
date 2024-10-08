@@ -1,8 +1,8 @@
 import { displayAsset, getPayments, isSwap, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = defaultEvent(event)
 
   const netSent = getPayments({

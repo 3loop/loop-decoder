@@ -43,8 +43,10 @@
   ],
   "interactions": [],
   "methodCall": {
-    "arguments": [],
     "name": "0x7cfb0a7e",
+    "params": undefined,
+    "signature": "",
+    "type": "",
   },
   "nativeValueSent": "0",
   "reverted": true,

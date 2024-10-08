@@ -132,7 +132,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "claim",
+    "params": [
       {
         "name": "_receiver",
         "type": "address",
@@ -192,7 +193,8 @@
         "value": "0x",
       },
     ],
-    "name": "claim",
+    "signature": "claim(address,uint256,uint256,address,uint256,(bytes32[],uint256,uint256,address),bytes)",
+    "type": "function",
   },
   "nativeValueSent": "3000000000000000000",
   "reverted": false,

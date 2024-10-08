@@ -10,7 +10,7 @@ export const MockedAbiStoreLive = Layer.succeed(
     strategies: {
       default: [
         // Run only when adding a new test case
-        // EtherscanStrategyResolver()
+        // EtherscanStrategyResolver({ apikey: '' }),
         // FourByteStrategyResolver(),
       ],
     },

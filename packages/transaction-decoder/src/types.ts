@@ -108,11 +108,11 @@ export interface DecodedError {
   message: string | null
 }
 
-export interface DecodedTx {
+export interface DecodedTransaction {
   txHash: string
   txType: TxType
   contractType: ContractType
-  methodCall: MethodCall
+  methodCall: DecodeResult
   traceCalls: DecodeTraceResult[]
   contractName: string | null
   interactions: Interaction[]
@@ -131,12 +131,6 @@ export interface DecodedTx {
   interactedAddresses: string[]
   errors: DecodedError[] | null
   addressesMeta: Record<Address, ContractData>
-}
-
-export interface MethodCall {
-  name: string | null
-  arguments: TreeNode[]
-  decoded?: boolean
 }
 
 export const enum TxType {

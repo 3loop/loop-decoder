@@ -194,7 +194,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "execute",
+    "params": [
       {
         "name": "commands",
         "type": "bytes",
@@ -214,7 +215,8 @@
         "value": "1688485116",
       },
     ],
-    "name": "execute",
+    "signature": "execute(bytes,bytes[],uint256)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

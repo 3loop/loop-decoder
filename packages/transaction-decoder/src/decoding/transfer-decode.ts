@@ -1,5 +1,5 @@
 import { formatEther, type TransactionReceipt, type GetTransactionReturnType } from 'viem'
-import type { DecodedTx } from '../types.js'
+import type { DecodedTransaction } from '../types.js'
 import { TxType } from '../types.js'
 
 export function transferDecode({
@@ -8,13 +8,13 @@ export function transferDecode({
 }: {
   transaction: GetTransactionReturnType
   receipt: TransactionReceipt
-}): DecodedTx {
+}): DecodedTransaction {
   const value = transaction.value.toString()
   const effectiveGasPrice = receipt.effectiveGasPrice ?? BigInt(0)
   const gasPaid = formatEther(receipt.gasUsed * effectiveGasPrice)
   const interactedAddresses = [receipt.from, receipt.to].filter(Boolean)
 
-  const decodedTx: DecodedTx = {
+  const decodedTx: DecodedTransaction = {
     contractName: null,
     contractType: 'OTHER',
     txHash: transaction.hash,
@@ -23,7 +23,9 @@ export function transferDecode({
     toAddress: receipt.to,
     methodCall: {
       name: 'Transfer',
-      arguments: [],
+      signature: 'Transfer(address,address,uint256)',
+      type: 'function',
+      params: [],
     },
     traceCalls: [],
     nativeValueSent: value,

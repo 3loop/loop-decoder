@@ -198,11 +198,9 @@ export const decodeErrorTrace = ({ trace }: { trace: TraceLog[] }) =>
         self.findIndex(
           (t) =>
             t.error === call.error &&
-            t.result &&
-            'output' in t.result &&
-            call.result &&
-            'output' in call.result &&
-            (t.result?.output ? t.result?.output === call.result?.output : true),
+            (t.type !== 'create' && call.type !== 'create' && t.result?.output
+              ? t.result?.output === call.result?.output
+              : true),
         ),
     )
 

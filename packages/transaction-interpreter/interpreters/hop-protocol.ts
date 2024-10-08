@@ -1,10 +1,10 @@
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import { displayAsset, defaultEvent } from './std.js'
 
-export function transformEvent(tx: DecodedTx): InterpretedTransaction {
+export function transformEvent(tx: DecodedTransaction): InterpretedTransaction {
   const methodName = tx.methodCall.name
-  const userAddress = tx.methodCall.arguments.find((arg) => arg.name === 'recipient')?.value as string
+  const userAddress = tx.methodCall.params.find((arg) => arg.name === 'recipient')?.value as string
   const event = defaultEvent(tx)
 
   if (userAddress) {

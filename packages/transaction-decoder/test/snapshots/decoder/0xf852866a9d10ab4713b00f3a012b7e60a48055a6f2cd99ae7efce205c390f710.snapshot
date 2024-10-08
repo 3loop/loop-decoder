@@ -215,7 +215,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "takeAskSinglePool",
+    "params": [
       {
         "components": [
           {
@@ -374,7 +375,8 @@
         "value": "1061717990000000000",
       },
     ],
-    "name": "takeAskSinglePool",
+    "signature": "takeAskSinglePool(((address,address,bytes32,uint256,uint256,uint8,(address,uint16),uint256),(uint256,bytes32[],(uint256,uint256,uint256,uint256),(uint256,uint256)),(address,uint16),bytes,address),bytes,uint256)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

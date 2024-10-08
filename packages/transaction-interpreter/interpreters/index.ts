@@ -1,4 +1,4 @@
-import { DecodedTx } from '@3loop/transaction-decoder'
+import { DecodedTransaction } from '@3loop/transaction-decoder'
 
 const interpretations: Record<string, string> = {
   /**PLACE_INTEPRETATIONS**/
@@ -19,7 +19,7 @@ const standardLibrary = '/**PLACE_STD_CONTENT**/'
 const fallbackInterpreter = standardLibrary + '\n' + '/**PLACE_FALLBACK_CONTENT**/'
 
 // TODO: Add a default interpreter as a fallback
-function getInterpreter(tx: DecodedTx): string | undefined {
+function getInterpreter(tx: DecodedTransaction): string | undefined {
   const { chainID, toAddress, contractType } = tx
   const key = `${chainID}:${toAddress}`.toLowerCase()
   const id = contractToName[key]

@@ -6,7 +6,7 @@ import * as LogDecoder from './decoding/log-decode.js'
 import * as TraceDecoder from './decoding/trace-decode.js'
 import * as CalldataDecode from './decoding/calldata-decode.js'
 import { transferDecode } from './decoding/transfer-decode.js'
-import type { DecodedTx, Interaction, ContractData } from './types.js'
+import type { DecodedTransaction, Interaction, ContractData } from './types.js'
 import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
 import { getAssetsTransfers } from './transformers/tokens.js'
@@ -157,7 +157,7 @@ export const decodeTransaction = ({
 
     const contractMeta = contractsMeta[contractAddress]
 
-    const decodedTx: DecodedTx = {
+    const decodedTx: DecodedTransaction = {
       txHash: transaction.hash,
       txType: TxType.CONTRACT_INTERACTION,
       fromAddress: receipt.from,
@@ -166,7 +166,9 @@ export const decodeTransaction = ({
       contractType: contractMeta?.type ?? 'OTHER',
       methodCall: {
         name: decodedDataRight?.name ?? data.slice(0, 10),
-        arguments: decodedDataRight?.params ?? [],
+        type: decodedDataRight?.type ?? '',
+        signature: decodedDataRight?.signature ?? '',
+        params: decodedDataRight?.params,
       },
       traceCalls: decodedTraceRight,
       nativeValueSent: value,

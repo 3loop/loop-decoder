@@ -1,5 +1,5 @@
 import { stringify } from './helpers/stringify.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import { Effect, Layer } from 'effect'
 import { Interpreter } from './types.js'
 import { getInterpreter } from './interpreters.js'
@@ -12,7 +12,7 @@ function localEval(code: string, input: string) {
 
 const make = Effect.succeed({
   // NOTE: We could export this separately to allow bundling the interpreters separately
-  findInterpreter: (decodedTx: DecodedTx) => {
+  findInterpreter: (decodedTx: DecodedTransaction) => {
     if (!decodedTx.toAddress) return undefined
 
     const code = getInterpreter(decodedTx)
@@ -23,7 +23,7 @@ const make = Effect.succeed({
       id: `${decodedTx.chainID}:${decodedTx.toAddress}`,
     }
   },
-  interpretTx: (decodedTx: DecodedTx, interpreter: Interpreter) =>
+  interpretTx: (decodedTx: DecodedTransaction, interpreter: Interpreter) =>
     Effect.sync(() => {
       // TODO: add ability to surpress warning on acknowledge
       Effect.logWarning('Using eval in production can result in security vulnerabilities. Use at your own risk.')

@@ -23,7 +23,7 @@ please contribute to Loop Decoder! If you have any questions or need help, pleas
 
 ### What is an interpretation
 
-Interpretations are TypeScript functions that transform a decoded transaction into a human-readable format, extracting the most significant information. The `DecodedTx` is generated using the `@3loop/transaction-decoder` package, and interpretations are managed in the `@3loop/transaction-interpreter` package.
+Interpretations are TypeScript functions that transform a decoded transaction into a human-readable format, extracting the most significant information. The `DecodedTransaction` is generated using the `@3loop/transaction-decoder` package, and interpretations are managed in the `@3loop/transaction-interpreter` package.
 
 ## Writing your first interpretation
 
@@ -51,13 +51,13 @@ Each interpretation is a TypeScript file located in the `packages/transaction-in
 
 Create a new file in the `interpreters` directory and copy the content from the [Fallback](https://github.com/3loop/loop-decoder/blob/main/packages/transaction-interpreter/interpreters/fallback.ts) interpretation, used for unsupported transactions.
 
-The simplest interpretation is a `transformEvent` function that takes a `DecodedTx` and returns an `InterpretedTransaction`:
+The simplest interpretation is a `transformEvent` function that takes a `DecodedTransaction` and returns an `InterpretedTransaction`:
 
 ```ts
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import type { InterpretedTransaction } from '@/types.js'
 
-function transformEvent(event: DecodedTx): InterpretedTransaction {
+function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   return {
     type: 'unknown',
     chain: event.chainID,
@@ -67,7 +67,7 @@ function transformEvent(event: DecodedTx): InterpretedTransaction {
 }
 ```
 
-Update the copied function from the fallback interpretation to transform the input `DecodedTx` into an `InterpretedTransaction` with a human-readable description in the `action` field.
+Update the copied function from the fallback interpretation to transform the input `DecodedTransaction` into an `InterpretedTransaction` with a human-readable description in the `action` field.
 
 #### Step 3.1. Adding Contract Address or Event Names as Filters
 
@@ -91,12 +91,12 @@ export const events = [
 
 #### Step 3.2. Using helpers
 
-The `@3loop/transaction-interpreter` package offers helper functions for handling `DecodedTx`. For example, you can retrieve the assets sent and received in a transaction:
+The `@3loop/transaction-interpreter` package offers helper functions for handling `DecodedTransaction`. For example, you can retrieve the assets sent and received in a transaction:
 
 ```ts
 import { assetsSent, assetsReceived, displayAddress } from '@/std.js'
 
-function transformEvent(event: DecodedTx): InterpretedTransaction {
+function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   return {
     type: 'unknown',
     chain: event.chainID,

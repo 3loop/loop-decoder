@@ -39,8 +39,10 @@
   ],
   "interactions": [],
   "methodCall": {
-    "arguments": [],
     "name": "swapCompact",
+    "params": [],
+    "signature": "swapCompact()",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": true,

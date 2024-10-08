@@ -8,7 +8,7 @@ import {
   assetsReceived,
 } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 /**
  * Moxie is a community-governed Farcaster economic engine on the Base blockchain. It aims to grow the
@@ -20,7 +20,7 @@ import type { DecodedTx } from '@3loop/transaction-decoder'
  * and https://developer.moxie.xyz/
  */
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
   const newEvent = defaultEvent(event)
 

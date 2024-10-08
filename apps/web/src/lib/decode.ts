@@ -1,6 +1,6 @@
 import { Effect, Layer } from 'effect'
 import { RPCProviderLive } from './rpc-provider'
-import { decodeTransactionByHash, type DecodedTx } from '@3loop/transaction-decoder'
+import { decodeTransactionByHash, type DecodedTransaction } from '@3loop/transaction-decoder'
 import { AbiStoreLive, ContractMetaStoreLive } from './contract-loader'
 import { Hex } from 'viem'
 
@@ -13,7 +13,7 @@ export async function decodeTransaction({
 }: {
   chainID: number
   hash: string
-}): Promise<DecodedTx | undefined> {
+}): Promise<DecodedTransaction | undefined> {
   const runnable = Effect.provide(decodeTransactionByHash(hash as Hex, chainID), MainLayer)
   return Effect.runPromise(runnable).catch((error: unknown) => {
     console.error('Decode error', JSON.stringify(error, null, 2))

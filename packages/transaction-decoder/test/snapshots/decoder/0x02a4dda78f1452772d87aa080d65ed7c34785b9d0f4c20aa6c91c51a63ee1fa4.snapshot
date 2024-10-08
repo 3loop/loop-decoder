@@ -147,7 +147,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "takeBidSingle",
+    "params": [
       {
         "components": [
           {
@@ -296,7 +297,8 @@
         "value": "0xa70773cc07a8826f7324d6505b00617410e960c8a50e72f9c7386bb852d0560f458c8b36117d1f64d065a905b1b008814733be8de88f1421dbd7f08374f913151b012b1c306af68e5d010513ff70a3aaed9afeb8661116e6ce",
       },
     ],
-    "name": "takeBidSingle",
+    "signature": "takeBidSingle(((address,address,bytes32,uint256,uint256,uint8,(address,uint16),uint256),(uint256,bytes32[],(uint256,uint256,uint256,uint256),(uint256,uint256)),(address,uint16),bytes),bytes)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

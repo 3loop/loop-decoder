@@ -1,5 +1,5 @@
 import type { AssetTransfer, InterpretedTransaction, Payment } from '@/types.js'
-import { Asset, DecodedTx } from '@3loop/transaction-decoder'
+import { Asset, DecodedTransaction } from '@3loop/transaction-decoder'
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -59,7 +59,7 @@ export function displayAddress(address: string): string {
   return address.slice(0, 6) + '...' + address.slice(-4)
 }
 
-export function isSwap(event: DecodedTx): boolean {
+export function isSwap(event: DecodedTransaction): boolean {
   if (event.transfers.some((t) => t.type !== 'ERC20' && t.type !== 'native')) return false
 
   const transfers = event.transfers.filter((t) => t.from !== NULL_ADDRESS && t.to !== NULL_ADDRESS)
@@ -222,7 +222,7 @@ export function displayPayments(erc20Payments: Payment[], nativePayments: Paymen
   }
 }
 
-export function defaultEvent(event: DecodedTx): InterpretedTransaction {
+export function defaultEvent(event: DecodedTransaction): InterpretedTransaction {
   const burned = assetsReceived(event.transfers, NULL_ADDRESS)
   const minted = assetsSent(event.transfers, NULL_ADDRESS)
 

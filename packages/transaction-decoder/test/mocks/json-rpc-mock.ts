@@ -67,6 +67,24 @@ export const mockedTransport = custom({
       return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')
     }
 
+    if (method === 'eth_call') {
+      // NOTE: mock for Gnosis Safe
+
+      if (params[0].to.toLowerCase() === '0x78c38d0e31592822135c83873e68c7ee4df82586') {
+        return Promise.resolve('0x000000000000000000000000fb1bffc9d739b8d520daf37df666da4c687191ea')
+      }
+
+      if (params[0].to.toLowerCase() === '0xbd4b515ed602792497364de7c306659297378fae') {
+        return Promise.resolve('0x0000000000000000000000003e5c63644e683549055b9be8653de26e0b4cd36e')
+      }
+
+      if (params[0].to.toLowerCase() === '0x2d8880bcc0618dbcc5d516640015a69e28fdc406') {
+        return Promise.resolve('0x000000000000000000000000d9db270c1b5e3bd161e8c8503c55ceabee709552')
+      }
+
+      return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')
+    }
+
     throw new Error(`Method ${method} not implemented`)
   },
 })

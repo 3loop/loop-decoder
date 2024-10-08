@@ -1,15 +1,15 @@
 import { assetsReceived, assetsSent, formatNumber, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
   const newEvent = defaultEvent(event)
 
   switch (methodName) {
     case 'approve': {
       const approval = event.interactions.find((i) => i.event.eventName === 'Approval')
-      const approvalValue = (event.methodCall?.arguments?.[1]?.value || '') as string
+      const approvalValue = (event.methodCall?.params?.[1]?.value || '') as string
       const name = approval?.contractSymbol || event.contractName || 'unknown'
       let action = ''
 
@@ -36,7 +36,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       }
     }
     case 'transfer': {
-      const amount = newEvent.assetsSent?.[0]?.amount || event.methodCall?.arguments?.[1]?.value || '0'
+      const amount = newEvent.assetsSent?.[0]?.amount || event.methodCall?.params?.[1]?.value || '0'
       const symbol = newEvent.assetsSent?.[0]?.asset?.symbol || event.contractName || 'unknown'
 
       return {
@@ -46,8 +46,8 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       }
     }
     case 'transferFrom': {
-      const from = event.methodCall?.arguments?.[0]?.value as string
-      const amount = event.transfers[0]?.amount || event.methodCall?.arguments?.[2]?.value || '0'
+      const from = event.methodCall?.params?.[0]?.value as string
+      const amount = event.transfers[0]?.amount || event.methodCall?.params?.[2]?.value || '0'
       const symbol = event.transfers[0]?.symbol || event.contractName || 'unknown'
 
       if (!from) break

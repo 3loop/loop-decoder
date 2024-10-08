@@ -6,9 +6,12 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { getTransactions } from '@/lib/etherscan'
 import { decodeTransaction } from '@/lib/decode'
-import { DecodedTx } from '@3loop/transaction-decoder'
+import { DecodedTransaction } from '@3loop/transaction-decoder'
 
-async function getListOfDecodedTxs(contract: string, chainID: number): Promise<(DecodedTx | undefined)[]> {
+async function getListOfDecodedTransactions(
+  contract: string,
+  chainID: number,
+): Promise<(DecodedTransaction | undefined)[]> {
   if (contract !== aaveV2) return []
 
   try {
@@ -24,7 +27,9 @@ async function getListOfDecodedTxs(contract: string, chainID: number): Promise<(
 
 export default async function Home({ params }: { params: { contract?: string } }) {
   let contract = params.contract?.toLowerCase() || DEFAULT_CONTRACT
-  const decodedTxs = (await getListOfDecodedTxs(contract, DEFAULT_CHAIN_ID)).filter((tx): tx is DecodedTx => !!tx)
+  const decodedTxs = (await getListOfDecodedTransactions(contract, DEFAULT_CHAIN_ID)).filter(
+    (tx): tx is DecodedTransaction => !!tx,
+  )
 
   return (
     <div>

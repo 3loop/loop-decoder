@@ -1,10 +1,10 @@
 'use client'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import React from 'react'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import { findAndRunInterpreter, Interpretation } from '@/lib/interpreter'
 
-export default function TxTable({ txs }: { txs: DecodedTx[] }) {
+export default function TxTable({ txs }: { txs: DecodedTransaction[] }) {
   const [result, setResult] = React.useState<Interpretation[]>([])
 
   React.useEffect(() => {

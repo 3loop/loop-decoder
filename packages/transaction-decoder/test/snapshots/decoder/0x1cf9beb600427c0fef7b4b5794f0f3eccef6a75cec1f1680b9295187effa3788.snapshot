@@ -74,7 +74,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "mint",
+    "params": [
       {
         "name": "account",
         "type": "address",
@@ -91,7 +92,8 @@
         "value": "2",
       },
     ],
-    "name": "mint",
+    "signature": "mint(address,uint256,uint256)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,
