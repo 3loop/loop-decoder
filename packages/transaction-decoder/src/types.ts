@@ -5,29 +5,28 @@ export interface RawTxData {
   txTrace: TraceLog[]
 }
 
+export type MostTypes = string | number | boolean | null | string[]
+
 export interface Node {
   name: string
   type: string
 }
 
 export interface Tree extends Node {
-  components: (InputArg | TreeNode)[]
+  components: TreeNode[]
   value?: never
+}
+
+export interface InputArg extends Node {
+  value: string | string[]
+  valueDecoded?: DecodeResult | DecodeResult[]
+  components?: never
 }
 
 export type TreeNode = InputArg | Tree
 
-export type MostTypes = string | number | boolean | null | string[]
-
-export interface InputArg extends Node {
-  value: string | string[]
-  components?: never
-}
-
-export interface DecodeResult {
-  name: string
+export interface DecodeResult extends Node {
   signature: string
-  type: string
   params?: TreeNode[]
 }
 
@@ -63,7 +62,7 @@ export interface ContractData {
   chainID: number
 }
 
-export interface Interaction {
+export interface BaseInteraction {
   contractName: Address | null
   contractSymbol: string | null
   contractAddress: Address
@@ -72,6 +71,10 @@ export interface Interaction {
   contractType: ContractType
   signature: string | null
   event: InteractionEvent
+}
+
+export type Interaction = BaseInteraction & {
+  decoded?: BaseInteraction
 }
 
 export interface NativeEventTransferParams {
@@ -164,3 +167,5 @@ export interface Asset {
   pair?: string // "RARE-WETH"
   tokenId?: string
 }
+
+export type ProxyType = 'eip1967' | 'zeppelin' | 'gnosis'

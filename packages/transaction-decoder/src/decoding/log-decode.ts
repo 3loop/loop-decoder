@@ -19,7 +19,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
 
     if (implementation) {
       yield* Effect.logDebug(`Proxy implementation found for ${abiAddress} at ${implementation}`)
-      abiAddress = implementation
+      abiAddress = implementation.address
     }
 
     const abiItem = yield* getAndCacheAbi({

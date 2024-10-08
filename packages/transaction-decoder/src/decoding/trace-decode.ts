@@ -196,13 +196,19 @@ export const decodeErrorTrace = ({ trace }: { trace: TraceLog[] }) =>
       (call, index, self) =>
         index ===
         self.findIndex(
-          (t) => t.error === call.error && (t.result?.output ? t.result?.output === call.result?.output : true),
+          (t) =>
+            t.error === call.error &&
+            t.result &&
+            'output' in t.result &&
+            call.result &&
+            'output' in call.result &&
+            (t.result?.output ? t.result?.output === call.result?.output : true),
         ),
     )
 
     const getErrorObject = (call: TraceLog) =>
       Effect.gen(function* () {
-        if (call.result?.output == null) {
+        if (call.result && 'output' in call.result && call.result.output == null) {
           return {
             error: call.error as string,
             message: null,

@@ -3,7 +3,7 @@ import { isAddress, Hex, getAddress } from 'viem'
 import { getProxyStorageSlot } from './proxies.js'
 import { AbiParams, AbiStore, ContractAbiResult, getAndCacheAbi, MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
-import { TreeNode } from '@/types.js'
+import { DecodeResult, InputArg, ProxyType, TreeNode } from '@/types.js'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '@/public-client.js'
 import { sameAddress } from '../helpers/address.js'
 
@@ -28,7 +28,7 @@ const decodeMulticall3 = (
               Effect.gen(function* () {
                 if (param.components == null) return param
                 const target = param.components.find((p) => p.name === 'target')
-                const callData = param.components.find((p) => p.name === 'callData')
+                const callData = param.components.find((p) => p.name === 'callData' || p.name === 'data')
 
                 // NOTE: Found a tuple with calldata, recursively decode the calldata
                 if (target != null && callData != null && callData.value != null) {
@@ -43,11 +43,11 @@ const decodeMulticall3 = (
 
                   // Replace the call data with the decoded call data tree
                   const components = param.components.map((p) => {
-                    if (p.name === 'callData') {
+                    if (p.name === 'callData' && decoded) {
                       return {
                         ...p,
-                        value: decoded,
-                        decoded: !!decoded,
+                        value: callData.value,
+                        valueDecoded: decoded,
                       }
                     }
                     return p
@@ -82,6 +82,96 @@ const decodeMulticall3 = (
     })
   })
 
+//https://etherscan.io/address/0x40a2accbd92bca938b02010e17a5b8929b49130d
+const decodeGnosisMultisendParams = (
+  inputParams: TreeNode[],
+  chainID: number,
+): Effect.Effect<
+  TreeNode[],
+  AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
+  AbiStore<AbiParams, ContractAbiResult> | PublicClient
+> =>
+  Effect.gen(function* () {
+    if (inputParams.length === 0) {
+      return inputParams
+    }
+
+    //Code from https://github.com/safe-global/safe-core-sdk/blob/dc98509f15f42f04d65edcbada3bcf1f61f1154a/packages/protocol-kit/src/utils/transactions/utils.ts#L159
+    const txs = []
+    // Decode after 0x
+    let index = 2
+    const transactionBytes = inputParams.find((p) => p.name === 'transactions')?.value as Hex
+    while (index < transactionBytes.length) {
+      // As we are decoding hex encoded bytes calldata, each byte is represented by 2 chars
+      // uint8 operation, address to, value uint256, dataLength uint256
+      const operation = `0x${transactionBytes.slice(index, (index += 2))}`
+      const to = `0x${transactionBytes.slice(index, (index += 40))}`
+      const value = `0x${transactionBytes.slice(index, (index += 64))}`
+      const dataLength = parseInt(`${transactionBytes.slice(index, (index += 64))}`, 16) * 2
+      const data = `0x${transactionBytes.slice(index, (index += dataLength))}`
+      txs.push({
+        operation: Number(operation),
+        to: getAddress(to),
+        value: BigInt(value).toString(),
+        data,
+      })
+    }
+    const txsDecoded = yield* Effect.all(
+      txs.map((tx) => {
+        return decodeMethod({
+          data: tx.data as Hex,
+          chainID,
+          contractAddress: tx.to,
+        }).pipe(Effect.orElseSucceed(() => null))
+      }),
+      {
+        concurrency: 'unbounded',
+      },
+    )
+
+    return inputParams.map((param) => {
+      if (param.name === 'transactions') {
+        return {
+          ...param,
+          valueDecoded: txsDecoded.filter((tx) => tx != null) as DecodeResult[],
+        } as InputArg
+      }
+      return param
+    })
+  })
+
+export const decodeGnosisSafeParams = (
+  params: TreeNode[],
+  chainID: number,
+): Effect.Effect<
+  TreeNode[],
+  AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
+  AbiStore<AbiParams, ContractAbiResult> | PublicClient
+> =>
+  Effect.gen(function* () {
+    const toParam = params.find((p) => p.name === 'to')
+    const dataParam = params.find((p) => p.name === 'data')
+    const toAddress = toParam?.value as Hex
+    const callData = dataParam?.value as Hex
+
+    if (toParam && dataParam && toAddress && callData) {
+      const decoded = yield* decodeMethod({
+        data: callData,
+        chainID,
+        contractAddress: toAddress,
+      })
+
+      if (decoded && decoded.params) {
+        return params.map((param) =>
+          param.name === 'data' ? ({ ...param, valueDecoded: decoded } as InputArg) : param,
+        )
+      }
+      return params
+    }
+
+    return params
+  })
+
 export const decodeMethod = ({
   data,
   chainID,
@@ -93,13 +183,15 @@ export const decodeMethod = ({
 }) =>
   Effect.gen(function* () {
     const signature = data.slice(0, 10)
+    let proxyType: ProxyType | undefined
 
     if (isAddress(contractAddress)) {
       //if contract is a proxy, get the implementation address
       const implementation = yield* getProxyStorageSlot({ address: getAddress(contractAddress), chainID })
 
       if (implementation) {
-        contractAddress = implementation
+        contractAddress = implementation.address
+        proxyType = implementation.type
       }
     }
 
@@ -121,6 +213,26 @@ export const decodeMethod = ({
       return {
         ...decoded,
         params: deepDecodedParams,
+      }
+    }
+
+    if (proxyType && proxyType === 'gnosis' && decoded.params != null) {
+      const decodedParams = yield* decodeGnosisSafeParams(decoded.params, chainID)
+      return {
+        ...decoded,
+        params: decodedParams,
+      }
+    }
+
+    if (
+      decoded.signature === 'multiSend(bytes)' &&
+      decoded.params != null &&
+      decoded.params.find((p) => p.name === 'transactions')
+    ) {
+      const decodedParams = yield* decodeGnosisMultisendParams(decoded.params, chainID)
+      return {
+        ...decoded,
+        params: decodedParams,
       }
     }
 

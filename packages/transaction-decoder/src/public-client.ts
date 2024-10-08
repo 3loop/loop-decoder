@@ -11,6 +11,11 @@ export class RPCFetchError {
   constructor(readonly reason: unknown) {}
 }
 
+export class RPCCallError {
+  readonly _tag = 'EPCCallError'
+  constructor(readonly reason: unknown) {}
+}
+
 export interface PublicClientConfig {
   readonly traceAPI?: 'parity' | 'geth' | 'none'
 }
