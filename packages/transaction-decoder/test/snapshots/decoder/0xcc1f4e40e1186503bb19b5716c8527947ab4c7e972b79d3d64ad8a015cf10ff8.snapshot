@@ -148,7 +148,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "handleOps",
+    "params": [
       {
         "components": [
           {
@@ -222,7 +223,8 @@
         "value": "0x65c51459258464020e850FBa27B427BD708da638",
       },
     ],
-    "name": "handleOps",
+    "signature": "handleOps((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes)[],address)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

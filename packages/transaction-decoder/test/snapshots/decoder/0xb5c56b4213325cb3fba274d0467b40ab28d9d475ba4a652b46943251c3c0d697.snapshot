@@ -630,7 +630,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "takeBid",
+    "params": [
       {
         "components": [
           {
@@ -1597,7 +1598,8 @@
         "value": "0x8f30f82bdba3d52c11239242965cc1ac290da41dce96e9164a431099fdc7d33a2607ea600123efe670360ca7a590826db8da009107d0fc54581fa3efec579bc91c012b1c2b6af68e5d010513ff70a3aaed9afeb8661116e6ce",
       },
     ],
-    "name": "takeBid",
+    "signature": "takeBid(((address,address,bytes32,uint256,uint256,uint8,(address,uint16),uint256)[],(uint256,bytes32[],(uint256,uint256,uint256,uint256),(uint256,uint256))[],(address,uint16),bytes),bytes)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

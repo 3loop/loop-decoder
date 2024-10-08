@@ -1,18 +1,9 @@
-import { assetsReceived, assetsSent, displayAsset, getPayments, isSwap } from './std.js'
+import { displayAsset, getPayments, isSwap, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
-  const methodName = event.methodCall.name
-
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-  }
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
+  const newEvent = defaultEvent(event)
 
   const netSent = getPayments({
     transfers: event.transfers,
@@ -26,17 +17,13 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
 
   if (isSwap(event)) {
     return {
+      ...newEvent,
       type: 'swap',
       action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
-      ...newEvent,
     }
   }
 
-  return {
-    type: 'unknown',
-    action: `Called method '${methodName}'`,
-    ...newEvent,
-  }
+  return newEvent
 }
 
 export const contracts = ['1:0x881D40237659C251811CEC9c364ef91dC08D300C']

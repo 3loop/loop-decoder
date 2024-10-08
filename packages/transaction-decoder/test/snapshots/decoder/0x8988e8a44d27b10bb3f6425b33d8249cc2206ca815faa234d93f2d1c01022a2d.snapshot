@@ -1704,7 +1704,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "multicall",
+    "params": [
       {
         "name": "data",
         "type": "bytes[]",
@@ -1768,7 +1769,8 @@
         ],
       },
     ],
-    "name": "multicall",
+    "signature": "multicall(bytes[])",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

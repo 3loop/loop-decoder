@@ -62,7 +62,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "setApprovalForAll",
+    "params": [
       {
         "name": "operator",
         "type": "address",
@@ -74,7 +75,8 @@
         "value": "true",
       },
     ],
-    "name": "setApprovalForAll",
+    "signature": "setApprovalForAll(address,bool)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

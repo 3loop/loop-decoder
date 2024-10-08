@@ -1,22 +1,15 @@
-import { assetsReceived, assetsSent, formatNumber } from './std.js'
+import { assetsReceived, assetsSent, formatNumber, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-  }
+  const newEvent = defaultEvent(event)
 
   switch (methodName) {
     case 'approve': {
       const approval = event.interactions.find((i) => i.event.eventName === 'Approval')
-      const approvalValue = (event.methodCall?.arguments?.[1]?.value || '') as string
+      const approvalValue = (event.methodCall?.params?.[1]?.value || '') as string
       const name = approval?.contractSymbol || event.contractName || 'unknown'
       let action = ''
 
@@ -37,43 +30,39 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       }
 
       return {
+        ...newEvent,
         type: 'approve-token',
         action,
-        ...newEvent,
       }
     }
     case 'transfer': {
-      const amount = newEvent.assetsSent?.[0]?.amount || event.methodCall?.arguments?.[1]?.value || '0'
+      const amount = newEvent.assetsSent?.[0]?.amount || event.methodCall?.params?.[1]?.value || '0'
       const symbol = newEvent.assetsSent?.[0]?.asset?.symbol || event.contractName || 'unknown'
 
       return {
+        ...newEvent,
         type: 'transfer-token',
         action: `Sent ${formatNumber(amount.toString())} ${symbol}`,
-        ...newEvent,
       }
     }
     case 'transferFrom': {
-      const from = event.methodCall?.arguments?.[0]?.value as string
-      const amount = event.transfers[0]?.amount || event.methodCall?.arguments?.[2]?.value || '0'
+      const from = event.methodCall?.params?.[0]?.value as string
+      const amount = event.transfers[0]?.amount || event.methodCall?.params?.[2]?.value || '0'
       const symbol = event.transfers[0]?.symbol || event.contractName || 'unknown'
 
       if (!from) break
 
       return {
+        ...newEvent,
         type: 'transfer-token',
         action: `Sent ${formatNumber(amount.toString())} ${symbol}`,
-        ...newEvent,
         assetsSent: assetsSent(event.transfers, from),
         assetsReceived: assetsReceived(event.transfers, from),
       }
     }
   }
 
-  return {
-    type: 'unknown',
-    action: `Called method '${methodName}'`,
-    ...newEvent,
-  }
+  return newEvent
 }
 
 export const contractType = 'erc20'

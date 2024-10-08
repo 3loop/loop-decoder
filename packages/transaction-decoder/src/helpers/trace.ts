@@ -38,6 +38,10 @@ export function nodeToTraceLog(node: TraceLogTree, path: number[]): TraceLog | u
     case 'CREATE':
       traceLog = {
         ...traceLogBase,
+        result: {
+          code: node.output ?? '0x0',
+          gasUsed: BigInt(node.gasUsed),
+        },
         type: 'create',
         action: {
           from: node.from,

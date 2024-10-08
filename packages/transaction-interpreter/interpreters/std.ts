@@ -1,27 +1,49 @@
-import type { AssetTransfer, Payment } from '@/types.js'
-import { Asset, DecodedTx } from '@3loop/transaction-decoder'
+import type { AssetTransfer, InterpretedTransaction, Payment } from '@/types.js'
+import { Asset, DecodedTransaction } from '@3loop/transaction-decoder'
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-function filterZeroTransfers(transfers: Asset[]): Asset[] {
-  return transfers.filter((t) => t.amount != null && t.amount !== '0')
+export function filterZeroTransfers(transfers: Asset[]): Asset[] {
+  return transfers.filter((t) => (t.amount && t.amount !== '0') || !t.amount)
+}
+
+export function filterNullTransfers(transfers: Asset[]): Asset[] {
+  return transfers.filter((t) => t.from !== NULL_ADDRESS && t.to !== NULL_ADDRESS)
+}
+
+export function toAssetTransfer(transfer: Asset): AssetTransfer {
+  return {
+    from: { address: transfer.from, name: null },
+    to: { address: transfer.to, name: null },
+    amount: transfer.amount ?? '0',
+    asset: {
+      address: transfer.address,
+      name: transfer.name,
+      symbol: transfer.symbol,
+      type: transfer.type,
+      tokenId: transfer.tokenId,
+    },
+  }
 }
 
 export function assetsSent(transfers: Asset[], address: string): AssetTransfer[] {
-  return filterZeroTransfers(transfers)
-    .filter((t) => t.from.toLowerCase() === address.toLowerCase())
-    .map((t) => {
-      return {
-        from: { address: t.from, name: null },
-        to: { address: t.to, name: null },
-        amount: t.amount ?? '0',
-        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type, tokenId: t.tokenId },
-      }
-    })
+  let filteredTransfers = filterZeroTransfers(transfers)
+
+  if (address !== NULL_ADDRESS) {
+    filteredTransfers = filterNullTransfers(filteredTransfers)
+  }
+
+  return filteredTransfers.filter((t) => t.from.toLowerCase() === address.toLowerCase()).map(toAssetTransfer)
 }
 
 export function assetsReceived(transfers: Asset[], address: string): AssetTransfer[] {
-  return filterZeroTransfers(transfers)
+  let filteredTransfers = filterZeroTransfers(transfers)
+
+  if (address !== NULL_ADDRESS) {
+    filteredTransfers = filterNullTransfers(filteredTransfers)
+  }
+
+  return filteredTransfers
     .filter((t) => t.to.toLowerCase() === address.toLowerCase())
     .map((t) => {
       return {
@@ -37,7 +59,7 @@ export function displayAddress(address: string): string {
   return address.slice(0, 6) + '...' + address.slice(-4)
 }
 
-export function isSwap(event: DecodedTx): boolean {
+export function isSwap(event: DecodedTransaction): boolean {
   if (event.transfers.some((t) => t.type !== 'ERC20' && t.type !== 'native')) return false
 
   const transfers = event.transfers.filter((t) => t.from !== NULL_ADDRESS && t.to !== NULL_ADDRESS)
@@ -197,5 +219,23 @@ export function displayPayments(erc20Payments: Payment[], nativePayments: Paymen
     )
   } else {
     return ''
+  }
+}
+
+export function defaultEvent(event: DecodedTransaction): InterpretedTransaction {
+  const burned = assetsReceived(event.transfers, NULL_ADDRESS)
+  const minted = assetsSent(event.transfers, NULL_ADDRESS)
+
+  return {
+    type: 'unknown',
+    action: 'Called method ' + event.methodCall.name,
+    chain: event.chainID,
+    txHash: event.txHash,
+    user: { address: event.fromAddress, name: null },
+    method: event.methodCall.name,
+    assetsSent: assetsSent(event.transfers, event.fromAddress),
+    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
+    assetsBurned: burned.length > 0 ? burned : undefined,
+    assetsMinted: minted.length > 0 ? minted : undefined,
   }
 }

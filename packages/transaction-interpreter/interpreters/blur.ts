@@ -1,29 +1,17 @@
-import { assetsReceived, assetsSent, displayPayments, processNftTransfers } from './std.js'
+import { displayPayments, processNftTransfers, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name ?? 'unknown'
-
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-  }
+  const newEvent = defaultEvent(event)
 
   const { sendingAddresses, receivingAddresses, nftTransfers, erc20Payments, nativePayments } = processNftTransfers(
     event.transfers,
   )
 
   if (nftTransfers.length === 0) {
-    return {
-      type: 'unknown',
-      action: 'Unknown action',
-      ...newEvent,
-    }
+    return newEvent
   }
 
   const collection = nftTransfers[0].name ?? ''
@@ -36,26 +24,22 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
   if (sell.includes(methodName)) {
     const from = receivingAddresses.length > 1 ? ` to ${receivingAddresses.length} users` : ''
     return {
+      ...newEvent,
       type: 'transfer-nft',
       action: `Sold${numberOfNfts} for ${payment}${from}`,
-      ...newEvent,
     }
   }
 
   if (buy.includes(methodName)) {
     const from = sendingAddresses.length > 1 ? ` from ${sendingAddresses.length} users` : ''
     return {
+      ...newEvent,
       type: 'transfer-nft',
       action: `Bought${numberOfNfts} for ${payment}${from}`,
-      ...newEvent,
     }
   }
 
-  return {
-    type: 'unknown',
-    action: 'Unknown action',
-    ...newEvent,
-  }
+  return newEvent
 }
 
 export const contracts = [

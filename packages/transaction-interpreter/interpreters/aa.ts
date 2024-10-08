@@ -1,20 +1,13 @@
-import { InterpretedTransaction } from '@/types.js'
-import { DecodedTx } from '@3loop/transaction-decoder'
-import { assetsReceived, assetsSent, displayAddress, formatNumber } from './std.js'
+import { defaultEvent, displayAddress, formatNumber } from './std.js'
+import type { InterpretedTransaction } from '@/types.js'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
-  const methodName = event.methodCall.name
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
+  const newEvent = defaultEvent(event)
 
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
+  if (event.methodCall.name !== 'handleOps') {
+    return newEvent
   }
-
-  if (event.methodCall.name !== 'handleOps') return { type: 'unknown', action: 'Unknown action', ...newEvent }
 
   const userOpEvents = event.interactions.filter((e) => e.event.eventName === 'UserOperationEvent')
   const isBatch = userOpEvents.length > 1
@@ -22,11 +15,11 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const sender = (userOpEvents[0].event.params as { sender: string }).sender
 
   return {
+    ...newEvent,
     type: 'account-abstraction',
     action: `Account Abstraction transaction by ${
-      isBatch ? userOpEvents.length + ' adresses' : displayAddress(sender)
+      isBatch ? userOpEvents.length + ' addresses' : displayAddress(sender)
     } with fee ${formatNumber(fee, 4)}`,
-    ...newEvent,
   }
 }
 

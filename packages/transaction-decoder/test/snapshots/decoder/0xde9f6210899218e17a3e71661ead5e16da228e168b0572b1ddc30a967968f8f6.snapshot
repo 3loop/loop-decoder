@@ -174,7 +174,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "borrow",
+    "params": [
       {
         "name": "asset",
         "type": "address",
@@ -201,7 +202,8 @@
         "value": "0x955fe53fF029d6a0503C0b101E109036475e580b",
       },
     ],
-    "name": "borrow",
+    "signature": "borrow(address,uint256,uint256,uint16,address)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

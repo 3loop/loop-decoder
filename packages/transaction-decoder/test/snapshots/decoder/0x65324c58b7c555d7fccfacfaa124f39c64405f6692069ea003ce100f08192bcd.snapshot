@@ -90,7 +90,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "safeTransferFrom",
+    "params": [
       {
         "name": "from",
         "type": "address",
@@ -107,7 +108,8 @@
         "value": "162",
       },
     ],
-    "name": "safeTransferFrom",
+    "signature": "safeTransferFrom(address,address,uint256)",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

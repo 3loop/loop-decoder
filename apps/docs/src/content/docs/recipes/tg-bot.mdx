@@ -107,9 +107,9 @@ const decoded = await decoder.decodeTransaction({
 })
 ```
 
-The `decodeTransaction` method returns a `DecodedTx` object, which you can inspect using our [playground](https://loop-decoder-web.vercel.app/). [Here](https://loop-decoder-web.vercel.app/tx/1/0xb8a923541802ea5017ddccd2c1047dd16ce22048630c1c619b19fdb799b690dd) is an example of an AAVE V3 transaction.
+The `decodeTransaction` method returns a `DecodedTransaction` object, which you can inspect using our [playground](https://loop-decoder-web.vercel.app/). [Here](https://loop-decoder-web.vercel.app/tx/1/0xb8a923541802ea5017ddccd2c1047dd16ce22048630c1c619b19fdb799b690dd) is an example of an AAVE V3 transaction.
 
-To interpret a decoded transaction, the `interpreter.ts` file contains a `transformEvent` function that transforms the `DecodedTx` and adds an action description. You can test the `transformEvent` function by putting it into the Interpretation field on the playground with the AAVE V3 [example](https://loop-decoder-web.vercel.app/tx/1/0xb8a923541802ea5017ddccd2c1047dd16ce22048630c1c619b19fdb799b690dd), and pressing "Interpret".
+To interpret a decoded transaction, the `interpreter.ts` file contains a `transformEvent` function that transforms the `DecodedTransaction` and adds an action description. You can test the `transformEvent` function by putting it into the Interpretation field on the playground with the AAVE V3 [example](https://loop-decoder-web.vercel.app/tx/1/0xb8a923541802ea5017ddccd2c1047dd16ce22048630c1c619b19fdb799b690dd), and pressing "Interpret".
 
 ![Playground](../../../assets/aave-v3.png)
 
@@ -163,7 +163,7 @@ async function handleTransaction(txHash?: string) {
     })
 
     if (!decoded) return;
-    const interpreted = interpretTx(decoded as DecodedTx);
+    const interpreted = interpretTx(decoded as DecodedTransaction);
 
     if (!interpreted.action) {
       console.log("No defined action for this transaction.", txHash);

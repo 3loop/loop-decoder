@@ -54,7 +54,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "cancelTrades",
+    "params": [
       {
         "components": [
           {
@@ -83,7 +84,8 @@
         "type": "tuple",
       },
     ],
-    "name": "cancelTrades",
+    "signature": "cancelTrades((bytes32,uint256,uint256)[])",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

@@ -112,7 +112,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "disperseEther",
+    "params": [
       {
         "name": "recipients",
         "type": "address[]",
@@ -130,7 +131,8 @@
         ],
       },
     ],
-    "name": "disperseEther",
+    "signature": "disperseEther(address[],uint256[])",
+    "type": "function",
   },
   "nativeValueSent": "10000000000000000",
   "reverted": false,

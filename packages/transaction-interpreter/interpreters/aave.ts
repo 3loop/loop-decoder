@@ -1,72 +1,60 @@
-import { assetsReceived, assetsSent, displayAsset, NULL_ADDRESS } from './std.js'
+import { displayAsset, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
-export function transformEvent(event: DecodedTx): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
 
-  const newEvent: Omit<InterpretedTransaction, 'action' | 'type'> = {
-    chain: event.chainID,
-    txHash: event.txHash,
-    user: { address: event.fromAddress, name: null },
-    method: methodName,
-    assetsSent: assetsSent(event.transfers, event.fromAddress),
-    assetsReceived: assetsReceived(event.transfers, event.fromAddress),
-  }
-
-  const directSent = newEvent.assetsSent.filter((a) => a.from.address !== NULL_ADDRESS && a.to.address !== NULL_ADDRESS)
-  const directReceived = newEvent.assetsReceived.filter(
-    (a) => a.from.address !== NULL_ADDRESS && a.to.address !== NULL_ADDRESS,
-  )
+  const newEvent = defaultEvent(event)
 
   switch (methodName) {
     case 'repay':
     case 'repayWithPermit':
     case 'repayWithATokens':
       return {
-        type: 'repay-loan',
-        action: 'User repaid ' + displayAsset(directSent[0]),
         ...newEvent,
+        type: 'repay-loan',
+        action: 'User repaid ' + displayAsset(newEvent.assetsSent[0]),
       }
 
     case 'deposit':
     case 'supplyWithPermit':
     case 'supply':
       return {
-        type: 'deposit-collateral',
-        action: 'User deposited ' + displayAsset(directSent[0]),
         ...newEvent,
+        type: 'deposit-collateral',
+        action: 'User deposited ' + displayAsset(newEvent.assetsSent[0]),
       }
 
     case 'borrow':
       return {
-        type: 'borrow',
-        action: 'User borrowed ' + displayAsset(directReceived[0]),
         ...newEvent,
+        type: 'borrow',
+        action: 'User borrowed ' + displayAsset(newEvent.assetsReceived[0]),
       }
 
     case 'withdraw':
       return {
-        type: 'withdraw-collateral',
-        action: 'User withdrew ' + displayAsset(directReceived[0]),
         ...newEvent,
+        type: 'withdraw-collateral',
+        action: 'User withdrew ' + displayAsset(newEvent.assetsReceived[0]),
       }
 
     case 'flashLoanSimple': {
       return {
-        type: 'unknown',
-        action: 'Executed flash loan with ' + displayAsset(directSent[0]),
         ...newEvent,
+        type: 'unknown',
+        action: 'Executed flash loan with ' + displayAsset(newEvent.assetsSent[0]),
       }
     }
 
     case 'setUserUseReserveAsCollateral': {
-      const assetAddress = event.methodCall.arguments[0].value as string
-      const enabled = event.methodCall.arguments[1].value === 'true'
+      const assetAddress = event.methodCall.params?.[0]?.value as string
+      const enabled = event.methodCall.params?.[1]?.value === 'true'
       return {
-        type: 'set-user-use-reserve-as-collateral',
-        action: `User ${enabled ? 'enabled' : 'disabled'} ${assetAddress} as collateral`,
         ...newEvent,
+        type: 'unknown',
+        action: `User ${enabled ? 'enabled' : 'disabled'} ${assetAddress} as collateral`,
       }
     }
   }

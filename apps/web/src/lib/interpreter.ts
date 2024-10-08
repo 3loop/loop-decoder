@@ -1,4 +1,4 @@
-import type { DecodedTx } from '@3loop/transaction-decoder'
+import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import {
   Interpreter,
   QuickjsInterpreterLive,
@@ -18,12 +18,15 @@ const config = Layer.succeed(QuickjsConfig, {
 const layer = Layer.provide(QuickjsInterpreterLive, config)
 
 export interface Interpretation {
-  tx: DecodedTx
+  tx: DecodedTransaction
   interpretation: any
   error?: string
 }
 
-export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interpreter): Promise<Interpretation> {
+export async function applyInterpreter(
+  decodedTx: DecodedTransaction,
+  interpreter: Interpreter,
+): Promise<Interpretation> {
   const runnable = Effect.gen(function* () {
     const interpreterService = yield* TransactionInterpreter
     const interpretation = yield* interpreterService.interpretTx(decodedTx, interpreter)
@@ -46,7 +49,7 @@ export async function applyInterpreter(decodedTx: DecodedTx, interpreter: Interp
     })
 }
 
-export async function findAndRunInterpreter(decodedTx: DecodedTx): Promise<Interpretation> {
+export async function findAndRunInterpreter(decodedTx: DecodedTransaction): Promise<Interpretation> {
   let interpreter = getInterpreter(decodedTx)
 
   if (!interpreter) {

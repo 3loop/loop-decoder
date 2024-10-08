@@ -73,7 +73,8 @@
     },
   ],
   "methodCall": {
-    "arguments": [
+    "name": "tryBlockAndAggregate",
+    "params": [
       {
         "name": "requireSuccess",
         "type": "bool",
@@ -89,10 +90,9 @@
                 "value": "0x886767B62C7ACD601672607373048FFD96Cf27B2",
               },
               {
-                "decoded": false,
                 "name": "callData",
                 "type": "bytes",
-                "value": null,
+                "value": "0x04caeb1000000000000000000000000011e10eef8bbcbcd9f21eb69cbf107cd53f3bb77a000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000010000000000000000000000008c3e3821259b82ffb32b2450a95d2dcbf161c24e",
               },
             ],
             "name": "calls",
@@ -103,7 +103,8 @@
         "type": "tuple",
       },
     ],
-    "name": "tryBlockAndAggregate",
+    "signature": "tryBlockAndAggregate(bool,(address,bytes)[])",
+    "type": "function",
   },
   "nativeValueSent": "0",
   "reverted": false,

@@ -140,9 +140,9 @@ const decoded = await decoder.decodeTransaction({
 })
 ```
 
-The `decodeTransaction` method returns a `DecodedTx` object, which you can inspect using our [playground](https://loop-decoder-web.vercel.app/). [Here](https://loop-decoder-web.vercel.app/tx/8453/0x3bc635e07e1cec2b73a896e6d130cffde6b3eeb419f91ea79028927fb7a66a07) is an example of the Friend.tech transaction.
+The `decodeTransaction` method returns a `DecodedTransaction` object, which you can inspect using our [playground](https://loop-decoder-web.vercel.app/). [Here](https://loop-decoder-web.vercel.app/tx/8453/0x3bc635e07e1cec2b73a896e6d130cffde6b3eeb419f91ea79028927fb7a66a07) is an example of the Friend.tech transaction.
 
-To interpret a decoded transaction, the `interpreter.ts` file contains a `transformEvent` function that transforms the `DecodedTx` and adds an action description. You can test the `transformEvent` function by putting it into the Interpretation field on the playground with the Friend.tech [example](https://loop-decoder-web.vercel.app/tx/8453/0x3bc635e07e1cec2b73a896e6d130cffde6b3eeb419f91ea79028927fb7a66a07), and pressing "Interpret".
+To interpret a decoded transaction, the `interpreter.ts` file contains a `transformEvent` function that transforms the `DecodedTransaction` and adds an action description. You can test the `transformEvent` function by putting it into the Interpretation field on the playground with the Friend.tech [example](https://loop-decoder-web.vercel.app/tx/8453/0x3bc635e07e1cec2b73a896e6d130cffde6b3eeb419f91ea79028927fb7a66a07), and pressing "Interpret".
 
 ![Playground](../../../assets/friend-tech.png)
 

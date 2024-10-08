@@ -63,6 +63,25 @@ const AA_TRANSACTIONS = [
   },
 ] as const
 
+const GNOSIS_SAFE_TRANSACTIONS = [
+  {
+    hash: '0xe6acfd7099db3c9bf94e7dab0052a9363cc9b6a33d91449ccc523bdd5d99861c',
+    chainID: 1,
+  },
+  {
+    hash: '0xabe682c315f7eb233c02618498b08dddf466513705d6402413016311844d3189',
+    chainID: 1,
+  },
+  {
+    hash: '0xbb07f5dbff6c4b7bdd26d0f9e2f7c6d41fd8f6eb5a5697832c45a738518cd284',
+    chainID: 1,
+  },
+  {
+    hash: '0x074e27d856aae900c2a16f8577baa4194a1c23daf54efe80faff4bb612e410ba',
+    chainID: 1,
+  },
+] as const
+
 const MULTICALL3_TRANSACTIONS = [
   {
     hash: '0x548af97ffad9b36b4ec40b403299dda5fac222c130cf4a3e2c4d438d88fe2280',
@@ -82,10 +101,7 @@ const MULTICALL3_TRANSACTIONS = [
   },
 ] as const
 
-export const TEST_TRANSACTIONS: TXS = [
-  ...NFTS_BLUR,
-  ...AA_TRANSACTIONS,
-  ...MULTICALL3_TRANSACTIONS,
+const OTHER = [
   {
     hash: '0xde9f6210899218e17a3e71661ead5e16da228e168b0572b1ddc30a967968f8f6', // DAI
     chainID: 1,
@@ -136,4 +152,12 @@ export const TEST_TRANSACTIONS: TXS = [
   },
 ] as const
 
-export const CALLDATA_TRANSACTIONS: TXS = [...TEST_TRANSACTIONS.slice(-5)] as const
+export const TEST_TRANSACTIONS: TXS = [
+  ...NFTS_BLUR,
+  ...AA_TRANSACTIONS,
+  ...OTHER,
+  ...MULTICALL3_TRANSACTIONS,
+  ...GNOSIS_SAFE_TRANSACTIONS,
+] as const
+
+export const CALLDATA_TRANSACTIONS: TXS = [...OTHER.slice(-5)] as const

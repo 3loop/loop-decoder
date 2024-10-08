@@ -8,7 +8,7 @@ import { PlayIcon } from '@radix-ui/react-icons'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { DecodedTx } from '@3loop/transaction-decoder'
+import { DecodedTransaction } from '@3loop/transaction-decoder'
 import { Interpretation, applyInterpreter } from '@/lib/interpreter'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
@@ -16,7 +16,7 @@ import { fallbackInterpreter, getInterpreter } from '@3loop/transaction-interpre
 
 interface FormProps {
   currentChainID: number
-  decoded?: DecodedTx
+  decoded?: DecodedTransaction
   currentHash?: string
 }
 

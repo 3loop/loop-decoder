@@ -29,6 +29,7 @@ type TransactionType = StringWithAutocompleteOptions<
   | 'stake-token'
   | 'unstake-token'
   | 'burn'
+  | 'mint'
   | 'unknown'
 >
 
@@ -58,4 +59,6 @@ export type InterpretedTransaction = {
   type: TransactionType
   assetsSent: AssetTransfer[]
   assetsReceived: AssetTransfer[]
+  assetsMinted?: AssetTransfer[]
+  assetsBurned?: AssetTransfer[]
 }

@@ -36,6 +36,12 @@ const EthTraceActionReward = Schema.Struct({
   value: bigintFromString,
 })
 
+const EthCreateTraceResult = Schema.Struct({
+  address: Schema.optional(Address),
+  code: Schema.String,
+  gasUsed: bigintFromString,
+})
+
 const EthTraceResult = Schema.Struct({
   gasUsed: bigintFromString,
   output: Schema.String,
@@ -56,13 +62,14 @@ const CallTrace = Schema.extend(
   }),
 )
 
-const CreateTrace = Schema.extend(
-  EthTraceBase,
-  Schema.Struct({
-    action: EthTraceActionCreate,
-    type: Schema.Literal('create'),
-  }),
-)
+const CreateTrace = Schema.Struct({
+  result: Schema.NullOr(EthCreateTraceResult),
+  subtraces: Schema.Number,
+  traceAddress: Schema.Array(Schema.Number),
+  error: Schema.optional(Schema.String),
+  action: EthTraceActionCreate,
+  type: Schema.Literal('create'),
+})
 
 const RewardTrace = Schema.extend(
   EthTraceBase,
