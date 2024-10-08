@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.18.1
+
+### Patch Changes
+
+- d0ff5af: Add retries during proxy resolution
+
 ## 0.18.0
 
 ### Minor Changes

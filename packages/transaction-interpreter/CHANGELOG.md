@@ -1,5 +1,17 @@
 # @3loop/transaction-interpreter
 
+## 0.9.0
+
+### Minor Changes
+
+- 9d99f31: Add decoding of Gnosis Safe transacitons, rename DecodedTx type, update type used in methodCall
+
+### Patch Changes
+
+- 9d99f31: Add more contracts from base network
+- Updated dependencies [d0ff5af]
+  - @3loop/transaction-decoder@0.18.1
+
 ## 0.8.0
 
 ### Minor Changes
