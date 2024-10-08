@@ -1,4 +1,12 @@
-import { displayAsset, formatNumber, NULL_ADDRESS, defaultEvent, toAssetTransfer } from './std.js'
+import {
+  displayAsset,
+  formatNumber,
+  NULL_ADDRESS,
+  defaultEvent,
+  toAssetTransfer,
+  assetsSent,
+  assetsReceived,
+} from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
 
@@ -41,8 +49,8 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
         action: `Bought ${formatNumber(bougt[0].amount)} Fan Tokens of ${bougt[0].asset?.name} for ${displayAsset(
           sold[0],
         )}`,
-        assetsSent: sold,
-        assetsReceived: bougt,
+        assetsSent: assetsSent(event.transfers, _spender),
+        assetsReceived: assetsReceived(event.transfers, _beneficiary),
       }
     }
 
@@ -53,8 +61,8 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
         action: `Sold ${formatNumber(sold[0].amount)} Fan Tokens of ${sold[0].asset?.name} for ${displayAsset(
           bougt[0],
         )}`,
-        assetsSent: sold,
-        assetsReceived: bougt,
+        assetsSent: assetsSent(event.transfers, _spender),
+        assetsReceived: assetsReceived(event.transfers, _beneficiary),
       }
     }
 
@@ -66,7 +74,7 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
         ...newEvent,
         type: 'burn',
         action: `Burned ${displayAsset(sold[0])} for ${buyTokenMetadata?.contractName} Fan Tokens holders`,
-        assetsSent: sold,
+        assetsSent: assetsSent(event.transfers, _spender),
         assetsReceived: [],
       }
     }
@@ -75,8 +83,8 @@ export function transformEvent(event: DecodedTx): InterpretedTransaction {
       ...newEvent,
       type: 'unknown',
       action: `Called method '${methodName}'`,
-      assetsSent: sold,
-      assetsReceived: bougt,
+      assetsSent: assetsSent(event.transfers, _spender),
+      assetsReceived: assetsReceived(event.transfers, _beneficiary),
     }
   }
 

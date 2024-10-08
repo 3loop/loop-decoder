@@ -1,10 +1,10 @@
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTx } from '@3loop/transaction-decoder'
-import { assetsSent, displayAsset, filterNullTransfers, defaultEvent } from './std.js'
+import { assetsSent, displayAsset, defaultEvent, filterZeroTransfers } from './std.js'
 
 export function transformEvent(event: DecodedTx): InterpretedTransaction {
   const newEvent = defaultEvent(event)
-  const transfers = filterNullTransfers(event.transfers)
+  const transfers = filterZeroTransfers(event.transfers)
 
   if (transfers.length === 1) {
     const fromAddress = transfers[0].from
