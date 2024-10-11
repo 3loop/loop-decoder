@@ -271,93 +271,259 @@
               "name": "transactions",
               "type": "bytes",
               "value": "0x00dac17f958d2ee523a2206206994597c13d831ec700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000002ab047c293fc5b431d2e17a5a0a33467d7ce34400000000000000000000000000000000000000000000000000000000121adda5c00dac17f958d2ee523a2206206994597c13d831ec700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb0000000000000000000000006db410d4cb15b64636ce28a6141cabcf647e820800000000000000000000000000000000000000000000000000000000871d90e400dac17f958d2ee523a2206206994597c13d831ec700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb00000000000000000000000035bcdffdd185743e479b6c3a9fd92caf9c36c83e000000000000000000000000000000000000000000000000000000001930ab6000dac17f958d2ee523a2206206994597c13d831ec700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000bd1a354f8aaaef8f9261644ae0fbb23f94faeafe00000000000000000000000000000000000000000000000000000000ee364f9900dac17f958d2ee523a2206206994597c13d831ec700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000556a9ece827812ed077b3669e09c280a648ae275000000000000000000000000000000000000000000000000000000005d66e0be",
-              "valueDecoded": [
-                {
-                  "name": "transfer",
-                  "params": [
-                    {
-                      "name": "_to",
-                      "type": "address",
-                      "value": "0x2aB047c293fC5b431d2e17A5A0a33467D7Ce3440",
-                    },
-                    {
-                      "name": "_value",
-                      "type": "uint256",
-                      "value": "4860009052",
-                    },
-                  ],
-                  "signature": "transfer(address,uint256)",
-                  "type": "function",
-                },
-                {
-                  "name": "transfer",
-                  "params": [
-                    {
-                      "name": "_to",
-                      "type": "address",
-                      "value": "0x6db410d4cb15B64636Ce28A6141CabCf647e8208",
-                    },
-                    {
-                      "name": "_value",
-                      "type": "uint256",
-                      "value": "2266861796",
-                    },
-                  ],
-                  "signature": "transfer(address,uint256)",
-                  "type": "function",
-                },
-                {
-                  "name": "transfer",
-                  "params": [
-                    {
-                      "name": "_to",
-                      "type": "address",
-                      "value": "0x35BcdffdD185743E479B6c3a9fD92Caf9c36c83e",
-                    },
-                    {
-                      "name": "_value",
-                      "type": "uint256",
-                      "value": "422620000",
-                    },
-                  ],
-                  "signature": "transfer(address,uint256)",
-                  "type": "function",
-                },
-                {
-                  "name": "transfer",
-                  "params": [
-                    {
-                      "name": "_to",
-                      "type": "address",
-                      "value": "0xBd1A354F8AAAEf8F9261644AE0fBb23F94FAeAFe",
-                    },
-                    {
-                      "name": "_value",
-                      "type": "uint256",
-                      "value": "3996536729",
-                    },
-                  ],
-                  "signature": "transfer(address,uint256)",
-                  "type": "function",
-                },
-                {
-                  "name": "transfer",
-                  "params": [
-                    {
-                      "name": "_to",
-                      "type": "address",
-                      "value": "0x556A9ecE827812ED077b3669e09C280A648AE275",
-                    },
-                    {
-                      "name": "_value",
-                      "type": "uint256",
-                      "value": "1567023294",
-                    },
-                  ],
-                  "signature": "transfer(address,uint256)",
-                  "type": "function",
-                },
-              ],
+              "valueDecoded": {
+                "name": "transactions",
+                "params": [
+                  {
+                    "components": [
+                      {
+                        "components": [
+                          {
+                            "name": "operation",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "dataLength",
+                            "type": "uint256",
+                            "value": "136",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb0000000000000000000000002ab047c293fc5b431d2e17a5a0a33467d7ce34400000000000000000000000000000000000000000000000000000000121adda5c",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0x2aB047c293fC5b431d2e17A5A0a33467D7Ce3440",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "4860009052",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                        ],
+                        "name": "unknown",
+                        "type": "tuple",
+                      },
+                      {
+                        "components": [
+                          {
+                            "name": "operation",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "dataLength",
+                            "type": "uint256",
+                            "value": "136",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb0000000000000000000000006db410d4cb15b64636ce28a6141cabcf647e820800000000000000000000000000000000000000000000000000000000871d90e4",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0x6db410d4cb15B64636Ce28A6141CabCf647e8208",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "2266861796",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                        ],
+                        "name": "unknown",
+                        "type": "tuple",
+                      },
+                      {
+                        "components": [
+                          {
+                            "name": "operation",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "dataLength",
+                            "type": "uint256",
+                            "value": "136",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb00000000000000000000000035bcdffdd185743e479b6c3a9fd92caf9c36c83e000000000000000000000000000000000000000000000000000000001930ab60",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0x35BcdffdD185743E479B6c3a9fD92Caf9c36c83e",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "422620000",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                        ],
+                        "name": "unknown",
+                        "type": "tuple",
+                      },
+                      {
+                        "components": [
+                          {
+                            "name": "operation",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "dataLength",
+                            "type": "uint256",
+                            "value": "136",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb000000000000000000000000bd1a354f8aaaef8f9261644ae0fbb23f94faeafe00000000000000000000000000000000000000000000000000000000ee364f99",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0xBd1A354F8AAAEf8F9261644AE0fBb23F94FAeAFe",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "3996536729",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                        ],
+                        "name": "unknown",
+                        "type": "tuple",
+                      },
+                      {
+                        "components": [
+                          {
+                            "name": "operation",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "dataLength",
+                            "type": "uint256",
+                            "value": "136",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb000000000000000000000000556a9ece827812ed077b3669e09c280a648ae275000000000000000000000000000000000000000000000000000000005d66e0be",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0x556A9ecE827812ED077b3669e09C280A648AE275",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "1567023294",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                        ],
+                        "name": "unknown",
+                        "type": "tuple",
+                      },
+                    ],
+                    "name": "unknown",
+                    "type": "tuple",
+                  },
+                ],
+                "signature": "transactions((uint256,address,uint256,uint256,bytes)[])",
+                "type": "function",
+              },
             },
           ],
           "signature": "multiSend(bytes)",
