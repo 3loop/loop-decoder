@@ -68,6 +68,8 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
               value = null
             } else if (Array.isArray(arg)) {
               value = arg.map((item) => item?.toString())
+            } else if (typeof arg === 'object') {
+              value = Object.entries(arg).map(([key, value]) => ({ key, value: value?.toString() }))
             } else {
               value = arg.toString()
             }

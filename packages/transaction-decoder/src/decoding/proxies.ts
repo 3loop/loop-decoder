@@ -9,9 +9,9 @@ interface StorageSlot {
 }
 
 const storageSlots: StorageSlot[] = [
-  { type: 'eip1967', slot: '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc' }, //eipEIP1967
+  { type: 'eip1967', slot: '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc' }, //EIP1967
   { type: 'zeppelin', slot: '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3' }, //zeppelin
-  { type: 'gnosis', slot: '0xa619486e00000000000000000000000000000000000000000000000000000000' }, // gnosis Safe Proxy Factor 1.1.1
+  { type: 'safe', slot: '0xa619486e00000000000000000000000000000000000000000000000000000000' }, // gnosis Safe Proxy Factor 1.1.1
 ]
 
 const zeroSlot = '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -69,7 +69,7 @@ export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetSt
             addressString = yield* getStorageSlot(request, slot)
             break
           }
-          case 'gnosis': {
+          case 'safe': {
             addressString = yield* ethCall(request, slot).pipe(Effect.orElseSucceed(() => undefined))
             break
           }

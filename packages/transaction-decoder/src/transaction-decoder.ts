@@ -156,7 +156,13 @@ export const decodeTransaction = ({
 
     const contractsMeta = contractMetaResult.reduce(
       (acc, meta) => {
-        return meta ? { ...acc, [getAddress(meta.address)]: meta } : acc
+        if (meta && 'id' in meta) delete meta.id
+        return meta
+          ? {
+              ...acc,
+              [getAddress(meta.address)]: meta,
+            }
+          : acc
       },
       {} as Record<Address, ContractData>,
     )
