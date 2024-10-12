@@ -230,7 +230,6 @@ export function displayPayments(erc20Payments: Payment[], nativePayments: Paymen
 export function defaultEvent(event: DecodedTransaction): InterpretedTransaction {
   const burned = assetsReceived(event.transfers, NULL_ADDRESS)
   const minted = assetsSent(event.transfers, NULL_ADDRESS)
-  const transfers = filterZeroTransfers(event.transfers)
 
   const newEvent = {
     type: 'unknown' as const,
@@ -245,33 +244,43 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
     assetsMinted: minted.length > 0 ? minted : undefined,
   }
 
+  return newEvent
+}
+
+export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedTransaction {
+  const newEvent = defaultEvent(event)
   // single burn
-  if (burned.length === 1) {
+  if (newEvent.assetsBurned?.length === 1) {
     return {
       ...newEvent,
       type: 'burn',
-      action: 'Burned ' + displayAsset(burned[0]),
+      action: 'Burned ' + displayAsset(newEvent.assetsBurned[0]),
     }
   }
 
   // single mint
-  if (minted.length === 1) {
+  if (newEvent.assetsMinted?.length === 1) {
     return {
       ...newEvent,
       type: 'mint',
-      action: 'Mint of ' + displayAsset(minted[0]),
+      action: 'Mint of ' + displayAsset(newEvent.assetsMinted[0]),
     }
   }
 
   // single transfer
-  if (transfers.length === 1) {
-    const fromAddress = transfers[0].from
-    const assetSent = assetsSent(transfers, fromAddress)
+  if (filterZeroTransfers(event.transfers).length === 1) {
+    const fromAddress =
+      event.transfers[0].from.toLowerCase() === event.fromAddress.toLowerCase() ||
+      event.transfers[0].to.toLowerCase() === event.fromAddress.toLowerCase()
+        ? event.fromAddress
+        : event.transfers[0].from
+    const asset = toAssetTransfer(event.transfers[0])
     return {
       ...newEvent,
       type: 'transfer-token',
-      action: 'Sent ' + displayAsset(assetSent[0]),
-      assetsSent: assetSent,
+      action: 'Sent ' + displayAsset(asset),
+      assetsSent: assetsSent(event.transfers, fromAddress),
+      assetsReceived: assetsReceived(event.transfers, fromAddress),
     }
   }
 

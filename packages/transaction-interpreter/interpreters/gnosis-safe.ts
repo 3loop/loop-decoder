@@ -1,9 +1,9 @@
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
-import { assetsSent, defaultEvent, assetsReceived } from './std.js'
+import { assetsSent, assetsReceived, categorizedDefaultEvent } from './std.js'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
-  const newEvent = defaultEvent(event)
+  const newEvent = categorizedDefaultEvent(event)
   const methodName = event.methodCall?.name
   const safeMultisigEvent = event.interactions.find((i) => i.event.eventName === 'SafeMultiSigTransaction')
   const successEvents = event.interactions.filter((i) => i.event.eventName === 'ExecutionSuccess')
