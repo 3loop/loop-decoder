@@ -80,6 +80,8 @@ export function formatNumber(numberString: string, precision?: number): string {
   const [integerPart, decimalPart] = numberString.split('.')
   const bigIntPart = BigInt(integerPart)
 
+  if (integerPart.length < 3 && !decimalPart) return numberString
+
   // Format the integer part manually
   let formattedIntegerPart = ''
   const integerStr = bigIntPart.toString()
@@ -103,9 +105,12 @@ export function formatNumber(numberString: string, precision?: number): string {
 export function displayAsset(asset: Payment | undefined): string {
   if (!asset || !asset.asset) return 'unknown asset'
 
-  if (asset.asset.symbol) return formatNumber(asset.amount) + ' ' + asset.asset.symbol
+  const amount = asset.amount === '0' ? '1' : asset.amount
+  const symbol = asset.asset.type === 'ERC20' ? asset.asset.symbol : asset.asset.name
 
-  return formatNumber(asset.amount) + ' ' + displayAddress(asset.asset.address)
+  if (symbol) return formatNumber(amount) + ' ' + symbol
+
+  return formatNumber(amount) + ' ' + displayAddress(asset.asset.address)
 }
 
 export function getPayments({
@@ -225,9 +230,10 @@ export function displayPayments(erc20Payments: Payment[], nativePayments: Paymen
 export function defaultEvent(event: DecodedTransaction): InterpretedTransaction {
   const burned = assetsReceived(event.transfers, NULL_ADDRESS)
   const minted = assetsSent(event.transfers, NULL_ADDRESS)
+  const transfers = filterZeroTransfers(event.transfers)
 
-  return {
-    type: 'unknown',
+  const newEvent = {
+    type: 'unknown' as const,
     action: 'Called method ' + event.methodCall.name,
     chain: event.chainID,
     txHash: event.txHash,
@@ -238,4 +244,36 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
     assetsBurned: burned.length > 0 ? burned : undefined,
     assetsMinted: minted.length > 0 ? minted : undefined,
   }
+
+  // single burn
+  if (burned.length === 1) {
+    return {
+      ...newEvent,
+      type: 'burn',
+      action: 'Burned ' + displayAsset(burned[0]),
+    }
+  }
+
+  // single mint
+  if (minted.length === 1) {
+    return {
+      ...newEvent,
+      type: 'mint',
+      action: 'Mint of ' + displayAsset(minted[0]),
+    }
+  }
+
+  // single transfer
+  if (transfers.length === 1) {
+    const fromAddress = transfers[0].from
+    const assetSent = assetsSent(transfers, fromAddress)
+    return {
+      ...newEvent,
+      type: 'transfer-token',
+      action: 'Sent ' + displayAsset(assetSent[0]),
+      assetsSent: assetSent,
+    }
+  }
+
+  return newEvent
 }

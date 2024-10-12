@@ -1,4 +1,4 @@
-import { assetsReceived, assetsSent, defaultEvent } from './std.js'
+import { assetsReceived, assetsSent, defaultEvent, displayAsset } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
@@ -64,6 +64,15 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
         action: `Sent ${name} #${tokenId}`,
         assetsSent: assetsSent(event.transfers, from),
         assetsReceived: assetsReceived(event.transfers, from),
+      }
+    }
+    case 'mintTo': {
+      const name = event.contractName
+      const minted = newEvent.assetsMinted?.filter((a) => a.asset.name === name)
+      return {
+        ...newEvent,
+        type: 'mint',
+        action: `Mint of ${displayAsset(minted?.[0])}`,
       }
     }
   }
