@@ -50,16 +50,16 @@ export interface RawDecodedLog {
   signature: string
 }
 
-export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'OTHER' | string
+export type ContractType = 'ERC20' | 'ERC721' | 'ERC1155' | 'WETH' | 'SAFE-PROXY' | 'ERC1967-PROXY' | 'OTHER' | string
 
 export interface ContractData {
   address: string
-  contractName: string
   contractAddress: string
-  tokenSymbol: string
-  decimals?: number
   type: ContractType
   chainID: number
+  contractName?: string
+  tokenSymbol?: string
+  decimals?: number
 }
 
 export interface BaseInteraction {
@@ -162,4 +162,4 @@ export interface Asset {
   tokenId?: string
 }
 
-export type ProxyType = 'eip1967' | 'zeppelin' | 'gnosis'
+export type ProxyType = 'eip1967' | 'zeppelin' | 'safe'

@@ -11,6 +11,12 @@ export function filterNullTransfers(transfers: Asset[]): Asset[] {
   return transfers.filter((t) => t.from !== NULL_ADDRESS && t.to !== NULL_ADDRESS)
 }
 
+export function filterDuplicateTransfers(transfers: Asset[]): Asset[] {
+  return transfers.filter(
+    (t, i, self) => self.findIndex((t2) => t2.address === t.address && t2.amount === t.amount) === i,
+  )
+}
+
 export function toAssetTransfer(transfer: Asset): AssetTransfer {
   return {
     from: { address: transfer.from, name: null },
@@ -43,16 +49,7 @@ export function assetsReceived(transfers: Asset[], address: string): AssetTransf
     filteredTransfers = filterNullTransfers(filteredTransfers)
   }
 
-  return filteredTransfers
-    .filter((t) => t.to.toLowerCase() === address.toLowerCase())
-    .map((t) => {
-      return {
-        from: { address: t.from, name: null },
-        to: { address: t.to, name: null },
-        amount: t.amount ?? '0',
-        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type, tokenId: t.tokenId },
-      }
-    })
+  return filteredTransfers.filter((t) => t.to.toLowerCase() === address.toLowerCase()).map(toAssetTransfer)
 }
 
 export function displayAddress(address: string): string {
@@ -80,6 +77,8 @@ export function formatNumber(numberString: string, precision?: number): string {
   const [integerPart, decimalPart] = numberString.split('.')
   const bigIntPart = BigInt(integerPart)
 
+  if (integerPart.length < 3 && !decimalPart) return numberString
+
   // Format the integer part manually
   let formattedIntegerPart = ''
   const integerStr = bigIntPart.toString()
@@ -103,7 +102,9 @@ export function formatNumber(numberString: string, precision?: number): string {
 export function displayAsset(asset: Payment | undefined): string {
   if (!asset || !asset.asset) return 'unknown asset'
 
-  if (asset.asset.symbol) return formatNumber(asset.amount) + ' ' + asset.asset.symbol
+  const symbol = asset.asset.type === 'ERC20' ? asset.asset.symbol : asset.asset.name
+
+  if (symbol) return formatNumber(asset.amount) + ' ' + symbol
 
   return formatNumber(asset.amount) + ' ' + displayAddress(asset.asset.address)
 }
@@ -226,8 +227,8 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
   const burned = assetsReceived(event.transfers, NULL_ADDRESS)
   const minted = assetsSent(event.transfers, NULL_ADDRESS)
 
-  return {
-    type: 'unknown',
+  const newEvent = {
+    type: 'unknown' as const,
     action: 'Called method ' + event.methodCall.name,
     chain: event.chainID,
     txHash: event.txHash,
@@ -238,4 +239,49 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
     assetsBurned: burned.length > 0 ? burned : undefined,
     assetsMinted: minted.length > 0 ? minted : undefined,
   }
+
+  return newEvent
+}
+
+export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedTransaction {
+  const newEvent = defaultEvent(event)
+  const nonDuplicateTransfers = filterDuplicateTransfers(event.transfers)
+  const nonZeroTransfers = filterZeroTransfers(nonDuplicateTransfers)
+
+  // single burn
+  if (newEvent.assetsBurned?.length === 1 && nonDuplicateTransfers.length <= 1) {
+    return {
+      ...newEvent,
+      type: 'burn',
+      action: 'Burned ' + displayAsset(newEvent.assetsBurned[0]),
+    }
+  }
+
+  // single mint
+  if (newEvent.assetsMinted?.length === 1 && nonDuplicateTransfers.length <= 1) {
+    return {
+      ...newEvent,
+      type: 'mint',
+      action: 'Mint of ' + displayAsset(newEvent.assetsMinted[0]),
+    }
+  }
+
+  // single transfer
+  if (nonZeroTransfers.length === 1) {
+    const fromAddress =
+      nonZeroTransfers[0].from.toLowerCase() === event.fromAddress.toLowerCase() ||
+      nonZeroTransfers[0].to.toLowerCase() === event.fromAddress.toLowerCase()
+        ? event.fromAddress
+        : nonZeroTransfers[0].from
+    const asset = toAssetTransfer(nonZeroTransfers[0])
+    return {
+      ...newEvent,
+      type: 'transfer-token',
+      action: 'Sent ' + displayAsset(asset),
+      assetsSent: assetsSent(event.transfers, fromAddress),
+      assetsReceived: assetsReceived(event.transfers, fromAddress),
+    }
+  }
+
+  return newEvent
 }

@@ -119,6 +119,7 @@
   "transfers": [
     {
       "address": "0xC3E4214dd442136079dF06bb2529Bae276d37564",
+      "amount": "1",
       "from": "0xdC75e8c3aE765D8947aDBC6698a2403A6141D439",
       "name": "Mock ERC721 Contract",
       "symbol": "ERC721",

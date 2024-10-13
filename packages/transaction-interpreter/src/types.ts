@@ -30,6 +30,7 @@ type TransactionType = StringWithAutocompleteOptions<
   | 'unstake-token'
   | 'burn'
   | 'mint'
+  | 'batch'
   | 'unknown'
 >
 

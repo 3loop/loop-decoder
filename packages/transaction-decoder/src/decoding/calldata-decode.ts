@@ -1,85 +1,73 @@
 import { Effect } from 'effect'
-import { isAddress, Hex, getAddress } from 'viem'
+import { isAddress, Hex, getAddress, encodeFunctionData, Address } from 'viem'
 import { getProxyStorageSlot } from './proxies.js'
 import { AbiParams, AbiStore, ContractAbiResult, getAndCacheAbi, MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
-import { DecodeResult, InputArg, ProxyType, TreeNode } from '../types.js'
+import { ProxyType, TreeNode } from '../types.js'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { sameAddress } from '../helpers/address.js'
+import { MULTICALL3_ADDRESS, SAFE_MULTISEND_ABI, SAFE_MULTISEND_SIGNATURE } from './constants.js'
 
-// Same address on all supported chains https://www.multicall3.com/deployments
-const MULTICALL3_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11'
-
-const decodeMulticall3 = (
-  params: TreeNode[],
+const decodeBytesRecursively = (
+  node: TreeNode,
   chainID: number,
+  address?: Address,
 ): Effect.Effect<
-  TreeNode[],
+  TreeNode,
   AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
   AbiStore<AbiParams, ContractAbiResult> | PublicClient
 > =>
   Effect.gen(function* () {
-    const decodeCalls = params.map((par) =>
-      Effect.gen(function* () {
-        if (par.components != null) {
-          // NOTE: Iterate over tuples
-          const next = yield* Effect.all(
-            par.components.map((param) =>
-              Effect.gen(function* () {
-                if (param.components == null) return param
-                const target = param.components.find((p) => p.name === 'target')
-                const callData = param.components.find((p) => p.name === 'callData' || p.name === 'data')
+    const callDataKeys = ['callData', 'data']
+    const addressKeys = ['to', 'target']
+    const isCallDataNode =
+      callDataKeys.includes(node.name) && node.type === 'bytes' && node.value && node.value !== '0x'
 
-                // NOTE: Found a tuple with calldata, recursively decode the calldata
-                if (target != null && callData != null && callData.value != null) {
-                  const targetAddress = target.value as Hex
+    if (
+      node.components &&
+      node.components.some((c) => callDataKeys.includes(c.name)) &&
+      node.components.some((c) => addressKeys.includes(c.name))
+    ) {
+      const toAddress = node.components.find((c) => addressKeys.includes(c.name))?.value as Address | undefined
+      return {
+        ...node,
+        components: yield* Effect.all(
+          node.components.map((n) => decodeBytesRecursively(n, chainID, toAddress)),
+          {
+            concurrency: 'unbounded',
+          },
+        ),
+      }
+    }
 
-                  // NOTE: For nested failed calls we ignore the error as there could be contract that are not verified
-                  const decoded = yield* decodeMethod({
-                    data: callData.value as Hex,
-                    chainID,
-                    contractAddress: targetAddress,
-                  }).pipe(Effect.orElseSucceed(() => null))
+    if (node.components) {
+      return {
+        ...node,
+        components: yield* Effect.all(
+          node.components.map((n) => decodeBytesRecursively(n, chainID, address)),
+          {
+            concurrency: 'unbounded',
+          },
+        ),
+      }
+    }
 
-                  // Replace the call data with the decoded call data tree
-                  const components = param.components.map((p) => {
-                    if (p.name === 'callData' && decoded) {
-                      return {
-                        ...p,
-                        value: callData.value,
-                        valueDecoded: decoded,
-                      }
-                    }
-                    return p
-                  })
+    if (isCallDataNode) {
+      const decoded = yield* decodeMethod({
+        data: node.value as Hex,
+        chainID: address ? chainID : 0,
+        contractAddress: address ?? '',
+      }).pipe(Effect.orElseSucceed(() => null))
 
-                  return {
-                    ...param,
-                    components,
-                  } as TreeNode
-                }
-
-                return param
-              }),
-            ),
-            {
-              concurrency: 'unbounded',
-            },
-          )
-
-          return {
-            ...par,
-            components: next,
+      return decoded
+        ? {
+            ...node,
+            valueDecoded: decoded,
           }
-        } else {
-          return par
-        }
-      }),
-    )
+        : node
+    }
 
-    return yield* Effect.all(decodeCalls, {
-      concurrency: 'unbounded',
-    })
+    return node
   })
 
 //https://etherscan.io/address/0x40a2accbd92bca938b02010e17a5b8929b49130d
@@ -97,7 +85,7 @@ const decodeGnosisMultisendParams = (
     }
 
     //Code from https://github.com/safe-global/safe-core-sdk/blob/dc98509f15f42f04d65edcbada3bcf1f61f1154a/packages/protocol-kit/src/utils/transactions/utils.ts#L159
-    const txs = []
+    const txs: string[][] = []
     // Decode after 0x
     let index = 2
     const transactionBytes = inputParams.find((p) => p.name === 'transactions')?.value as Hex
@@ -109,67 +97,43 @@ const decodeGnosisMultisendParams = (
       const value = `0x${transactionBytes.slice(index, (index += 64))}`
       const dataLength = parseInt(`${transactionBytes.slice(index, (index += 64))}`, 16) * 2
       const data = `0x${transactionBytes.slice(index, (index += dataLength))}`
-      txs.push({
-        operation: Number(operation),
-        to: getAddress(to),
-        value: BigInt(value).toString(),
-        data,
-      })
+      txs.push([operation, to, value.toString(), dataLength.toString(), data])
     }
-    const txsDecoded = yield* Effect.all(
-      txs.map((tx) => {
-        return decodeMethod({
-          data: tx.data as Hex,
-          chainID,
-          contractAddress: tx.to,
-        }).pipe(Effect.orElseSucceed(() => null))
-      }),
+
+    //encode and decode the transactions for the proper data structure
+    const txsEncoded = yield* Effect.try({
+      try: () =>
+        encodeFunctionData({
+          abi: SAFE_MULTISEND_ABI,
+          args: [txs],
+        }),
+      catch: (error) => new AbiDecoder.DecodeError(error),
+    })
+    const txsDecoded = yield* AbiDecoder.decodeMethod(txsEncoded, SAFE_MULTISEND_ABI)
+
+    if (!txsDecoded || !txsDecoded.params) {
+      return inputParams
+    }
+
+    //decode recursively all the bytes params
+    const decodedParams = yield* Effect.all(
+      txsDecoded.params.map((p) => decodeBytesRecursively(p, chainID, undefined)),
       {
         concurrency: 'unbounded',
       },
     )
 
-    return inputParams.map((param) => {
-      if (param.name === 'transactions') {
-        return {
-          ...param,
-          valueDecoded: txsDecoded.filter((tx) => tx != null) as DecodeResult[],
-        } as InputArg
-      }
-      return param
-    })
-  })
-
-export const decodeGnosisSafeParams = (
-  params: TreeNode[],
-  chainID: number,
-): Effect.Effect<
-  TreeNode[],
-  AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
-  AbiStore<AbiParams, ContractAbiResult> | PublicClient
-> =>
-  Effect.gen(function* () {
-    const toParam = params.find((p) => p.name === 'to')
-    const dataParam = params.find((p) => p.name === 'data')
-    const toAddress = toParam?.value as Hex
-    const callData = dataParam?.value as Hex
-
-    if (toParam && dataParam && toAddress && callData) {
-      const decoded = yield* decodeMethod({
-        data: callData,
-        chainID,
-        contractAddress: toAddress,
-      })
-
-      if (decoded && decoded.params) {
-        return params.map((param) =>
-          param.name === 'data' ? ({ ...param, valueDecoded: decoded } as InputArg) : param,
-        )
-      }
-      return params
-    }
-
-    return params
+    return inputParams.map((p) =>
+      p.name === 'transactions'
+        ? {
+            ...p,
+            valueDecoded: {
+              ...txsDecoded,
+              params: decodedParams,
+            },
+          }
+        : p,
+    )
   })
 
 export const decodeMethod = ({
@@ -207,25 +171,41 @@ export const decodeMethod = ({
       return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${data}`)
     }
 
-    if (sameAddress(MULTICALL3_ADDRESS, contractAddress) && decoded.params != null) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const deepDecodedParams = yield* decodeMulticall3(decoded.params!, chainID)
-      return {
-        ...decoded,
-        params: deepDecodedParams,
-      }
-    }
+    //MULTICALL3: decode the params for the multicall3 contract
+    if (sameAddress(MULTICALL3_ADDRESS, contractAddress) && decoded.params) {
+      const targetAddress = decoded.params.find((p) => p.name === 'target')?.value as Address | undefined
+      const decodedParams = yield* Effect.all(
+        decoded.params.map((p) => decodeBytesRecursively(p, chainID, targetAddress)),
+        {
+          concurrency: 'unbounded',
+        },
+      )
 
-    if (proxyType && proxyType === 'gnosis' && decoded.params != null) {
-      const decodedParams = yield* decodeGnosisSafeParams(decoded.params, chainID)
       return {
         ...decoded,
         params: decodedParams,
       }
     }
 
+    //SAFE CONTRACT: decode the params for the safe smart account contract
+    if (proxyType === 'safe' && decoded.params != null) {
+      const toAddress = decoded.params.find((p) => p.name === 'to')?.value as Address | undefined
+      const decodedParams = yield* Effect.all(
+        decoded.params.map((p) => decodeBytesRecursively(p, chainID, toAddress)),
+        {
+          concurrency: 'unbounded',
+        },
+      )
+
+      return {
+        ...decoded,
+        params: decodedParams,
+      }
+    }
+
+    //MULTISEND: decode the params for the multisend contract which is also related to the safe smart account
     if (
-      decoded.signature === 'multiSend(bytes)' &&
+      decoded.signature === SAFE_MULTISEND_SIGNATURE &&
       decoded.params != null &&
       decoded.params.find((p) => p.name === 'transactions')
     ) {

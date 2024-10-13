@@ -9,6 +9,7 @@ import {
   BlockscoutStrategyResolver,
   PublicClient,
   ERC20RPCStrategyResolver,
+  ProxyRPCStrategyResolver,
 } from '@3loop/transaction-decoder'
 import { Effect, Layer } from 'effect'
 import prisma from './prisma'
@@ -92,12 +93,14 @@ export const ContractMetaStoreLive = Layer.effect(
   ContractMetaStore,
   Effect.gen(function* () {
     const publicClient = yield* PublicClient
-    const erc20Loader = ERC20RPCStrategyResolver(publicClient)
-    const nftLoader = NFTRPCStrategyResolver(publicClient)
 
     return ContractMetaStore.of({
       strategies: {
-        default: [erc20Loader, nftLoader],
+        default: [
+          ERC20RPCStrategyResolver(publicClient),
+          NFTRPCStrategyResolver(publicClient),
+          ProxyRPCStrategyResolver(publicClient),
+        ],
       },
       get: ({ address, chainID }) =>
         Effect.gen(function* () {
@@ -118,6 +121,7 @@ export const ContractMetaStoreLive = Layer.effect(
               result: null,
             }
           } else {
+            if ('id' in data) delete data.id
             return {
               status: 'success',
               result: data,
@@ -136,10 +140,13 @@ export const ContractMetaStoreLive = Layer.effect(
           yield* Effect.tryPromise(() =>
             prisma.contractMeta.create({
               data: {
-                ...contractMeta.result,
-                decimals: contractMeta.result.decimals ?? 0,
+                type: contractMeta.result.type,
                 address: normAddress,
+                contractAddress: normAddress,
                 chainID: chainID,
+                decimals: contractMeta.result.decimals ?? 0,
+                tokenSymbol: contractMeta.result.tokenSymbol ?? '',
+                contractName: contractMeta.result.contractName ?? '',
               },
             }),
           ).pipe(Effect.catchAll((_) => Effect.succeed(null)))
