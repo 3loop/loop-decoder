@@ -1,7 +1,7 @@
 import { Effect, Request, RequestResolver, Schedule } from 'effect'
 import { PublicClient, RPCCallError, RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { Address, Hex } from 'viem'
-import { ProxyType } from '@/types.js'
+import { ProxyType } from '../types.js'
 
 interface StorageSlot {
   type: ProxyType

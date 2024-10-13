@@ -1,4 +1,4 @@
-import { ContractData, ContractType } from '@/types.js'
+import { ContractData, ContractType } from '../types.js'
 import * as RequestModel from './request-model.js'
 import { Effect, RequestResolver } from 'effect'
 import { PublicClient } from '../public-client.js'

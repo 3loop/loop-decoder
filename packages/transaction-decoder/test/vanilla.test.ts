@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'vitest'
 import { MockedTransaction, mockedTransport } from './mocks/json-rpc-mock.js'
-import { TransactionDecoder } from '@/vanilla.js'
+import { TransactionDecoder } from '../src/vanilla.js'
 import fs from 'fs'
 import { createPublicClient } from 'viem'
 import { goerli } from 'viem/chains'
-import { ERC20RPCStrategyResolver } from '@/effect.js'
+import { ERC20RPCStrategyResolver } from '../src/effect.js'
 import { TEST_TRANSACTIONS } from './constants.js'
 
 describe('Transaction Decoder', () => {

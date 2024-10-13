@@ -1,4 +1,4 @@
-import { ContractMetaStore } from '@/contract-meta-loader.js'
+import { ContractMetaStore } from '../../src/contract-meta-loader.js'
 import { Effect, Layer } from 'effect'
 
 const ERC1155_CONTRACTS = ['0x58c3c2547084cc1c94130d6fd750a3877c7ca5d2', '0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80']

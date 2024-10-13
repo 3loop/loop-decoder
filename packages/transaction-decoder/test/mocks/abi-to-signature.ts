@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { convertAbiToFragments } from '@/helpers/abi.js'
+import { convertAbiToFragments } from '../../src/helpers/abi.js'
 
 export async function main(abiPath: string) {
   const abi = fs.readFileSync(abiPath).toString()
