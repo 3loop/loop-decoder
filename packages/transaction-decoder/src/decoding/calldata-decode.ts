@@ -3,8 +3,8 @@ import { isAddress, Hex, getAddress } from 'viem'
 import { getProxyStorageSlot } from './proxies.js'
 import { AbiParams, AbiStore, ContractAbiResult, getAndCacheAbi, MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
-import { DecodeResult, InputArg, ProxyType, TreeNode } from '@/types.js'
-import { PublicClient, RPCFetchError, UnknownNetwork } from '@/public-client.js'
+import { DecodeResult, InputArg, ProxyType, TreeNode } from '../types.js'
+import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { sameAddress } from '../helpers/address.js'
 
 // Same address on all supported chains https://www.multicall3.com/deployments

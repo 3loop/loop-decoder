@@ -1,8 +1,8 @@
 import { Effect, Layer, Match } from 'effect'
 import fs from 'node:fs'
-import { AbiStore } from '@/abi-loader.js'
-// import { FourByteStrategyResolver } from '@/effect.js'
-// import { EtherscanStrategyResolver } from '@/abi-strategy/index.js'
+import { AbiStore } from '../../src/abi-loader.js'
+// import { FourByteStrategyResolver } from '../../src/effect.js'
+// import { EtherscanStrategyResolver } from '../../src/abi-strategy/index.js'
 
 export const MockedAbiStoreLive = Layer.succeed(
   AbiStore,

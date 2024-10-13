@@ -141,7 +141,7 @@
   "traceCalls": [],
   "transfers": [
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.01",
       "from": "0xea3c9d1d357c02b5bd0d98ffb8b5d06f0de3ceac",
       "name": "Ethereum",
@@ -150,7 +150,7 @@
       "type": "native",
     },
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.005",
       "from": "0xD152f549545093347A162Dce210e7293f1452150",
       "name": "Ethereum",
@@ -159,7 +159,7 @@
       "type": "native",
     },
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.005",
       "from": "0xD152f549545093347A162Dce210e7293f1452150",
       "name": "Ethereum",

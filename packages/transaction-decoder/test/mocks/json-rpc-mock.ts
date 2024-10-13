@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { PublicClient, PublicClientObject, UnknownNetwork } from '@/effect.js'
+import { PublicClient, PublicClientObject, UnknownNetwork } from '../../src/effect.js'
 import { Effect } from 'effect'
 import { createPublicClient, custom } from 'viem'
 

@@ -5,7 +5,7 @@ import { sameAddress } from '../helpers/address.js'
 const toKeys = ['to', '_to', 'dst']
 const fromKeys = ['from', '_from', 'src']
 const valueKeys = ['value', 'amount', 'wad', '_amount']
-export const ethAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+export const ethAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 const transferEvents = ['Transfer', 'TransferBatch', 'TransferSingle']
 
 function findValue(params: EventParams): EventParams[keyof EventParams] {

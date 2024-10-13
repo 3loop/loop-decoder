@@ -1,5 +1,5 @@
-import { UnknownNetwork } from '@/public-client.js'
-import { ContractData } from '@/types.js'
+import { UnknownNetwork } from '../public-client.js'
+import { ContractData } from '../types.js'
 import { Request } from 'effect'
 import { Address } from 'viem'
 

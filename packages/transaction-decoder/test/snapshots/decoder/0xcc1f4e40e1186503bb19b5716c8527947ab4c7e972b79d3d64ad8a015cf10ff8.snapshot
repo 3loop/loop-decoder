@@ -405,7 +405,7 @@
   ],
   "transfers": [
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.001601969428026279",
       "from": "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
       "name": "Ethereum",

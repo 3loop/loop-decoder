@@ -5,8 +5,7 @@ import { getBlockTimestamp, getTrace, getTransaction, getTransactionReceipt } fr
 import * as LogDecoder from './decoding/log-decode.js'
 import * as TraceDecoder from './decoding/trace-decode.js'
 import * as CalldataDecode from './decoding/calldata-decode.js'
-import { transferDecode } from './decoding/transfer-decode.js'
-import type { DecodedTransaction, Interaction, ContractData } from './types.js'
+import type { DecodedTransaction, Interaction, ContractData, DecodeResult } from './types.js'
 import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
 import { getAssetsTransfers } from './transformers/tokens.js'
@@ -60,6 +59,13 @@ export const decodeTrace = ({ trace, transaction }: { trace: TraceLog[]; transac
     }),
   )
 
+const NATIVE_TRANSFER_METHOD = Effect.succeed({
+  name: 'Transfer',
+  signature: 'Transfer(address,address,uint256)',
+  type: 'function',
+  params: [],
+} as DecodeResult)
+
 export const decodeTransaction = ({
   transaction,
   receipt,
@@ -80,9 +86,7 @@ export const decodeTransaction = ({
       return yield* Effect.fail(new UnsupportedEvent({ message: 'Unsupported transaction' }))
     }
 
-    if (transaction.input === '0x') {
-      return yield* Effect.sync(() => transferDecode({ transaction, receipt }))
-    }
+    const nativeTransfer = transaction.input === '0x'
 
     const data = transaction.input
     const chainID = Number(transaction.chainId)
@@ -90,7 +94,9 @@ export const decodeTransaction = ({
 
     const { decodedData, decodedTrace, decodedLogs, decodedErrorTrace } = yield* Effect.all(
       {
-        decodedData: Effect.either(CalldataDecode.decodeMethod({ data, chainID, contractAddress })),
+        decodedData: Effect.either(
+          nativeTransfer ? NATIVE_TRANSFER_METHOD : CalldataDecode.decodeMethod({ data, chainID, contractAddress }),
+        ),
         decodedTrace: decodeTrace({ trace, transaction }),
         decodedLogs: decodeLogs({ receipt, transaction }),
         decodedErrorTrace: decodeErrorTrace({ trace }),
@@ -112,7 +118,7 @@ export const decodeTransaction = ({
       yield* Effect.logError(`Logs decode errors: ${stringify(logsErrors)}`)
     }
 
-    if (Either.isLeft(decodedData)) {
+    if (!nativeTransfer && Either.isLeft(decodedData)) {
       yield* Effect.logError(`Data decode error: ${decodedData.left}`)
     }
 
@@ -159,7 +165,7 @@ export const decodeTransaction = ({
 
     const decodedTx: DecodedTransaction = {
       txHash: transaction.hash,
-      txType: TxType.CONTRACT_INTERACTION,
+      txType: nativeTransfer ? TxType.TRANSFER : TxType.CONTRACT_INTERACTION,
       fromAddress: receipt.from,
       toAddress: receipt.to,
       contractName: contractMeta?.contractName ?? null,
