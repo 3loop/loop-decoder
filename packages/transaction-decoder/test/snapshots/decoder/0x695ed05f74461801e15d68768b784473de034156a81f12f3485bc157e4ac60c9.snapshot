@@ -281,7 +281,7 @@
       "type": "ERC1155",
     },
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "3",
       "from": "0xbdddd277583dcae0b501046ba86714feea71b03f",
       "name": "Ethereum",
@@ -290,7 +290,7 @@
       "type": "native",
     },
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "3",
       "from": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
       "name": "Ethereum",

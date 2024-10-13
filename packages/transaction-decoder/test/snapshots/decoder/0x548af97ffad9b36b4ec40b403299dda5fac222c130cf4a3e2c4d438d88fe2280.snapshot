@@ -394,7 +394,7 @@
       "type": "ERC20",
     },
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.001361017781386941",
       "from": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
       "name": "Ethereum",
@@ -403,7 +403,7 @@
       "type": "native",
     },
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.000396600581496154",
       "from": "0x12D737470fB3ec6C3DeEC9b518100Bec9D520144",
       "name": "Ethereum",
@@ -412,7 +412,7 @@
       "type": "native",
     },
     {
-      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.000964417199890787",
       "from": "0x12D737470fB3ec6C3DeEC9b518100Bec9D520144",
       "name": "Ethereum",
