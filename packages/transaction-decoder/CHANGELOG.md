@@ -1,5 +1,12 @@
 # @3loop/transaction-decoder
 
+## 0.19.0
+
+### Minor Changes
+
+- 806075e: Decode all deep params of safe tx
+- 86c6e12: Fix native transfer decoding
+
 ## 0.18.1
 
 ### Patch Changes
