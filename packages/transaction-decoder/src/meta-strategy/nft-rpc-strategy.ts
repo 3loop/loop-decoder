@@ -11,13 +11,17 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
       const service = yield* PublicClient
       const { client } = yield* service.getPublicClient(chainID)
 
+      // const proxyResult = yield* getProxyStorageSlot({ address, chainID })
+      // const { address: implementationAddress } = proxyResult ?? {}
+      const contractAddress = address
+
       const inst = getContract({
         abi: erc165Abi,
-        address,
+        address: contractAddress,
         client,
       })
 
-      const fail = new RequestModel.ResolveStrategyMetaError('NFTRPCStrategy', address, chainID)
+      const fail = new RequestModel.ResolveStrategyMetaError('NFTRPCStrategy', contractAddress, chainID)
 
       const [isERC721, isERC1155] = yield* Effect.all(
         [
@@ -40,7 +44,7 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
 
       const erc721inst = getContract({
         abi: erc721Abi,
-        address,
+        address: contractAddress,
         client,
       })
 

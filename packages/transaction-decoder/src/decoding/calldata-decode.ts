@@ -20,13 +20,15 @@ const decodeBytesRecursively = (
   Effect.gen(function* () {
     const callDataKeys = ['callData', 'data']
     const addressKeys = ['to', 'target']
+    const isCallDataNode =
+      callDataKeys.includes(node.name) && node.type === 'bytes' && node.value && node.value !== '0x'
 
     if (
       node.components &&
       node.components.some((c) => callDataKeys.includes(c.name)) &&
       node.components.some((c) => addressKeys.includes(c.name))
     ) {
-      const toAddress = node.components.find((c) => addressKeys.includes(c.name))?.value as Address
+      const toAddress = node.components.find((c) => addressKeys.includes(c.name))?.value as Address | undefined
       return {
         ...node,
         components: yield* Effect.all(
@@ -35,7 +37,7 @@ const decodeBytesRecursively = (
             concurrency: 'unbounded',
           },
         ),
-      } as TreeNode
+      }
     }
 
     if (node.components) {
@@ -47,37 +49,22 @@ const decodeBytesRecursively = (
             concurrency: 'unbounded',
           },
         ),
-      } as TreeNode
+      }
     }
 
-    if (callDataKeys.includes(node.name) && node.type === 'bytes' && node.value && node.value !== '0x') {
-      if (address) {
-        const decoded = yield* decodeMethod({
-          data: node.value as Hex,
-          chainID,
-          contractAddress: address,
-        }).pipe(Effect.orElseSucceed(() => null))
+    if (isCallDataNode) {
+      const decoded = yield* decodeMethod({
+        data: node.value as Hex,
+        chainID: address ? chainID : 0,
+        contractAddress: address ?? '',
+      }).pipe(Effect.orElseSucceed(() => null))
 
-        return decoded
-          ? {
-              ...node,
-              valueDecoded: decoded,
-            }
-          : node
-      } else {
-        const decoded = yield* decodeMethod({
-          data: node.value as Hex,
-          chainID,
-          contractAddress: '',
-        }).pipe(Effect.orElseSucceed(() => null))
-
-        return decoded
-          ? {
-              ...node,
-              valueDecoded: decoded,
-            }
-          : node
-      }
+      return decoded
+        ? {
+            ...node,
+            valueDecoded: decoded,
+          }
+        : node
     }
 
     return node
@@ -138,13 +125,13 @@ const decodeGnosisMultisendParams = (
 
     return inputParams.map((p) =>
       p.name === 'transactions'
-        ? ({
+        ? {
             ...p,
             valueDecoded: {
               ...txsDecoded,
               params: decodedParams,
             },
-          } as TreeNode)
+          }
         : p,
     )
   })
@@ -184,12 +171,11 @@ export const decodeMethod = ({
       return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${data}`)
     }
 
-    if (sameAddress(MULTICALL3_ADDRESS, contractAddress) && decoded.params != null) {
-      const targetAddress = decoded.params.find((p) => p.name === 'target')?.value
+    //MULTICALL3: decode the params for the multicall3 contract
+    if (sameAddress(MULTICALL3_ADDRESS, contractAddress) && decoded.params) {
+      const targetAddress = decoded.params.find((p) => p.name === 'target')?.value as Address | undefined
       const decodedParams = yield* Effect.all(
-        decoded.params.map((p) =>
-          decodeBytesRecursively(p, chainID, targetAddress ? (targetAddress as Address) : undefined),
-        ),
+        decoded.params.map((p) => decodeBytesRecursively(p, chainID, targetAddress)),
         {
           concurrency: 'unbounded',
         },
@@ -201,11 +187,11 @@ export const decodeMethod = ({
       }
     }
 
-    //decode the params for the safe smart account contract
-    if (proxyType && proxyType === 'safe' && decoded.params != null) {
-      const toAddress = decoded.params.find((p) => p.name === 'to')?.value
+    //SAFE CONTRACT: decode the params for the safe smart account contract
+    if (proxyType === 'safe' && decoded.params != null) {
+      const toAddress = decoded.params.find((p) => p.name === 'to')?.value as Address | undefined
       const decodedParams = yield* Effect.all(
-        decoded.params.map((p) => decodeBytesRecursively(p, chainID, toAddress ? (toAddress as Address) : undefined)),
+        decoded.params.map((p) => decodeBytesRecursively(p, chainID, toAddress)),
         {
           concurrency: 'unbounded',
         },
@@ -217,7 +203,7 @@ export const decodeMethod = ({
       }
     }
 
-    //decode the params for the multisend contract which is also related to the safe smart account
+    //MULTISEND: decode the params for the multisend contract which is also related to the safe smart account
     if (
       decoded.signature === SAFE_MULTISEND_SIGNATURE &&
       decoded.params != null &&

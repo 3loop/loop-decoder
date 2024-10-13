@@ -121,6 +121,7 @@ export const ContractMetaStoreLive = Layer.effect(
               result: null,
             }
           } else {
+            if ('id' in data) delete data.id
             return {
               status: 'success',
               result: data,

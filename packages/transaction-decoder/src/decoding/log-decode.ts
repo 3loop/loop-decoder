@@ -8,6 +8,15 @@ import * as AbiDecoder from './abi-decode.js'
 import { stringify } from '../helpers/stringify.js'
 import { formatAbiItem } from 'viem/utils'
 
+function formatValue(arg: any): any {
+  if (arg == null) return null
+  if (Array.isArray(arg)) return arg.map(formatValue)
+  if (typeof arg === 'object') {
+    return Object.fromEntries(Object.entries(arg).map(([key, value]) => [key.toString(), value?.toString()]))
+  }
+  return arg.toString()
+}
+
 const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
   Effect.gen(function* () {
     const chainID = Number(transaction.chainId)
@@ -62,17 +71,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
             if (input.name == null) return null
 
             const arg = Array.isArray(args) ? args[i] : args[input.name]
-
-            let value
-            if (arg == null) {
-              value = null
-            } else if (Array.isArray(arg)) {
-              value = arg.map((item) => item?.toString())
-            } else if (typeof arg === 'object') {
-              value = Object.entries(arg).map(([key, value]) => ({ key, value: value?.toString() }))
-            } else {
-              value = arg.toString()
-            }
+            const value = formatValue(arg)
 
             return {
               type: input.type,

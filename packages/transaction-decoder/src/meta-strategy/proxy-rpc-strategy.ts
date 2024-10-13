@@ -1,4 +1,4 @@
-import { ContractData, ContractType } from '@/types.js'
+import { ContractData, ContractType } from '../types.js'
 import * as RequestModel from './request-model.js'
 import { Effect, RequestResolver } from 'effect'
 import { getProxyStorageSlot } from '../decoding/proxies.js'
@@ -12,7 +12,6 @@ export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) =>
 
       const fail = new RequestModel.ResolveStrategyMetaError('ProxyRPCStrategy', address, chainID)
 
-      //NOTE: only gnosis safe is supported atm
       if (!implementationAddress || !proxyType) {
         return yield* Effect.fail(fail)
       }
@@ -28,14 +27,15 @@ export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) =>
         }
       }
 
-      if (proxyType === 'eip1967') {
-        meta = {
-          address,
-          contractAddress: address,
-          type: 'ERC1967-PROXY' as ContractType,
-          chainID,
-        }
-      }
+      // NOTE: ERC1967 is not supported yet becasue some tokens are using this proxy type
+      // if (proxyType === 'eip1967') {
+      //   meta = {
+      //     address,
+      //     contractAddress: address,
+      //     type: 'ERC1967-PROXY' as ContractType,
+      //     chainID,
+      //   }
+      // }
 
       if (!meta) {
         return yield* Effect.fail(fail)

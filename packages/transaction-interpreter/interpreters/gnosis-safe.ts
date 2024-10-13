@@ -18,7 +18,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
     const action = (event.methodCall?.params?.find((p) => p.name === 'data') as { valueDecoded: any | undefined })
       ?.valueDecoded
 
-    if (action.name === 'multiSend') {
+    if (action?.name === 'multiSend') {
       const txs = action?.params?.[0]?.valueDecoded?.params?.[0]?.components
       return {
         ...newEvent,
@@ -31,7 +31,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
 
     return {
       ...newEvent,
-      action: 'Called ' + action?.name + ' from Safe Wallet',
+      action: 'Called ' + (action?.name ?? methodName) + ' from Safe Wallet',
       assetsSent: assetsSent(event.transfers, safeAddress),
       assetsReceived: assetsReceived(event.transfers, safeAddress),
     }

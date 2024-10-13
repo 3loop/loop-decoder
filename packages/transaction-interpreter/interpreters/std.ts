@@ -11,6 +11,12 @@ export function filterNullTransfers(transfers: Asset[]): Asset[] {
   return transfers.filter((t) => t.from !== NULL_ADDRESS && t.to !== NULL_ADDRESS)
 }
 
+export function filterDuplicateTransfers(transfers: Asset[]): Asset[] {
+  return transfers.filter(
+    (t, i, self) => self.findIndex((t2) => t2.address === t.address && t2.amount === t.amount) === i,
+  )
+}
+
 export function toAssetTransfer(transfer: Asset): AssetTransfer {
   return {
     from: { address: transfer.from, name: null },
@@ -43,16 +49,7 @@ export function assetsReceived(transfers: Asset[], address: string): AssetTransf
     filteredTransfers = filterNullTransfers(filteredTransfers)
   }
 
-  return filteredTransfers
-    .filter((t) => t.to.toLowerCase() === address.toLowerCase())
-    .map((t) => {
-      return {
-        from: { address: t.from, name: null },
-        to: { address: t.to, name: null },
-        amount: t.amount ?? '0',
-        asset: { address: t.address, name: t.name, symbol: t.symbol, type: t.type, tokenId: t.tokenId },
-      }
-    })
+  return filteredTransfers.filter((t) => t.to.toLowerCase() === address.toLowerCase()).map(toAssetTransfer)
 }
 
 export function displayAddress(address: string): string {
@@ -105,12 +102,11 @@ export function formatNumber(numberString: string, precision?: number): string {
 export function displayAsset(asset: Payment | undefined): string {
   if (!asset || !asset.asset) return 'unknown asset'
 
-  const amount = asset.amount === '0' ? '1' : asset.amount
   const symbol = asset.asset.type === 'ERC20' ? asset.asset.symbol : asset.asset.name
 
-  if (symbol) return formatNumber(amount) + ' ' + symbol
+  if (symbol) return formatNumber(asset.amount) + ' ' + symbol
 
-  return formatNumber(amount) + ' ' + displayAddress(asset.asset.address)
+  return formatNumber(asset.amount) + ' ' + displayAddress(asset.asset.address)
 }
 
 export function getPayments({
@@ -249,8 +245,11 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
 
 export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = defaultEvent(event)
+  const nonDuplicateTransfers = filterDuplicateTransfers(event.transfers)
+  const nonZeroTransfers = filterZeroTransfers(nonDuplicateTransfers)
+
   // single burn
-  if (newEvent.assetsBurned?.length === 1) {
+  if (newEvent.assetsBurned?.length === 1 && nonDuplicateTransfers.length <= 1) {
     return {
       ...newEvent,
       type: 'burn',
@@ -259,7 +258,7 @@ export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedT
   }
 
   // single mint
-  if (newEvent.assetsMinted?.length === 1) {
+  if (newEvent.assetsMinted?.length === 1 && nonDuplicateTransfers.length <= 1) {
     return {
       ...newEvent,
       type: 'mint',
@@ -268,13 +267,13 @@ export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedT
   }
 
   // single transfer
-  if (filterZeroTransfers(event.transfers).length === 1) {
+  if (nonZeroTransfers.length === 1) {
     const fromAddress =
-      event.transfers[0].from.toLowerCase() === event.fromAddress.toLowerCase() ||
-      event.transfers[0].to.toLowerCase() === event.fromAddress.toLowerCase()
+      nonZeroTransfers[0].from.toLowerCase() === event.fromAddress.toLowerCase() ||
+      nonZeroTransfers[0].to.toLowerCase() === event.fromAddress.toLowerCase()
         ? event.fromAddress
-        : event.transfers[0].from
-    const asset = toAssetTransfer(event.transfers[0])
+        : nonZeroTransfers[0].from
+    const asset = toAssetTransfer(nonZeroTransfers[0])
     return {
       ...newEvent,
       type: 'transfer-token',

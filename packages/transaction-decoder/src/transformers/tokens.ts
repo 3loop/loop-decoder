@@ -19,14 +19,9 @@ function findValue(params: EventParams): EventParams[keyof EventParams] {
 }
 
 function getTokenType(interaction: Interaction): AssetType {
-  const LPTokenSymbols = ['UNI-V2']
   let tokenType = AssetType.DEFAULT
 
-  // LP Token
-  if (interaction.contractSymbol && LPTokenSymbols.includes(interaction.contractSymbol)) {
-    tokenType = AssetType.LPToken
-    // ERC-1155
-  } else if (interaction.contractType === 'ERC1155') {
+  if (interaction.contractType === 'ERC1155') {
     tokenType = AssetType.ERC1155
     // ERC-721
   } else if (interaction.contractType === 'ERC721') {
@@ -86,6 +81,7 @@ function getTokens(interactions: Interaction[]): Asset[] {
             name: interaction.contractName,
             symbol: interaction.contractSymbol,
             address: interaction.contractAddress,
+            amount: '1',
             tokenId,
             to,
             from,
