@@ -1,5 +1,17 @@
 # @3loop/transaction-interpreter
 
+## 0.10.0
+
+### Minor Changes
+
+- 806075e: Add new safe interpretation and update std functions
+
+### Patch Changes
+
+- Updated dependencies [806075e]
+- Updated dependencies [86c6e12]
+  - @3loop/transaction-decoder@0.19.0
+
 ## 0.9.0
 
 ### Minor Changes
