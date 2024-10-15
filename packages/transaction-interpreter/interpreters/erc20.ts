@@ -1,10 +1,10 @@
-import { assetsReceived, assetsSent, formatNumber, defaultEvent } from './std.js'
+import { assetsReceived, assetsSent, formatNumber, categorizedDefaultEvent, displayAsset } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
-  const newEvent = defaultEvent(event)
+  const newEvent = categorizedDefaultEvent(event)
 
   switch (methodName) {
     case 'approve': {
@@ -25,7 +25,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
           action = `Revoked approval for ${name} to be spent`
         } else {
           const amount = formatAmount(approvalValue, approval?.decimals || 18)
-          action = `Approved ${formatNumber(amount)}${name} to be spent`
+          action = `Approved ${formatNumber(amount)} ${name} to be spent`
         }
       }
 
@@ -36,13 +36,10 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
       }
     }
     case 'transfer': {
-      const amount = newEvent.assetsSent?.[0]?.amount || event.methodCall?.params?.[1]?.value || '0'
-      const symbol = newEvent.assetsSent?.[0]?.asset?.symbol || event.contractName || 'unknown'
-
       return {
         ...newEvent,
         type: 'transfer-token',
-        action: `Sent ${formatNumber(amount.toString())} ${symbol}`,
+        action: `Sent ${displayAsset(newEvent.assetsSent[0])}`,
       }
     }
     case 'transferFrom': {

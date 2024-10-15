@@ -77,7 +77,8 @@ export function formatNumber(numberString: string, precision?: number): string {
   const [integerPart, decimalPart] = numberString.split('.')
   const bigIntPart = BigInt(integerPart)
 
-  if (integerPart.length < 3 && !decimalPart) return numberString
+  if ((integerPart && integerPart.length < 3 && !decimalPart) || (decimalPart && decimalPart.startsWith('000')))
+    return numberString
 
   // Format the integer part manually
   let formattedIntegerPart = ''
@@ -247,27 +248,51 @@ export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedT
   const newEvent = defaultEvent(event)
   const nonDuplicateTransfers = filterDuplicateTransfers(event.transfers)
   const nonZeroTransfers = filterZeroTransfers(nonDuplicateTransfers)
+  const minted = newEvent.assetsMinted || []
+  const burned = newEvent.assetsBurned || []
 
   // single burn
-  if (newEvent.assetsBurned?.length === 1 && nonDuplicateTransfers.length <= 1) {
+  if (burned.length === 1 && nonDuplicateTransfers.length <= 2) {
     return {
       ...newEvent,
       type: 'burn',
-      action: 'Burned ' + displayAsset(newEvent.assetsBurned[0]),
+      action: 'Burned ' + displayAsset(burned[0]),
     }
   }
 
   // single mint
-  if (newEvent.assetsMinted?.length === 1 && nonDuplicateTransfers.length <= 1) {
+  if (minted.length === 1 && nonDuplicateTransfers.length <= 2) {
+    const price = newEvent.assetsSent.length === 1 ? newEvent.assetsSent[0] : undefined
     return {
       ...newEvent,
       type: 'mint',
-      action: 'Mint of ' + displayAsset(newEvent.assetsMinted[0]),
+      action: 'Minted ' + displayAsset(minted[0]) + (price ? ' for ' + displayAsset(price) : ''),
+    }
+  }
+
+  //batch mint
+  if (minted.length > 1) {
+    const price = newEvent.assetsSent.length === 1 ? newEvent.assetsSent[0] : undefined
+    const uniqueAssets = new Set(minted.map((asset) => asset.asset.address))
+
+    if (uniqueAssets.size === 1) {
+      const amount = minted.reduce((acc, asset) => acc + Number(asset.amount), 0)
+      return {
+        ...newEvent,
+        type: 'mint',
+        action:
+          'Minted ' +
+          displayAsset({
+            ...minted[0],
+            amount: amount.toString(),
+          }) +
+          (price ? ' for ' + displayAsset(price) : ''),
+      }
     }
   }
 
   // single transfer
-  if (nonZeroTransfers.length === 1) {
+  if (nonZeroTransfers.length === 1 && minted.length === 0 && burned.length === 0) {
     const fromAddress =
       nonZeroTransfers[0].from.toLowerCase() === event.fromAddress.toLowerCase() ||
       nonZeroTransfers[0].to.toLowerCase() === event.fromAddress.toLowerCase()

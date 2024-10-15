@@ -14,6 +14,7 @@ import {
 import { Effect, Layer } from 'effect'
 import prisma from './prisma'
 import { NFTRPCStrategyResolver } from '@3loop/transaction-decoder'
+import { LOCAL_FRAGMENTS } from './abis'
 
 export const AbiStoreLive = Layer.succeed(
   AbiStore,
@@ -57,8 +58,35 @@ export const AbiStoreLive = Layer.succeed(
             }),
         )
       }),
-    get: ({ address, chainID }) =>
+    get: ({ address, chainID, event, signature }) =>
       Effect.gen(function* () {
+        const match = signature ? LOCAL_FRAGMENTS[signature] : null
+        if (signature != null && match != null) {
+          return {
+            status: 'success',
+            result: {
+              type: 'func',
+              address,
+              signature: signature,
+              chainID: chainID,
+              abi: match.fragment,
+            },
+          }
+        }
+        const eventMatch = event ? LOCAL_FRAGMENTS[event] : null
+        if (event != null && eventMatch != null) {
+          return {
+            status: 'success',
+            result: {
+              type: 'event',
+              address: address,
+              event: event,
+              chainID: chainID,
+              abi: eventMatch.fragment,
+            },
+          }
+        }
+
         const normAddress = address.toLowerCase()
         const cached = yield* Effect.promise(() =>
           prisma.contractAbi.findFirst({

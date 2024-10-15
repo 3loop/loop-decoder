@@ -1,10 +1,10 @@
-import { assetsReceived, assetsSent, defaultEvent, displayAsset } from './std.js'
+import { assetsReceived, assetsSent, categorizedDefaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
-  const newEvent = defaultEvent(event)
+  const newEvent = categorizedDefaultEvent(event)
 
   switch (methodName) {
     case 'approve': {
@@ -36,21 +36,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
         }
       }
     }
-    case 'safeTransferFrom': {
-      const from = (event.methodCall?.params?.[0]?.value as string) || ''
-      const name = event.contractName
-      const tokenId = event.methodCall?.params?.[2]?.value
-
-      if (!name || !tokenId) break
-
-      return {
-        ...newEvent,
-        type: 'transfer-nft',
-        action: `Sent ${name} #${tokenId}`,
-        assetsSent: assetsSent(event.transfers, from),
-        assetsReceived: assetsReceived(event.transfers, from),
-      }
-    }
+    case 'safeTransferFrom':
     case 'transferFrom': {
       const from = (event.methodCall?.params?.[0]?.value as string) || ''
       const name = event.contractName
@@ -64,15 +50,6 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
         action: `Sent ${name} #${tokenId}`,
         assetsSent: assetsSent(event.transfers, from),
         assetsReceived: assetsReceived(event.transfers, from),
-      }
-    }
-    case 'mintTo': {
-      const name = event.contractName
-      const minted = newEvent.assetsMinted?.filter((a) => a.asset.name === name)
-      return {
-        ...newEvent,
-        type: 'mint',
-        action: `Mint of ${displayAsset(minted?.[0])}`,
       }
     }
   }
