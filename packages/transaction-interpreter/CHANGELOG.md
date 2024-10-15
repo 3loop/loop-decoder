@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.10.1
+
+### Patch Changes
+
+- b3db2e9: Fix default parsing of nft and token transfers
+
 ## 0.10.0
 
 ### Minor Changes
