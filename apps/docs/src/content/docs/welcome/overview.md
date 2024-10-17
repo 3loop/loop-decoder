@@ -11,6 +11,8 @@ Loop Decoder is a TypeScript library with minimal dependencies that transforms b
 - Minimal external dependencies - you only need an RPC; everything else can be fetched from your own storage.
 - Highly customizable - we don't force you to use a specific API or storage; instead, we provide data loaders.
 
+![Loop Decoder architecture](../../../assets/diagram.png)
+
 ### Transaction Decoder
 
 The Transaction Decoder package transforms raw transactions, including calldata, traces, and events, into a structured format with detailed information about all function calls and parameters. The decoded transaction includes the following:

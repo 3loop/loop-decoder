@@ -16,7 +16,7 @@ hero:
       icon: external
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components'
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components'
 
 <CardGrid stagger>
   <Card title="TypeScript" icon="seti:typescript">
@@ -31,4 +31,17 @@ import { Card, CardGrid } from '@astrojs/starlight/components'
   <Card title="Flexible Intepreters" icon="setting">
     Define any custom interpretation of EVM transactions.
   </Card>
+</CardGrid>
+
+<div style="text-align: center; padding-top: 3rem; padding-bottom: 3rem;">
+  <h2>Use cases</h2>
+</div>
+
+<CardGrid>
+  <LinkCard title="Push Notifications" href="https://github.com/3loop/example-push-notifications" />
+  <LinkCard title="Transaction History" href="/welcome/getting-started" />
+  <LinkCard title="Block Explorers" href="https://github.com/3loop/transaction-frame" />
+  <LinkCard title="On Chain Bots" href="/recipes/fc-bot" />
+  <LinkCard title="Custom Indexers" href="/welcome/getting-started" />
+  <LinkCard title="Analytics" href="https://3loop.io/" />
 </CardGrid>
