@@ -9,7 +9,8 @@ A library to transform any EVM transaction into a human-readable format. It cons
 - [Transaction decoder](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-decoder)
 - [Transaction interpreter](https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter)
 
-![Untitled-2023-11-18-1118](https://github.com/user-attachments/assets/be9db18e-5a74-48ca-8120-f7e888e084df)
+![Untitled-2023-11-18-1118](https://github.com/user-attachments/assets/09b04e89-0bb9-4b1e-a8ca-3307bd3bd0dc)
+
 
 ## Documentation
 
