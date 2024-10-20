@@ -31,7 +31,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
 
     return {
       ...newEvent,
-      action: 'Called ' + (action?.name ?? methodName) + ' from Safe Wallet',
+      action: `Called method '${action?.name ?? methodName}' from Safe Wallet`,
       assetsSent: assetsSent(event.transfers, safeAddress),
       assetsReceived: assetsReceived(event.transfers, safeAddress),
     }
