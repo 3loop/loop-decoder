@@ -19,6 +19,7 @@ Loop Decoder provides some strategies out of the box:
 
 - `ERC20RPCStrategyResolver` - resolves the contract metadata of an ERC20 token from the RPC
 - `NFTRPCStrategyResolver` - resolves the contract metadata of an NFT token (ERC721, ERC1155) from the RPC
+- `ProxyRPCStrategyResolver` - resolves the contract metadata of a Gnosis Safe proxy contract from the RPC
 
 ## ABI Strategies
 
