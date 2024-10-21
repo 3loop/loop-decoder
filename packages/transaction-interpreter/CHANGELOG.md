@@ -1,5 +1,13 @@
 # @3loop/transaction-interpreter
 
+## 0.10.2
+
+### Patch Changes
+
+- e47d781: Add basic interpretation for account abstaction transacitons by event
+- Updated dependencies [461e16a]
+  - @3loop/transaction-decoder@0.19.1
+
 ## 0.10.1
 
 ### Patch Changes
