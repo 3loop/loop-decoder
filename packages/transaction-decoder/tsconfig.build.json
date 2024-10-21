@@ -11,7 +11,8 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noEmit": true
   },
   "include": ["src"],
   "exclude": ["dist", "example", "node_modules"]
