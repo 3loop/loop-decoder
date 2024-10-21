@@ -1,6 +1,8 @@
 ---
 title: How to decode an Ethereum Transaction
 description: On this page you will provide a step-by-step guide on how to decode and interpret an Ethereum transaction using Loop Decoder.
+sidebar:
+  order: 1
 ---
 
 import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
@@ -9,7 +11,7 @@ import { Content as RpcProvider } from '../../components/rpc-provider.md'
 
 In this guide, we will go through the process of decoding an Ethereum transaction using Loop Decoder. For the simplicity of the example, we assume that that contract ABIs involved in the transaction are verified on Etherscan.
 
-We recomend to copy all snipepts to a typescript project and run it at the end of this guide.
+We recomend to copy all snipepts to a typescript project and run it at the end of this guide, or or you can copy the whole example from this gist: [Full Example Code](https://gist.github.com/anastasiarods/cb3547b1e215a325619269ad1efdfcde). Do not forget to replace the placeholder `YourApiKeyToken` with your own free Etherscan API key.
 
 ## Prerequisites
 
@@ -17,46 +19,18 @@ We recomend to copy all snipepts to a typescript project and run it at the end o
 
 Optionally, you can create a new project to follow along, or skip to [Required packages](#required-packages).
 
-1. Generate an empty project using npm:
+1. Install Bun:
+   First, make sure you have Bun installed on your system. If you haven't installed it yet, you can do so using npm:
+
+```bash
+npm install -g bun
+```
+
+1. Generate and initialize a new project:
 
 ```bash
 mkdir example-decode && cd example-decode
-npm init -y
-npm install typescript --save-dev
-```
-
-2. Initialize typescript:
-
-```bash
-npx tsc --init
-```
-
-3. Ensure that you have `strict` flag set to `true` in `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "strict": true
-  }
-}
-```
-
-4. Create a new file `index.ts` where you will add the code snipets from this guide.
-
-5. Add a new script to `package.json`:
-
-```json
-{
-  "scripts": {
-    "start": "tsc && node index.js"
-  }
-}
-```
-
-6. Run the example:
-
-```bash
-npm start
+bun init
 ```
 
 ### Required packages
@@ -64,7 +38,7 @@ npm start
 For this guide, you will need to have the following packages installed:
 
 ```bash
-npm install @3loop/transaction-decoder viem
+bun install @3loop/transaction-decoder viem
 ```
 
 ## Data Sources
@@ -81,7 +55,7 @@ We will start by creating a function which will return an object with PublicClie
 
 To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache. We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
 
-Create a cache for contract ABI:
+Create a cache for contract ABI and add your free Etherscan API key instead of the placeholder `YourApiKeyToken`:
 
 <MemoryAbiLoader />
 
@@ -122,4 +96,51 @@ async function main() {
 }
 
 main()
+```
+
+Run the script:
+
+```bash
+bun run index.ts
+```
+
+Expected output:
+
+```json
+{
+  "txHash": "0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7",
+  "txType": "contract interaction",
+  "fromAddress": "0xf89a3799b90593317e0a1eb74164fbc1755a297a",
+  "toAddress": "0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9",
+  "contractName": null,
+  "contractType": "OTHER",
+  "methodCall": {
+    "name": "repay",
+    "type": "function",
+    "signature": "repay(address,uint256,uint256,address)",
+    "params": [
+      {
+        "name": "asset",
+        "type": "address",
+        "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "value": "1238350000"
+      },
+      {
+        "name": "rateMode",
+        "type": "uint256",
+        "value": "2"
+      },
+      {
+        "name": "onBehalfOf",
+        "type": "address",
+        "value": "0xf89a3799b90593317E0a1Eb74164fbc1755A297A"
+      }
+    ]
+  }
+  // ...
+}
 ```

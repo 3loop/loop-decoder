@@ -6,7 +6,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
   const newEvent = defaultEvent(event)
   const hasSwap = event.traceCalls.some((call) => call.name === 'swap')
 
-  if (hasSwap) {
+  if (hasSwap && newEvent.assetsSent.length === 1 && newEvent.assetsReceived.length === 1) {
     const from = displayAsset(newEvent.assetsSent[0])
     const to = displayAsset(newEvent.assetsReceived[0])
 

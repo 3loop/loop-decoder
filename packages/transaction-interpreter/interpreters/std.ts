@@ -230,7 +230,7 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
 
   const newEvent = {
     type: 'unknown' as const,
-    action: 'Called method ' + event.methodCall.name,
+    action: "Called method '" + event.methodCall.name + "'",
     chain: event.chainID,
     txHash: event.txHash,
     user: { address: event.fromAddress, name: null },
