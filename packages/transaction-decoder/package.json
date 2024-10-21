@@ -4,6 +4,7 @@
   "description": "A library for decoding Ethereum transactions",
   "types": "dist/index.d.ts",
   "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "license": "GPL-3.0-only",
   "type": "module",
   "exports": {
@@ -12,15 +13,17 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./*": {
+    "./in-memory": {
       "import": {
-        "types": "./dist/*.d.ts",
-        "default": "./dist/*.js"
+        "types": "./dist/in-memory/index.d.ts",
+        "default": "./dist/in-memory/index.js"
       },
       "require": {
-        "types": "./dist/*.d.cts",
-        "default": "./dist/*.cjs"
-      }
+        "types": "./dist/in-memory/index.d.cts",
+        "default": "./dist/in-memory/index.cjs"
+      },
+      "types": "./dist/in-memory/index.d.ts",
+      "default": "./dist/in-memory/index.js"
     }
   },
   "scripts": {
@@ -56,6 +59,7 @@
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
     "eslint-config-prettier": "^8.10.0",
+    "glob": "^11.0.0",
     "prettier": "^2.8.8",
     "quickjs-emscripten": "^0.29.2",
     "ts-node": "^10.9.2",

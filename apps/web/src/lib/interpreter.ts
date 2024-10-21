@@ -5,10 +5,10 @@ import {
   QuickjsConfig,
   TransactionInterpreter,
   fallbackInterpreter,
+  getInterpreter,
 } from '@3loop/transaction-interpreter'
 import { Effect, Layer } from 'effect'
 import variant from '@jitl/quickjs-singlefile-browser-release-sync'
-import { getInterpreter } from '@3loop/transaction-interpreter'
 
 const config = Layer.succeed(QuickjsConfig, {
   variant: variant,
