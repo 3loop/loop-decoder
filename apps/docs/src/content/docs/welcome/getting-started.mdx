@@ -3,6 +3,19 @@ title: Getting Started
 description: Quick start guide on using the Loop Decoder
 ---
 
+import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
+import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
+import { Content as RpcProvider } from '../../components/rpc-provider.md'
+
+## Try Loop Decoder
+
+<div style="height: 600px;">
+  <iframe
+    style="width: 100%; height: 100%; border: 0;"
+    src="https://stackblitz.com/edit/vitejs-vite-hpenle?embed=1&file=src%2FApp.tsx"
+  ></iframe>
+</div>
+
 ### Requirements
 
 - TypeScript 5.x
@@ -22,99 +35,17 @@ To begin using the Loop Decoder, you need to create an instance of the LoopDecod
 
 1. `getPublicClient`: This function returns an object with [Viem](https://viem.sh/) `PublicClient` based on the chain ID.
 
-```ts
-import { createPublicClient, http } from 'viem'
-
-const getPublicClient = (chainId: number) => {
-  if (chainId === 1) {
-    return {
-      client: createPublicClient({
-        transport: http('https://rpc.ankr.com/eth'),
-      }),
-    }
-  }
-}
-```
+<RpcProvider />
 
 2. `contractMetaStore`: This object has two required properties, `get` and `set`, which return and cache contract meta-information. Optionally, you can provide a list of `strategies` that will resolve data when it is missing in the cache. See the `ContractData` type for the required properties of the contract meta-information.
 
-```ts
-import type { VanillaContractMetaStore } from '@3loop/transaction-decoder'
-
-const db = new Map()
-
-const contractMetaStore: VanillaContractMetaStore = {
-  strategies: [], // NOTE: We will cover stragies later
-  get: async ({ address, chainID }) => {
-    const key = `${address}-${chainID}`
-    if (db.has(key)) {
-      return {
-        status: 'success',
-        result: db.get(key),
-      }
-    }
-    return {
-      status: 'empty',
-      result: null,
-    }
-  },
-  set: async ({ address, chainID }, result) => {
-    const key = `${address}-${chainID}`
-
-    if (result.status === 'success') {
-      db.set(key, result.result)
-    }
-  },
-}
-```
+<MemoryContractLoader />
 
 1. `abiStore`: Similarly, this object has two required properties, `get` and `set`, which return and cache the contract or fragment ABI based on the chain ID, address, function, or event signature. Additionally, it includes strategies to resolve the data from third parties when it is missing in the cache.
 
 In the following example we will cache all types of ABIs into the same Map.
 
-```ts
-import type { VanillaAbiStore } from '@3loop/transaction-decoder'
-
-const db = new Map()
-
-const abiStore: VanillaAbiStore = {
-  strategies: [], // NOTE: We will cover stragies later
-  get: async ({ address, event, signature }) => {
-    if (db.has(address)) {
-      return {
-        status: 'success',
-        result: db.get(address),
-      }
-    } else if (event != null && db.has(event)) {
-      return {
-        status: 'success',
-        result: db.get(event),
-      }
-    } else if (signature != null && db.has(signature)) {
-      return {
-        status: 'success',
-        result: db.get(signature),
-      }
-    }
-
-    return {
-      status: 'empty',
-      result: null,
-    }
-  },
-  set: async (_key, value) => {
-    if (value.status === 'success') {
-      if (value.result.type === 'address') {
-        db.set(value.result.address, value.result)
-      } else if (value.result.type === 'event') {
-        db.set(value.result.event, value.result)
-      } else if (value.result.type === 'func') {
-        db.set(value.result.signature, value.result)
-      }
-    }
-  },
-}
-```
+<MemoryAbiLoader />
 
 Finally, you can create a new instance of the LoopDecoder class:
 
