@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.19.1
+
+### Patch Changes
+
+- 461e16a: Remove traverse library from dependecies
+
 ## 0.19.0
 
 ### Minor Changes
