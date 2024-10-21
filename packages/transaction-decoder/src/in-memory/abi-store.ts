@@ -27,9 +27,9 @@ export const InMemoryAbiStoreLive = Layer.effect(
     const etherscanStrategy =
       etherscanEndpoint && etherscanApiKey
         ? EtherscanStrategyResolver({
-          apikey: etherscanApiKey,
-          endpoint: etherscanEndpoint,
-        })
+            apikey: etherscanApiKey,
+            endpoint: etherscanEndpoint,
+          })
         : undefined
 
     return AbiStore.of({
