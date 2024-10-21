@@ -1,6 +1,6 @@
 import { Address, getAddress, isAddress, TransactionReceipt } from 'viem'
-import traverse from 'traverse'
 import type { DecodeResult, Interaction } from '../types.js'
+import traverse from '../helpers/traverse.js'
 
 export const collectAllAddresses = ({
   interactions,
@@ -23,8 +23,8 @@ export const collectAllAddresses = ({
 
   for (const interaction of interactions) {
     addresses.add(interaction.contractAddress)
-    traverse(interaction.event).forEach(function (value: string) {
-      if (this.isLeaf && isAddress(value)) {
+    traverse(interaction.event).forEach((value: string, _path: string[], isLeaf: boolean) => {
+      if (isLeaf && isAddress(value)) {
         addresses.add(value)
       }
     })
