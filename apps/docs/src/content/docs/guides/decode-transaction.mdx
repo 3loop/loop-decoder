@@ -5,8 +5,6 @@ sidebar:
   order: 1
 ---
 
-import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
-import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
 import { Content as RpcProvider } from '../../components/rpc-provider.md'
 
 In this guide, we will go through the process of decoding an Ethereum transaction using Loop Decoder. For the simplicity of the example, we assume that that contract ABIs involved in the transaction are verified on Etherscan.
@@ -53,27 +51,23 @@ We will start by creating a function which will return an object with PublicClie
 
 ### ABI loader
 
-To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache. We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
-
-Create a cache for contract ABI and add your free Etherscan API key instead of the placeholder `YourApiKeyToken`:
-
-<MemoryAbiLoader />
+To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache.
+We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
 
 ### Contract Metadata loader
 
-Create an in-memory cache for contract meta-information. Using `ERC20RPCStrategyResolver` we will automatically retrieve token meta information from the contract such as token name, decimals, symbol, etc.
-
-<MemoryContractLoader />
+Create an in-memory cache for contract meta-information. We will automatically retrieve ERC20, ERC721, and ERC1155 token meta information from the contract such as token name, decimals, symbol, etc.
 
 Finally, you can create a new instance of the LoopDecoder class:
 
 ```ts
 import { TransactionDecoder } from '@3loop/transaction-decoder'
+import { InMemoryAbiStoreLive, InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
 
 const decoder = new TransactionDecoder({
   getPublicClient: getPublicClient,
-  abiStore: abiStore,
-  contractMetaStore: contractMetaStore,
+  abiStore: InMemoryAbiStoreLive,
+  contractMetaStore: InMemoryContractMetaStoreLive,
 })
 ```
 
