@@ -13,8 +13,10 @@ import type { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 
 export interface TransactionDecoderOptions {
   getPublicClient: (chainID: number) => PublicClientObject | undefined
-  abiStore: VanillaAbiStore
-  contractMetaStore: VanillaContractMetaStore
+  abiStore: VanillaAbiStore | Layer.Layer<EffectAbiStore<AbiParams, ContractAbiResult>>
+  contractMetaStore:
+    | VanillaContractMetaStore
+    | Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>>
   logLevel?: LogLevel.Literal
 }
 
@@ -58,25 +60,37 @@ export class TransactionDecoder {
       },
     })
 
-    const AbiStoreLive = Layer.succeed(
-      EffectAbiStore,
-      EffectAbiStore.of({
-        strategies: { default: abiStore.strategies ?? [] },
-        get: (key) => Effect.promise(() => abiStore.get(key)),
-        set: (key, val) => Effect.promise(() => abiStore.set(key, val)),
-      }),
-    )
+    let AbiStoreLive: Layer.Layer<EffectAbiStore<AbiParams, ContractAbiResult>>
 
-    const contractMetaStrategies = contractMetaStore.strategies?.map((strategy) => strategy(PublicClientLive))
+    if (Layer.isLayer(abiStore)) {
+      AbiStoreLive = abiStore as Layer.Layer<EffectAbiStore<AbiParams, ContractAbiResult>>
+    } else {
+      const store = abiStore as VanillaAbiStore
+      AbiStoreLive = Layer.succeed(
+        EffectAbiStore,
+        EffectAbiStore.of({
+          strategies: { default: store.strategies ?? [] },
+          get: (key) => Effect.promise(() => store.get(key)),
+          set: (key, val) => Effect.promise(() => store.set(key, val)),
+        }),
+      )
+    }
 
-    const MetaStoreLive = Layer.succeed(
-      EffectContractMetaStore,
-      EffectContractMetaStore.of({
-        strategies: { default: contractMetaStrategies ?? [] },
-        get: (key) => Effect.promise(() => contractMetaStore.get(key)),
-        set: (key, val) => Effect.promise(() => contractMetaStore.set(key, val)),
-      }),
-    )
+    let MetaStoreLive: Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>>
+
+    if (Layer.isLayer(contractMetaStore)) {
+      MetaStoreLive = contractMetaStore as Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>>
+    } else {
+      const store = contractMetaStore as VanillaContractMetaStore
+      MetaStoreLive = Layer.succeed(
+        EffectContractMetaStore,
+        EffectContractMetaStore.of({
+          strategies: { default: (store.strategies ?? [])?.map((strategy) => strategy(PublicClientLive)) },
+          get: (key) => Effect.promise(() => store.get(key)),
+          set: (key, val) => Effect.promise(() => store.set(key, val)),
+        }),
+      )
+    }
 
     const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
     const MainLayer = Layer.provideMerge(Layer.succeed(PublicClient, PublicClientLive), LoadersLayer).pipe(
