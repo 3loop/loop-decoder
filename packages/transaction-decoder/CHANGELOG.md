@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.19.3
+
+### Patch Changes
+
+- b1afc80: Fix in-memory meta store was missing access to PubliClient for RPC requests
+
 ## 0.19.2
 
 ### Patch Changes
