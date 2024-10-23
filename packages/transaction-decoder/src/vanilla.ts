@@ -16,7 +16,7 @@ export interface TransactionDecoderOptions {
   abiStore: VanillaAbiStore | Layer.Layer<EffectAbiStore<AbiParams, ContractAbiResult>>
   contractMetaStore:
     | VanillaContractMetaStore
-    | Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>>
+    | Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>, never, PublicClient>
   logLevel?: LogLevel.Literal
 }
 
@@ -76,7 +76,7 @@ export class TransactionDecoder {
       )
     }
 
-    let MetaStoreLive: Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>>
+    let MetaStoreLive: Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>, never, PublicClient>
 
     if (Layer.isLayer(contractMetaStore)) {
       MetaStoreLive = contractMetaStore as Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>>
@@ -93,7 +93,7 @@ export class TransactionDecoder {
     }
 
     const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
-    const MainLayer = Layer.provideMerge(Layer.succeed(PublicClient, PublicClientLive), LoadersLayer).pipe(
+    const MainLayer = LoadersLayer.pipe(Layer.provideMerge(Layer.succeed(PublicClient, PublicClientLive))).pipe(
       Layer.provide(Logger.minimumLogLevel(LogLevel.fromLiteral(logLevel))),
     )
 

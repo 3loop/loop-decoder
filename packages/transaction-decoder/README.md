@@ -1,7 +1,9 @@
 # Transaction Decoder
 
 ## Getting Started
+
 To get started, install the package from npm, along with its peer dependencies:
+
 ```
 $ npm i @3loop/transaction-decoder
 ```
