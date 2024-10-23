@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.19.2
+
+### Patch Changes
+
+- f8dbcbd: Add default in-memory stores for contract and abi
+
 ## 0.19.1
 
 ### Patch Changes
