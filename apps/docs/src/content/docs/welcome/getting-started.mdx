@@ -26,36 +26,49 @@ import { Content as RpcProvider } from '../../components/rpc-provider.md'
 To get started, install the package from npm, along with its peer dependencies:
 
 ```sh
-npm i @3loop/transaction-decoder
+npm i @3loop/transaction-decoder viem effect
 ```
 
 ### Quick Start
 
 To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three data loaders:
 
+- RPC Provider
+- ABI Loader
+- Contract Meta Information Loader
+
+Loop Decoder has default in-memory implementations for ABI and contract meta-information loaders: `InMemoryAbiStoreLive` and `InMemoryContractMetaStoreLive`. If you need more customization for a storage, see our guide on [How To Decode Transaction](/guides/decode-transaction/).
+
 1. `getPublicClient`: This function returns an object with [Viem](https://viem.sh/) `PublicClient` based on the chain ID.
 
 <RpcProvider />
 
-2. `contractMetaStore`: This object has two required properties, `get` and `set`, which return and cache contract meta-information. Optionally, you can provide a list of `strategies` that will resolve data when it is missing in the cache. See the `ContractData` type for the required properties of the contract meta-information.
+2. `abiStore`: To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache.
+   We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
 
-<MemoryContractLoader />
-
-1. `abiStore`: Similarly, this object has two required properties, `get` and `set`, which return and cache the contract or fragment ABI based on the chain ID, address, function, or event signature. Additionally, it includes strategies to resolve the data from third parties when it is missing in the cache.
-
-In the following example we will cache all types of ABIs into the same Map.
-
-<MemoryAbiLoader />
+3. `contractMetaStore`: Create an in-memory cache for contract meta-information. We will automatically retrieve ERC20, ERC721, and ERC1155 token meta information from the contract such as token name, decimals, symbol, etc.
 
 Finally, you can create a new instance of the LoopDecoder class:
 
 ```ts
 import { TransactionDecoder } from '@3loop/transaction-decoder'
+import { InMemoryAbiStoreLive, InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
+import { ConfigProvider, Layer } from 'effect'
 
-const decoded = new TransactionDecoder({
+// Create a config for the ABI loader
+const ABILoaderConfig = ConfigProvider.fromMap(
+  new Map([
+    ['ETHERSCAN_API_KEY', 'YourApiKeyToken'],
+    ['ETHERSCAN_ENDPOINT', 'https://api.etherscan.io/api'],
+  ]),
+)
+
+const ConfigLayer = Layer.setConfigProvider(ABILoaderConfig)
+
+const decoder = new TransactionDecoder({
   getPublicClient: getPublicClient,
-  abiStore: abiStore,
-  contractMetaStore: contractMetaStore,
+  abiStore: InMemoryAbiStoreLive.pipe(Layer.provide(ConfigLayer)),
+  contractMetaStore: InMemoryContractMetaStoreLive.pipe,
 })
 ```
 
