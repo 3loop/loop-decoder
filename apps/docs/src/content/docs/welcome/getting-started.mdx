@@ -39,7 +39,7 @@ To begin using the Loop Decoder, you need to create an instance of the LoopDecod
 
 Loop Decoder has default in-memory implementations for ABI and contract meta-information loaders: `InMemoryAbiStoreLive` and `InMemoryContractMetaStoreLive`. If you need more customization for a storage, see our guide on [How To Decode Transaction](/guides/decode-transaction/).
 
-1. `getPublicClient`: This function returns an object with [Viem](https://viem.sh/) `PublicClient` based on the chain ID.
+1. `getPublicClient`: This function returns an object with [Viem](https://viem.sh/) `PublicClient` based on the chain ID. For detailed configuration options and trace API settings, see the [RPC Provider](/reference/rpc-provider/) documentation.
 
 <RpcProvider />
 
@@ -55,13 +55,8 @@ import { TransactionDecoder } from '@3loop/transaction-decoder'
 import { InMemoryAbiStoreLive, InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
 import { ConfigProvider, Layer } from 'effect'
 
-// Create a config for the ABI loader
-const ABILoaderConfig = ConfigProvider.fromMap(
-  new Map([
-    ['ETHERSCAN_API_KEY', 'YourApiKeyToken'],
-    ['ETHERSCAN_ENDPOINT', 'https://api.etherscan.io/api'],
-  ]),
-)
+// Create a config for the ABI loader, provide Etherscan V2 API key
+const ABILoaderConfig = ConfigProvider.fromMap(new Map([['ETHERSCAN_API_KEY', 'YourApiKeyToken']]))
 
 const ConfigLayer = Layer.setConfigProvider(ABILoaderConfig)
 

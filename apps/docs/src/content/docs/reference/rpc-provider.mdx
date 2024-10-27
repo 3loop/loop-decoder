@@ -1,0 +1,34 @@
+---
+title: RPC Provider
+description: Configuration options for the RPC Provider
+sidebar:
+  order: 4
+---
+
+import { Content as RpcProvider } from '../../components/rpc-provider.md'
+
+Loop Decoder requires an RPC provider to fetch transaction data. To configure RPC providers, implement a `getPublicClient` function that returns a `PublicClientObject` based on the chain ID.
+
+<RpcProvider />
+
+## PublicClientObject Structure
+
+The `PublicClientObject` consists of two properties:
+
+### client
+
+- An instance of Viem's `PublicClient`
+- See the [Viem documentation](https://viem.sh/docs/clients/public.html) for more details
+
+### config
+
+An optional configuration object with the following properties:
+
+- `traceAPI`: Specifies the tracing API to use (default: `parity`)
+  - `parity` - for Parity/OpenEthereum RPC nodes
+  - `geth` - for Geth RPC nodes
+  - `none` - when tracing is not supported
+
+:::tip
+If you do not need traces in the decoded transaction or your RPC node does not support tracing, make sure to specify `none` in the `config.traceAPI` property.
+:::
