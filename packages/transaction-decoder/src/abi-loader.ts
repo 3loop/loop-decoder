@@ -1,6 +1,8 @@
 import { Context, Effect, Either, RequestResolver, Request, Array, pipe, Data } from 'effect'
 import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
-import { Abi } from 'viem'
+import { Abi, toEventSelector, toFunctionSelector } from 'viem'
+import { ERC20 } from './decoding/constants.js'
+import { formatAbiItem } from 'viem/utils'
 
 const STRATEGY_TIMEOUT = 5000
 export interface AbiParams {
@@ -72,6 +74,47 @@ const AbiLoader = Request.tagged<AbiLoader>('AbiLoader')
 function makeRequestKey(key: AbiLoader) {
   return `abi::${key.chainID}:${key.address}:${key.event}:${key.signature}`
 }
+
+/**
+ * For fragments that are part of stadard contracts, we store them locally
+ * to avoid making requests to APIs, and to speed up the decoding process.
+ */
+const getLocalFragments = (requests: Array<AbiLoader>) =>
+  Effect.sync(() => {
+    const results = requests.map((request): ContractAbiResult => {
+      const abiItem = ERC20.find(
+        (x) =>
+          (x.type === 'event' && request.event === toEventSelector(formatAbiItem(x))) ||
+          (x.type === 'function' && toFunctionSelector(formatAbiItem(x)) === request.signature),
+      )
+
+      if (request.signature && abiItem) {
+        return {
+          status: 'success',
+          result: {
+            type: 'func',
+            abi: JSON.stringify(abiItem),
+            signature: request.signature,
+          },
+        }
+      }
+
+      if (request.event && abiItem) {
+        return {
+          status: 'success',
+          result: {
+            type: 'event',
+            abi: JSON.stringify(abiItem),
+            event: request.event,
+          },
+        }
+      }
+
+      return { status: 'empty', result: null }
+    })
+
+    return results
+  })
 
 const getMany = (requests: Array<AbiParams>) =>
   Effect.gen(function* () {
@@ -162,8 +205,9 @@ const AbiLoaderRequestResolver: Effect.Effect<
     const requestGroups = Array.groupBy(requests, makeRequestKey)
     const uniqueRequests = Object.values(requestGroups).map((group) => group[0])
 
-    const [remaining, cachedResults] = yield* pipe(
-      getMany(uniqueRequests),
+    // Resolve the common fragments from local hardcoded data
+    const [remote, localResults] = yield* pipe(
+      getLocalFragments(uniqueRequests),
       Effect.map(
         Array.partitionMap((resp, i) => {
           return resp.status === 'empty'
@@ -174,12 +218,23 @@ const AbiLoaderRequestResolver: Effect.Effect<
       Effect.orElseSucceed(() => [uniqueRequests, []] as const),
     )
 
+    const [remaining, cachedResults] = yield* pipe(
+      getMany(remote),
+      Effect.map(
+        Array.partitionMap((resp, i) => {
+          return resp.status === 'empty' ? Either.left(remote[i]) : Either.right([remote[i], resp.result] as const)
+        }),
+      ),
+      Effect.orElseSucceed(() => [remote, []] as const),
+    )
+
     //  Resolve ABI from the store
     yield* Effect.forEach(
-      cachedResults,
+      Array.appendAll(localResults, cachedResults),
       ([request, abi]) => {
         const group = requestGroups[makeRequestKey(request)]
         const bestMatch = getBestMatch(abi)
+
         const result = bestMatch ? Effect.succeed(bestMatch) : Effect.fail(new MissingABIError(request))
 
         return Effect.forEach(group, (req) => Request.completeEffect(req, result), { discard: true })

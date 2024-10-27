@@ -19,16 +19,12 @@ export class ResolveStrategyABIError {
 interface FunctionFragmentABI {
   type: 'func'
   abi: string
-  address: string
-  chainID: number
   signature: string
 }
 
 interface EventFragmentABI {
   type: 'event'
   abi: string
-  address: string
-  chainID: number
   event: string
 }
 
