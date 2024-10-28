@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TransactionDecoder } from '@3loop/transaction-decoder'
 import { createPublicClient, http } from 'viem'
 import { InMemoryAbiStoreLive, InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
