@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { TransactionDecoder } from '@3loop/transaction-decoder'
 import { createPublicClient, http } from 'viem'
 import { InMemoryAbiStoreLive, InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
@@ -11,10 +10,12 @@ import { ConfigProvider, Layer } from 'effect'
 
 // Create a public client for the Ethereum Mainnet network
 const getPublicClient = (chainId: number) => {
-  return {
-    client: createPublicClient({
-      transport: http('https://rpc.ankr.com/eth'),
-    }),
+  if (chainId === 1) {
+    return {
+      client: createPublicClient({
+        transport: http('https://rpc.ankr.com/eth'),
+      }),
+    }
   }
 }
 
