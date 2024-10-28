@@ -5,6 +5,7 @@ import {
   AbiStore,
   SourcifyStrategyResolver,
   OpenchainStrategyResolver,
+  EtherscanV2StrategyResolver,
 } from '../effect.js'
 import { Config, Effect, Layer } from 'effect'
 
@@ -18,17 +19,17 @@ export const InMemoryAbiStoreLive = Layer.effect(
         return Effect.succeed(undefined)
       }),
     )
-    const etherscanEndpoint = yield* Config.string('ETHERSCAN_ENDPOINT').pipe(
-      Effect.catchTag('ConfigError', () => {
-        return Effect.succeed(undefined)
-      }),
-    )
+    const etherscanEndpoint = yield* Config.string('ETHERSCAN_ENDPOINT').pipe(Effect.orElseSucceed(() => undefined))
 
     const etherscanStrategy =
       etherscanEndpoint && etherscanApiKey
         ? EtherscanStrategyResolver({
             apikey: etherscanApiKey,
             endpoint: etherscanEndpoint,
+          })
+        : etherscanApiKey
+        ? EtherscanV2StrategyResolver({
+            apikey: etherscanApiKey,
           })
         : undefined
 
