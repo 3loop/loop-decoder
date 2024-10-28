@@ -61,25 +61,6 @@ importers:
         specifier: ^2.3.4
         version: 2.3.4(eslint@8.57.0)
 
-  apps/quick-start:
-    dependencies:
-      '@3loop/transaction-decoder':
-        specifier: 0.19.3
-        version: 0.19.3(@effect/schema@0.66.16(effect@3.10.4)(fast-check@3.22.0))(effect@3.10.4)(quickjs-emscripten@0.29.2)(viem@2.21.35(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@6.0.4)(zod@3.23.8))
-      effect:
-        specifier: ^3.10.4
-        version: 3.10.4
-      viem:
-        specifier: ^2.21.35
-        version: 2.21.35(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@6.0.4)(zod@3.23.8)
-    devDependencies:
-      typescript:
-        specifier: ~5.6.2
-        version: 5.6.3
-      vite:
-        specifier: ^5.4.9
-        version: 5.4.10(@types/node@20.16.3)
-
   apps/web:
     dependencies:
       '@3loop/transaction-decoder':
@@ -374,20 +355,8 @@ importers:
 
 packages:
 
-  '@3loop/transaction-decoder@0.19.3':
-    resolution: {integrity: sha512-a7q1Ob4vFmyvINt5GzsuedokwaBVZiWPWzxkuJtxEeydRyeeXeoe3uIClCtGN9EtVuXxctiRRs843/5zpOdahA==}
-    engines: {node: '>=18.16'}
-    peerDependencies:
-      '@effect/schema': ^0.66.8
-      effect: ^3.4.2
-      quickjs-emscripten: ^0.29.1
-      viem: ^2.7.22
-
   '@adraffy/ens-normalize@1.10.0':
     resolution: {integrity: sha512-nA9XHtlAkYfJxY7bce8DcN7eKxWWCWkU+1GR9d+U6MbNpfwQp8TI7vqOsBsMcHoT4mBu2kypKoSKnghEzOOq5Q==}
-
-  '@adraffy/ens-normalize@1.11.0':
-    resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -1554,17 +1523,9 @@ packages:
   '@noble/curves@1.4.0':
     resolution: {integrity: sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==}
 
-  '@noble/curves@1.6.0':
-    resolution: {integrity: sha512-TlaHRXDehJuRNR9TfZDNQ45mMEd5dwUwmicsafcIX4SsNiqnCHKjE/1alYPd/lDRVhxdhUAlv8uEhMCI5zjIJQ==}
-    engines: {node: ^14.21.3 || >=16}
-
   '@noble/hashes@1.4.0':
     resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
     engines: {node: '>= 16'}
-
-  '@noble/hashes@1.5.0':
-    resolution: {integrity: sha512-1j6kQFb7QRru7eKN3ZDvRcP13rugwdxZqCjbiAVZfIJwgj2A65UmT4TgARXGlXgnRkORLTDTrO19ZErt7+QXgA==}
-    engines: {node: ^14.21.3 || >=16}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2104,20 +2065,11 @@ packages:
   '@scure/base@1.1.7':
     resolution: {integrity: sha512-PPNYBslrLNNUQ/Yad37MHYsNQtK67EhWb6WtSvNLLPo7SdVZgkUjD6Dg+5On7zNwmskf8OX7I7Nx5oN+MIWE0g==}
 
-  '@scure/base@1.1.9':
-    resolution: {integrity: sha512-8YKhl8GHiNI/pU2VMaofa2Tor7PJRAjwQLBBuilkJ9L5+13yVbC7JO/wS7piioAvPSwR3JKM1IJ/u4xQzbcXKg==}
-
   '@scure/bip32@1.4.0':
     resolution: {integrity: sha512-sVUpc0Vq3tXCkDGYVWGIZTRfnvu8LoTDaev7vbwh0omSvVORONr960MQWdKqJDCReIEmTj3PAr73O3aoxz7OPg==}
 
-  '@scure/bip32@1.5.0':
-    resolution: {integrity: sha512-8EnFYkqEQdnkuGBVpCzKxyIwDCBLDVj3oiX0EKUFre/tOjL/Hqba1D6n/8RcmaQy4f95qQFrO2A8Sr6ybh4NRw==}
-
   '@scure/bip39@1.3.0':
     resolution: {integrity: sha512-disdg7gHuTDZtY+ZdkmLpPCk7fxZSu3gBiEGuoC1XYxv9cGx3Z6cpTggCgW6odSOOIXCiDjuGejW+aJKCY/pIQ==}
-
-  '@scure/bip39@1.4.0':
-    resolution: {integrity: sha512-BEEm6p8IueV/ZTfQLp/0vhw4NPnT9oWf5+28nvmeUICjP99f4vr2d+qc7AVGDDtwRep6ifR43Yed9ERVmiITzw==}
 
   '@shikijs/core@1.16.1':
     resolution: {integrity: sha512-aI0hBtw+a6KsJp2jcD4YuQqKpeCbURMZbhHVozDknJpm+KJqeMRkEnfBC8BaKE/5XC+uofPgCLsa/TkTk0Ba0w==}
@@ -2475,17 +2427,6 @@ packages:
 
   abitype@1.0.5:
     resolution: {integrity: sha512-YzDhti7cjlfaBhHutMaboYB21Ha3rXR9QTkNJFzYC4kC8YclaiwPBBBJY8ejFdu2wnJeZCVZSMlQJ7fi8S6hsw==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3 >=3.22.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-
-  abitype@1.0.6:
-    resolution: {integrity: sha512-MMSqYh4+C/aVqI2RQaWqbvI4Kxo5cQV40WQ4QFtDnNzCkqChm8MuENhElmynZlO0qUy/ObkEUaXtKqYnx1Kp3A==}
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3 >=3.22.0
@@ -3119,9 +3060,6 @@ packages:
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
-
-  effect@3.10.4:
-    resolution: {integrity: sha512-D7Mryq8jylT0fIGrgXEn2TublO/BhduRwzlqV5z1l/QFY6grs7UOyyomlAOFMK9ArSYiLgrOSMQ/Cr/cIOeU2Q==}
 
   effect@3.7.0:
     resolution: {integrity: sha512-TXrb4SHTHrij396NfvGgpOD/5Sh503LtN2AeskkB7YO6Oe1tWSekk8dcrj3AWbMDOJ/fXOvcf6HD+Svus2zIeA==}
@@ -4173,11 +4111,6 @@ packages:
 
   isows@1.0.4:
     resolution: {integrity: sha512-hEzjY+x9u9hPmBom9IIAqdJCwNLax+xrPb51vEPpERoFlIxgmZcHzsT5jKG06nvInKOBGvReAVz80Umed5CczQ==}
-    peerDependencies:
-      ws: '*'
-
-  isows@1.0.6:
-    resolution: {integrity: sha512-lPHCayd40oW98/I0uvgaHKWCSvkzY27LjWLbtzOm64yQ+G3Q5npjjbdppU65iZXkK1Zt+kH9pfegli0AYfwYYw==}
     peerDependencies:
       ws: '*'
 
@@ -6245,14 +6178,6 @@ packages:
       typescript:
         optional: true
 
-  viem@2.21.35:
-    resolution: {integrity: sha512-f3EFc5JILeA9veuNymUN8HG/nKP9ykC0NCgwFrZWuxcCc822GaP0IEnkRBsHGqmjwbz//FxJFmvtx7TBcdVs0A==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   vite-node@0.34.2:
     resolution: {integrity: sha512-JtW249Zm3FB+F7pQfH56uWSdlltCo1IOkZW5oHBzeQo0iX4jtC7o1t9aILMGd9kVekXBP2lfJBEQt9rBh07ebA==}
     engines: {node: '>=v14.18.0'}
@@ -6286,37 +6211,6 @@ packages:
       lightningcss:
         optional: true
       sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-
-  vite@5.4.10:
-    resolution: {integrity: sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==}
-    engines: {node: ^18.0.0 || >=20.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || >=20.0.0
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      sass-embedded: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
         optional: true
       stylus:
         optional: true
@@ -6517,9 +6411,6 @@ packages:
   web-namespaces@2.0.1:
     resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
 
-  webauthn-p256@0.0.10:
-    resolution: {integrity: sha512-EeYD+gmIT80YkSIDb2iWq0lq2zbHo1CxHlQTeJ+KkCILWpVy3zASH3ByD4bopzfk0uCwXxLqKGLqp2W4O28VFA==}
-
   webauthn-p256@0.0.5:
     resolution: {integrity: sha512-drMGNWKdaixZNobeORVIqq7k5DsRC9FnG201K2QjeOoQLmtSDaSsVZdkg6n5jUALJKcAG++zBPJXmv6hy0nWFg==}
 
@@ -6707,16 +6598,7 @@ packages:
 
 snapshots:
 
-  '@3loop/transaction-decoder@0.19.3(@effect/schema@0.66.16(effect@3.10.4)(fast-check@3.22.0))(effect@3.10.4)(quickjs-emscripten@0.29.2)(viem@2.21.35(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@6.0.4)(zod@3.23.8))':
-    dependencies:
-      '@effect/schema': 0.66.16(effect@3.10.4)(fast-check@3.22.0)
-      effect: 3.10.4
-      quickjs-emscripten: 0.29.2
-      viem: 2.21.35(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@6.0.4)(zod@3.23.8)
-
   '@adraffy/ens-normalize@1.10.0': {}
-
-  '@adraffy/ens-normalize@1.11.0': {}
 
   '@alloc/quick-lru@5.2.0': {}
 
@@ -7222,11 +7104,6 @@ snapshots:
       '@jridgewell/trace-mapping': 0.3.9
 
   '@ctrl/tinycolor@3.6.1': {}
-
-  '@effect/schema@0.66.16(effect@3.10.4)(fast-check@3.22.0)':
-    dependencies:
-      effect: 3.10.4
-      fast-check: 3.22.0
 
   '@effect/schema@0.66.16(effect@3.7.0)(fast-check@3.22.0)':
     dependencies:
@@ -7857,13 +7734,7 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.4.0
 
-  '@noble/curves@1.6.0':
-    dependencies:
-      '@noble/hashes': 1.5.0
-
   '@noble/hashes@1.4.0': {}
-
-  '@noble/hashes@1.5.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -8345,29 +8216,16 @@ snapshots:
 
   '@scure/base@1.1.7': {}
 
-  '@scure/base@1.1.9': {}
-
   '@scure/bip32@1.4.0':
     dependencies:
       '@noble/curves': 1.4.0
       '@noble/hashes': 1.4.0
       '@scure/base': 1.1.7
 
-  '@scure/bip32@1.5.0':
-    dependencies:
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
-      '@scure/base': 1.1.7
-
   '@scure/bip39@1.3.0':
     dependencies:
       '@noble/hashes': 1.4.0
       '@scure/base': 1.1.7
-
-  '@scure/bip39@1.4.0':
-    dependencies:
-      '@noble/hashes': 1.5.0
-      '@scure/base': 1.1.9
 
   '@shikijs/core@1.16.1':
     dependencies:
@@ -8867,11 +8725,6 @@ snapshots:
   abitype@1.0.5(typescript@5.1.3)(zod@3.23.8):
     optionalDependencies:
       typescript: 5.1.3
-      zod: 3.23.8
-
-  abitype@1.0.6(typescript@5.6.3)(zod@3.23.8):
-    optionalDependencies:
-      typescript: 5.6.3
       zod: 3.23.8
 
   acorn-jsx@5.3.2(acorn@8.12.1):
@@ -9588,10 +9441,6 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@3.10.4:
-    dependencies:
-      fast-check: 3.22.0
-
   effect@3.7.0: {}
 
   electron-to-chromium@1.5.14: {}
@@ -9854,7 +9703,7 @@ snapshots:
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
@@ -9902,7 +9751,7 @@ snapshots:
       is-bun-module: 1.1.0
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
@@ -9989,7 +9838,7 @@ snapshots:
       eslint: 8.57.0
       ignore: 5.2.4
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -11086,10 +10935,6 @@ snapshots:
   isows@1.0.4(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)):
     dependencies:
       ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
-
-  isows@1.0.6(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)):
-    dependencies:
-      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
 
   istanbul-lib-coverage@3.2.2: {}
 
@@ -13920,24 +13765,6 @@ snapshots:
       - utf-8-validate
       - zod
 
-  viem@2.21.35(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@6.0.4)(zod@3.23.8):
-    dependencies:
-      '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
-      '@scure/bip32': 1.5.0
-      '@scure/bip39': 1.4.0
-      abitype: 1.0.6(typescript@5.6.3)(zod@3.23.8)
-      isows: 1.0.6(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
-      webauthn-p256: 0.0.10
-      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
-    optionalDependencies:
-      typescript: 5.6.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-      - zod
-
   vite-node@0.34.2(@types/node@20.16.3):
     dependencies:
       cac: 6.7.14
@@ -13972,15 +13799,6 @@ snapshots:
       esbuild: 0.18.20
       postcss: 8.4.29
       rollup: 3.29.4
-    optionalDependencies:
-      '@types/node': 20.16.3
-      fsevents: 2.3.3
-
-  vite@5.4.10(@types/node@20.16.3):
-    dependencies:
-      esbuild: 0.21.5
-      postcss: 8.4.44
-      rollup: 4.21.2
     optionalDependencies:
       '@types/node': 20.16.3
       fsevents: 2.3.3
@@ -14157,11 +13975,6 @@ snapshots:
       defaults: 1.0.4
 
   web-namespaces@2.0.1: {}
-
-  webauthn-p256@0.0.10:
-    dependencies:
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
 
   webauthn-p256@0.0.5:
     dependencies:
