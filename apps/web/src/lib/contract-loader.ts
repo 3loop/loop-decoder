@@ -2,7 +2,7 @@ import {
   ContractData,
   AbiStore,
   ContractMetaStore,
-  EtherscanStrategyResolver,
+  EtherscanV2StrategyResolver,
   SourcifyStrategyResolver,
   FourByteStrategyResolver,
   OpenchainStrategyResolver,
@@ -20,16 +20,13 @@ export const AbiStoreLive = Layer.succeed(
   AbiStore,
   AbiStore.of({
     strategies: {
-      default: [SourcifyStrategyResolver(), OpenchainStrategyResolver(), FourByteStrategyResolver()],
-      1: [
-        EtherscanStrategyResolver({
+      default: [
+        EtherscanV2StrategyResolver({
           apikey: process.env.ETHERSCAN_API_KEY,
         }),
-      ],
-      8453: [
-        EtherscanStrategyResolver({
-          apikey: process.env.BASESCAN_API_KEY,
-        }),
+        SourcifyStrategyResolver(),
+        OpenchainStrategyResolver(),
+        FourByteStrategyResolver(),
       ],
       169: [
         BlockscoutStrategyResolver({

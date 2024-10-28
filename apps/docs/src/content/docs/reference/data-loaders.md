@@ -26,6 +26,7 @@ Loop Decoder provides some strategies out of the box:
 ABI strategies will receive the contract address, and event or function signature as input and would return the ABI as a stringified JSON. Loop Decoder provides some strategies out of the box:
 
 - `EtherscanStrategyResolver` - resolves the ABI from Etherscan
+- `EtherscanV2StrategyResolver` - resolves the ABI from Etherscan v2
 - `SourcifyStrategyResolver` - resolves the ABI from Sourcify
 - `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
 - `OpenchainStrategyResolver` - resolves the ABI from Openchain
