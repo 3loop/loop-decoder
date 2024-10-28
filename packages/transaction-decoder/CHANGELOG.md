@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.19.4
+
+### Patch Changes
+
+- 8d492b6: Add Etherscan V2 Abi data loader
+
 ## 0.19.3
 
 ### Patch Changes
