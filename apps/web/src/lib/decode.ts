@@ -1,13 +1,11 @@
 import { getProvider, RPCProviderLive } from './rpc-provider'
+import { Effect, Layer } from 'effect'
 import {
-  decodeTransactionByHash,
-  type DecodedTransaction,
-  decodeCalldata as calldataDecoder,
+  DecodedTransaction,
   DecodeResult,
-} from '@3loop/transaction-decoder'
-import { Config, Effect, Layer } from 'effect'
-import {
-  EtherscanStrategyResolver,
+  decodeCalldata as calldataDecoder,
+  decodeTransactionByHash,
+  EtherscanV2StrategyResolver,
   FourByteStrategyResolver,
   OpenchainStrategyResolver,
   SourcifyStrategyResolver,
@@ -18,7 +16,7 @@ import { DatabaseLive } from './database'
 
 const AbiStoreLive = SqlAbiStore.make({
   default: [
-    EtherscanStrategyResolver({
+    EtherscanV2StrategyResolver({
       apikey: process.env.ETHERSCAN_API_KEY,
     }),
     SourcifyStrategyResolver(),
