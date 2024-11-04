@@ -6,13 +6,20 @@ import {
   decodeCalldata as calldataDecoder,
   decodeTransactionByHash,
   EtherscanV2StrategyResolver,
+  FetchTransactionError,
   FourByteStrategyResolver,
   OpenchainStrategyResolver,
+  RPCFetchError,
   SourcifyStrategyResolver,
+  UnknownNetwork,
+  UnsupportedEvent,
 } from '@3loop/transaction-decoder'
 import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sql'
 import { Hex } from 'viem'
 import { DatabaseLive } from './database'
+import { SqlError } from '@effect/sql/SqlError'
+import { ConfigError } from 'effect/ConfigError'
+import { ParseError } from 'effect/ParseResult'
 
 const AbiStoreLive = SqlAbiStore.make({
   default: [
@@ -25,8 +32,10 @@ const AbiStoreLive = SqlAbiStore.make({
   ],
 })
 
-const LoadersLayer = Layer.mergeAll(AbiStoreLive, SqlContractMetaStore.make())
-const DataLayer = Layer.mergeAll(DatabaseLive, RPCProviderLive)
+const MetaStoreLive = SqlContractMetaStore.make()
+
+const DataLayer = Layer.mergeAll(RPCProviderLive, DatabaseLive)
+const LoadersLayer = Layer.mergeAll(AbiStoreLive, MetaStoreLive)
 const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer)
 
 export async function decodeTransaction({
@@ -36,7 +45,19 @@ export async function decodeTransaction({
   chainID: number
   hash: string
 }): Promise<DecodedTransaction | undefined> {
-  const runnable = Effect.provide(decodeTransactionByHash(hash as Hex, chainID), MainLayer)
+  // NOTE: For unknonw reason the context of main layer is still missing the SqlClient in the type
+  const runnable = Effect.provide(decodeTransactionByHash(hash as Hex, chainID), MainLayer) as Effect.Effect<
+    DecodedTransaction,
+    | SqlError
+    | UnknownNetwork
+    | ConfigError
+    | SqlError
+    | RPCFetchError
+    | ParseError
+    | UnsupportedEvent
+    | FetchTransactionError,
+    never
+  >
   return Effect.runPromise(runnable).catch((error: unknown) => {
     console.error('Decode error', JSON.stringify(error, null, 2))
     return undefined
@@ -59,7 +80,18 @@ export async function decodeCalldata({
       contractAddress,
     }),
     MainLayer,
-  )
+  ) as Effect.Effect<
+    DecodeResult,
+    | SqlError
+    | UnknownNetwork
+    | ConfigError
+    | SqlError
+    | RPCFetchError
+    | ParseError
+    | UnsupportedEvent
+    | FetchTransactionError,
+    never
+  >
   return Effect.runPromise(runnable).catch((error: unknown) => {
     console.error('Decode error', JSON.stringify(error, null, 2))
     return undefined

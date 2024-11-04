@@ -2,9 +2,9 @@
   "name": "@3loop/transaction-decoder",
   "version": "0.19.4",
   "description": "A library for decoding Ethereum transactions",
-  "types": "dist/index.d.ts",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "license": "GPL-3.0-only",
   "type": "module",
   "exports": {
