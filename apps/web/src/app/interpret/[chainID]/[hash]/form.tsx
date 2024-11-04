@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react'
 import { Label } from '@/components/ui/label'
-import { DEFAULT_CHAIN_ID, sidebarNavItems, EXAMPLE_TXS, INTERPRETER_REPO } from '@/app/data'
+import { DEFAULT_CHAIN_ID, geSidebarNavItems, EXAMPLE_TXS, INTERPRETER_REPO } from '@/app/data'
 import { useLocalStorage } from 'usehooks-ts'
 import { SidebarNav } from '@/components/ui/sidebar-nav'
 import { PlayIcon } from '@radix-ui/react-icons'
@@ -13,12 +13,15 @@ import { Interpretation, applyInterpreter } from '@/lib/interpreter'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
 import { fallbackInterpreter, getInterpreter } from '@3loop/transaction-interpreter'
+import { ExampleTransactions } from '@/components/ui/examples'
 
 interface FormProps {
   currentChainID: number
   decoded?: DecodedTransaction
   currentHash?: string
 }
+
+const PATH = 'interpret'
 
 export default function DecodingForm({ decoded, currentHash, currentChainID }: FormProps) {
   const [result, setResult] = React.useState<Interpretation>()
@@ -41,7 +44,7 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const hash = (e.target as any).hash.value
-    router.push(`/tx/${currentChainID}/${hash}`)
+    router.push(`/${PATH}/${currentChainID}/${hash}`)
   }
 
   const onRun = React.useCallback(() => {
@@ -80,7 +83,13 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
         <form onSubmit={onSubmit}>
           <div className="flex w-full lg:items-center gap-2 flex-col lg:flex-row">
             <div>
-              <NetworkSelect defaultValue={DEFAULT_CHAIN_ID.toString()} />
+              <NetworkSelect
+                defaultValue={currentChainID.toString()}
+                onValueChange={(value) => {
+                  const hash = currentHash || ''
+                  router.push(`/${PATH}/${value}/${hash}`)
+                }}
+              />
             </div>
             <Input
               className="flex-1"
@@ -145,16 +154,7 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
       </div>
 
       <div className="md:order-2">
-        <div className="space-y-4">
-          <p className="text-lg font-semibold tracking-tight">Example Transactions</p>
-
-          {Object.entries(sidebarNavItems).map(([heading, items]) => (
-            <div key={heading}>
-              <p className="text-sm text-muted-foreground">{heading}</p>
-              <SidebarNav items={items} />
-            </div>
-          ))}
-        </div>
+        <ExampleTransactions path={PATH} />
       </div>
     </div>
   )

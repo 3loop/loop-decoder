@@ -5,13 +5,11 @@ import { Inter } from 'next/font/google'
 import { MainNav } from '@/components/ui/main-nav'
 import { Analytics } from '@vercel/analytics/react'
 import { aaveV2 } from '../app/data'
-import { title } from 'process'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -20,9 +18,19 @@ import Link from 'next/link'
 
 const navLinks = [
   {
-    href: '/',
-    match: 'tx',
-    title: 'Playground',
+    href: '/calldata',
+    match: '/calldata',
+    title: 'Calldata',
+  },
+  {
+    href: '/decode',
+    match: 'decode',
+    title: 'Transaction Decoder',
+  },
+  {
+    href: '/interpret',
+    match: 'interpret',
+    title: 'Transaction Interpreter',
   },
   {
     href: `/contract/${aaveV2}`,

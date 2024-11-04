@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { PlayIcon } from 'lucide-react'
 import { NetworkSelect } from '@/components/ui/network-select'
-import { sidebarNavItems } from '@/app/data'
+import { geSidebarNavItems } from '@/app/data'
 
 export default function Loading() {
   return (
@@ -53,7 +53,7 @@ export default function Loading() {
         <div className="space-y-4">
           <p className="text-lg font-semibold tracking-tight">Example Transactions</p>
 
-          {Object.entries(sidebarNavItems).map(([heading, items]) => (
+          {Object.entries(geSidebarNavItems('interpret')).map(([heading, items]) => (
             <div key={heading}>
               <p className="text-sm text-muted-foreground">{heading}</p>
               <SidebarNav items={items} />
