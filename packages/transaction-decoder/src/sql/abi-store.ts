@@ -34,8 +34,9 @@ export const make = (strategies: AbiStore['strategies']) =>
               const result = value.result
               yield* sql`
               INSERT INTO contractAbi (type, event, signature, abi, status)
-              VALUES (${result.type}, ${'event' in result ? result.event : null}, ${'signature' in result ? result.signature : null
-                }, ${result.abi}, "success")
+              VALUES (${result.type}, ${'event' in result ? result.event : null}, ${
+                'signature' in result ? result.signature : null
+              }, ${result.abi}, "success")
             `
             } else {
               yield* sql`

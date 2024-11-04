@@ -69,15 +69,24 @@ importers:
       '@3loop/transaction-interpreter':
         specifier: workspace:*
         version: link:../../packages/transaction-interpreter
+      '@effect/experimental':
+        specifier: ^0.30.16
+        version: 0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform':
+        specifier: ^0.69.15
+        version: 0.69.15(effect@3.10.9)
+      '@effect/sql':
+        specifier: ^0.18.16
+        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)
+      '@effect/sql-pg':
+        specifier: ^0.19.5
+        version: 0.19.5(@effect/platform@0.69.15(effect@3.10.9))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9))(effect@3.10.9)
       '@jitl/quickjs-singlefile-browser-release-sync':
         specifier: ^0.29.2
         version: 0.29.2
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@prisma/client':
-        specifier: ^5.19.1
-        version: 5.19.1(prisma@5.19.1)
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.1
         version: 2.1.1(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -124,8 +133,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       effect:
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.10.9
+        version: 3.10.9
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -175,9 +184,6 @@ importers:
       bufferutil:
         specifier: ^4.0.8
         version: 4.0.8
-      prisma:
-        specifier: ^5.19.1
-        version: 5.19.1
       typescript:
         specifier: 5.1.3
         version: 5.1.3
@@ -206,12 +212,12 @@ importers:
   packages/transaction-decoder:
     dependencies:
       '@effect/sql':
-        specifier: ^0.18.10
-        version: 0.18.10(@effect/experimental@0.30.10(@effect/platform@0.69.9(effect@3.7.0))(effect@3.7.0)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.9(effect@3.7.0))(effect@3.7.0)
+        specifier: ^0.18.16
+        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)
     devDependencies:
       '@effect/schema':
         specifier: ^0.66.16
-        version: 0.66.16(effect@3.7.0)(fast-check@3.22.0)
+        version: 0.66.16(effect@3.10.9)(fast-check@3.22.0)
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -228,8 +234,8 @@ importers:
         specifier: 0.34.2
         version: 0.34.2(vitest@0.34.2)
       effect:
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.10.9
+        version: 3.10.9
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -325,8 +331,8 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       effect:
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.10.9
+        version: 3.10.9
       esbuild:
         specifier: ^0.21.5
         version: 0.21.5
@@ -634,12 +640,12 @@ packages:
     resolution: {integrity: sha512-SITSV6aIXsuVNV3f3O0f2n/cgyEDWoSqtZMYiAmcsYHydcKrOz3gUxB/iXd/Qf08+IZX4KpgNbvUdMBmWz+kcA==}
     engines: {node: '>=10'}
 
-  '@effect/experimental@0.30.10':
-    resolution: {integrity: sha512-FSnZm0HmmX4Uw9m1t4ZAUaqFYZqjmnb6YbkjZjtHwNoGrKWimZzReafEiPAiIgkBIH4j5QfeCjJE52dur5ftNQ==}
+  '@effect/experimental@0.30.16':
+    resolution: {integrity: sha512-xDXSfjiZloRmmaCT4sVCPxn0rfN/txFtiVhBMfB97Lo8TWsgCdYKiMw6w7m7/enO5gOOF3TGtUhSeISh9GqIjA==}
     peerDependencies:
-      '@effect/platform': ^0.69.9
-      '@effect/platform-node': ^0.64.10
-      effect: ^3.10.4
+      '@effect/platform': ^0.69.15
+      '@effect/platform-node': ^0.64.16
+      effect: ^3.10.9
       ioredis: ^5
       lmdb: ^3
       ws: ^8
@@ -653,10 +659,10 @@ packages:
       ws:
         optional: true
 
-  '@effect/platform@0.69.9':
-    resolution: {integrity: sha512-gdp5rLxKLBBI895ycBRkuwCQHnYf8g6+Sdg5tFhuH+axIdgP4J8dGzIvYBGAkRMw/4k2BYeSKKf8ZONYnNWcWg==}
+  '@effect/platform@0.69.15':
+    resolution: {integrity: sha512-e5oLVmi12NyyPaCsGwYGIztWxZ5z6bDbYB+7S6muXZXrESOgDeHECBlZxqQdq1g3EURrZ85cOl9v+QO4KJYwNA==}
     peerDependencies:
-      effect: ^3.10.4
+      effect: ^3.10.9
 
   '@effect/schema@0.66.16':
     resolution: {integrity: sha512-sT/k5NOgKslGPzs3DUaCFuM6g2JQoIIT8jpwEorAZooplPIMK2xIspr7ECz6pp6Dc7Wz/ppXGk7HVyGZQsIYEQ==}
@@ -664,12 +670,19 @@ packages:
       effect: ^3.1.3
       fast-check: ^3.13.2
 
-  '@effect/sql@0.18.10':
-    resolution: {integrity: sha512-seLP8kGpEXRCsC1VZErx8TE+GC3VwF1j2+Hhq55V5u/tjeDd1nG3+/L6StfpIEaeeexkGrzY0gXk4VVS79bFcQ==}
+  '@effect/sql-pg@0.19.5':
+    resolution: {integrity: sha512-DWNNvyM+yC8+glr2XKWtQn+gTms2S6SOrN/SOW6E7qQ7rbKX6n3JSxoIkhy3eUuN514onOmiPzcVMyH8foWZMg==}
     peerDependencies:
-      '@effect/experimental': ^0.30.10
-      '@effect/platform': ^0.69.9
-      effect: ^3.10.4
+      '@effect/platform': ^0.69.15
+      '@effect/sql': ^0.18.16
+      effect: ^3.10.9
+
+  '@effect/sql@0.18.16':
+    resolution: {integrity: sha512-KEKvEI0RxiG6fbKwCMMUaiCtBqkBCGMQAeAaUE6ZhP7H2OG02MxZg4CQZHiAHp2IgDGOXFUahO11xnwcyQOQtA==}
+    peerDependencies:
+      '@effect/experimental': ^0.30.16
+      '@effect/platform': ^0.69.15
+      effect: ^3.10.9
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -1665,30 +1678,6 @@ packages:
   '@pkgr/core@0.1.0':
     resolution: {integrity: sha512-Zwq5OCzuwJC2jwqmpEQt7Ds1DTi6BWSwoGkbb1n9pO3hzb35BoJELx7c0T23iDkBGkh2e7tvOtjF3tr3OaQHDQ==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
-
-  '@prisma/client@5.19.1':
-    resolution: {integrity: sha512-x30GFguInsgt+4z5I4WbkZP2CGpotJMUXy+Gl/aaUjHn2o1DnLYNTA+q9XdYmAQZM8fIIkvUiA2NpgosM3fneg==}
-    engines: {node: '>=16.13'}
-    peerDependencies:
-      prisma: '*'
-    peerDependenciesMeta:
-      prisma:
-        optional: true
-
-  '@prisma/debug@5.19.1':
-    resolution: {integrity: sha512-lAG6A6QnG2AskAukIEucYJZxxcSqKsMK74ZFVfCTOM/7UiyJQi48v6TQ47d6qKG3LbMslqOvnTX25dj/qvclGg==}
-
-  '@prisma/engines-version@5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3':
-    resolution: {integrity: sha512-xR6rt+z5LnNqTP5BBc+8+ySgf4WNMimOKXRn6xfNRDSpHvbOEmd7+qAOmzCrddEc4Cp8nFC0txU14dstjH7FXA==}
-
-  '@prisma/engines@5.19.1':
-    resolution: {integrity: sha512-kR/PoxZDrfUmbbXqqb8SlBBgCjvGaJYMCOe189PEYzq9rKqitQ2fvT/VJ8PDSe8tTNxhc2KzsCfCAL+Iwm/7Cg==}
-
-  '@prisma/fetch-engine@5.19.1':
-    resolution: {integrity: sha512-pCq74rtlOVJfn4pLmdJj+eI4P7w2dugOnnTXpRilP/6n5b2aZiA4ulJlE0ddCbTPkfHmOL9BfaRgA8o+1rfdHw==}
-
-  '@prisma/get-platform@5.19.1':
-    resolution: {integrity: sha512-sCeoJ+7yt0UjnR+AXZL7vXlg5eNxaFOwC23h0KvW1YIXUoa7+W2ZcAUhoEQBmJTW4GrFqCuZ8YSP0mkDa4k3Zg==}
 
   '@radix-ui/number@1.1.0':
     resolution: {integrity: sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==}
@@ -3133,8 +3122,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  effect@3.7.0:
-    resolution: {integrity: sha512-TXrb4SHTHrij396NfvGgpOD/5Sh503LtN2AeskkB7YO6Oe1tWSekk8dcrj3AWbMDOJ/fXOvcf6HD+Svus2zIeA==}
+  effect@3.10.9:
+    resolution: {integrity: sha512-nNRknWPKCBDvAfsoJ/XsxTvIsN9mRdnM02AD6SMPGmHE3dIpnG1lTC/3ywjSYtU7YtBhFV64s2KKaDzdIU8p4Q==}
 
   electron-to-chromium@1.5.14:
     resolution: {integrity: sha512-bEfPECb3fJ15eaDnu9LEJ2vPGD6W1vt7vZleSVyFhYuMIKm3vz/g9lt7IvEzgdwj58RjbPKUF2rXTCN/UW47tQ==}
@@ -5177,6 +5166,10 @@ packages:
     resolution: {integrity: sha512-Aweb9unOEpQ3ezu4Q00DPvvM2ZTUitJdNKeP/+uQgr1IBIqu574IaZoURId7BKtWMREwzKa9OgzPzezWGPWFQw==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postgres@3.4.5:
+    resolution: {integrity: sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg==}
+    engines: {node: '>=12'}
+
   preferred-pm@3.1.4:
     resolution: {integrity: sha512-lEHd+yEm22jXdCphDrkvIJQU66EuLojPPtvZkpKIkiD+l0DMThF/niqZKJSoU8Vl7iuvtmzyMhir9LdVy5WMnA==}
     engines: {node: '>=10'}
@@ -5222,11 +5215,6 @@ packages:
 
   printable-characters@1.0.42:
     resolution: {integrity: sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ==}
-
-  prisma@5.19.1:
-    resolution: {integrity: sha512-c5K9MiDaa+VAAyh1OiYk76PXOme9s3E992D7kvvIOhCrNsBQfy2mP2QAQtX0WNj140IgG++12kwZpYB9iIydNQ==}
-    engines: {node: '>=16.13'}
-    hasBin: true
 
   prismjs@1.29.0:
     resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==}
@@ -7200,31 +7188,54 @@ snapshots:
 
   '@ctrl/tinycolor@3.6.1': {}
 
-  '@effect/experimental@0.30.10(@effect/platform@0.69.9(effect@3.7.0))(effect@3.7.0)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
+  '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
     dependencies:
-      '@effect/platform': 0.69.9(effect@3.7.0)
-      effect: 3.7.0
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      effect: 3.10.9
       msgpackr: 1.11.0
     optionalDependencies:
       ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
 
-  '@effect/platform@0.69.9(effect@3.7.0)':
+  '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
     dependencies:
-      effect: 3.7.0
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      effect: 3.10.9
+      msgpackr: 1.11.0
+    optionalDependencies:
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+
+  '@effect/platform@0.69.15(effect@3.10.9)':
+    dependencies:
+      effect: 3.10.9
       find-my-way-ts: 0.1.5
       multipasta: 0.2.5
 
-  '@effect/schema@0.66.16(effect@3.7.0)(fast-check@3.22.0)':
+  '@effect/schema@0.66.16(effect@3.10.9)(fast-check@3.22.0)':
     dependencies:
-      effect: 3.7.0
+      effect: 3.10.9
       fast-check: 3.22.0
 
-  '@effect/sql@0.18.10(@effect/experimental@0.30.10(@effect/platform@0.69.9(effect@3.7.0))(effect@3.7.0)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.9(effect@3.7.0))(effect@3.7.0)':
+  '@effect/sql-pg@0.19.5(@effect/platform@0.69.15(effect@3.10.9))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9))(effect@3.10.9)':
     dependencies:
-      '@effect/experimental': 0.30.10(@effect/platform@0.69.9(effect@3.7.0))(effect@3.7.0)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
-      '@effect/platform': 0.69.9(effect@3.7.0)
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      '@effect/sql': 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)
       '@opentelemetry/semantic-conventions': 1.27.0
-      effect: 3.7.0
+      effect: 3.10.9
+      postgres: 3.4.5
+
+  '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)':
+    dependencies:
+      '@effect/experimental': 0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      '@opentelemetry/semantic-conventions': 1.27.0
+      effect: 3.10.9
+
+  '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)':
+    dependencies:
+      '@effect/experimental': 0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      '@opentelemetry/semantic-conventions': 1.27.0
+      effect: 3.10.9
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -7929,31 +7940,6 @@ snapshots:
     optional: true
 
   '@pkgr/core@0.1.0': {}
-
-  '@prisma/client@5.19.1(prisma@5.19.1)':
-    optionalDependencies:
-      prisma: 5.19.1
-
-  '@prisma/debug@5.19.1': {}
-
-  '@prisma/engines-version@5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3': {}
-
-  '@prisma/engines@5.19.1':
-    dependencies:
-      '@prisma/debug': 5.19.1
-      '@prisma/engines-version': 5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3
-      '@prisma/fetch-engine': 5.19.1
-      '@prisma/get-platform': 5.19.1
-
-  '@prisma/fetch-engine@5.19.1':
-    dependencies:
-      '@prisma/debug': 5.19.1
-      '@prisma/engines-version': 5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3
-      '@prisma/get-platform': 5.19.1
-
-  '@prisma/get-platform@5.19.1':
-    dependencies:
-      '@prisma/debug': 5.19.1
 
   '@radix-ui/number@1.1.0': {}
 
@@ -9577,7 +9563,9 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@3.7.0: {}
+  effect@3.10.9:
+    dependencies:
+      fast-check: 3.22.0
 
   electron-to-chromium@1.5.14: {}
 
@@ -12571,6 +12559,8 @@ snapshots:
       picocolors: 1.0.1
       source-map-js: 1.2.0
 
+  postgres@3.4.5: {}
+
   preferred-pm@3.1.4:
     dependencies:
       find-up: 5.0.0
@@ -12611,12 +12601,6 @@ snapshots:
       react-is: 18.3.1
 
   printable-characters@1.0.42: {}
-
-  prisma@5.19.1:
-    dependencies:
-      '@prisma/engines': 5.19.1
-    optionalDependencies:
-      fsevents: 2.3.3
 
   prismjs@1.29.0: {}
 

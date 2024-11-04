@@ -1,4 +1,3 @@
-import { Effect, Layer } from 'effect'
 import { getProvider, RPCProviderLive } from './rpc-provider'
 import {
   decodeTransactionByHash,
@@ -6,11 +5,31 @@ import {
   decodeCalldata as calldataDecoder,
   DecodeResult,
 } from '@3loop/transaction-decoder'
-import { AbiStoreLive, ContractMetaStoreLive } from './contract-loader'
+import { Config, Effect, Layer } from 'effect'
+import {
+  EtherscanStrategyResolver,
+  FourByteStrategyResolver,
+  OpenchainStrategyResolver,
+  SourcifyStrategyResolver,
+} from '@3loop/transaction-decoder'
+import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sql'
 import { Hex } from 'viem'
+import { DatabaseLive } from './database'
 
-const LoadersLayer = Layer.mergeAll(AbiStoreLive, ContractMetaStoreLive)
-const MainLayer = LoadersLayer.pipe(Layer.provideMerge(RPCProviderLive))
+const AbiStoreLive = SqlAbiStore.make({
+  default: [
+    EtherscanStrategyResolver({
+      apikey: process.env.ETHERSCAN_API_KEY,
+    }),
+    SourcifyStrategyResolver(),
+    OpenchainStrategyResolver(),
+    FourByteStrategyResolver(),
+  ],
+})
+
+const LoadersLayer = Layer.mergeAll(AbiStoreLive, SqlContractMetaStore.make())
+const DataLayer = Layer.mergeAll(DatabaseLive, RPCProviderLive)
+const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer)
 
 export async function decodeTransaction({
   chainID,
