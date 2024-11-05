@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.20.0
+
+### Minor Changes
+
+- 657b68f: Add default sql stores based on @effect/sql for loading abi and contract meta
+
 ## 0.19.4
 
 ### Patch Changes
