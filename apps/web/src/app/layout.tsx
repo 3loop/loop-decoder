@@ -1,4 +1,6 @@
 import { Separator } from '@/components/ui/separator'
+import { Terminal } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -15,6 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { NpmAlert } from '@/components/NpmAlert'
 
 const navLinks = [
   {
@@ -121,7 +124,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="flex h-screen flex-col">
           <NavigationBar />
 
-          <div className="w-full mx-auto px-3 lg:px-4 max-w-screen-xl h-full py-4">{children}</div>
+          <div className="w-full mx-auto px-3 lg:px-4 max-w-screen-xl h-full py-4">
+            <NpmAlert />
+            {children}
+          </div>
         </div>
         <Analytics />
       </body>
