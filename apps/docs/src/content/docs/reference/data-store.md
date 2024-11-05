@@ -149,3 +149,17 @@ You can notice that the `AbiStore` and `ContractMetadataStore` interfaces are ve
 We have two states that can return an empty result. We want to be able to skip the meta strategy in cases where we know it's not available, as this can significantly reduce the number of requests to the strategies and improve performance.
 
 Some strategies may be able to add the data later. Therefore, we encourage storing a timestamp and removing the "not-found" state to be able to check again.
+
+## Default Stores
+
+By defulat loop decoder provides two stores that can be used out of the box:
+
+1. In-memory store - located at `@3loop/transaction-decoder/in-memory`
+
+- `InMemoryAbiStore` - caches the resolved abi in-memory
+- `InMemoryContractMetaStore` - caches the resolved contract metadata in-memory
+
+2. Sqlite store - located at `@3loop/transaction-decoder/sql`
+
+- `SqlAbiStore` - caches the resolved abi in any sql database supported by `@effect/sql`
+- `SqlContractMetaStore` - caches the resolved contract metadata in any sql database supported by `@effect/sql`
