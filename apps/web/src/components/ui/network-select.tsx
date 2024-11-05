@@ -2,17 +2,15 @@
 import * as React from 'react'
 import { SelectProps } from '@radix-ui/react-select'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { supportedChains } from '@/app/data'
 
-export function NetworkSelect(props: SelectProps) {
-  const router = useRouter()
+interface NetworkSelectProps extends SelectProps {
+  onValueChange?: (chainId: string) => void
+}
+
+export function NetworkSelect({ onValueChange, ...props }: NetworkSelectProps) {
   const params = useParams()
-
-  const onValueChange = (newChainID: string) => {
-    router.push(`/tx/${newChainID}`)
-  }
-
   const chainID = (params.chainID as string) ?? props.defaultValue
 
   return (

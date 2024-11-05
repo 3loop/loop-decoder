@@ -179,15 +179,14 @@ export const defaultTrasaction = EXAMPLE_TXS['AAVE V2'][0]
 export const DEFAULT_CONTRACT = aaveV2
 export const DEFAULT_CHAIN_ID = 1
 
-const generateNavItems = (transactions: any) => {
+const generateNavItems = (transactions: any, path: string) => {
   return transactions.map((tx: any) => ({
-    href: `/tx/${tx.chainID}/${tx.hash}`,
+    href: `/${path}/${tx.chainID}/${tx.hash}`,
     title: `${tx.name}`,
   }))
 }
 
-export const sidebarNavItems = Object.fromEntries(
-  Object.entries(EXAMPLE_TXS).map(([key, value]) => [key, generateNavItems(value)]),
-)
+export const geSidebarNavItems = (path: string) =>
+  Object.fromEntries(Object.entries(EXAMPLE_TXS).map(([key, value]) => [key, generateNavItems(value, path)]))
 
 export const INTERPRETER_REPO = 'https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter'

@@ -1,8 +1,6 @@
-'use client'
-import * as React from 'react'
-import DecodingForm from './tx/[chainID]/[hash]/form'
-import { DEFAULT_CHAIN_ID } from './data'
+import { redirect } from 'next/navigation'
 
-export default function Home() {
-  return <DecodingForm currentChainID={DEFAULT_CHAIN_ID} />
+export default function RootPage() {
+  // Redirect to calldata page by default
+  redirect('/decode')
 }
