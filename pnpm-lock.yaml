@@ -69,15 +69,24 @@ importers:
       '@3loop/transaction-interpreter':
         specifier: workspace:*
         version: link:../../packages/transaction-interpreter
+      '@effect/experimental':
+        specifier: ^0.30.16
+        version: 0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform':
+        specifier: ^0.69.15
+        version: 0.69.15(effect@3.10.9)
+      '@effect/sql':
+        specifier: ^0.18.16
+        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)
+      '@effect/sql-pg':
+        specifier: ^0.19.5
+        version: 0.19.5(@effect/platform@0.69.15(effect@3.10.9))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9))(effect@3.10.9)
       '@jitl/quickjs-singlefile-browser-release-sync':
         specifier: ^0.29.2
         version: 0.29.2
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.47.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@prisma/client':
-        specifier: ^5.19.1
-        version: 5.19.1(prisma@5.19.1)
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.1
         version: 2.1.1(@types/react-dom@18.2.7)(@types/react@18.2.21)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -124,8 +133,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       effect:
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.10.9
+        version: 3.10.9
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -175,9 +184,6 @@ importers:
       bufferutil:
         specifier: ^4.0.8
         version: 4.0.8
-      prisma:
-        specifier: ^5.19.1
-        version: 5.19.1
       typescript:
         specifier: 5.1.3
         version: 5.1.3
@@ -204,10 +210,14 @@ importers:
         version: 1.4.1(eslint@8.57.0)
 
   packages/transaction-decoder:
+    dependencies:
+      '@effect/sql':
+        specifier: ^0.18.16
+        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)
     devDependencies:
       '@effect/schema':
         specifier: ^0.66.16
-        version: 0.66.16(effect@3.7.0)(fast-check@3.22.0)
+        version: 0.66.16(effect@3.10.9)(fast-check@3.22.0)
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
         version: 0.5.1
@@ -224,8 +234,8 @@ importers:
         specifier: 0.34.2
         version: 0.34.2(vitest@0.34.2)
       effect:
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.10.9
+        version: 3.10.9
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -321,8 +331,8 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       effect:
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.10.9
+        version: 3.10.9
       esbuild:
         specifier: ^0.21.5
         version: 0.21.5
@@ -630,11 +640,49 @@ packages:
     resolution: {integrity: sha512-SITSV6aIXsuVNV3f3O0f2n/cgyEDWoSqtZMYiAmcsYHydcKrOz3gUxB/iXd/Qf08+IZX4KpgNbvUdMBmWz+kcA==}
     engines: {node: '>=10'}
 
+  '@effect/experimental@0.30.16':
+    resolution: {integrity: sha512-xDXSfjiZloRmmaCT4sVCPxn0rfN/txFtiVhBMfB97Lo8TWsgCdYKiMw6w7m7/enO5gOOF3TGtUhSeISh9GqIjA==}
+    peerDependencies:
+      '@effect/platform': ^0.69.15
+      '@effect/platform-node': ^0.64.16
+      effect: ^3.10.9
+      ioredis: ^5
+      lmdb: ^3
+      ws: ^8
+    peerDependenciesMeta:
+      '@effect/platform-node':
+        optional: true
+      ioredis:
+        optional: true
+      lmdb:
+        optional: true
+      ws:
+        optional: true
+
+  '@effect/platform@0.69.15':
+    resolution: {integrity: sha512-e5oLVmi12NyyPaCsGwYGIztWxZ5z6bDbYB+7S6muXZXrESOgDeHECBlZxqQdq1g3EURrZ85cOl9v+QO4KJYwNA==}
+    peerDependencies:
+      effect: ^3.10.9
+
   '@effect/schema@0.66.16':
     resolution: {integrity: sha512-sT/k5NOgKslGPzs3DUaCFuM6g2JQoIIT8jpwEorAZooplPIMK2xIspr7ECz6pp6Dc7Wz/ppXGk7HVyGZQsIYEQ==}
     peerDependencies:
       effect: ^3.1.3
       fast-check: ^3.13.2
+
+  '@effect/sql-pg@0.19.5':
+    resolution: {integrity: sha512-DWNNvyM+yC8+glr2XKWtQn+gTms2S6SOrN/SOW6E7qQ7rbKX6n3JSxoIkhy3eUuN514onOmiPzcVMyH8foWZMg==}
+    peerDependencies:
+      '@effect/platform': ^0.69.15
+      '@effect/sql': ^0.18.16
+      effect: ^3.10.9
+
+  '@effect/sql@0.18.16':
+    resolution: {integrity: sha512-KEKvEI0RxiG6fbKwCMMUaiCtBqkBCGMQAeAaUE6ZhP7H2OG02MxZg4CQZHiAHp2IgDGOXFUahO11xnwcyQOQtA==}
+    peerDependencies:
+      '@effect/experimental': ^0.30.16
+      '@effect/platform': ^0.69.15
+      effect: ^3.10.9
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -1460,6 +1508,36 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
+  '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
+    resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@msgpackr-extract/msgpackr-extract-darwin-x64@3.0.3':
+    resolution: {integrity: sha512-mdzd3AVzYKuUmiWOQ8GNhl64/IoFGol569zNRdkLReh6LRLHOXxU4U8eq0JwaD8iFHdVGqSy4IjFL4reoWCDFw==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@msgpackr-extract/msgpackr-extract-linux-arm64@3.0.3':
+    resolution: {integrity: sha512-YxQL+ax0XqBJDZiKimS2XQaf+2wDGVa1enVRGzEvLLVFeqa5kx2bWbtcSXgsxjQB7nRqqIGFIcLteF/sHeVtQg==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@msgpackr-extract/msgpackr-extract-linux-arm@3.0.3':
+    resolution: {integrity: sha512-fg0uy/dG/nZEXfYilKoRe7yALaNmHoYeIoJuJ7KJ+YyU2bvY8vPv27f7UKhGRpY6euFYqEVhxCFZgAUNQBM3nw==}
+    cpu: [arm]
+    os: [linux]
+
+  '@msgpackr-extract/msgpackr-extract-linux-x64@3.0.3':
+    resolution: {integrity: sha512-cvwNfbP07pKUfq1uH+S6KJ7dT9K8WOE4ZiAcsrSes+UY55E/0jLYc+vq+DO7jlmqRb5zAggExKm0H7O/CBaesg==}
+    cpu: [x64]
+    os: [linux]
+
+  '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.3':
+    resolution: {integrity: sha512-x0fWaQtYp4E6sktbsdAqnehxDgEc/VwM7uLsRCYWaiGu0ykYdZPiS8zCWdnjHwyiumousxfBm4SO31eXqwEZhQ==}
+    cpu: [x64]
+    os: [win32]
+
   '@next/env@13.4.19':
     resolution: {integrity: sha512-FsAT5x0jF2kkhNkKkukhsyYOrRqtSxrEhfliniIq0bwWbuXLgyt3Gv0Ml+b91XwjwArmuP7NxCiGd++GGKdNMQ==}
 
@@ -1558,6 +1636,10 @@ packages:
     resolution: {integrity: sha512-pwK+BfEBZJbKdNYpHHRTNBwBoqrN/iIMO0AiGvYsp3Hoaq0WbgGSWQR6SCldZovoDpY3yje5lkFUe6gsDgJ2vg==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
+  '@opentelemetry/semantic-conventions@1.27.0':
+    resolution: {integrity: sha512-sAay1RrB+ONOem0OZanAR1ZI/k7yDpnOQSQmTMuGImUQb2y8EbSaCJ94FQluM74xoU03vlb2d2U90hZluL6nQg==}
+    engines: {node: '>=14'}
+
   '@oslojs/encoding@0.4.1':
     resolution: {integrity: sha512-hkjo6MuIK/kQR5CrGNdAPZhS01ZCXuWDRJ187zh6qqF2+yMHZpD9fAYpX8q2bOO6Ryhl3XpCT6kUX76N8hhm4Q==}
 
@@ -1596,30 +1678,6 @@ packages:
   '@pkgr/core@0.1.0':
     resolution: {integrity: sha512-Zwq5OCzuwJC2jwqmpEQt7Ds1DTi6BWSwoGkbb1n9pO3hzb35BoJELx7c0T23iDkBGkh2e7tvOtjF3tr3OaQHDQ==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
-
-  '@prisma/client@5.19.1':
-    resolution: {integrity: sha512-x30GFguInsgt+4z5I4WbkZP2CGpotJMUXy+Gl/aaUjHn2o1DnLYNTA+q9XdYmAQZM8fIIkvUiA2NpgosM3fneg==}
-    engines: {node: '>=16.13'}
-    peerDependencies:
-      prisma: '*'
-    peerDependenciesMeta:
-      prisma:
-        optional: true
-
-  '@prisma/debug@5.19.1':
-    resolution: {integrity: sha512-lAG6A6QnG2AskAukIEucYJZxxcSqKsMK74ZFVfCTOM/7UiyJQi48v6TQ47d6qKG3LbMslqOvnTX25dj/qvclGg==}
-
-  '@prisma/engines-version@5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3':
-    resolution: {integrity: sha512-xR6rt+z5LnNqTP5BBc+8+ySgf4WNMimOKXRn6xfNRDSpHvbOEmd7+qAOmzCrddEc4Cp8nFC0txU14dstjH7FXA==}
-
-  '@prisma/engines@5.19.1':
-    resolution: {integrity: sha512-kR/PoxZDrfUmbbXqqb8SlBBgCjvGaJYMCOe189PEYzq9rKqitQ2fvT/VJ8PDSe8tTNxhc2KzsCfCAL+Iwm/7Cg==}
-
-  '@prisma/fetch-engine@5.19.1':
-    resolution: {integrity: sha512-pCq74rtlOVJfn4pLmdJj+eI4P7w2dugOnnTXpRilP/6n5b2aZiA4ulJlE0ddCbTPkfHmOL9BfaRgA8o+1rfdHw==}
-
-  '@prisma/get-platform@5.19.1':
-    resolution: {integrity: sha512-sCeoJ+7yt0UjnR+AXZL7vXlg5eNxaFOwC23h0KvW1YIXUoa7+W2ZcAUhoEQBmJTW4GrFqCuZ8YSP0mkDa4k3Zg==}
 
   '@radix-ui/number@1.1.0':
     resolution: {integrity: sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==}
@@ -3064,8 +3122,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  effect@3.7.0:
-    resolution: {integrity: sha512-TXrb4SHTHrij396NfvGgpOD/5Sh503LtN2AeskkB7YO6Oe1tWSekk8dcrj3AWbMDOJ/fXOvcf6HD+Svus2zIeA==}
+  effect@3.10.9:
+    resolution: {integrity: sha512-nNRknWPKCBDvAfsoJ/XsxTvIsN9mRdnM02AD6SMPGmHE3dIpnG1lTC/3ywjSYtU7YtBhFV64s2KKaDzdIU8p4Q==}
 
   electron-to-chromium@1.5.14:
     resolution: {integrity: sha512-bEfPECb3fJ15eaDnu9LEJ2vPGD6W1vt7vZleSVyFhYuMIKm3vz/g9lt7IvEzgdwj58RjbPKUF2rXTCN/UW47tQ==}
@@ -3520,6 +3578,9 @@ packages:
   fill-range@7.1.1:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
     engines: {node: '>=8'}
+
+  find-my-way-ts@0.1.5:
+    resolution: {integrity: sha512-4GOTMrpGQVzsCH2ruUn2vmwzV/02zF4q+ybhCIrw/Rkt3L8KWcycdC6aJMctJzwN4fXD4SD5F/4B9Sksh5rE0A==}
 
   find-up-simple@1.0.0:
     resolution: {integrity: sha512-q7Us7kcjj2VMePAa02hDAF6d+MzsdsAWEwYyOpwUtlerRBkOEPBCRZrAV4XfcSN8fHAgaD0hP7miwoay6DCprw==}
@@ -4728,8 +4789,18 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
+  msgpackr-extract@3.0.3:
+    resolution: {integrity: sha512-P0efT1C9jIdVRefqjzOQ9Xml57zpOXnIuS+csaB4MdZbTdmGDLo8XhzBG1N7aO11gKDDkJvBLULeFTo46wwreA==}
+    hasBin: true
+
+  msgpackr@1.11.0:
+    resolution: {integrity: sha512-I8qXuuALqJe5laEBYoFykChhSXLikZmUhccjGsPuSJ/7uPip2TJ7lwdIQwWSAi0jGZDXv4WOP8Qg65QZRuXxXw==}
+
   muggle-string@0.4.1:
     resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
+
+  multipasta@0.2.5:
+    resolution: {integrity: sha512-c8eMDb1WwZcE02WVjHoOmUVk7fnKU/RmUcosHACglrWAuPQsEJv+E8430sXj6jNc1jHw0zrS16aCjQh4BcEb4A==}
 
   mustache@4.2.0:
     resolution: {integrity: sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==}
@@ -4773,6 +4844,10 @@ packages:
 
   nlcst-to-string@4.0.0:
     resolution: {integrity: sha512-YKLBCcUYKAg0FNlOBT6aI91qFmSiFKiluk655WzPF+DDMA02qIyy8uiRqI8QXtcFpEvll12LpL5MXqEmAZ+dcA==}
+
+  node-gyp-build-optional-packages@5.2.2:
+    resolution: {integrity: sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw==}
+    hasBin: true
 
   node-gyp-build@4.8.2:
     resolution: {integrity: sha512-IRUxE4BVsHWXkV/SFOut4qTlagw2aM8T5/vnTsmrHJvVoKueJHRc/JaFND7QDDc61kLYUJ6qlZM3sqTSyx2dTw==}
@@ -5091,6 +5166,10 @@ packages:
     resolution: {integrity: sha512-Aweb9unOEpQ3ezu4Q00DPvvM2ZTUitJdNKeP/+uQgr1IBIqu574IaZoURId7BKtWMREwzKa9OgzPzezWGPWFQw==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postgres@3.4.5:
+    resolution: {integrity: sha512-cDWgoah1Gez9rN3H4165peY9qfpEo+SA61oQv65O3cRUE1pOEoJWwddwcqKE8XZYjbblOJlYDlLV4h67HrEVDg==}
+    engines: {node: '>=12'}
+
   preferred-pm@3.1.4:
     resolution: {integrity: sha512-lEHd+yEm22jXdCphDrkvIJQU66EuLojPPtvZkpKIkiD+l0DMThF/niqZKJSoU8Vl7iuvtmzyMhir9LdVy5WMnA==}
     engines: {node: '>=10'}
@@ -5136,11 +5215,6 @@ packages:
 
   printable-characters@1.0.42:
     resolution: {integrity: sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ==}
-
-  prisma@5.19.1:
-    resolution: {integrity: sha512-c5K9MiDaa+VAAyh1OiYk76PXOme9s3E992D7kvvIOhCrNsBQfy2mP2QAQtX0WNj140IgG++12kwZpYB9iIydNQ==}
-    engines: {node: '>=16.13'}
-    hasBin: true
 
   prismjs@1.29.0:
     resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==}
@@ -7114,10 +7188,54 @@ snapshots:
 
   '@ctrl/tinycolor@3.6.1': {}
 
-  '@effect/schema@0.66.16(effect@3.7.0)(fast-check@3.22.0)':
+  '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
     dependencies:
-      effect: 3.7.0
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      effect: 3.10.9
+      msgpackr: 1.11.0
+    optionalDependencies:
+      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+
+  '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
+    dependencies:
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      effect: 3.10.9
+      msgpackr: 1.11.0
+    optionalDependencies:
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+
+  '@effect/platform@0.69.15(effect@3.10.9)':
+    dependencies:
+      effect: 3.10.9
+      find-my-way-ts: 0.1.5
+      multipasta: 0.2.5
+
+  '@effect/schema@0.66.16(effect@3.10.9)(fast-check@3.22.0)':
+    dependencies:
+      effect: 3.10.9
       fast-check: 3.22.0
+
+  '@effect/sql-pg@0.19.5(@effect/platform@0.69.15(effect@3.10.9))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9))(effect@3.10.9)':
+    dependencies:
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      '@effect/sql': 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)
+      '@opentelemetry/semantic-conventions': 1.27.0
+      effect: 3.10.9
+      postgres: 3.4.5
+
+  '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)':
+    dependencies:
+      '@effect/experimental': 0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      '@opentelemetry/semantic-conventions': 1.27.0
+      effect: 3.10.9
+
+  '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)':
+    dependencies:
+      '@effect/experimental': 0.30.16(@effect/platform@0.69.15(effect@3.10.9))(effect@3.10.9)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform': 0.69.15(effect@3.10.9)
+      '@opentelemetry/semantic-conventions': 1.27.0
+      effect: 3.10.9
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -7702,6 +7820,24 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
+  '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
+    optional: true
+
+  '@msgpackr-extract/msgpackr-extract-darwin-x64@3.0.3':
+    optional: true
+
+  '@msgpackr-extract/msgpackr-extract-linux-arm64@3.0.3':
+    optional: true
+
+  '@msgpackr-extract/msgpackr-extract-linux-arm@3.0.3':
+    optional: true
+
+  '@msgpackr-extract/msgpackr-extract-linux-x64@3.0.3':
+    optional: true
+
+  '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.3':
+    optional: true
+
   '@next/env@13.4.19': {}
 
   '@next/eslint-plugin-next@13.4.19':
@@ -7779,6 +7915,8 @@ snapshots:
 
   '@npmcli/name-from-folder@2.0.0': {}
 
+  '@opentelemetry/semantic-conventions@1.27.0': {}
+
   '@oslojs/encoding@0.4.1': {}
 
   '@pagefind/darwin-arm64@1.1.0':
@@ -7802,31 +7940,6 @@ snapshots:
     optional: true
 
   '@pkgr/core@0.1.0': {}
-
-  '@prisma/client@5.19.1(prisma@5.19.1)':
-    optionalDependencies:
-      prisma: 5.19.1
-
-  '@prisma/debug@5.19.1': {}
-
-  '@prisma/engines-version@5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3': {}
-
-  '@prisma/engines@5.19.1':
-    dependencies:
-      '@prisma/debug': 5.19.1
-      '@prisma/engines-version': 5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3
-      '@prisma/fetch-engine': 5.19.1
-      '@prisma/get-platform': 5.19.1
-
-  '@prisma/fetch-engine@5.19.1':
-    dependencies:
-      '@prisma/debug': 5.19.1
-      '@prisma/engines-version': 5.19.1-2.69d742ee20b815d88e17e54db4a2a7a3b30324e3
-      '@prisma/get-platform': 5.19.1
-
-  '@prisma/get-platform@5.19.1':
-    dependencies:
-      '@prisma/debug': 5.19.1
 
   '@radix-ui/number@1.1.0': {}
 
@@ -9450,7 +9563,9 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@3.7.0: {}
+  effect@3.10.9:
+    dependencies:
+      fast-check: 3.22.0
 
   electron-to-chromium@1.5.14: {}
 
@@ -10240,6 +10355,8 @@ snapshots:
   fill-range@7.1.1:
     dependencies:
       to-regex-range: 5.0.1
+
+  find-my-way-ts@0.1.5: {}
 
   find-up-simple@1.0.0: {}
 
@@ -12024,7 +12141,25 @@ snapshots:
 
   ms@2.1.3: {}
 
+  msgpackr-extract@3.0.3:
+    dependencies:
+      node-gyp-build-optional-packages: 5.2.2
+    optionalDependencies:
+      '@msgpackr-extract/msgpackr-extract-darwin-arm64': 3.0.3
+      '@msgpackr-extract/msgpackr-extract-darwin-x64': 3.0.3
+      '@msgpackr-extract/msgpackr-extract-linux-arm': 3.0.3
+      '@msgpackr-extract/msgpackr-extract-linux-arm64': 3.0.3
+      '@msgpackr-extract/msgpackr-extract-linux-x64': 3.0.3
+      '@msgpackr-extract/msgpackr-extract-win32-x64': 3.0.3
+    optional: true
+
+  msgpackr@1.11.0:
+    optionalDependencies:
+      msgpackr-extract: 3.0.3
+
   muggle-string@0.4.1: {}
+
+  multipasta@0.2.5: {}
 
   mustache@4.2.0: {}
 
@@ -12075,6 +12210,11 @@ snapshots:
   nlcst-to-string@4.0.0:
     dependencies:
       '@types/nlcst': 2.0.3
+
+  node-gyp-build-optional-packages@5.2.2:
+    dependencies:
+      detect-libc: 2.0.3
+    optional: true
 
   node-gyp-build@4.8.2: {}
 
@@ -12419,6 +12559,8 @@ snapshots:
       picocolors: 1.0.1
       source-map-js: 1.2.0
 
+  postgres@3.4.5: {}
+
   preferred-pm@3.1.4:
     dependencies:
       find-up: 5.0.0
@@ -12459,12 +12601,6 @@ snapshots:
       react-is: 18.3.1
 
   printable-characters@1.0.42: {}
-
-  prisma@5.19.1:
-    dependencies:
-      '@prisma/engines': 5.19.1
-    optionalDependencies:
-      fsevents: 2.3.3
 
   prismjs@1.29.0: {}
 
