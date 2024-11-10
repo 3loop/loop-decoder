@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-To use the default SQL stores you can import `SqlAbiStore` and `ContractStore ` from the `@3loop/transaction-decoder/sql`.
+To use the default SQL stores you can import `SqlAbiStore` and `SqlContractMetaStore ` from the `@3loop/transaction-decoder/sql`.
 
 Given that the SQL stores are based on `@effect/sql` it inherits its SQL Client abstraction. For example we will use a Sqlite client for bun: `SqliteClient` from `@effect/sql-sqlite-bun` package.
 
@@ -93,5 +93,5 @@ main()
 Now you can run this script with bun:
 
 ```
-$ bun run index.ts 1 0x123transactionhash
+$ ETHERSCAN_API_KEY='YOUR_API_KEY' RPC_1=https://rpc.ankr.com/eth bun run index.ts 1 0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7
 ```

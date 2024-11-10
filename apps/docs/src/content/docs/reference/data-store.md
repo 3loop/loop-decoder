@@ -159,7 +159,9 @@ By defulat loop decoder provides two stores that can be used out of the box:
 - `InMemoryAbiStore` - caches the resolved abi in-memory
 - `InMemoryContractMetaStore` - caches the resolved contract metadata in-memory
 
-2. Sqlite store - located at `@3loop/transaction-decoder/sql`
+You will most likely use these stores for testing and development purposes. A persistent store will significantly improve the performance of the decoder over time.
+
+1. Sqlite store - located at `@3loop/transaction-decoder/sql`
 
 - `SqlAbiStore` - caches the resolved abi in any sql database supported by `@effect/sql`
 - `SqlContractMetaStore` - caches the resolved contract metadata in any sql database supported by `@effect/sql`
