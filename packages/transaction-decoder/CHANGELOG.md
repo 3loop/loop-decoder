@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.21.0
+
+### Minor Changes
+
+- 0faa1fc: Added deep-nested decoding of calldata parameters for all transactions. Added 2 new keys to detect calldata in the parameters: \_data and \_target
+
 ## 0.20.0
 
 ### Minor Changes
