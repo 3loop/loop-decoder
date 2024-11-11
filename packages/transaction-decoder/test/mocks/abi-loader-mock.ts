@@ -1,18 +1,22 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
 import { Effect, Layer, Match } from 'effect'
 import fs from 'node:fs'
 import { AbiStore } from '../../src/abi-loader.js'
-// import { FourByteStrategyResolver } from '../../src/effect.js'
-// import { EtherscanStrategyResolver } from '../../src/abi-strategy/index.js'
+import { FourByteStrategyResolver } from '../../src/effect.js'
+import { EtherscanStrategyResolver } from '../../src/abi-strategy/index.js'
 
 export const MockedAbiStoreLive = Layer.succeed(
   AbiStore,
   AbiStore.of({
     strategies: {
-      default: [
-        // Run only when adding a new test case
-        // EtherscanStrategyResolver({ apikey: '' }),
-        // FourByteStrategyResolver(),
-      ],
+      default:
+        process.env.ETHERSCAN_API_KEY != null
+          ? [
+              // Run only when adding a new test case
+              EtherscanStrategyResolver({ apikey: process.env.ETHERSCAN_API_KEY! }),
+              FourByteStrategyResolver(),
+            ]
+          : [],
     },
     set: (key, response) =>
       Effect.gen(function* () {

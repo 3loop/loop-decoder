@@ -1,0 +1,1 @@
+{"name":"transferFrom","type":"function","stateMutability":"nonpayable","inputs":[{"type":"address"},{"type":"address"},{"type":"address"},{"type":"uint256"}],"outputs":[]}

@@ -150,6 +150,10 @@ const OTHER = [
     hash: '0x026fdb8b0017ef0e468e6d1627357adb9a8c4b6205ac0049bad80c253c76750c', // Disperse app
     chainID: 1,
   },
+  {
+    hash: '0x36f5c6d053ef3de0a412f871ead797d199d80dbc5ea4ba6ab1b1a211730aea13', //Uniswap Multicall
+    chainID: 1,
+  },
 ] as const
 
 export const TEST_TRANSACTIONS: TXS = [

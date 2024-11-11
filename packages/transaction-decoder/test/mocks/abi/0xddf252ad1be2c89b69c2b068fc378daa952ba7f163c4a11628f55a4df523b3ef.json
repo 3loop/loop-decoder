@@ -1,0 +1,1 @@
+{"name":"Transfer","type":"event","inputs":[{"type":"address"},{"type":"address"},{"type":"uint256"}]}

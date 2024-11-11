@@ -9,8 +9,8 @@ export default async function TransactionPage({ params }: { params: { hash: stri
   })
 
   if (!decoded || !decoded.toAddress) {
-    return <DecodingForm currentHash={params.hash} currentChainID={params.chainID} />
+    return <DecodingForm currentHash={params.hash} chainID={params.chainID} />
   }
 
-  return <DecodingForm decoded={decoded} currentHash={params.hash} currentChainID={params.chainID} />
+  return <DecodingForm decoded={decoded} currentHash={params.hash} chainID={params.chainID} />
 }
