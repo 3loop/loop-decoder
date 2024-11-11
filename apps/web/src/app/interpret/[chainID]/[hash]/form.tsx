@@ -1,9 +1,8 @@
 'use client'
 import * as React from 'react'
 import { Label } from '@/components/ui/label'
-import { DEFAULT_CHAIN_ID, geSidebarNavItems, EXAMPLE_TXS, INTERPRETER_REPO } from '@/app/data'
+import { EXAMPLE_TXS, INTERPRETER_REPO } from '@/app/data'
 import { useLocalStorage } from 'usehooks-ts'
-import { SidebarNav } from '@/components/ui/sidebar-nav'
 import { PlayIcon } from '@radix-ui/react-icons'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -16,14 +15,14 @@ import { fallbackInterpreter, getInterpreter } from '@3loop/transaction-interpre
 import { ExampleTransactions } from '@/components/ui/examples'
 
 interface FormProps {
-  currentChainID: number
+  chainID: number
   decoded?: DecodedTransaction
   currentHash?: string
 }
 
 const PATH = 'interpret'
 
-export default function DecodingForm({ decoded, currentHash, currentChainID }: FormProps) {
+export default function DecodingForm({ decoded, currentHash, chainID }: FormProps) {
   const [result, setResult] = React.useState<Interpretation>()
   const [persistedSchema, setSchema] = useLocalStorage(decoded?.toAddress ?? 'unknown', '')
 
@@ -44,7 +43,7 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const hash = (e.target as any).hash.value
-    router.push(`/${PATH}/${currentChainID}/${hash}`)
+    router.push(`/${PATH}/${chainID}/${hash}`)
   }
 
   const onRun = React.useCallback(() => {
@@ -84,7 +83,7 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
           <div className="flex w-full lg:items-center gap-2 flex-col lg:flex-row">
             <div>
               <NetworkSelect
-                defaultValue={currentChainID.toString()}
+                defaultValue={chainID.toString()}
                 onValueChange={(value) => {
                   const hash = currentHash || ''
                   router.push(`/${PATH}/${value}/${hash}`)

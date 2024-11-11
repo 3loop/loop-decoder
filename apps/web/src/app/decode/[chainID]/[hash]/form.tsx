@@ -10,20 +10,20 @@ import { NetworkSelect } from '@/components/ui/network-select'
 import { ExampleTransactions } from '@/components/ui/examples'
 
 interface FormProps {
-  currentChainID: number
+  chainID: number
   decoded?: DecodedTransaction
   currentHash?: string
 }
 
 const PATH = 'decode'
 
-export default function DecodingForm({ decoded, currentHash, currentChainID }: FormProps) {
+export default function DecodingForm({ decoded, currentHash, chainID }: FormProps) {
   const router = useRouter()
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const hash = (e.target as any).hash.value
-    router.push(`/${PATH}/${currentChainID}/${hash}`)
+    router.push(`/${PATH}/${chainID}/${hash}`)
   }
 
   return (
@@ -33,7 +33,7 @@ export default function DecodingForm({ decoded, currentHash, currentChainID }: F
           <div className="flex w-full lg:items-center gap-2 flex-col lg:flex-row">
             <div>
               <NetworkSelect
-                defaultValue={currentChainID.toString()}
+                defaultValue={chainID.toString()}
                 onValueChange={(value) => {
                   const hash = currentHash || ''
                   router.push(`/${PATH}/${value}/${hash}`)
