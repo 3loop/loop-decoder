@@ -1,0 +1,1 @@
+{"name":"validateUserOp","type":"function","stateMutability":"nonpayable","inputs":[{"type":"tuple","components":[{"type":"address"},{"type":"uint256"},{"type":"bytes"},{"type":"bytes"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"bytes"},{"type":"bytes"}]},{"type":"bytes32"},{"type":"uint256"}],"outputs":[]}

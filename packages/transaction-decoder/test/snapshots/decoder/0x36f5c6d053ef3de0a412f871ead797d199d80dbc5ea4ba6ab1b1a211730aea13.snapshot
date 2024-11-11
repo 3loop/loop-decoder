@@ -1,0 +1,188 @@
+{
+  "addressesMeta": {
+    "0x1F98415757620B543A52E61c46B32eB19261F984": {
+      "address": "0x1F98415757620B543A52E61c46B32eB19261F984",
+      "chainID": 1,
+      "contractAddress": "0x1F98415757620B543A52E61c46B32eB19261F984",
+      "contractName": "Mock ERC20 Contract",
+      "decimals": 18,
+      "tokenSymbol": "ERC20",
+      "type": "ERC20",
+    },
+    "0xaC21aC0AAA1c9C658C8ea29f81F02520a3D82D60": {
+      "address": "0xaC21aC0AAA1c9C658C8ea29f81F02520a3D82D60",
+      "chainID": 1,
+      "contractAddress": "0xaC21aC0AAA1c9C658C8ea29f81F02520a3D82D60",
+      "contractName": "Mock ERC20 Contract",
+      "decimals": 18,
+      "tokenSymbol": "ERC20",
+      "type": "ERC20",
+    },
+  },
+  "chainID": 1,
+  "chainSymbol": "mainnet",
+  "contractName": "Mock ERC20 Contract",
+  "contractType": "ERC20",
+  "effectiveGasPrice": "7233943704",
+  "errors": null,
+  "fromAddress": "0xac21ac0aaa1c9c658c8ea29f81f02520a3d82d60",
+  "gasPaid": "0.000372121298077464",
+  "gasUsed": "51441",
+  "interactedAddresses": [
+    "0xaC21aC0AAA1c9C658C8ea29f81F02520a3D82D60",
+    "0x1F98415757620B543A52E61c46B32eB19261F984",
+  ],
+  "interactions": [],
+  "methodCall": {
+    "name": "multicall",
+    "params": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "name": "target",
+                "type": "address",
+                "value": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+              },
+              {
+                "name": "gasLimit",
+                "type": "uint256",
+                "value": "1000000",
+              },
+              {
+                "name": "callData",
+                "type": "bytes",
+                "value": "0x0178b8bff992c34fe25f0141226c336a646b08d24bfed7aa58c7dbc3ec80377609e427a7",
+                "valueDecoded": {
+                  "name": "resolver",
+                  "params": [
+                    {
+                      "name": "node",
+                      "type": "bytes32",
+                      "value": "0xf992c34fe25f0141226c336a646b08d24bfed7aa58c7dbc3ec80377609e427a7",
+                    },
+                  ],
+                  "signature": "resolver(bytes32)",
+                  "type": "function",
+                },
+              },
+            ],
+            "name": "calls",
+            "type": "tuple",
+          },
+          {
+            "components": [
+              {
+                "name": "target",
+                "type": "address",
+                "value": "0x1F98415757620B543A52E61c46B32eB19261F984",
+              },
+              {
+                "name": "gasLimit",
+                "type": "uint256",
+                "value": "1000000",
+              },
+              {
+                "name": "callData",
+                "type": "bytes",
+                "value": "0x0f28c97d",
+                "valueDecoded": {
+                  "name": "getCurrentBlockTimestamp",
+                  "params": [],
+                  "signature": "getCurrentBlockTimestamp()",
+                  "type": "function",
+                },
+              },
+            ],
+            "name": "calls",
+            "type": "tuple",
+          },
+          {
+            "components": [
+              {
+                "name": "target",
+                "type": "address",
+                "value": "0x65770b5283117639760beA3F867b69b3697a91dd",
+              },
+              {
+                "name": "gasLimit",
+                "type": "uint256",
+                "value": "185000",
+              },
+              {
+                "name": "callData",
+                "type": "bytes",
+                "value": "0x70a08231000000000000000000000000ac21ac0aaa1c9c658c8ea29f81f02520a3d82d60",
+                "valueDecoded": {
+                  "name": "balanceOf",
+                  "params": [
+                    {
+                      "name": "_owner",
+                      "type": "address",
+                      "value": "0xaC21aC0AAA1c9C658C8ea29f81F02520a3D82D60",
+                    },
+                  ],
+                  "signature": "balanceOf(address)",
+                  "type": "function",
+                },
+              },
+            ],
+            "name": "calls",
+            "type": "tuple",
+          },
+        ],
+        "name": "calls",
+        "type": "tuple",
+      },
+    ],
+    "signature": "multicall((address,uint256,bytes)[])",
+    "type": "function",
+  },
+  "nativeValueSent": "0",
+  "reverted": false,
+  "timestamp": 1730731979,
+  "toAddress": "0x1f98415757620b543a52e61c46b32eb19261f984",
+  "traceCalls": [
+    {
+      "from": "0x1f98415757620b543a52e61c46b32eb19261f984",
+      "name": "resolver",
+      "params": [
+        {
+          "name": "node",
+          "type": "bytes32",
+          "value": "0xf992c34fe25f0141226c336a646b08d24bfed7aa58c7dbc3ec80377609e427a7",
+        },
+      ],
+      "signature": "resolver(bytes32)",
+      "to": "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+      "type": "function",
+    },
+    {
+      "from": "0x1f98415757620b543a52e61c46b32eb19261f984",
+      "name": "getCurrentBlockTimestamp",
+      "params": [],
+      "signature": "getCurrentBlockTimestamp()",
+      "to": "0x1f98415757620b543a52e61c46b32eb19261f984",
+      "type": "function",
+    },
+    {
+      "from": "0x1f98415757620b543a52e61c46b32eb19261f984",
+      "name": "balanceOf",
+      "params": [
+        {
+          "name": "_owner",
+          "type": "address",
+          "value": "0xaC21aC0AAA1c9C658C8ea29f81F02520a3D82D60",
+        },
+      ],
+      "signature": "balanceOf(address)",
+      "to": "0x65770b5283117639760bea3f867b69b3697a91dd",
+      "type": "function",
+    },
+  ],
+  "transfers": [],
+  "txHash": "0x36f5c6d053ef3de0a412f871ead797d199d80dbc5ea4ba6ab1b1a211730aea13",
+  "txIndex": 83,
+  "txType": "contract interaction",
+}

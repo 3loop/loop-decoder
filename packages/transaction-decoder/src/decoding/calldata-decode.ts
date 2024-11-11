@@ -3,10 +3,12 @@ import { isAddress, Hex, getAddress, encodeFunctionData, Address } from 'viem'
 import { getProxyStorageSlot } from './proxies.js'
 import { AbiParams, AbiStore, ContractAbiResult, getAndCacheAbi, MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
-import { ProxyType, TreeNode } from '../types.js'
+import { TreeNode } from '../types.js'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
-import { sameAddress } from '../helpers/address.js'
-import { MULTICALL3_ADDRESS, SAFE_MULTISEND_ABI, SAFE_MULTISEND_SIGNATURE } from './constants.js'
+import { SAFE_MULTISEND_ABI, SAFE_MULTISEND_SIGNATURE } from './constants.js'
+
+const callDataKeys = ['callData', 'data', '_data']
+const addressKeys = ['to', 'target', '_target']
 
 const decodeBytesRecursively = (
   node: TreeNode,
@@ -18,8 +20,6 @@ const decodeBytesRecursively = (
   AbiStore<AbiParams, ContractAbiResult> | PublicClient
 > =>
   Effect.gen(function* () {
-    const callDataKeys = ['callData', 'data']
-    const addressKeys = ['to', 'target']
     const isCallDataNode =
       callDataKeys.includes(node.name) && node.type === 'bytes' && node.value && node.value !== '0x'
 
@@ -147,20 +147,19 @@ export const decodeMethod = ({
 }) =>
   Effect.gen(function* () {
     const signature = data.slice(0, 10)
-    let proxyType: ProxyType | undefined
+    let implementationAddress: Address | undefined
 
     if (isAddress(contractAddress)) {
       //if contract is a proxy, get the implementation address
       const implementation = yield* getProxyStorageSlot({ address: getAddress(contractAddress), chainID })
 
       if (implementation) {
-        contractAddress = implementation.address
-        proxyType = implementation.type
+        implementationAddress = implementation.address
       }
     }
 
     const abi = yield* getAndCacheAbi({
-      address: contractAddress,
+      address: implementationAddress ?? contractAddress,
       signature,
       chainID,
     })
@@ -169,38 +168,6 @@ export const decodeMethod = ({
 
     if (decoded == null) {
       return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${data}`)
-    }
-
-    //MULTICALL3: decode the params for the multicall3 contract
-    if (sameAddress(MULTICALL3_ADDRESS, contractAddress) && decoded.params) {
-      const targetAddress = decoded.params.find((p) => p.name === 'target')?.value as Address | undefined
-      const decodedParams = yield* Effect.all(
-        decoded.params.map((p) => decodeBytesRecursively(p, chainID, targetAddress)),
-        {
-          concurrency: 'unbounded',
-        },
-      )
-
-      return {
-        ...decoded,
-        params: decodedParams,
-      }
-    }
-
-    //SAFE CONTRACT: decode the params for the safe smart account contract
-    if (proxyType === 'safe' && decoded.params != null) {
-      const toAddress = decoded.params.find((p) => p.name === 'to')?.value as Address | undefined
-      const decodedParams = yield* Effect.all(
-        decoded.params.map((p) => decodeBytesRecursively(p, chainID, toAddress)),
-        {
-          concurrency: 'unbounded',
-        },
-      )
-
-      return {
-        ...decoded,
-        params: decodedParams,
-      }
     }
 
     //MULTISEND: decode the params for the multisend contract which is also related to the safe smart account
@@ -213,6 +180,29 @@ export const decodeMethod = ({
       return {
         ...decoded,
         params: decodedParams,
+      }
+    }
+
+    //Attempt to decode the params recursively if they contain data bytes or tuple params
+    if (decoded.params != null) {
+      const hasCalldataParam = decoded.params.find((p) => callDataKeys.includes(p.name) && p.type === 'bytes')
+      const hasTuppleParams = decoded.params.some((p) => p.type === 'tuple')
+
+      if (hasCalldataParam || hasTuppleParams) {
+        const targetAddressParam = decoded.params.find((p) => addressKeys.includes(p.name))
+        const targetAddress = targetAddressParam?.value as Address | undefined
+
+        const decodedParams = yield* Effect.all(
+          decoded.params.map((p) => decodeBytesRecursively(p, chainID, targetAddress)),
+          {
+            concurrency: 'unbounded',
+          },
+        )
+
+        return {
+          ...decoded,
+          params: decodedParams,
+        }
       }
     }
 

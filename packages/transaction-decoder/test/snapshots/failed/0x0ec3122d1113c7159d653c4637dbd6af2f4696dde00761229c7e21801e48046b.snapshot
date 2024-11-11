@@ -55,6 +55,49 @@
   "traceCalls": [
     {
       "from": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
+      "name": "isModule",
+      "params": [
+        {
+          "name": "unknown",
+          "type": "address",
+          "value": "0x5DC66BdeD53937C225204215a71271E634647B61",
+        },
+      ],
+      "signature": "isModule(address)",
+      "to": "0x37b0f2e9a597953476a7e2e0d6cc5f7479daf68a",
+      "type": "function",
+    },
+    {
+      "from": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
+      "name": "transferFrom",
+      "params": [
+        {
+          "name": "unknown",
+          "type": "address",
+          "value": "0x0305f515fa978cf87226cf8A9776D25bcfb2Cc0B",
+        },
+        {
+          "name": "unknown",
+          "type": "address",
+          "value": "0x27d377547da6bEeE6ec254a6bE22868B4a418708",
+        },
+        {
+          "name": "unknown",
+          "type": "address",
+          "value": "0x9c8648Bf415e4f49381C42757A4eEf1C566D6Ed8",
+        },
+        {
+          "name": "unknown",
+          "type": "uint256",
+          "value": "341279996700581973287192643",
+        },
+      ],
+      "signature": "transferFrom(address,address,address,uint256)",
+      "to": "0x5832a39c41a9f44dca1c49724c486c02a7fe05ca",
+      "type": "function",
+    },
+    {
+      "from": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
       "name": "balanceOf",
       "params": [
         {
@@ -79,6 +122,30 @@
       ],
       "signature": "balanceOf(address)",
       "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "type": "function",
+    },
+    {
+      "from": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
+      "name": "sendFunds",
+      "params": [
+        {
+          "name": "unknown",
+          "type": "address",
+          "value": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        },
+        {
+          "name": "unknown",
+          "type": "address",
+          "value": "0xA3dB3d1569d58A7235916d76322934B238420988",
+        },
+        {
+          "name": "unknown",
+          "type": "uint256",
+          "value": "1990744772090303",
+        },
+      ],
+      "signature": "sendFunds(address,address,uint256)",
+      "to": "0x9c8648bf415e4f49381c42757a4eef1c566d6ed8",
       "type": "function",
     },
   ],
