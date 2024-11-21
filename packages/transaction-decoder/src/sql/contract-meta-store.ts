@@ -17,16 +17,16 @@ export const make = () =>
       const publicClient = yield* PublicClient
 
       yield* sql`
-      CREATE TABLE IF NOT EXISTS contractMeta (
-        address TEXT NOT NULL,
-        chain INTEGER NOT NULL,
-        contractName TEXT,
-        tokenSymbol TEXT,
-        decimals INTEGER,
-        type TEXT,
-        status TEXT NOT NULL
-      )
-    `
+        CREATE TABLE IF NOT EXISTS contractMeta (
+          address TEXT NOT NULL,
+          chain INTEGER NOT NULL,
+          contractName TEXT,
+          tokenSymbol TEXT,
+          decimals INTEGER,
+          type TEXT,
+          status TEXT NOT NULL
+        )
+      `.pipe(Effect.catchAll(() => Effect.dieMessage('Failed to create contractMeta table')))
 
       return ContractMetaStore.of({
         strategies: {

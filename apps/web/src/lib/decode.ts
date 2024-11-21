@@ -46,18 +46,8 @@ export async function decodeTransaction({
   hash: string
 }): Promise<DecodedTransaction | undefined> {
   // NOTE: For unknonw reason the context of main layer is still missing the SqlClient in the type
-  const runnable = Effect.provide(decodeTransactionByHash(hash as Hex, chainID), MainLayer) as Effect.Effect<
-    DecodedTransaction,
-    | SqlError
-    | UnknownNetwork
-    | ConfigError
-    | SqlError
-    | RPCFetchError
-    | ParseError
-    | UnsupportedEvent
-    | FetchTransactionError,
-    never
-  >
+  const runnable = Effect.provide(decodeTransactionByHash(hash as Hex, chainID), MainLayer)
+
   return Effect.runPromise(runnable).catch((error: unknown) => {
     console.error('Decode error', JSON.stringify(error, null, 2))
     return undefined
@@ -80,18 +70,8 @@ export async function decodeCalldata({
       contractAddress,
     }),
     MainLayer,
-  ) as Effect.Effect<
-    DecodeResult,
-    | SqlError
-    | UnknownNetwork
-    | ConfigError
-    | SqlError
-    | RPCFetchError
-    | ParseError
-    | UnsupportedEvent
-    | FetchTransactionError,
-    never
-  >
+  )
+
   return Effect.runPromise(runnable).catch((error: unknown) => {
     console.error('Decode error', JSON.stringify(error, null, 2))
     return undefined
