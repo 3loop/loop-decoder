@@ -1,4 +1,4 @@
-import { displayPayments, processNftTransfers, defaultEvent } from './std.js'
+import { displayAssets, processNftTransfers, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
@@ -16,7 +16,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
 
   const collection = nftTransfers[0].name ?? ''
   const numberOfNfts = nftTransfers.length > 1 ? ` ${nftTransfers.length} ${collection} NFTS` : ` 1 ${collection} NFT`
-  const payment = displayPayments(erc20Payments, nativePayments)
+  const payment = displayAssets([...erc20Payments, ...nativePayments])
 
   const sell = ['takeBidSingle', 'takeBid']
   const buy = ['takeAskSinglePool', 'takeAskSingle', 'takeAsk', 'takeAskPool', 'batchBuyWithETH', 'batchBuyWithERC20s']
