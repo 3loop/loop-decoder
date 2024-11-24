@@ -107,7 +107,7 @@ const decodeGnosisMultisendParams = (
           abi: SAFE_MULTISEND_ABI,
           args: [txs],
         }),
-      catch: (error) => new AbiDecoder.DecodeError(error),
+      catch: (error) => new AbiDecoder.DecodeError(`Could not encode multisend transactions`, error),
     })
     const txsDecoded = yield* AbiDecoder.decodeMethod(txsEncoded, SAFE_MULTISEND_ABI)
 

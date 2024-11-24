@@ -5,8 +5,8 @@ import { Data, Effect } from 'effect'
 import { messageFromUnknown } from '../helpers/error.js'
 
 export class DecodeError extends Data.TaggedError('DecodeError')<{ message: string }> {
-  constructor(error: unknown) {
-    super({ message: `Failed to decode ${messageFromUnknown(error)}` })
+  constructor(message: string, error?: unknown) {
+    super({ message: `${message} ${messageFromUnknown(error)}` })
   }
 }
 
@@ -72,7 +72,7 @@ export const decodeMethod = (data: Hex, abi: Abi): Effect.Effect<DecodeResult | 
   Effect.gen(function* () {
     const { functionName, args = [] } = yield* Effect.try({
       try: () => decodeFunctionData({ abi, data }),
-      catch: (error) => new DecodeError(error),
+      catch: (error) => new DecodeError(`Could not decode function data`, error),
     })
 
     const method = getAbiItem({ abi, name: functionName, args }) as AbiFunction | undefined
@@ -80,7 +80,7 @@ export const decodeMethod = (data: Hex, abi: Abi): Effect.Effect<DecodeResult | 
     if (method != null) {
       const signature = yield* Effect.try({
         try: () => formatAbiItem(method),
-        catch: (error) => new DecodeError(error),
+        catch: (error) => new DecodeError(`Could not format function data`, error),
       })
 
       const paramsTree = attachValues(method.inputs, args)

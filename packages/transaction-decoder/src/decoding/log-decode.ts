@@ -45,11 +45,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
           data: logItem.data,
           strict: false,
         }),
-      catch: (err) =>
-        Effect.gen(function* () {
-          yield* Effect.logError(`Could not decode log ${abiAddress} `, err)
-          return new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)
-        }),
+      catch: (err) => new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`, err),
     })
 
     if (eventName == null) {
@@ -58,7 +54,12 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
 
     const args = args_ as any
 
-    const fragment = getAbiItem({ abi: abiItem, name: eventName })
+    const fragment = yield* Effect.try({
+      try: () => getAbiItem({ abi: abiItem, name: eventName }),
+      catch: () => {
+        Effect.logError(`Could not find fragment in ABI ${abiAddress} ${eventName}`)
+      },
+    })
 
     if (fragment == null) {
       return yield* new AbiDecoder.DecodeError(`Could not find fragment in ABI ${abiAddress} ${eventName}`)
@@ -136,8 +137,10 @@ export const decodeLogs = ({ logs, transaction }: { logs: readonly Log[]; transa
 
     const eithers = effects.map((e) => Effect.either(e))
 
-    return yield* Effect.all(eithers, {
+    const resp = yield* Effect.all(eithers, {
       concurrency: 'inherit',
       batching: 'inherit',
     })
+
+    return resp
   })
