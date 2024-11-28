@@ -16,17 +16,23 @@ export const make = () =>
       const sql = yield* SqlClient.SqlClient
       const publicClient = yield* PublicClient
 
+      const table = sql('loop_decoder_contract_meta__')
+
+      // TODO; add timestamp to the table
       yield* sql`
-        CREATE TABLE IF NOT EXISTS contractMeta (
+        CREATE TABLE IF NOT EXISTS ${table} (
           address TEXT NOT NULL,
           chain INTEGER NOT NULL,
-          contractName TEXT,
-          tokenSymbol TEXT,
+          contract_name TEXT,
+          token_symbol TEXT,
           decimals INTEGER,
           type TEXT,
           status TEXT NOT NULL
         )
-      `.pipe(Effect.catchAll(() => Effect.dieMessage('Failed to create contractMeta table')))
+      `.pipe(
+        Effect.tapError(Effect.logError),
+        Effect.catchAll(() => Effect.dieMessage('Failed to create contractMeta table')),
+      )
 
       return ContractMetaStore.of({
         strategies: {
@@ -39,28 +45,51 @@ export const make = () =>
         set: (key, value) =>
           Effect.gen(function* () {
             if (value.status === 'success') {
-              const name = value.result.contractName ?? null
-              const symbol = value.result.tokenSymbol ?? null
-              const decimals = value.result.decimals ?? null
+              const name = value.result.contractName ?? ''
+              const symbol = value.result.tokenSymbol ?? ''
+              const decimals = value.result.decimals ?? undefined
+
+              const clear = Object.fromEntries(
+                Object.entries({
+                  address: key.address.toLowerCase(),
+                  chain: key.chainID,
+                  contract_name: name,
+                  token_symbol: symbol,
+                  decimals,
+                  type: value.result.type,
+                  status: 'success',
+                }).filter(([_, v]) => v !== undefined),
+              )
 
               yield* sql`
-              INSERT INTO contractMeta (address, chain, contractName, tokenSymbol, decimals, type, status)
-              VALUES (${key.address.toLowerCase()}, ${key.chainID}, ${name}, ${symbol}, ${decimals},
-               ${value.result.type}, "success")
-            `
+                INSERT INTO ${table}
+                ${sql.insert([clear])}
+              `
             } else {
               yield* sql`
-              INSERT INTO contractMeta (address, chain, contractName, tokenSymbol, decimals, type, status)
-              VALUES (${key.address.toLowerCase()}, ${key.chainID}, null, null, null, null, "not-found")
-            `
+                INSERT INTO ${table}
+                ${sql.insert([
+                  {
+                    address: key.address.toLowerCase(),
+                    chain: key.chainID,
+                    status: 'not-found',
+                  },
+                ])}
+              `
             }
-          }).pipe(Effect.catchAll(() => Effect.succeed(null))),
+          }).pipe(
+            Effect.tapError(Effect.logError),
+            Effect.catchAll(() => Effect.succeed(null)),
+          ),
         get: ({ address, chainID }) =>
           Effect.gen(function* () {
             const items = yield* sql`
-            SELECT * FROM contractMeta
-            WHERE address = ${address.toLowerCase()} AND chain = ${chainID}
-          `.pipe(Effect.catchAll(() => Effect.succeed([])))
+            SELECT * FROM ${table}
+            WHERE ${sql.and([sql`address = ${address.toLowerCase()}`, sql`chain = ${chainID}`])}
+          `.pipe(
+              Effect.tapError(Effect.logError),
+              Effect.catchAll(() => Effect.succeed([])),
+            )
 
             const item = items[0]
 
@@ -69,8 +98,8 @@ export const make = () =>
                 status: 'success',
                 result: {
                   contractAddress: address,
-                  contractName: item.contractName,
-                  tokenSymbol: item.tokenSymbol,
+                  contractName: item.contract_name,
+                  tokenSymbol: item.token_symbol,
                   decimals: item.decimals,
                   type: item.type,
                   address,
