@@ -1,16 +1,16 @@
-import { displayAddress, displayAsset, getPayments, defaultEvent } from './std.js'
+import { displayAddress, displayAsset, getNetTransfers, defaultEvent } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = defaultEvent(event)
 
-  const netSent = getPayments({
+  const netSent = getNetTransfers({
     transfers: event.transfers,
     fromAddresses: [event.fromAddress],
   })
 
-  const netReceived = getPayments({
+  const netReceived = getNetTransfers({
     transfers: event.transfers,
     toAddresses: [event.fromAddress],
   })
