@@ -1,5 +1,17 @@
 # web
 
+## 0.1.36
+
+### Patch Changes
+
+- Updated dependencies [7b1fedf]
+- Updated dependencies [7b1fedf]
+- Updated dependencies [d058de3]
+- Updated dependencies [d058de3]
+- Updated dependencies [d058de3]
+  - @3loop/transaction-interpreter@0.11.0
+  - @3loop/transaction-decoder@0.21.1
+
 ## 0.1.35
 
 ### Patch Changes
