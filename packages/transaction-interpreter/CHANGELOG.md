@@ -1,5 +1,20 @@
 # @3loop/transaction-interpreter
 
+## 0.11.0
+
+### Minor Changes
+
+- 7b1fedf: Add default categorization of swaps into fallback interpreter
+
+### Patch Changes
+
+- d058de3: Bump effect version to latest, and remove the separate schema package
+- Updated dependencies [7b1fedf]
+- Updated dependencies [d058de3]
+- Updated dependencies [d058de3]
+- Updated dependencies [d058de3]
+  - @3loop/transaction-decoder@0.21.1
+
 ## 0.10.7
 
 ### Patch Changes

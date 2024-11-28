@@ -1,5 +1,14 @@
 # @3loop/transaction-decoder
 
+## 0.21.1
+
+### Patch Changes
+
+- 7b1fedf: Improve decoder error displaying
+- d058de3: Bump effect version to latest, and remove the separate schema package
+- d058de3: Fetch contract meta and contract abi in parallel when decoding a log
+- d058de3: SQL stores will now die instead of failure if tables can't be created
+
 ## 0.21.0
 
 ### Minor Changes
