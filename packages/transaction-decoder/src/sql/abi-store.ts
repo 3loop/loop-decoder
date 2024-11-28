@@ -9,16 +9,17 @@ export const make = (strategies: AbiStore['strategies']) =>
       const sql = yield* SqlClient.SqlClient
 
       yield* sql`
-      CREATE TABLE IF NOT EXISTS contractAbi (
-        type TEXT NOT NULL,
-        address TEXT,
-        event TEXT,
-        signature TEXT,
-        chain INTEGER,
-        abi TEXT,
-        status TEXT NOT NULL
-      )
-    `
+        CREATE TABLE IF NOT EXISTS contractAbi (
+          type TEXT NOT NULL,
+          address TEXT,
+          event TEXT,
+          signature TEXT,
+          chain INTEGER,
+          abi TEXT,
+          status TEXT NOT NULL
+        )
+      `.pipe(Effect.catchAll(() => Effect.dieMessage('Failed to create contractAbi table')))
+
       return AbiStore.of({
         strategies,
         set: (key, value) =>

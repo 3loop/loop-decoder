@@ -21,7 +21,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
   Effect.gen(function* () {
     const chainID = Number(transaction.chainId)
 
-    const address = logItem.address
+    const address = getAddress(logItem.address)
     let abiAddress = address
 
     const implementation = yield* getProxyStorageSlot({ address: getAddress(abiAddress), chainID })
@@ -31,11 +31,22 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       abiAddress = implementation.address
     }
 
-    const abiItem = yield* getAndCacheAbi({
-      address: abiAddress,
-      event: logItem.topics[0],
-      chainID,
-    })
+    const [abiItem, contractData] = yield* Effect.all(
+      [
+        getAndCacheAbi({
+          address: abiAddress,
+          event: logItem.topics[0],
+          chainID,
+        }),
+        getAndCacheContractMeta({
+          address,
+          chainID: Number(transaction.chainId),
+        }),
+      ],
+      {
+        concurrency: 'unbounded',
+      },
+    )
 
     const { eventName, args: args_ } = yield* Effect.try({
       try: () =>
@@ -99,21 +110,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       decoded: true,
     }
 
-    return yield* transformLog(transaction, rawLog)
-  })
-
-const transformLog = (transaction: GetTransactionReturnType, log: RawDecodedLog) =>
-  Effect.gen(function* () {
-    const events = Object.fromEntries(log.events.map((param) => [param.name, param.value]))
-
-    // NOTE: Can use a common parser with branded type evrywhere
-    const address = getAddress(log.address)
-
-    const contractData = yield* getAndCacheContractMeta({
-      address,
-      chainID: Number(transaction.chainId),
-    })
-
+    const events = Object.fromEntries(rawLog.events.map((param) => [param.name, param.value]))
     return {
       contractName: contractData?.contractName || null,
       contractSymbol: contractData?.tokenSymbol || null,
@@ -121,12 +118,12 @@ const transformLog = (transaction: GetTransactionReturnType, log: RawDecodedLog)
       decimals: contractData?.decimals || null,
       chainID: Number(transaction.chainId),
       contractType: contractData?.type ?? 'OTHER',
-      signature: log.signature,
+      signature: rawLog.signature,
       event: {
-        eventName: log.name,
-        logIndex: log.logIndex,
+        eventName: rawLog.name,
+        logIndex: rawLog.logIndex,
         params: events,
-        ...(!log.decoded && { decoded: log.decoded }),
+        ...(!rawLog.decoded && { decoded: rawLog.decoded }),
       },
     } as Interaction
   })

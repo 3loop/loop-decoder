@@ -1,11 +1,10 @@
-import { Effect } from 'effect'
-import * as Schema from '@effect/schema/Schema'
+import { Effect, Schema } from 'effect'
 import { RPCFetchError, PublicClient } from './public-client.js'
 import type { TraceLog, TraceLogTree } from './schema/trace.js'
 import { EthTrace } from './schema/trace.js'
 import { transformTraceTree } from './helpers/trace.js'
 import { GetTransactionReturnType, type Hash } from 'viem'
-import { ParseError } from '@effect/schema/ParseResult'
+import { ParseError } from 'effect/ParseResult'
 
 export const getTransaction = (hash: Hash, chainID: number) =>
   Effect.gen(function* () {

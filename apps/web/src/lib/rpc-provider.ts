@@ -10,17 +10,11 @@ const providerConfigs: Record<string, (typeof supportedChains)[number]> = suppor
   }
 }, {})
 
-const providers: Record<number, PublicClientObject> = {}
-
 export function getProvider(chainID: number): PublicClientObject | null {
-  let provider = providers[chainID]
-  if (provider != null) {
-    return provider
-  }
   const url = providerConfigs[chainID]?.rpcUrl
 
   if (url != null) {
-    provider = {
+    return {
       client: createPublicClient({
         transport: http(url),
       }),
@@ -28,9 +22,6 @@ export function getProvider(chainID: number): PublicClientObject | null {
         traceAPI: providerConfigs[chainID]?.traceAPI,
       },
     }
-
-    providers[chainID] = provider
-    return provider
   }
 
   return null
