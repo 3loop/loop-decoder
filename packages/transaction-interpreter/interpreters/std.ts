@@ -65,14 +65,16 @@ export function assetsReceived(transfers: Asset[], address: string): AssetTransf
   return filtered.filter((t) => t.to.toLowerCase() === address.toLowerCase()).map(toAssetTransfer)
 }
 
-export function getPayments({
+export function getNetTransfers({
   transfers,
   fromAddresses,
   toAddresses,
+  type,
 }: {
   transfers: Asset[]
   fromAddresses?: string[]
   toAddresses?: string[]
+  type?: string | string[]
 }): Payment[] {
   const fromAddressFilter = fromAddresses?.map((a) => a.toLowerCase())
   const toAddressFilter = toAddresses?.map((a) => a.toLowerCase())
@@ -84,6 +86,14 @@ export function getPayments({
 
   if (toAddressFilter && toAddressFilter.length > 0) {
     filteredTransfers = filteredTransfers.filter((t) => toAddressFilter.includes(t.to.toLowerCase()))
+  }
+
+  if (type) {
+    if (Array.isArray(type)) {
+      filteredTransfers = filteredTransfers.filter((t) => type.includes(t.type))
+    } else {
+      filteredTransfers = filteredTransfers.filter((t) => t.type === type)
+    }
   }
 
   return Object.values(
@@ -139,12 +149,12 @@ export function processNftTransfers(transfers: Asset[]) {
     }
   })
 
-  const erc20Payments = getPayments({
+  const erc20Payments = getNetTransfers({
     transfers: erc20Transfers,
     fromAddresses: Array.from(receivingAddresses),
   })
 
-  const nativePayments = getPayments({
+  const nativePayments = getNetTransfers({
     transfers: nativeTransfers,
     fromAddresses: Array.from(receivingAddresses),
   })
@@ -332,12 +342,12 @@ export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedT
   }
 
   if (isSwap(event)) {
-    const netSent = getPayments({
+    const netSent = getNetTransfers({
       transfers: event.transfers,
       fromAddresses: [event.fromAddress],
     })
 
-    const netReceived = getPayments({
+    const netReceived = getNetTransfers({
       transfers: event.transfers,
       toAddresses: [event.fromAddress],
     })
