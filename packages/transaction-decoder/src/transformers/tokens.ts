@@ -102,7 +102,7 @@ function getTokens(interactions: Interaction[]): Asset[] {
         ]
       }
 
-      console.error('Unsupported type:', interaction)
+      console.warn('Unsupported type:', interaction)
       // TODO: Batch transfers are not supported yet
       return []
     })

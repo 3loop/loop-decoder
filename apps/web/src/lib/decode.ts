@@ -1,5 +1,5 @@
 import { getProvider, RPCProviderLive } from './rpc-provider'
-import { Effect, Layer } from 'effect'
+import { Effect, Layer, ManagedRuntime } from 'effect'
 import {
   DecodedTransaction,
   DecodeResult,
@@ -54,6 +54,8 @@ const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer) as Layer.Layer<
   never
 >
 
+const runtime = ManagedRuntime.make(MainLayer)
+
 export async function decodeTransaction({
   chainID,
   hash,
@@ -62,9 +64,9 @@ export async function decodeTransaction({
   hash: string
 }): Promise<DecodedTransaction | undefined> {
   // NOTE: For unknonw reason the context of main layer is still missing the SqlClient in the type
-  const runnable = Effect.provide(decodeTransactionByHash(hash as Hex, chainID), MainLayer)
+  const runnable = decodeTransactionByHash(hash as Hex, chainID)
 
-  return Effect.runPromise(runnable).catch((error: unknown) => {
+  return runtime.runPromise(runnable).catch((error: unknown) => {
     console.error('Decode error', JSON.stringify(error, null, 2))
     return undefined
   })
@@ -79,16 +81,13 @@ export async function decodeCalldata({
   data: string
   contractAddress?: string
 }): Promise<DecodeResult | undefined> {
-  const runnable = Effect.provide(
-    calldataDecoder({
-      data: data as Hex,
-      chainID,
-      contractAddress,
-    }),
-    MainLayer,
-  )
+  const runnable = calldataDecoder({
+    data: data as Hex,
+    chainID,
+    contractAddress,
+  })
 
-  return Effect.runPromise(runnable).catch((error: unknown) => {
+  return runtime.runPromise(runnable).catch((error: unknown) => {
     console.error('Decode error', JSON.stringify(error, null, 2))
     return undefined
   })
