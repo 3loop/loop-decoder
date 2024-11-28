@@ -13,13 +13,21 @@ import {
   SourcifyStrategyResolver,
   UnknownNetwork,
   UnsupportedEvent,
+  AbiStore,
+  AbiParams,
+  ContractAbiResult,
+  ContractMetaStore,
+  ContractMetaParams,
+  ContractMetaResult,
+  PublicClient,
 } from '@3loop/transaction-decoder'
 import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sql'
 import { Hex } from 'viem'
 import { DatabaseLive } from './database'
-import { SqlError } from '@effect/sql/SqlError'
+import { PgClient } from '@effect/sql-pg/PgClient'
+import { SqlClient } from '@effect/sql/SqlClient'
 import { ConfigError } from 'effect/ConfigError'
-import { ParseError } from 'effect/ParseResult'
+import { SqlError } from '@effect/sql/SqlError'
 
 const AbiStoreLive = SqlAbiStore.make({
   default: [
@@ -36,7 +44,15 @@ const MetaStoreLive = SqlContractMetaStore.make()
 
 const DataLayer = Layer.mergeAll(RPCProviderLive, DatabaseLive)
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, MetaStoreLive)
-const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer)
+const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer) as Layer.Layer<
+  | AbiStore<AbiParams, ContractAbiResult>
+  | ContractMetaStore<ContractMetaParams, ContractMetaResult>
+  | PublicClient
+  | PgClient
+  | SqlClient,
+  ConfigError | SqlError,
+  never
+>
 
 export async function decodeTransaction({
   chainID,

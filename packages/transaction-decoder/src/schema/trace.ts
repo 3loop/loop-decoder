@@ -1,5 +1,4 @@
-import * as Schema from '@effect/schema/Schema'
-
+import { Schema } from 'effect'
 const CallType = Schema.Literal('call', 'delegatecall', 'callcode', 'staticcall')
 
 const Address = Schema.String // NOTE: Probably we can use a branded type
