@@ -1,6 +1,6 @@
 import { UnknownNetwork } from '../public-client.js'
 import { ContractData } from '../types.js'
-import { Request } from 'effect'
+import { PrimaryKey, Schema, SchemaAST } from 'effect'
 import { Address } from 'viem'
 
 export interface FetchMetaParams {
@@ -17,11 +17,20 @@ export class ResolveStrategyMetaError {
   ) {}
 }
 
-// TODO: Remove UnknownNetwork
-export interface GetContractMetaStrategy
-  extends Request.Request<ContractData, ResolveStrategyMetaError | UnknownNetwork>,
-    FetchMetaParams {
-  readonly _tag: 'GetContractMetaStrategy'
+class SchemaAddress extends Schema.make<Address>(SchemaAST.stringKeyword) {}
+class SchemaContractData extends Schema.make<ContractData>(SchemaAST.objectKeyword) {}
+export class GetContractMetaStrategy extends Schema.TaggedRequest<GetContractMetaStrategy>()(
+  'GetContractMetaStrategy',
+  {
+    failure: Schema.Union(Schema.instanceOf(ResolveStrategyMetaError), Schema.instanceOf(UnknownNetwork)),
+    success: SchemaContractData,
+    payload: {
+      chainID: Schema.Number,
+      address: SchemaAddress,
+    },
+  },
+) {
+  [PrimaryKey.symbol]() {
+    return `contract-meta-strategy::${this.chainID}:${this.address}`
+  }
 }
-
-export const GetContractMetaStrategy = Request.tagged<GetContractMetaStrategy>('GetContractMetaStrategy')

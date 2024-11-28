@@ -1,4 +1,16 @@
-import { Context, Effect, Either, RequestResolver, Request, Array, pipe, Data } from 'effect'
+import {
+  Context,
+  Effect,
+  Either,
+  RequestResolver,
+  Request,
+  Array,
+  pipe,
+  Data,
+  PrimaryKey,
+  Schema,
+  SchemaAST,
+} from 'effect'
 import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
 import { Abi } from 'viem'
 
@@ -63,11 +75,21 @@ export class EmptyCalldataError extends Data.TaggedError('DecodeError')<
   }
 }
 
-export interface AbiLoader extends Request.Request<Abi, MissingABIError>, LoadParameters {
-  _tag: 'AbiLoader'
+class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) {}
+class AbiLoader extends Schema.TaggedRequest<AbiLoader>()('AbiLoader', {
+  failure: Schema.instanceOf(MissingABIError),
+  success: SchemaAbi, // Abi
+  payload: {
+    chainID: Schema.Number,
+    address: Schema.String,
+    event: Schema.optional(Schema.String),
+    signature: Schema.optional(Schema.String),
+  },
+}) {
+  [PrimaryKey.symbol]() {
+    return `abi::${this.chainID}:${this.address}:${this.event}:${this.signature}`
+  }
 }
-
-const AbiLoader = Request.tagged<AbiLoader>('AbiLoader')
 
 function makeRequestKey(key: AbiLoader) {
   return `abi::${key.chainID}:${key.address}:${key.event}:${key.signature}`
@@ -191,7 +213,7 @@ const AbiLoaderRequestResolver: Effect.Effect<
 
     // NOTE: Firstly we batch strategies by address because in a transaction most of events and traces are from the same abi
     const response = yield* Effect.forEach(remaining, (req) => {
-      const strategyRequest = GetContractABIStrategy({
+      const strategyRequest = new GetContractABIStrategy({
         address: req.address,
         chainID: req.chainID,
       })
@@ -216,7 +238,7 @@ const AbiLoaderRequestResolver: Effect.Effect<
 
     // NOTE: Secondly we request strategies to fetch fragments
     const fragmentStrategyResults = yield* Effect.forEach(notFound, ({ chainID, address, event, signature }) => {
-      const strategyRequest = GetContractABIStrategy({
+      const strategyRequest = new GetContractABIStrategy({
         address,
         chainID,
         event,
@@ -271,7 +293,7 @@ export const getAndCacheAbi = (params: AbiParams) =>
       return yield* Effect.fail(new EmptyCalldataError(params))
     }
 
-    return yield* Effect.request(AbiLoader(params), AbiLoaderRequestResolver)
+    return yield* Effect.request(new AbiLoader(params), AbiLoaderRequestResolver)
   }).pipe(
     Effect.withSpan('AbiLoader.GetAndCacheAbi', {
       attributes: {
