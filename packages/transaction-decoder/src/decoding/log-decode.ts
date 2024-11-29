@@ -45,6 +45,7 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       ],
       {
         concurrency: 'unbounded',
+        batching: true,
       },
     )
 
