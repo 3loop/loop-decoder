@@ -1,5 +1,15 @@
 # @3loop/transaction-decoder
 
+## 0.22.0
+
+### Minor Changes
+
+- a3dd631: Fix sql stores syntax
+
+### Patch Changes
+
+- a3dd631: Use TaggedRequest for request to allow for equality check for in-memory caching of requests
+
 ## 0.21.1
 
 ### Patch Changes
