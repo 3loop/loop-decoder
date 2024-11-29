@@ -90,6 +90,8 @@ const getMany = (requests: Array<ContractMetaLoader>) =>
 const setValue = ({ chainID, address }: ContractMetaLoader, result: ContractData | null) =>
   Effect.gen(function* () {
     const { set } = yield* ContractMetaStore
+    if (result == null) return
+    // NOTE: Now when RPC fails if we store not-found it causes issues and not retries, for now we will just always retry
     yield* set(
       { chainID, address },
       result == null ? { status: 'not-found', result: null } : { status: 'success', result },

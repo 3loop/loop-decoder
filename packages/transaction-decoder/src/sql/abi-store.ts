@@ -8,7 +8,7 @@ export const make = (strategies: AbiStore['strategies']) =>
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
 
-      const table = sql('loop_decoder_contract_abi__')
+      const table = sql('_loop_decoder_contract_abi_')
 
       // TODO; add timestamp to the table
       yield* sql`
@@ -19,7 +19,9 @@ export const make = (strategies: AbiStore['strategies']) =>
           signature TEXT,
           chain INTEGER,
           abi TEXT,
-          status TEXT NOT NULL
+          status TEXT NOT NULL,
+          timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (address, chain)
         )
       `.pipe(
         Effect.tapError(Effect.logError),
