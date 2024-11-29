@@ -16,7 +16,7 @@ export const make = () =>
       const sql = yield* SqlClient.SqlClient
       const publicClient = yield* PublicClient
 
-      const table = sql('loop_decoder_contract_meta__')
+      const table = sql('_loop_decoder_contract_meta_')
 
       // TODO; add timestamp to the table
       yield* sql`
@@ -27,7 +27,9 @@ export const make = () =>
           token_symbol TEXT,
           decimals INTEGER,
           type TEXT,
-          status TEXT NOT NULL
+          status TEXT NOT NULL,
+          timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
+          PRIMARY KEY (address, chain)
         )
       `.pipe(
         Effect.tapError(Effect.logError),
