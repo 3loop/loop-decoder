@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.22.1
+
+### Patch Changes
+
+- 610f7e2: Do not cache failed request to meta strategies
+
 ## 0.22.0
 
 ### Minor Changes

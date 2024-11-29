@@ -1,5 +1,12 @@
 # @3loop/transaction-interpreter
 
+## 0.11.2
+
+### Patch Changes
+
+- Updated dependencies [610f7e2]
+  - @3loop/transaction-decoder@0.22.1
+
 ## 0.11.1
 
 ### Patch Changes
