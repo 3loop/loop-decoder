@@ -1,4 +1,4 @@
-import { Context, Effect, RequestResolver, Request, Array, Either, pipe } from 'effect'
+import { Context, Effect, RequestResolver, Request, Array, Either, pipe, Schema, PrimaryKey, SchemaAST } from 'effect'
 import { ContractData } from './types.js'
 import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'
@@ -50,13 +50,21 @@ export interface ContractMetaStore<Key = ContractMetaParams, Value = ContractMet
 
 export const ContractMetaStore = Context.GenericTag<ContractMetaStore>('@3loop-decoder/ContractMetaStore')
 
-export interface ContractMetaLoader extends Request.Request<ContractData | null, never> {
-  _tag: 'ContractMetaLoader'
-  address: Address
-  chainID: number
-}
+class SchemaContractData extends Schema.make<ContractData>(SchemaAST.objectKeyword) {}
+class SchemaAddress extends Schema.make<Address>(SchemaAST.stringKeyword) {}
 
-const ContractMetaLoader = Request.tagged<ContractMetaLoader>('ContractMetaLoader')
+class ContractMetaLoader extends Schema.TaggedRequest<ContractMetaLoader>()('ContractMetaLoader', {
+  failure: Schema.Never,
+  success: Schema.NullOr(SchemaContractData),
+  payload: {
+    address: SchemaAddress,
+    chainID: Schema.Number,
+  },
+}) {
+  [PrimaryKey.symbol]() {
+    return `contract-meta::${this.chainID}:${this.address}`
+  }
+}
 
 function makeKey(key: ContractMetaLoader) {
   return `contract-meta::${key.chainID}:${key.address}`
@@ -148,7 +156,7 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
 
     // Fetch ContractMeta from the strategies
     const strategyResults = yield* Effect.forEach(remaining, ({ chainID, address }) => {
-      const strategyRequest = GetContractMetaStrategy({
+      const strategyRequest = new GetContractMetaStrategy({
         address,
         chainID,
       })
@@ -186,7 +194,7 @@ export const getAndCacheContractMeta = ({
   readonly address: Address
 }) => {
   return Effect.withSpan(
-    Effect.request(ContractMetaLoader({ chainID, address }), ContractMetaLoaderRequestResolver),
+    Effect.request(new ContractMetaLoader({ chainID, address }), ContractMetaLoaderRequestResolver),
     'GetAndCacheContractMeta',
     { attributes: { chainID, address } },
   )

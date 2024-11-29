@@ -1,4 +1,4 @@
-import { Request, RequestResolver } from 'effect'
+import { PrimaryKey, RequestResolver, Schema, SchemaAST } from 'effect'
 
 export interface FetchABIParams {
   readonly chainID: number
@@ -41,16 +41,23 @@ interface AddressABI {
 
 export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI
 
-// NOTE: We might want to return a list of ABIs, this might be helpful when fetching for signature
-export interface GetContractABIStrategy
-  extends Request.Request<ContractABI[], ResolveStrategyABIError>,
-    FetchABIParams {
-  readonly _tag: 'GetContractABIStrategy'
-}
-
-export const GetContractABIStrategy = Request.tagged<GetContractABIStrategy>('GetContractABIStrategy')
-
 export interface ContractAbiResolverStrategy {
   type: 'address' | 'fragment'
   resolver: RequestResolver.RequestResolver<GetContractABIStrategy, never>
+}
+
+class SchemaContractAbi extends Schema.make<ContractABI>(SchemaAST.objectKeyword) {}
+export class GetContractABIStrategy extends Schema.TaggedRequest<GetContractABIStrategy>()('GetContractABIStrategy', {
+  failure: Schema.instanceOf(ResolveStrategyABIError),
+  success: Schema.Array(SchemaContractAbi),
+  payload: {
+    chainID: Schema.Number,
+    address: Schema.String,
+    event: Schema.optional(Schema.String),
+    signature: Schema.optional(Schema.String),
+  },
+}) {
+  [PrimaryKey.symbol]() {
+    return `abi-strategy::${this.chainID}:${this.address}:${this.event}:${this.signature}`
+  }
 }

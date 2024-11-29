@@ -8,8 +8,11 @@ export const make = (strategies: AbiStore['strategies']) =>
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
 
+      const table = sql('loop_decoder_contract_abi__')
+
+      // TODO; add timestamp to the table
       yield* sql`
-        CREATE TABLE IF NOT EXISTS contractAbi (
+        CREATE TABLE IF NOT EXISTS ${table} (
           type TEXT NOT NULL,
           address TEXT,
           event TEXT,
@@ -18,7 +21,10 @@ export const make = (strategies: AbiStore['strategies']) =>
           abi TEXT,
           status TEXT NOT NULL
         )
-      `.pipe(Effect.catchAll(() => Effect.dieMessage('Failed to create contractAbi table')))
+      `.pipe(
+        Effect.tapError(Effect.logError),
+        Effect.catchAll(() => Effect.dieMessage('Failed to create contractAbi table')),
+      )
 
       return AbiStore.of({
         strategies,
@@ -28,33 +34,70 @@ export const make = (strategies: AbiStore['strategies']) =>
             if (value.status === 'success' && value.result.type === 'address') {
               const result = value.result
               yield* sql`
-              INSERT INTO contractAbi (type, address, chain, abi, status)
-              VALUES (${result.type}, ${normalizedAddress}, ${result.chainID}, ${result.abi}, "success")
+              INSERT INTO ${table}
+               ${sql.insert([
+                 {
+                   type: result.type,
+                   address: normalizedAddress,
+                   chain: key.chainID,
+                   abi: result.abi,
+                   status: 'success',
+                 },
+               ])}
             `
             } else if (value.status === 'success') {
               const result = value.result
               yield* sql`
-              INSERT INTO contractAbi (type, event, signature, abi, status)
-              VALUES (${result.type}, ${'event' in result ? result.event : null}, ${
-                'signature' in result ? result.signature : null
-              }, ${result.abi}, "success")
+              INSERT INTO ${table}
+              ${sql.insert([
+                {
+                  type: result.type,
+                  event: 'event' in result ? result.event : null,
+                  signature: 'signature' in result ? result.signature : null,
+                  abi: result.abi,
+                  status: 'success',
+                },
+              ])}
             `
             } else {
               yield* sql`
-              INSERT INTO contractAbi (type, address, chain, status)
-              VALUES ("address", ${normalizedAddress}, ${key.chainID}, "not-found")
+              INSERT INTO ${table}
+              ${sql.insert([
+                {
+                  type: 'address',
+                  address: normalizedAddress,
+                  chain: key.chainID,
+                  status: 'not-found',
+                },
+              ])}
             `
             }
-          }).pipe(Effect.catchAll(() => Effect.succeed(null))),
+          }).pipe(
+            Effect.tapError(Effect.logError),
+            Effect.catchAll(() => {
+              return Effect.succeed(null)
+            }),
+          ),
 
         get: ({ address, signature, event, chainID }) =>
           Effect.gen(function* () {
-            const items = yield* sql`
-            SELECT * FROM contractAbi
-            WHERE (address = ${address.toLowerCase()} AND chain = ${chainID} AND type = "address")
-              ${signature ? `OR (signature = ${signature} AND type = "func")` : ''}
-              ${event ? `OR (event = ${event} AND type = "event")` : ''}
-          `.pipe(Effect.catchAll(() => Effect.succeed([])))
+            const addressQuery = sql.and([
+              sql`address = ${address.toLowerCase()}`,
+              sql`chain = ${chainID}`,
+              sql`type = 'address'`,
+            ])
+
+            const signatureQuery = signature ? sql.and([sql`signature = ${signature}`, sql`type = 'func'`]) : undefined
+            const eventQuery = event ? sql.and([sql`event = ${event}`, sql`type = 'event'`]) : undefined
+            const query =
+              signature == null && event == null
+                ? addressQuery
+                : sql.or([addressQuery, signatureQuery, eventQuery].filter(Boolean))
+
+            const items = yield* sql` SELECT * FROM ${table} WHERE ${query}`.pipe(
+              Effect.tapError(Effect.logError),
+              Effect.catchAll(() => Effect.succeed([])),
+            )
 
             const item =
               items.find((item) => {
