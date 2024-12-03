@@ -1,5 +1,12 @@
 # @3loop/transaction-interpreter
 
+## 0.11.3
+
+### Patch Changes
+
+- Updated dependencies [3ebadac]
+  - @3loop/transaction-decoder@0.22.2
+
 ## 0.11.2
 
 ### Patch Changes
