@@ -8,11 +8,18 @@ export const make = (strategies: AbiStore['strategies']) =>
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
 
-      const table = sql('_loop_decoder_contract_abi_')
+      const table = sql('_loop_decoder_contract_abi_v2')
+      const id = sql.onDialectOrElse({
+        sqlite: () => sql`id INTEGER PRIMARY KEY AUTOINCREMENT,`,
+        pg: () => sql`id SERIAL PRIMARY KEY,`,
+        mysql: () => sql`id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY (id),`,
+        orElse: () => sql``,
+      })
 
       // TODO; add timestamp to the table
       yield* sql`
         CREATE TABLE IF NOT EXISTS ${table} (
+          ${id}
           type TEXT NOT NULL,
           address TEXT,
           event TEXT,
@@ -20,8 +27,7 @@ export const make = (strategies: AbiStore['strategies']) =>
           chain INTEGER,
           abi TEXT,
           status TEXT NOT NULL,
-          timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
-          PRIMARY KEY (address, chain)
+          timestamp TEXT DEFAULT CURRENT_TIMESTAMP
         )
       `.pipe(
         Effect.tapError(Effect.logError),
