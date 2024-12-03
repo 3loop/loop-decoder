@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.22.2
+
+### Patch Changes
+
+- 3ebadac: Change primary key for sql cache table
+
 ## 0.22.1
 
 ### Patch Changes
