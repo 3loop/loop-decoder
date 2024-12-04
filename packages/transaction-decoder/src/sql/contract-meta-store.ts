@@ -1,24 +1,14 @@
 import { SqlClient } from '@effect/sql'
 import { Effect, Layer } from 'effect'
-import {
-  ContractData,
-  ContractMetaStore,
-  ERC20RPCStrategyResolver,
-  NFTRPCStrategyResolver,
-  ProxyRPCStrategyResolver,
-  PublicClient,
-} from '../effect.js'
+import { ContractData, ContractMetaStore } from '../effect.js'
 
-export const make = () =>
+export const make = (strategies: ContractMetaStore['strategies']) =>
   Layer.effect(
     ContractMetaStore,
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
-      const publicClient = yield* PublicClient
-
       const table = sql('_loop_decoder_contract_meta_')
 
-      // TODO; add timestamp to the table
       yield* sql`
         CREATE TABLE IF NOT EXISTS ${table} (
           address TEXT NOT NULL,
@@ -37,13 +27,7 @@ export const make = () =>
       )
 
       return ContractMetaStore.of({
-        strategies: {
-          default: [
-            ERC20RPCStrategyResolver(publicClient),
-            NFTRPCStrategyResolver(publicClient),
-            ProxyRPCStrategyResolver(publicClient),
-          ],
-        },
+        strategies,
         set: (key, value) =>
           Effect.gen(function* () {
             if (value.status === 'success') {
