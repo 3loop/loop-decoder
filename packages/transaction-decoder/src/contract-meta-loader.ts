@@ -3,8 +3,6 @@ import { ContractData } from './types.js'
 import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'
 
-const STRATEGY_TIMEOUT = 5000
-
 export interface ContractMetaParams {
   address: string
   chainID: number
@@ -167,7 +165,6 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
 
       // TODO: Distinct the errors and missing data, so we can retry on errors
       return Effect.validateFirst(allAvailableStrategies, (strategy) => Effect.request(strategyRequest, strategy)).pipe(
-        Effect.timeout(STRATEGY_TIMEOUT),
         Effect.orElseSucceed(() => null),
       )
     })

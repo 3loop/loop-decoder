@@ -14,7 +14,6 @@ import {
 import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
 import { Abi } from 'viem'
 
-const STRATEGY_TIMEOUT = 5000
 export interface AbiParams {
   chainID: number
   address: string
@@ -212,27 +211,30 @@ const AbiLoaderRequestResolver: Effect.Effect<
     )
 
     // NOTE: Firstly we batch strategies by address because in a transaction most of events and traces are from the same abi
-    const response = yield* Effect.forEach(remaining, (req) => {
-      const strategyRequest = new GetContractABIStrategy({
-        address: req.address,
-        chainID: req.chainID,
-      })
+    const response = yield* Effect.forEach(
+      remaining,
+      (req) => {
+        const strategyRequest = new GetContractABIStrategy({
+          address: req.address,
+          chainID: req.chainID,
+        })
 
-      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? []).filter(
-        (strategy) => strategy.type === 'address',
-      )
+        const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? []).filter(
+          (strategy) => strategy.type === 'address',
+        )
 
-      return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-        pipe(
-          Effect.request(strategyRequest, strategy.resolver),
-          Effect.withRequestCaching(true),
-          Effect.timeout(STRATEGY_TIMEOUT),
-        ),
-      ).pipe(
-        Effect.map(Either.left),
-        Effect.orElseSucceed(() => Either.right(req)),
-      )
-    })
+        return Effect.validateFirst(allAvailableStrategies, (strategy) => {
+          return Effect.request(strategyRequest, strategy.resolver)
+        }).pipe(
+          Effect.map(Either.left),
+          Effect.orElseSucceed(() => Either.right(req)),
+        )
+      },
+      {
+        concurrency: 'unbounded',
+        batching: true,
+      },
+    )
 
     const [addressStrategyResults, notFound] = Array.partitionMap(response, (res) => res)
 
@@ -276,7 +278,11 @@ const AbiLoaderRequestResolver: Effect.Effect<
           Effect.forEach(group, (req) => Request.completeEffect(req, result), { discard: true }),
         )
       },
-      { discard: true },
+      {
+        discard: true,
+        concurrency: 'unbounded',
+        batching: true,
+      },
     )
   }),
 ).pipe(RequestResolver.contextFromServices(AbiStore), Effect.withRequestCaching(true))
