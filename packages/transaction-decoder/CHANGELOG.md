@@ -1,5 +1,15 @@
 # @3loop/transaction-decoder
 
+## 0.23.0
+
+### Minor Changes
+
+- 87fa837: Add expermiental erc20 abi strategy and change how sql strategy is defined
+
+### Patch Changes
+
+- 87fa837: Fix timeout on strategy would stop fetching all strategies
+
 ## 0.22.2
 
 ### Patch Changes
