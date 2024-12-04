@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.23.1
+
+### Patch Changes
+
+- 30fb052: Disable request caching for fetch strategy
+
 ## 0.23.0
 
 ### Minor Changes
