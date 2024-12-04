@@ -1,18 +1,15 @@
 import { getProvider, RPCProviderLive } from './rpc-provider'
-import { Effect, Layer, ManagedRuntime } from 'effect'
+import { Config, Effect, Layer, ManagedRuntime } from 'effect'
 import {
   DecodedTransaction,
   DecodeResult,
   decodeCalldata as calldataDecoder,
   decodeTransactionByHash,
   EtherscanV2StrategyResolver,
-  FetchTransactionError,
+  ExperimentalErc20AbiStrategyResolver,
   FourByteStrategyResolver,
   OpenchainStrategyResolver,
-  RPCFetchError,
   SourcifyStrategyResolver,
-  UnknownNetwork,
-  UnsupportedEvent,
   AbiStore,
   AbiParams,
   ContractAbiResult,
@@ -20,6 +17,9 @@ import {
   ContractMetaParams,
   ContractMetaResult,
   PublicClient,
+  ERC20RPCStrategyResolver,
+  NFTRPCStrategyResolver,
+  ProxyRPCStrategyResolver,
 } from '@3loop/transaction-decoder'
 import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sql'
 import { Hex } from 'viem'
@@ -29,19 +29,33 @@ import { SqlClient } from '@effect/sql/SqlClient'
 import { ConfigError } from 'effect/ConfigError'
 import { SqlError } from '@effect/sql/SqlError'
 
-const AbiStoreLive = SqlAbiStore.make({
-  default: [
-    EtherscanV2StrategyResolver({
-      apikey: process.env.ETHERSCAN_API_KEY,
-    }),
-    SourcifyStrategyResolver(),
-    OpenchainStrategyResolver(),
-    FourByteStrategyResolver(),
-  ],
-})
+const AbiStoreLive = Layer.unwrapEffect(
+  Effect.gen(function* () {
+    const service = yield* PublicClient
+    const apikey = yield* Config.withDefault(Config.string('ETHERSCAN_API_KEY'), undefined)
+    return SqlAbiStore.make({
+      default: [
+        EtherscanV2StrategyResolver({
+          apikey: apikey,
+        }),
+        ExperimentalErc20AbiStrategyResolver(service),
+        OpenchainStrategyResolver(),
+        SourcifyStrategyResolver(),
+        FourByteStrategyResolver(),
+      ],
+    })
+  }),
+)
 
-const MetaStoreLive = SqlContractMetaStore.make()
+const MetaStoreLive = Layer.unwrapEffect(
+  Effect.gen(function* () {
+    const service = yield* PublicClient
 
+    return SqlContractMetaStore.make({
+      default: [ERC20RPCStrategyResolver(service), NFTRPCStrategyResolver(service), ProxyRPCStrategyResolver(service)],
+    })
+  }),
+)
 const DataLayer = Layer.mergeAll(RPCProviderLive, DatabaseLive)
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, MetaStoreLive)
 const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer) as Layer.Layer<
