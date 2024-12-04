@@ -165,7 +165,7 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
 
       // TODO: Distinct the errors and missing data, so we can retry on errors
       return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-        pipe(Effect.request(strategyRequest, strategy), Effect.withRequestCaching(true)),
+        pipe(Effect.request(strategyRequest, strategy), Effect.withRequestCaching(false)),
       ).pipe(Effect.orElseSucceed(() => null))
     })
 

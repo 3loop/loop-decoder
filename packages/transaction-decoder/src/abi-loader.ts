@@ -224,7 +224,7 @@ const AbiLoaderRequestResolver: Effect.Effect<
         )
 
         return Effect.validateFirst(allAvailableStrategies, (strategy) => {
-          return pipe(Effect.request(strategyRequest, strategy.resolver), Effect.withRequestCaching(true))
+          return pipe(Effect.request(strategyRequest, strategy.resolver), Effect.withRequestCaching(false))
         }).pipe(
           Effect.map(Either.left),
           Effect.orElseSucceed(() => Either.right(req)),
@@ -253,7 +253,7 @@ const AbiLoaderRequestResolver: Effect.Effect<
 
       // TODO: Distinct the errors and missing data, so we can retry on errors
       return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-        pipe(Effect.request(strategyRequest, strategy.resolver), Effect.withRequestCaching(true)),
+        pipe(Effect.request(strategyRequest, strategy.resolver), Effect.withRequestCaching(false)),
       ).pipe(Effect.orElseSucceed(() => null))
     })
 
