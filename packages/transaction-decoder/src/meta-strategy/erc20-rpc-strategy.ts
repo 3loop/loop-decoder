@@ -5,13 +5,16 @@ import { PublicClient } from '../public-client.js'
 import { erc20Abi } from 'viem'
 import { MULTICALL3_ADDRESS } from '../decoding/constants.js'
 
-export const ERC20RPCStrategyResolver = (publicClientLive: PublicClient) =>
-  RequestResolver.fromEffect(({ chainID, address }: RequestModel.GetContractMetaStrategy) =>
+export const ERC20RPCStrategyResolver = (
+  publicClientLive: PublicClient,
+): RequestModel.ContractMetaResolverStrategy => ({
+  id: 'erc20-rpc-strategy',
+  resolver: RequestResolver.fromEffect(({ chainId, address }: RequestModel.GetContractMetaStrategy) =>
     Effect.gen(function* () {
       const service = yield* PublicClient
-      const { client } = yield* service.getPublicClient(chainID)
+      const { client } = yield* service.getPublicClient(chainId)
 
-      const fail = new RequestModel.ResolveStrategyMetaError('ERC20RPCStrategy', address, chainID)
+      const fail = new RequestModel.ResolveStrategyMetaError('ERC20RPCStrategy', address, chainId)
 
       const [symbolResponse, decimalsResponse, nameResponse] = yield* Effect.tryPromise({
         try: () =>
@@ -51,13 +54,14 @@ export const ERC20RPCStrategyResolver = (publicClientLive: PublicClient) =>
         tokenSymbol: symbolResponse.result,
         decimals: Number(decimalsResponse.result),
         type: 'ERC20' as ContractType,
-        chainID,
+        chainID: chainId,
       }
 
       return meta
-    }).pipe(Effect.withSpan('MetaStrategy.ERC20RPCStrategyResolver', { attributes: { chainID, address } })),
+    }).pipe(Effect.withSpan('MetaStrategy.ERC20RPCStrategyResolver', { attributes: { chainId, address } })),
   ).pipe(
     RequestResolver.contextFromServices(PublicClient),
     Effect.provideService(PublicClient, publicClientLive),
     Effect.runSync,
-  )
+  ),
+})

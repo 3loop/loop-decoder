@@ -24,7 +24,7 @@ async function fetchABI({
   address,
   event,
   signature,
-  chainID,
+  chainId,
 }: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI[]> {
   if (signature != null) {
     const full_match = await fetch(`${endpoint}/signatures/?hex_signature=${signature}`)
@@ -34,7 +34,7 @@ async function fetchABI({
       return json.results.map((result) => ({
         type: 'func',
         address,
-        chainID,
+        chainID: chainId,
         abi: parseFunctionSignature(result.text_signature),
         signature,
       }))
@@ -48,27 +48,28 @@ async function fetchABI({
       return json.results.map((result) => ({
         type: 'event',
         address,
-        chainID,
+        chainID: chainId,
         abi: parseEventSignature(result.text_signature),
         event,
       }))
     }
   }
 
-  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainID}`)
+  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainId}`)
 }
 
 export const FourByteStrategyResolver = (): RequestModel.ContractAbiResolverStrategy => {
   return {
+    id: 'fourbyte-strategy',
     type: 'fragment',
     resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchABI(req),
-          catch: () => new RequestModel.ResolveStrategyABIError('4byte.directory', req.address, req.chainID),
+          catch: () => new RequestModel.ResolveStrategyABIError('4byte.directory', req.address, req.chainId),
         }),
         'AbiStrategy.FourByteStrategyResolver',
-        { attributes: { chainID: req.chainID, address: req.address } },
+        { attributes: { chainId: req.chainId, address: req.address } },
       ),
     ),
   }

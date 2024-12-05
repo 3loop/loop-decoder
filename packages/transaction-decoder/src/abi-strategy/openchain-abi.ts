@@ -40,7 +40,7 @@ function parseEventSignature(signature: string): string {
 
 async function fetchABI({
   address,
-  chainID,
+  chainId,
   signature,
   event,
 }: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI[]> {
@@ -52,7 +52,7 @@ async function fetchABI({
       return json.result.function[signature].map((f) => ({
         type: 'func',
         address,
-        chainID,
+        chainID: chainId,
         abi: parseFunctionSignature(f.name),
         signature,
       }))
@@ -66,27 +66,28 @@ async function fetchABI({
       return json.result.event[event].map((e) => ({
         type: 'event',
         address,
-        chainID,
+        chainID: chainId,
         abi: parseEventSignature(e.name),
         event,
       }))
     }
   }
 
-  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainID}`)
+  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainId}`)
 }
 
 export const OpenchainStrategyResolver = (): RequestModel.ContractAbiResolverStrategy => {
   return {
+    id: 'openchain-strategy',
     type: 'fragment',
     resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchABI(req),
-          catch: () => new RequestModel.ResolveStrategyABIError('openchain', req.address, req.chainID),
+          catch: () => new RequestModel.ResolveStrategyABIError('openchain', req.address, req.chainId),
         }),
         'AbiStrategy.OpenchainStrategyResolver',
-        { attributes: { chainID: req.chainID, address: req.address } },
+        { attributes: { chainId: req.chainId, address: req.address } },
       ),
     ),
   }

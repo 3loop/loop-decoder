@@ -3,13 +3,13 @@ import { Effect, RequestResolver } from 'effect'
 import { PublicClient } from '../public-client.js'
 import { erc20Abi, getAddress, getContract } from 'viem'
 
-const getLocalFragments = (service: PublicClient, { address, chainID }: RequestModel.GetContractABIStrategy) =>
+const getLocalFragments = (service: PublicClient, { address, chainId }: RequestModel.GetContractABIStrategy) =>
   Effect.gen(function* () {
     const client = yield* service
-      .getPublicClient(chainID)
+      .getPublicClient(chainId)
       .pipe(
         Effect.catchAll(() =>
-          Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainID)),
+          Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId)),
         ),
       )
 
@@ -21,7 +21,7 @@ const getLocalFragments = (service: PublicClient, { address, chainID }: RequestM
 
     const decimals = yield* Effect.tryPromise({
       try: () => inst.read.decimals(),
-      catch: () => new RequestModel.ResolveStrategyABIError('local-strategy', address, chainID),
+      catch: () => new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId),
     })
 
     if (decimals != null) {
@@ -29,23 +29,24 @@ const getLocalFragments = (service: PublicClient, { address, chainID }: RequestM
         {
           type: 'address',
           address,
-          chainID,
+          chainID: chainId,
           abi: JSON.stringify(erc20Abi),
         },
       ] as RequestModel.ContractABI[]
     }
 
-    return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainID))
+    return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId))
   })
 
 export const ExperimentalErc20AbiStrategyResolver = (
   service: PublicClient,
 ): RequestModel.ContractAbiResolverStrategy => {
   return {
+    id: 'experimental-erc20-strategy',
     type: 'address',
     resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
       Effect.withSpan(getLocalFragments(service, req), 'AbiStrategy.ExperimentalErc20AbiStrategyResolver', {
-        attributes: { chainID: req.chainID, address: req.address },
+        attributes: { chainId: req.chainId, address: req.address },
       }),
     ),
   }

@@ -4,13 +4,14 @@ import { Effect, RequestResolver } from 'effect'
 import { getProxyStorageSlot } from '../decoding/proxies.js'
 import { PublicClient } from '../public-client.js'
 
-export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) =>
-  RequestResolver.fromEffect(({ chainID, address }: RequestModel.GetContractMetaStrategy) =>
+export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) => ({
+  id: 'proxy-rpc-strategy',
+  resolver: RequestResolver.fromEffect(({ chainId, address }: RequestModel.GetContractMetaStrategy) =>
     Effect.gen(function* () {
-      const proxyResult = yield* getProxyStorageSlot({ address, chainID })
+      const proxyResult = yield* getProxyStorageSlot({ address, chainID: chainId })
       const { address: implementationAddress, type: proxyType } = proxyResult ?? {}
 
-      const fail = new RequestModel.ResolveStrategyMetaError('ProxyRPCStrategy', address, chainID)
+      const fail = new RequestModel.ResolveStrategyMetaError('ProxyRPCStrategy', address, chainId)
 
       if (!implementationAddress || !proxyType) {
         return yield* Effect.fail(fail)
@@ -23,7 +24,7 @@ export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) =>
           address,
           contractAddress: address,
           type: 'SAFE-PROXY' as ContractType,
-          chainID,
+          chainID: chainId,
         }
       }
 
@@ -42,9 +43,10 @@ export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) =>
       }
 
       return meta
-    }).pipe(Effect.withSpan('MetaStrategy.ProxyRPCStrategyResolver', { attributes: { chainID, address } })),
+    }).pipe(Effect.withSpan('MetaStrategy.ProxyRPCStrategyResolver', { attributes: { chainId, address } })),
   ).pipe(
     RequestResolver.contextFromServices(PublicClient),
     Effect.provideService(PublicClient, publicClientLive),
     Effect.runSync,
-  )
+  ),
+})

@@ -1,6 +1,6 @@
 import { Context, Effect, RequestResolver, Request, Array, Either, pipe, Schema, PrimaryKey, SchemaAST } from 'effect'
 import { ContractData } from './types.js'
-import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
+import { ContractMetaResolverStrategy, GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'
 
 export interface ContractMetaParams {
@@ -28,7 +28,7 @@ export type ContractMetaResult = ContractMetaSuccess | ContractMetaNotFound | Co
 type ChainOrDefault = number | 'default'
 
 export interface ContractMetaStore<Key = ContractMetaParams, Value = ContractMetaResult> {
-  readonly strategies: Record<ChainOrDefault, readonly RequestResolver.RequestResolver<GetContractMetaStrategy>[]>
+  readonly strategies: Record<ChainOrDefault, readonly ContractMetaResolverStrategy[]>
   readonly set: (arg: Key, value: Value) => Effect.Effect<void, never>
   /**
    * The `get` function might return 3 states:
@@ -156,16 +156,21 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
 
     // Fetch ContractMeta from the strategies
     const strategyResults = yield* Effect.forEach(remaining, ({ chainID, address }) => {
-      const strategyRequest = new GetContractMetaStrategy({
-        address,
-        chainID,
-      })
-
       const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
       // TODO: Distinct the errors and missing data, so we can retry on errors
       return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-        pipe(Effect.request(strategyRequest, strategy), Effect.withRequestCaching(false)),
+        pipe(
+          Effect.request(
+            new GetContractMetaStrategy({
+              address,
+              chainId: chainID,
+              strategyId: strategy.id,
+            }),
+            strategy.resolver,
+          ),
+          Effect.withRequestCaching(true),
+        ),
       ).pipe(Effect.orElseSucceed(() => null))
     })
 

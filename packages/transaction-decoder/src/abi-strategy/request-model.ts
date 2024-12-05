@@ -43,6 +43,7 @@ export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI
 
 export interface ContractAbiResolverStrategy {
   type: 'address' | 'fragment'
+  id: string
   resolver: RequestResolver.RequestResolver<GetContractABIStrategy, never>
 }
 
@@ -51,13 +52,14 @@ export class GetContractABIStrategy extends Schema.TaggedRequest<GetContractABIS
   failure: Schema.instanceOf(ResolveStrategyABIError),
   success: Schema.Array(SchemaContractAbi),
   payload: {
-    chainID: Schema.Number,
+    chainId: Schema.Number,
     address: Schema.String,
+    strategyId: Schema.String,
     event: Schema.optional(Schema.String),
     signature: Schema.optional(Schema.String),
   },
 }) {
   [PrimaryKey.symbol]() {
-    return `abi-strategy::${this.chainID}:${this.address}:${this.event}:${this.signature}`
+    return `abi-strategy::${this.chainId}:${this.address}:${this.event}:${this.signature}:${this.strategyId}`
   }
 }
