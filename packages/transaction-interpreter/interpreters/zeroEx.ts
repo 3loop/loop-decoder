@@ -1,11 +1,14 @@
-import { categorizedDefaultEvent, displayAsset, getNetTransfers } from './std.js'
+import { assetsReceived, categorizedDefaultEvent, displayAsset, getNetTransfers } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = categorizedDefaultEvent(event)
+  const swapEvent = event.interactions.find((i) => i.event?.eventName?.toLowerCase() === 'swap')
 
-  if (newEvent.type !== 'unknown') return newEvent
+  if (!swapEvent || newEvent.type !== 'unknown') return newEvent
+
+  const { recipient } = swapEvent.event?.params as { recipient: string }
 
   const netSent = getNetTransfers({
     transfers: event.transfers,
@@ -15,7 +18,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
 
   const netReceived = getNetTransfers({
     transfers: event.transfers,
-    toAddresses: [event.fromAddress],
+    toAddresses: [recipient],
     type: ['ERC20', 'native'],
   })
 
@@ -24,6 +27,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
       ...newEvent,
       type: 'swap',
       action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
+      assetsReceived: assetsReceived(event.transfers, recipient),
     }
   }
 
