@@ -1,5 +1,13 @@
 # @3loop/transaction-interpreter
 
+## 0.11.6
+
+### Patch Changes
+
+- 2d17903: Update 0x interpretator
+- Updated dependencies [611d1c4]
+  - @3loop/transaction-decoder@0.24.0
+
 ## 0.11.5
 
 ### Patch Changes

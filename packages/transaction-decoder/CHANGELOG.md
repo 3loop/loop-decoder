@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.24.0
+
+### Minor Changes
+
+- 611d1c4: Add an id to each strategy to make each request to a strategy unique. Effect will cache the request in a single global cache, thus to avoid the same request of being cached across different strategies we added an unique id that will identify each request.
+
 ## 0.23.1
 
 ### Patch Changes
