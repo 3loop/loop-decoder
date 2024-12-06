@@ -5,11 +5,12 @@ import { PublicClient } from '../public-client.js'
 import { erc721Abi, getContract } from 'viem'
 import { ERC1155InterfaceId, ERC721InterfaceId, erc165Abi } from './constants.js'
 
-export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
-  RequestResolver.fromEffect(({ chainID, address }: RequestModel.GetContractMetaStrategy) =>
+export const NFTRPCStrategyResolver = (publicClientLive: PublicClient): RequestModel.ContractMetaResolverStrategy => ({
+  id: 'nft-rpc-strategy',
+  resolver: RequestResolver.fromEffect(({ chainId, address }: RequestModel.GetContractMetaStrategy) =>
     Effect.gen(function* () {
       const service = yield* PublicClient
-      const { client } = yield* service.getPublicClient(chainID)
+      const { client } = yield* service.getPublicClient(chainId)
 
       // const proxyResult = yield* getProxyStorageSlot({ address, chainID })
       // const { address: implementationAddress } = proxyResult ?? {}
@@ -21,7 +22,7 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
         client,
       })
 
-      const fail = new RequestModel.ResolveStrategyMetaError('NFTRPCStrategy', contractAddress, chainID)
+      const fail = new RequestModel.ResolveStrategyMetaError('NFTRPCStrategy', contractAddress, chainId)
 
       const [isERC721, isERC1155] = yield* Effect.all(
         [
@@ -73,13 +74,14 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient) =>
         contractName: name,
         tokenSymbol: symbol,
         type,
-        chainID,
+        chainID: chainId,
       }
 
       return meta
-    }).pipe(Effect.withSpan('MetaStrategy.NFTRPCStrategyResolver', { attributes: { chainID, address } })),
+    }).pipe(Effect.withSpan('MetaStrategy.NFTRPCStrategyResolver', { attributes: { chainId, address } })),
   ).pipe(
     RequestResolver.contextFromServices(PublicClient),
     Effect.provideService(PublicClient, publicClientLive),
     Effect.runSync,
-  )
+  ),
+})

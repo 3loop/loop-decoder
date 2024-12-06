@@ -1,11 +1,12 @@
 import { UnknownNetwork } from '../public-client.js'
 import { ContractData } from '../types.js'
-import { PrimaryKey, Schema, SchemaAST } from 'effect'
+import { PrimaryKey, RequestResolver, Schema, SchemaAST } from 'effect'
 import { Address } from 'viem'
 
 export interface FetchMetaParams {
-  readonly chainID: number
+  readonly chainId: number
   readonly address: Address
+  readonly strategyId: string
 }
 
 export class ResolveStrategyMetaError {
@@ -17,6 +18,11 @@ export class ResolveStrategyMetaError {
   ) {}
 }
 
+export interface ContractMetaResolverStrategy {
+  id: string
+  resolver: RequestResolver.RequestResolver<GetContractMetaStrategy, never>
+}
+
 class SchemaAddress extends Schema.make<Address>(SchemaAST.stringKeyword) {}
 class SchemaContractData extends Schema.make<ContractData>(SchemaAST.objectKeyword) {}
 export class GetContractMetaStrategy extends Schema.TaggedRequest<GetContractMetaStrategy>()(
@@ -25,12 +31,13 @@ export class GetContractMetaStrategy extends Schema.TaggedRequest<GetContractMet
     failure: Schema.Union(Schema.instanceOf(ResolveStrategyMetaError), Schema.instanceOf(UnknownNetwork)),
     success: SchemaContractData,
     payload: {
-      chainID: Schema.Number,
+      chainId: Schema.Number,
       address: SchemaAddress,
+      strategyId: Schema.String,
     },
   },
 ) {
   [PrimaryKey.symbol]() {
-    return `contract-meta-strategy::${this.chainID}:${this.address}`
+    return `contract-meta-strategy::${this.chainId}:${this.address}${this.strategyId}`
   }
 }

@@ -2,7 +2,7 @@ import { Effect, RequestResolver } from 'effect'
 import * as RequestModel from './request-model.js'
 
 async function fetchContractABI(
-  { address, chainID }: RequestModel.GetContractABIStrategy,
+  { address, chainId }: RequestModel.GetContractABIStrategy,
   config: { apikey?: string; endpoint: string },
 ): Promise<RequestModel.ContractABI[]> {
   const endpoint = config.endpoint
@@ -25,7 +25,7 @@ async function fetchContractABI(
   if (json.status === '1') {
     return [
       {
-        chainID,
+        chainID: chainId,
         address,
         abi: json.result,
         type: 'address',
@@ -33,7 +33,7 @@ async function fetchContractABI(
     ]
   }
 
-  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainID}`)
+  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainId}`)
 }
 
 export const BlockscoutStrategyResolver = (config: {
@@ -41,15 +41,16 @@ export const BlockscoutStrategyResolver = (config: {
   endpoint: string
 }): RequestModel.ContractAbiResolverStrategy => {
   return {
+    id: 'blockscout-strategy',
     type: 'address',
     resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchContractABI(req, config),
-          catch: () => new RequestModel.ResolveStrategyABIError('Blockscout', req.address, req.chainID),
+          catch: () => new RequestModel.ResolveStrategyABIError('Blockscout', req.address, req.chainId),
         }),
         'AbiStrategy.BlockscoutStrategyResolver',
-        { attributes: { chainID: req.chainID, address: req.address } },
+        { attributes: { chainId: req.chainId, address: req.address } },
       ),
     ),
   }

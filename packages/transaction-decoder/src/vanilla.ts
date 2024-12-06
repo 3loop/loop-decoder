@@ -1,4 +1,4 @@
-import { Effect, Logger, LogLevel, RequestResolver, ManagedRuntime, Layer } from 'effect'
+import { Effect, Logger, LogLevel, ManagedRuntime, Layer } from 'effect'
 import { PublicClient, PublicClientObject, UnknownNetwork } from './public-client.js'
 import { decodeTransactionByHash, decodeCalldata } from './transaction-decoder.js'
 import { ContractAbiResult, AbiStore as EffectAbiStore, AbiParams } from './abi-loader.js'
@@ -9,7 +9,7 @@ import {
 } from './contract-meta-loader.js'
 import type { ContractAbiResolverStrategy } from './abi-strategy/index.js'
 import type { Hex } from 'viem'
-import type { GetContractMetaStrategy } from './meta-strategy/request-model.js'
+import type { ContractMetaResolverStrategy } from './meta-strategy/request-model.js'
 
 export interface TransactionDecoderOptions {
   getPublicClient: (chainID: number) => PublicClientObject | undefined
@@ -26,7 +26,7 @@ export interface VanillaAbiStore {
   set: (key: AbiParams, val: ContractAbiResult) => Promise<void>
 }
 
-type VanillaContractMetaStategy = (client: PublicClient) => RequestResolver.RequestResolver<GetContractMetaStrategy>
+type VanillaContractMetaStategy = (client: PublicClient) => ContractMetaResolverStrategy
 
 export interface VanillaContractMetaStore {
   strategies?: readonly VanillaContractMetaStategy[]

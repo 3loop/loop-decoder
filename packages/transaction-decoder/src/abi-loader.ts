@@ -214,17 +214,22 @@ const AbiLoaderRequestResolver: Effect.Effect<
     const response = yield* Effect.forEach(
       remaining,
       (req) => {
-        const strategyRequest = new GetContractABIStrategy({
-          address: req.address,
-          chainID: req.chainID,
-        })
-
         const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? []).filter(
           (strategy) => strategy.type === 'address',
         )
 
         return Effect.validateFirst(allAvailableStrategies, (strategy) => {
-          return pipe(Effect.request(strategyRequest, strategy.resolver), Effect.withRequestCaching(false))
+          return pipe(
+            Effect.request(
+              new GetContractABIStrategy({
+                address: req.address,
+                chainId: req.chainID,
+                strategyId: strategy.id,
+              }),
+              strategy.resolver,
+            ),
+            Effect.withRequestCaching(true),
+          )
         }).pipe(
           Effect.map(Either.left),
           Effect.orElseSucceed(() => Either.right(req)),
@@ -239,23 +244,35 @@ const AbiLoaderRequestResolver: Effect.Effect<
     const [addressStrategyResults, notFound] = Array.partitionMap(response, (res) => res)
 
     // NOTE: Secondly we request strategies to fetch fragments
-    const fragmentStrategyResults = yield* Effect.forEach(notFound, ({ chainID, address, event, signature }) => {
-      const strategyRequest = new GetContractABIStrategy({
-        address,
-        chainID,
-        event,
-        signature,
-      })
+    const fragmentStrategyResults = yield* Effect.forEach(
+      notFound,
+      ({ chainID, address, event, signature }) => {
+        const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? []).filter(
+          (strategy) => strategy.type === 'fragment',
+        )
 
-      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? []).filter(
-        (strategy) => strategy.type === 'fragment',
-      )
-
-      // TODO: Distinct the errors and missing data, so we can retry on errors
-      return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-        pipe(Effect.request(strategyRequest, strategy.resolver), Effect.withRequestCaching(false)),
-      ).pipe(Effect.orElseSucceed(() => null))
-    })
+        // TODO: Distinct the errors and missing data, so we can retry on errors
+        return Effect.validateFirst(allAvailableStrategies, (strategy) =>
+          pipe(
+            Effect.request(
+              new GetContractABIStrategy({
+                address,
+                chainId: chainID,
+                event,
+                signature,
+                strategyId: strategy.id,
+              }),
+              strategy.resolver,
+            ),
+            Effect.withRequestCaching(true),
+          ),
+        ).pipe(Effect.orElseSucceed(() => null))
+      },
+      {
+        concurrency: 'unbounded',
+        batching: true,
+      },
+    )
 
     const strategyResults = Array.appendAll(addressStrategyResults, fragmentStrategyResults)
 
@@ -299,7 +316,7 @@ export const getAndCacheAbi = (params: AbiParams) =>
   }).pipe(
     Effect.withSpan('AbiLoader.GetAndCacheAbi', {
       attributes: {
-        chainID: params.chainID,
+        chainId: params.chainID,
         address: params.address,
         event: params.event,
         signature: params.signature,
