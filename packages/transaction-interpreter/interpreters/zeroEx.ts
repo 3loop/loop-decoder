@@ -8,7 +8,12 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
 
   if (!swapEvent || newEvent.type !== 'unknown') return newEvent
 
-  const { recipient } = swapEvent.event?.params as { recipient: string }
+  const params = swapEvent.event?.params as { recipient?: string } | undefined
+  const recipient = params?.recipient || event.fromAddress
+
+  const buyToken = event.methodCall?.params?.[0]?.components?.find((c) => c.name === 'buyToken') as
+    | { value: string }
+    | undefined
 
   const netSent = getNetTransfers({
     transfers: event.transfers,
@@ -17,7 +22,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
   })
 
   const netReceived = getNetTransfers({
-    transfers: event.transfers,
+    transfers: buyToken ? event.transfers.filter((t) => t.address === buyToken.value) : event.transfers,
     toAddresses: [recipient],
     type: ['ERC20', 'native'],
   })
