@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.7
+
+### Patch Changes
+
+- 335b860: Fix ts error for 0x interpreter
+
 ## 0.11.6
 
 ### Patch Changes
