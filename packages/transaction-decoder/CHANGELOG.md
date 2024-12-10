@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.24.1
+
+### Patch Changes
+
+- da3a060: Do not decode internal calldata param without knowing the address
+
 ## 0.24.0
 
 ### Minor Changes
