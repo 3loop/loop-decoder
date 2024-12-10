@@ -52,11 +52,11 @@ const decodeBytesRecursively = (
       }
     }
 
-    if (isCallDataNode) {
+    if (isCallDataNode && address) {
       const decoded = yield* decodeMethod({
         data: node.value as Hex,
-        chainID: address ? chainID : 0,
-        contractAddress: address ?? '',
+        chainID,
+        contractAddress: address,
       }).pipe(Effect.orElseSucceed(() => null))
 
       return decoded
