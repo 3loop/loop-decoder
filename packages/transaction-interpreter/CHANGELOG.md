@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.9
+
+### Patch Changes
+
+- d98f867: Update ZeroEx interpreter to filter out fees
+
 ## 0.11.8
 
 ### Patch Changes
