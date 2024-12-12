@@ -10,6 +10,7 @@ interface FilterOptions {
   excludeZero?: boolean
   excludeNull?: boolean
   excludeDuplicates?: boolean
+  sumUpRepeated?: boolean
 }
 
 export const filterTransfers = (transfers: Asset[], filters: FilterOptions = {}): Asset[] => {
@@ -27,6 +28,25 @@ export const filterTransfers = (transfers: Asset[], filters: FilterOptions = {})
     filtered = filtered.filter(
       (t, i, self) => self.findIndex((t2) => t2.address === t.address && t2.amount === t.amount) === i,
     )
+  }
+
+  if (filters.sumUpRepeated) {
+    const transferMap = new Map<string, Asset>()
+
+    filtered.forEach((transfer) => {
+      const key = transfer.from.toLowerCase() + '-' + transfer.to.toLowerCase() + '-' + transfer.address.toLowerCase()
+
+      if (transferMap.has(key)) {
+        const existing = transferMap.get(key) || { ...transfer }
+        const existingAmount = existing.amount ? Number(existing.amount) : 0
+        const newAmount = transfer.amount ? Number(transfer.amount) : 0
+        existing.amount = (existingAmount + newAmount).toString()
+      } else {
+        transferMap.set(key, { ...transfer })
+      }
+    })
+
+    filtered = Array.from(transferMap.values())
   }
 
   return filtered
@@ -176,20 +196,28 @@ export function displayAddress(address: string): string {
 }
 
 export const formatNumber = (numberString: string, precision = 3): string => {
-  const [integerPart, decimalPart] = numberString.split('.')
-  const bigIntPart = BigInt(integerPart)
+  // Convert scientific notation to regular number
+  const num = Number(numberString)
+
+  if (isNaN(num)) return numberString
+
+  // For very small numbers (less than 0.000001), return in scientific notation
+  if (num < 0.000001 && num > 0) {
+    return num.toExponential(precision)
+  }
+
+  const [integerPart, decimalPart] = num.toString().split('.')
 
   if ((integerPart && integerPart.length < 3 && !decimalPart) || (decimalPart && decimalPart.startsWith('000')))
     return numberString
 
   // Format the integer part manually
   let formattedIntegerPart = ''
-  const integerStr = bigIntPart.toString()
-  for (let i = 0; i < integerStr.length; i++) {
-    if (i > 0 && (integerStr.length - i) % 3 === 0) {
+  for (let i = 0; i < integerPart.length; i++) {
+    if (i > 0 && (integerPart.length - i) % 3 === 0) {
       formattedIntegerPart += ','
     }
-    formattedIntegerPart += integerStr[i]
+    formattedIntegerPart += integerPart[i]
   }
 
   // Format the decimal part
@@ -234,6 +262,11 @@ export function displayAssets(assets: Payment[]) {
 
 export function isSwap(event: DecodedTransaction): boolean {
   if (event.transfers.some((t) => t.type !== 'ERC20' && t.type !== 'native')) return false
+
+  const minted = assetsSent(event.transfers, NULL_ADDRESS)
+  const burned = assetsReceived(event.transfers, NULL_ADDRESS)
+
+  if (minted.length > 0 || burned.length > 0) return false
 
   const transfers = filterTransfers(event.transfers, {
     excludeZero: true,
