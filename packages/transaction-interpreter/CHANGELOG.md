@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.10
+
+### Patch Changes
+
+- 5155fde: Fix interpreter crash during number formatting
+
 ## 0.11.9
 
 ### Patch Changes
