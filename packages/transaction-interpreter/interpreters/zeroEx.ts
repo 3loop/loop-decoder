@@ -4,16 +4,10 @@ import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = categorizedDefaultEvent(event)
-  const swapEvent = event.interactions.find((i) => i.event?.eventName?.toLowerCase() === 'swap')
+  const recipient = event.fromAddress
+  const contractAddress = event.toAddress
 
-  if (!swapEvent || newEvent.type !== 'unknown') return newEvent
-
-  const params = swapEvent.event?.params as { recipient?: string } | undefined
-  const recipient = params?.recipient || event.fromAddress
-
-  const buyToken = event.methodCall?.params?.[0]?.components?.find((c) => c.name === 'buyToken') as
-    | { value: string }
-    | undefined
+  if (!contractAddress) return newEvent
 
   const netSent = getNetTransfers({
     transfers: event.transfers,
@@ -22,17 +16,25 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
   })
 
   const netReceived = getNetTransfers({
-    transfers: buyToken ? event.transfers.filter((t) => t.address === buyToken.value) : event.transfers,
+    transfers: event.transfers,
     toAddresses: [recipient],
+    fromAddresses: [contractAddress],
     type: ['ERC20', 'native'],
   })
 
-  if (netSent.length === 1 && netReceived.length === 1) {
+  //filter the same tokne from netReceived (to filter out received fees)
+  const sentTokens = netSent.map((t) => t.asset.address)
+  const filteredNetReceived = netReceived.filter((t) => !sentTokens.includes(t.asset.address))
+
+  if (netSent.length === 1 && filteredNetReceived.length === 1) {
     return {
       ...newEvent,
       type: 'swap',
-      action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
-      assetsReceived: assetsReceived(event.transfers, recipient),
+      action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(filteredNetReceived[0]),
+      assetsReceived: assetsReceived(
+        event.transfers.filter((t) => filteredNetReceived.some((r) => r.asset.address === t.address)),
+        recipient,
+      ),
     }
   }
 
