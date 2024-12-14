@@ -23,6 +23,7 @@ import type { DecodedTransaction } from '@3loop/transaction-decoder'
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
   const newEvent = categorizedDefaultEvent(event)
+  const { assetsMinted, assetsBurned } = newEvent
 
   const purchaseOrSaleEvent = event.interactions.find(
     (i) => i.event.eventName === 'SubjectSharePurchased' || i.event.eventName === 'SubjectShareSold',
@@ -60,7 +61,9 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
           sold[0],
         )}`,
         assetsSent: assetsSent(event.transfers, _spender),
-        assetsReceived: assetsReceived(event.transfers, _beneficiary),
+        assetsReceived: assetsMinted ? assetsMinted : assetsReceived(event.transfers, _beneficiary),
+        assetsMinted: [],
+        assetsBurned: [],
       }
     }
 
@@ -71,8 +74,10 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
         action: `Sold ${formatNumber(sold[0].amount)} Fan Tokens of ${sold[0].asset?.name} for ${displayAsset(
           bougt[0],
         )}`,
-        assetsSent: assetsSent(event.transfers, _spender),
+        assetsSent: assetsBurned ? assetsBurned : assetsSent(event.transfers, _spender),
         assetsReceived: assetsReceived(event.transfers, _beneficiary),
+        assetsMinted: [],
+        assetsBurned: [],
       }
     }
 
