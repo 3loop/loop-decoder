@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.11
+
+### Patch Changes
+
+- 6c8733a: Update moxie interpreter
+
 ## 0.11.10
 
 ### Patch Changes
