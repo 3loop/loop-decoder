@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.12
+
+### Patch Changes
+
+- 6fc9465: Add timestamp to interpreted transaction
+
 ## 0.11.11
 
 ### Patch Changes
