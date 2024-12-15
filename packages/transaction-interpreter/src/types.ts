@@ -55,6 +55,7 @@ export type InterpretedTransaction = {
   chain: number
   action: string
   txHash: string
+  timestamp: number
   user: Address
   method: string | null
   type: TransactionType

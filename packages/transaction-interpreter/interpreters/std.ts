@@ -295,6 +295,7 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
     action: "Called method '" + event.methodCall.name + "'",
     chain: event.chainID,
     txHash: event.txHash,
+    timestamp: event.timestamp,
     user: { address: event.fromAddress, name: null },
     method: event.methodCall.name,
     assetsSent: assetsSent(event.transfers, event.fromAddress),
