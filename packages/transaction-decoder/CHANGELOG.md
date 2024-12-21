@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.24.2
+
+### Patch Changes
+
+- 47b4225: Fix crash in experimental erc20 resolver when address is empty. We provide an empty address when we decode logs for errors
+
 ## 0.24.1
 
 ### Patch Changes
