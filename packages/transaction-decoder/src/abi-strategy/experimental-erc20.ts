@@ -5,6 +5,9 @@ import { erc20Abi, getAddress, getContract } from 'viem'
 
 const getLocalFragments = (service: PublicClient, { address, chainId }: RequestModel.GetContractABIStrategy) =>
   Effect.gen(function* () {
+    if (!address)
+      return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId))
+
     const client = yield* service
       .getPublicClient(chainId)
       .pipe(
@@ -13,10 +16,16 @@ const getLocalFragments = (service: PublicClient, { address, chainId }: RequestM
         ),
       )
 
-    const inst = getContract({
-      abi: erc20Abi,
-      address: getAddress(address),
-      client: client.client,
+    const inst = yield* Effect.try({
+      try: () =>
+        getContract({
+          abi: erc20Abi,
+          address: getAddress(address),
+          client: client.client,
+        }),
+      catch: () => {
+        throw new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId)
+      },
     })
 
     const decimals = yield* Effect.tryPromise({
