@@ -70,7 +70,7 @@
   "contractType": "ERC20",
   "effectiveGasPrice": "14279272922",
   "errors": null,
-  "fromAddress": "0xaffca680e6dcbb1bb336108d5acca9c545885260",
+  "fromAddress": "0xAffca680e6dcbb1bb336108D5aCcA9c545885260",
   "gasPaid": "0.002487863441927138",
   "gasUsed": "174229",
   "interactedAddresses": [
@@ -381,7 +381,7 @@
   "nativeValueSent": "0",
   "reverted": false,
   "timestamp": 1712476355,
-  "toAddress": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",
+  "toAddress": "0xb2ecfE4E4D61f8790bbb9DE2D1259B9e2410CEA5",
   "traceCalls": [
     {
       "from": "0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5",

@@ -42,7 +42,7 @@
   "contractType": "ERC1155",
   "effectiveGasPrice": "1500000008",
   "errors": null,
-  "fromAddress": "0xbdddd277583dcae0b501046ba86714feea71b03f",
+  "fromAddress": "0xBdDDd277583DCaE0B501046ba86714FEea71B03F",
   "gasPaid": "0.000261153001392816",
   "gasUsed": "174102",
   "interactedAddresses": [
@@ -199,7 +199,7 @@
   "nativeValueSent": "3000000000000000000",
   "reverted": false,
   "timestamp": 1693789380,
-  "toAddress": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
+  "toAddress": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
   "traceCalls": [
     {
       "from": "0x4bed3ae022fd201ab7185a9bc80cb8bf9819bb80",
