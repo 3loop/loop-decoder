@@ -166,8 +166,8 @@ export const decodeTransaction = ({
     const decodedTx: DecodedTransaction = {
       txHash: transaction.hash,
       txType: nativeTransfer ? TxType.TRANSFER : TxType.CONTRACT_INTERACTION,
-      fromAddress: receipt.from,
-      toAddress: receipt.to,
+      fromAddress: getAddress(receipt.from),
+      toAddress: receipt.to ? getAddress(receipt.to) : null,
       contractName: contractMeta?.contractName ?? null,
       contractType: contractMeta?.type ?? 'OTHER',
       methodCall: {

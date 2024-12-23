@@ -34,7 +34,7 @@
       "message": null,
     },
   ],
-  "fromAddress": "0x27d377547da6beee6ec254a6be22868b4a418708",
+  "fromAddress": "0x27d377547da6bEeE6ec254a6bE22868B4a418708",
   "gasPaid": "0.003837719786750116",
   "gasUsed": "262244",
   "interactedAddresses": [
@@ -51,7 +51,7 @@
   "nativeValueSent": "0",
   "reverted": true,
   "timestamp": 1712818187,
-  "toAddress": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",
+  "toAddress": "0x7D89AB380F223D01Fce6b36d37f74A87b0Da0c92",
   "traceCalls": [
     {
       "from": "0x7d89ab380f223d01fce6b36d37f74a87b0da0c92",

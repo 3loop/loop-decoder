@@ -30,7 +30,7 @@
       "message": "Slippage Limit Exceeded",
     },
   ],
-  "fromAddress": "0x26de224cbe06fd4321ce5747a176cbbd24773beb",
+  "fromAddress": "0x26de224CBE06fd4321Ce5747a176CBBD24773BEb",
   "gasPaid": "0.005569830614649707",
   "gasUsed": "305761",
   "interactedAddresses": [
@@ -47,7 +47,7 @@
   "nativeValueSent": "0",
   "reverted": true,
   "timestamp": 1717675571,
-  "toAddress": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",
+  "toAddress": "0xCf5540fFFCdC3d510B18bFcA6d2b9987b0772559",
   "traceCalls": [
     {
       "from": "0xcf5540fffcdc3d510b18bfca6d2b9987b0772559",

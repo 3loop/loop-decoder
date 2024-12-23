@@ -5,6 +5,8 @@ import type { DecodedTransaction } from '@3loop/transaction-decoder'
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = categorizedDefaultEvent(event)
 
+  if (newEvent.type !== 'unknown') return newEvent
+
   if (!event.toAddress) return newEvent
 
   const filteredTransfers = filterTransfers(event.transfers, {
