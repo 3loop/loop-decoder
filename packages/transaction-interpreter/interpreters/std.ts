@@ -328,7 +328,7 @@ export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedT
   }
 
   // single mint
-  if (minted.length === 1 && transfers.length <= 2) {
+  if (minted.length === 1 && newEvent.assetsSent.length <= 1) {
     const price = newEvent.assetsSent.length === 1 ? newEvent.assetsSent[0] : undefined
     return {
       ...newEvent,
