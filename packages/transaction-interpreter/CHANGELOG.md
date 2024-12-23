@@ -1,5 +1,13 @@
 # @3loop/transaction-interpreter
 
+## 0.11.14
+
+### Patch Changes
+
+- dc5643e: Small fixes in 0x and erc 721 interpreters
+- Updated dependencies [dc5643e]
+  - @3loop/transaction-decoder@0.24.3
+
 ## 0.11.13
 
 ### Patch Changes
