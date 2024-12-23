@@ -1,5 +1,14 @@
 # web
 
+## 0.1.50
+
+### Patch Changes
+
+- Updated dependencies [dc5643e]
+- Updated dependencies [dc5643e]
+  - @3loop/transaction-decoder@0.24.3
+  - @3loop/transaction-interpreter@0.11.14
+
 ## 0.1.49
 
 ### Patch Changes
