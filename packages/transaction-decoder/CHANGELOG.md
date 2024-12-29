@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.24.3
+
+### Patch Changes
+
+- dc5643e: Update from and to adresses to the Hex format
+
 ## 0.24.2
 
 ### Patch Changes
