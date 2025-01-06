@@ -1,5 +1,5 @@
 import { getProvider, RPCProviderLive } from './rpc-provider'
-import { Config, Effect, Layer, ManagedRuntime } from 'effect'
+import { Config, Effect, Layer, ManagedRuntime, Request } from 'effect'
 import {
   DecodedTransaction,
   DecodeResult,
@@ -56,8 +56,10 @@ const MetaStoreLive = Layer.unwrapEffect(
     })
   }),
 )
+const CacheLayer = Layer.setRequestCache(Request.makeCache({ capacity: 100, timeToLive: '60 minutes' }))
 const DataLayer = Layer.mergeAll(RPCProviderLive, DatabaseLive)
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, MetaStoreLive)
+
 const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer) as Layer.Layer<
   | AbiStore<AbiParams, ContractAbiResult>
   | ContractMetaStore<ContractMetaParams, ContractMetaResult>
@@ -68,7 +70,7 @@ const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer) as Layer.Layer<
   never
 >
 
-const runtime = ManagedRuntime.make(MainLayer)
+const runtime = ManagedRuntime.make(Layer.provide(MainLayer, CacheLayer))
 
 export async function decodeTransaction({
   chainID,
@@ -80,10 +82,19 @@ export async function decodeTransaction({
   // NOTE: For unknonw reason the context of main layer is still missing the SqlClient in the type
   const runnable = decodeTransactionByHash(hash as Hex, chainID)
 
-  return runtime.runPromise(runnable).catch((error: unknown) => {
+  const startTime = performance.now()
+
+  try {
+    const result = await runtime.runPromise(runnable)
+    const endTime = performance.now()
+    console.log(`Decode transaction took ${endTime - startTime}ms`)
+    return result
+  } catch (error: unknown) {
+    const endTime = performance.now()
     console.error('Decode error', JSON.stringify(error, null, 2))
+    console.log(`Failed decode transaction took ${endTime - startTime}ms`)
     return undefined
-  })
+  }
 }
 
 export async function decodeCalldata({

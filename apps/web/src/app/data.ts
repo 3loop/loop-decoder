@@ -130,7 +130,6 @@ export const supportedChains: {
   chainID: number
   rpcUrl: string
   traceAPI?: 'parity' | 'geth' | 'none'
-  batchMaxCount?: number
 }[] = [
   {
     name: 'Ethereum Mainnet',
@@ -146,8 +145,7 @@ export const supportedChains: {
     name: 'Base mainnet',
     chainID: 8453,
     rpcUrl: process.env.BASE_RPC_URL as string,
-    traceAPI: 'parity',
-    batchMaxCount: 1,
+    traceAPI: 'geth',
   },
   {
     name: 'Polygon Mainnet',
