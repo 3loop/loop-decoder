@@ -1,14 +1,14 @@
 import { ContractData, ContractType } from '../types.js'
 import * as RequestModel from './request-model.js'
 import { Effect, RequestResolver } from 'effect'
-import { getProxyStorageSlot } from '../decoding/proxies.js'
+import { getProxyImplementation } from '../decoding/proxies.js'
 import { PublicClient } from '../public-client.js'
 
 export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) => ({
   id: 'proxy-rpc-strategy',
   resolver: RequestResolver.fromEffect(({ chainId, address }: RequestModel.GetContractMetaStrategy) =>
     Effect.gen(function* () {
-      const proxyResult = yield* getProxyStorageSlot({ address, chainID: chainId })
+      const proxyResult = yield* getProxyImplementation({ address, chainID: chainId })
       const { address: implementationAddress, type: proxyType } = proxyResult ?? {}
 
       const fail = new RequestModel.ResolveStrategyMetaError('ProxyRPCStrategy', address, chainId)

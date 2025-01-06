@@ -12,7 +12,8 @@ import {
   SchemaAST,
 } from 'effect'
 import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
-import { Abi } from 'viem'
+import { Abi, getAddress } from 'viem'
+import { getProxyImplementation } from './decoding/proxies.js'
 
 export interface AbiParams {
   chainID: number
@@ -39,6 +40,7 @@ export interface ContractAbiEmpty {
 export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | ContractAbiEmpty
 
 type ChainOrDefault = number | 'default'
+
 export interface AbiStore<Key = AbiParams, Value = ContractAbiResult> {
   readonly strategies: Record<ChainOrDefault, readonly ContractAbiResolverStrategy[]>
   readonly set: (key: Key, value: Value) => Effect.Effect<void, never>

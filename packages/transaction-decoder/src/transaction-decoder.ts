@@ -99,7 +99,7 @@ export const decodeTransaction = ({
         ),
         decodedTrace: decodeTrace({ trace, transaction }),
         decodedLogs: decodeLogs({ receipt, transaction }),
-        decodedErrorTrace: decodeErrorTrace({ trace }),
+        decodedErrorTrace: decodeErrorTrace({ trace, transaction }),
       },
       {
         batching: true,

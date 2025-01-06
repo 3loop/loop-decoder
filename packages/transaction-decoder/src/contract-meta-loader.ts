@@ -2,6 +2,7 @@ import { Context, Effect, RequestResolver, Request, Array, Either, pipe, Schema,
 import { ContractData } from './types.js'
 import { ContractMetaResolverStrategy, GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'
+import { ZERO_ADDRESS } from './decoding/constants.js'
 
 export interface ContractMetaParams {
   address: string
@@ -155,24 +156,28 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
     )
 
     // Fetch ContractMeta from the strategies
-    const strategyResults = yield* Effect.forEach(remaining, ({ chainID, address }) => {
-      const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
+    const strategyResults = yield* Effect.forEach(
+      remaining,
+      ({ chainID, address }) => {
+        const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
-      // TODO: Distinct the errors and missing data, so we can retry on errors
-      return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-        pipe(
-          Effect.request(
-            new GetContractMetaStrategy({
-              address,
-              chainId: chainID,
-              strategyId: strategy.id,
-            }),
-            strategy.resolver,
+        // TODO: Distinct the errors and missing data, so we can retry on errors
+        return Effect.validateFirst(allAvailableStrategies, (strategy) =>
+          pipe(
+            Effect.request(
+              new GetContractMetaStrategy({
+                address,
+                chainId: chainID,
+                strategyId: strategy.id,
+              }),
+              strategy.resolver,
+            ),
+            Effect.withRequestCaching(true),
           ),
-          Effect.withRequestCaching(true),
-        ),
-      ).pipe(Effect.orElseSucceed(() => null))
-    })
+        ).pipe(Effect.orElseSucceed(() => null))
+      },
+      { concurrency: 'unbounded', batching: true },
+    )
 
     // Store results and resolve pending requests
     yield* Effect.forEach(
@@ -197,6 +202,8 @@ export const getAndCacheContractMeta = ({
   readonly chainID: number
   readonly address: Address
 }) => {
+  if (address === ZERO_ADDRESS) return Effect.succeed(null)
+
   return Effect.withSpan(
     Effect.request(new ContractMetaLoader({ chainID, address }), ContractMetaLoaderRequestResolver),
     'GetAndCacheContractMeta',

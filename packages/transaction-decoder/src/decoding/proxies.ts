@@ -1,11 +1,18 @@
-import { Effect, Request, RequestResolver, Schedule } from 'effect'
-import { PublicClient, RPCCallError, RPCFetchError, UnknownNetwork } from '../public-client.js'
+import { Effect, PrimaryKey, Request, RequestResolver, Schedule, Schema, SchemaAST } from 'effect'
+
+import { PublicClient, RPCCallError, RPCFetchError } from '../public-client.js'
 import { Address, Hex } from 'viem'
 import { ProxyType } from '../types.js'
+import { ZERO_ADDRESS } from './constants.js'
 
 interface StorageSlot {
   type: ProxyType
   slot: Hex
+}
+
+interface ProxyResult {
+  type: ProxyType
+  address: Address
 }
 
 const storageSlots: StorageSlot[] = [
@@ -16,14 +23,30 @@ const storageSlots: StorageSlot[] = [
 
 const zeroSlot = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
-export interface GetStorageSlot
-  extends Request.Request<{ type: ProxyType; address: Address } | undefined, UnknownNetwork> {
-  readonly _tag: 'GetStorageSlot'
+export interface GetProxy extends Request.Request<ProxyResult | undefined, RPCFetchError> {
+  readonly _tag: 'GetProxy'
   readonly address: Address
   readonly chainID: number
 }
 
-const getStorageSlot = (request: GetStorageSlot, slot: StorageSlot) =>
+export const GetProxy = Request.tagged<GetProxy>('GetProxy')
+class SchemaAddress extends Schema.make<Address>(SchemaAST.stringKeyword) {}
+class SchemaProxy extends Schema.make<ProxyResult | undefined>(SchemaAST.objectKeyword) {}
+
+class ProxyLoader extends Schema.TaggedRequest<ProxyLoader>()('ProxyLoader', {
+  failure: Schema.instanceOf(RPCFetchError),
+  success: Schema.NullOr(SchemaProxy),
+  payload: {
+    address: SchemaAddress,
+    chainID: Schema.Number,
+  },
+}) {
+  [PrimaryKey.symbol]() {
+    return `proxy::${this.chainID}:${this.address}`
+  }
+}
+
+const getStorageSlot = (request: ProxyLoader, slot: StorageSlot) =>
   Effect.gen(function* () {
     const service = yield* PublicClient
     const { client: publicClient } = yield* service.getPublicClient(request.chainID)
@@ -37,7 +60,7 @@ const getStorageSlot = (request: GetStorageSlot, slot: StorageSlot) =>
     })
   })
 
-const ethCall = (request: GetStorageSlot, slot: StorageSlot) =>
+const ethCall = (request: ProxyLoader, slot: StorageSlot) =>
   Effect.gen(function* () {
     const service = yield* PublicClient
     const { client: publicClient } = yield* service.getPublicClient(request.chainID)
@@ -49,52 +72,54 @@ const ethCall = (request: GetStorageSlot, slot: StorageSlot) =>
             data: slot.slot,
           })
         )?.data,
-      catch: () => new RPCCallError('Get storage'),
+      catch: () => new RPCCallError('Eth call'),
     })
   })
 
-export const GetStorageSlot = Request.tagged<GetStorageSlot>('GetStorageSlot')
+export const GetProxyResolver = RequestResolver.fromEffect(
+  (request: ProxyLoader): Effect.Effect<ProxyResult | undefined, RPCFetchError, PublicClient> =>
+    Effect.gen(function* () {
+      // NOTE: Should we make this recursive when we have a Proxy of a Proxy?
 
-export const GetStorageSlotResolver = RequestResolver.fromEffect((request: GetStorageSlot) =>
-  Effect.gen(function* () {
-    // NOTE: Should we make this recursive when we have a Proxy of a Proxy?
-    const effects = storageSlots.map((slot) =>
-      Effect.gen(function* () {
-        const res: { type: ProxyType; address: Hex } | undefined = { type: slot.type, address: '0x' }
+      const effects = storageSlots.map((slot) =>
+        Effect.gen(function* () {
+          const res: ProxyResult | undefined = { type: slot.type, address: '0x' }
 
-        let addressString: Address | undefined
-        switch (slot.type) {
-          case 'eip1967':
-          case 'zeppelin': {
-            addressString = yield* getStorageSlot(request, slot)
-            break
+          let address: Hex | undefined
+          switch (slot.type) {
+            case 'eip1967':
+            case 'zeppelin': {
+              address = yield* getStorageSlot(request, slot)
+              break
+            }
+            case 'safe': {
+              address = yield* ethCall(request, slot).pipe(Effect.orElseSucceed(() => undefined))
+              break
+            }
           }
-          case 'safe': {
-            addressString = yield* ethCall(request, slot).pipe(Effect.orElseSucceed(() => undefined))
-            break
-          }
-        }
 
-        if (addressString == null || addressString === zeroSlot) return undefined
+          if (!address || address === zeroSlot) return undefined
 
-        res.address = ('0x' + addressString.slice(addressString.length - 40)) as Address
+          res.address = ('0x' + address.slice(address.length - 40)) as Address
+          return res
+        }),
+      )
 
-        return res
-      }),
-    )
+      const policy = Schedule.addDelay(
+        Schedule.recurs(2), // Retry for a maximum of 2 times
+        () => '100 millis', // Add a delay of 100 milliseconds between retries
+      )
+      const res = yield* Effect.all(effects, {
+        concurrency: 'inherit',
+        batching: 'inherit',
+      }).pipe(Effect.retryOrElse(policy, () => Effect.succeed(undefined)))
 
-    const policy = Schedule.addDelay(
-      Schedule.recurs(2), // Retry for a maximum of 2 times
-      () => '100 millis', // Add a delay of 100 milliseconds between retries
-    )
-    const res = yield* Effect.all(effects, {
-      concurrency: 'inherit',
-      batching: 'inherit',
-    }).pipe(Effect.retryOrElse(policy, () => Effect.succeed(undefined)))
-
-    return res?.find((x) => x != null)
-  }),
+      return res?.find((x) => x != null)
+    }),
 ).pipe(RequestResolver.contextFromEffect)
 
-export const getProxyStorageSlot = ({ address, chainID }: { address: Address; chainID: number }) =>
-  Effect.request(GetStorageSlot({ address, chainID }), GetStorageSlotResolver).pipe(Effect.withRequestCaching(true))
+export const getProxyImplementation = ({ address, chainID }: { address: Address; chainID: number }) => {
+  if (address === ZERO_ADDRESS) return Effect.succeed(null)
+
+  return Effect.request(new ProxyLoader({ address, chainID }), GetProxyResolver).pipe(Effect.withRequestCaching(true))
+}

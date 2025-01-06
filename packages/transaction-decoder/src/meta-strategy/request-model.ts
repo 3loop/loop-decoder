@@ -1,4 +1,4 @@
-import { UnknownNetwork } from '../public-client.js'
+import { RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { ContractData } from '../types.js'
 import { PrimaryKey, RequestResolver, Schema, SchemaAST } from 'effect'
 import { Address } from 'viem'
@@ -28,7 +28,11 @@ class SchemaContractData extends Schema.make<ContractData>(SchemaAST.objectKeywo
 export class GetContractMetaStrategy extends Schema.TaggedRequest<GetContractMetaStrategy>()(
   'GetContractMetaStrategy',
   {
-    failure: Schema.Union(Schema.instanceOf(ResolveStrategyMetaError), Schema.instanceOf(UnknownNetwork)),
+    failure: Schema.Union(
+      Schema.instanceOf(ResolveStrategyMetaError),
+      Schema.instanceOf(UnknownNetwork),
+      Schema.instanceOf(RPCFetchError),
+    ),
     success: SchemaContractData,
     payload: {
       chainId: Schema.Number,

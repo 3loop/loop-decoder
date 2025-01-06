@@ -16,7 +16,39 @@ export function getProvider(chainID: number): PublicClientObject | null {
   if (url != null) {
     return {
       client: createPublicClient({
-        transport: http(url),
+        transport: http(url, {
+          // Requests logging
+          // onFetchRequest(request) {
+          //   const reader = request.body?.getReader()
+          //   if (!reader) {
+          //     return
+          //   }
+          //   let body = ''
+          //   reader
+          //     .read()
+          //     .then(function processText({ done, value }) {
+          //       if (done) {
+          //         return
+          //       }
+          //       // value for fetch streams is a Uint8Array
+          //       body += value
+          //       reader.read().then(processText)
+          //     })
+          //     .then(() => {
+          //       const json = JSON.parse(
+          //         body
+          //           .split(',')
+          //           .map((code) => String.fromCharCode(parseInt(code, 10)))
+          //           .join(''),
+          //       )
+          //       try {
+          //         console.log(JSON.stringify(json, null, 2))
+          //       } catch (e) {
+          //         console.log(json['id'], json['method'], body.length)
+          //       }
+          //     })
+          // },
+        }),
       }),
       config: {
         traceAPI: providerConfigs[chainID]?.traceAPI,

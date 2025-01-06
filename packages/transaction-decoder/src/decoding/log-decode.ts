@@ -1,7 +1,7 @@
-import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, getAddress } from 'viem'
+import { Address, type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, getAddress } from 'viem'
 import { Effect } from 'effect'
 import type { DecodedLogEvent, Interaction, RawDecodedLog } from '../types.js'
-import { getProxyStorageSlot } from './proxies.js'
+import { getProxyImplementation } from './proxies.js'
 import { getAndCacheAbi } from '../abi-loader.js'
 import { getAndCacheContractMeta } from '../contract-meta-loader.js'
 import * as AbiDecoder from './abi-decode.js'
@@ -22,14 +22,8 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     const chainID = Number(transaction.chainId)
 
     const address = getAddress(logItem.address)
-    let abiAddress = address
-
-    const implementation = yield* getProxyStorageSlot({ address: getAddress(abiAddress), chainID })
-
-    if (implementation) {
-      yield* Effect.logDebug(`Proxy implementation found for ${abiAddress} at ${implementation}`)
-      abiAddress = implementation.address
-    }
+    const implementation = yield* getProxyImplementation({ address, chainID })
+    const abiAddress = implementation?.address ?? address
 
     const [abiItem, contractData] = yield* Effect.all(
       [

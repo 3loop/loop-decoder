@@ -38,3 +38,4 @@ export const SAFE_MULTISEND_ABI: Abi = [
     outputs: [],
   },
 ]
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'

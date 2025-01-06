@@ -47,7 +47,7 @@ const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =
     return yield* new DecodeError(`Could not decode trace log ${stringify(call)}`)
   })
 
-const decodeTraceLogOutput = (call: TraceLog) =>
+const decodeTraceLogOutput = (call: TraceLog, chainID: number) =>
   Effect.gen(function* () {
     if (call.result && 'output' in call.result && call.result.output !== '0x') {
       const data = call.result.output as Hex
@@ -61,7 +61,7 @@ const decodeTraceLogOutput = (call: TraceLog) =>
         const abi_ = yield* getAndCacheAbi({
           address: '',
           signature,
-          chainID: 0,
+          chainID,
         })
 
         abi = [...abi, ...abi_]
@@ -184,7 +184,13 @@ export function augmentTraceLogs(
   return [...interactionsWithoutNativeTransfers, ...nativeTransfers]
 }
 
-export const decodeErrorTrace = ({ trace }: { trace: TraceLog[] }) =>
+export const decodeErrorTrace = ({
+  trace,
+  transaction,
+}: {
+  trace: TraceLog[]
+  transaction: GetTransactionReturnType
+}) =>
   Effect.gen(function* () {
     const errorCalls = trace?.filter((call) => call.error != null)
     if (errorCalls.length === 0) {
@@ -212,7 +218,7 @@ export const decodeErrorTrace = ({ trace }: { trace: TraceLog[] }) =>
             message: null,
           }
         }
-        const decodedOutput = yield* decodeTraceLogOutput(call)
+        const decodedOutput = yield* decodeTraceLogOutput(call, Number(transaction.chainId))
         const value = decodedOutput?.params?.[0]?.value?.toString()
         let message: string | null = null
 
