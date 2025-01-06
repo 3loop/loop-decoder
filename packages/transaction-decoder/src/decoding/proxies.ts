@@ -81,8 +81,6 @@ export const GetProxyResolver = RequestResolver.fromEffect(
     Effect.gen(function* () {
       // NOTE: Should we make this recursive when we have a Proxy of a Proxy?
 
-      if (request.address === ZERO_ADDRESS) return undefined
-
       const effects = storageSlots.map((slot) =>
         Effect.gen(function* () {
           const res: ProxyResult | undefined = { type: slot.type, address: '0x' }
@@ -120,5 +118,8 @@ export const GetProxyResolver = RequestResolver.fromEffect(
     }),
 ).pipe(RequestResolver.contextFromEffect)
 
-export const getProxyImplementation = ({ address, chainID }: { address: Address; chainID: number }) =>
-  Effect.request(new ProxyLoader({ address, chainID }), GetProxyResolver).pipe(Effect.withRequestCaching(true))
+export const getProxyImplementation = ({ address, chainID }: { address: Address; chainID: number }) => {
+  if (address === ZERO_ADDRESS) return Effect.succeed(null)
+
+  return Effect.request(new ProxyLoader({ address, chainID }), GetProxyResolver).pipe(Effect.withRequestCaching(true))
+}

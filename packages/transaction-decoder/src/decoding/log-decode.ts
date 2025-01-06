@@ -1,4 +1,4 @@
-import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, getAddress } from 'viem'
+import { Address, type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, getAddress } from 'viem'
 import { Effect } from 'effect'
 import type { DecodedLogEvent, Interaction, RawDecodedLog } from '../types.js'
 import { getProxyImplementation } from './proxies.js'
@@ -22,7 +22,8 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     const chainID = Number(transaction.chainId)
 
     const address = getAddress(logItem.address)
-    const abiAddress = address
+    const implementation = yield* getProxyImplementation({ address, chainID })
+    const abiAddress = implementation?.address ?? address
 
     const [abiItem, contractData] = yield* Effect.all(
       [

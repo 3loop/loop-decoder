@@ -314,22 +314,7 @@ export const getAndCacheAbi = (params: AbiParams) =>
       return yield* Effect.fail(new EmptyCalldataError(params))
     }
 
-    let implementation = null
-
-    if (params.address !== '') {
-      implementation = yield* getProxyImplementation({
-        address: getAddress(params.address),
-        chainID: params.chainID,
-      })
-    }
-
-    return yield* Effect.request(
-      new AbiLoader({
-        ...params,
-        address: implementation?.address ?? params.address,
-      }),
-      AbiLoaderRequestResolver,
-    )
+    return yield* Effect.request(new AbiLoader(params), AbiLoaderRequestResolver)
   }).pipe(
     Effect.withSpan('AbiLoader.GetAndCacheAbi', {
       attributes: {
