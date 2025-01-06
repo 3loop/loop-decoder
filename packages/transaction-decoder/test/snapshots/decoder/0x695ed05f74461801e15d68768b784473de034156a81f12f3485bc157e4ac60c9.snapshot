@@ -1,14 +1,5 @@
 {
   "addressesMeta": {
-    "0x0000000000000000000000000000000000000000": {
-      "address": "0x0000000000000000000000000000000000000000",
-      "chainID": 5,
-      "contractAddress": "0x0000000000000000000000000000000000000000",
-      "contractName": "Mock ERC20 Contract",
-      "decimals": 18,
-      "tokenSymbol": "ERC20",
-      "type": "ERC20",
-    },
     "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80": {
       "address": "0x4BED3aE022FD201AB7185a9BC80cB8Bf9819bb80",
       "chainID": 5,
