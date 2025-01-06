@@ -12,7 +12,8 @@ import {
   SchemaAST,
 } from 'effect'
 import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
-import { Abi } from 'viem'
+import { Abi, getAddress } from 'viem'
+import { getProxyImplementation } from './decoding/proxies.js'
 
 export interface AbiParams {
   chainID: number
@@ -39,6 +40,7 @@ export interface ContractAbiEmpty {
 export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | ContractAbiEmpty
 
 type ChainOrDefault = number | 'default'
+
 export interface AbiStore<Key = AbiParams, Value = ContractAbiResult> {
   readonly strategies: Record<ChainOrDefault, readonly ContractAbiResolverStrategy[]>
   readonly set: (key: Key, value: Value) => Effect.Effect<void, never>
@@ -312,7 +314,18 @@ export const getAndCacheAbi = (params: AbiParams) =>
       return yield* Effect.fail(new EmptyCalldataError(params))
     }
 
-    return yield* Effect.request(new AbiLoader(params), AbiLoaderRequestResolver)
+    const implementation = yield* getProxyImplementation({
+      address: getAddress(params.address),
+      chainID: params.chainID,
+    })
+
+    return yield* Effect.request(
+      new AbiLoader({
+        ...params,
+        address: implementation?.address ?? params.address,
+      }),
+      AbiLoaderRequestResolver,
+    )
   }).pipe(
     Effect.withSpan('AbiLoader.GetAndCacheAbi', {
       attributes: {
