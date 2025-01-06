@@ -314,10 +314,14 @@ export const getAndCacheAbi = (params: AbiParams) =>
       return yield* Effect.fail(new EmptyCalldataError(params))
     }
 
-    const implementation = yield* getProxyImplementation({
-      address: getAddress(params.address),
-      chainID: params.chainID,
-    })
+    let implementation = null
+
+    if (params.address !== '') {
+      implementation = yield* getProxyImplementation({
+        address: getAddress(params.address),
+        chainID: params.chainID,
+      })
+    }
 
     return yield* Effect.request(
       new AbiLoader({
