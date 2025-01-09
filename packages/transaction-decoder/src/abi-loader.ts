@@ -12,8 +12,7 @@ import {
   SchemaAST,
 } from 'effect'
 import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
-import { Abi, getAddress } from 'viem'
-import { getProxyImplementation } from './decoding/proxies.js'
+import { Abi } from 'viem'
 
 export interface AbiParams {
   chainID: number

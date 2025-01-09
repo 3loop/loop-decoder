@@ -162,4 +162,4 @@ export interface Asset {
   tokenId?: string
 }
 
-export type ProxyType = 'eip1967' | 'zeppelin' | 'safe'
+export type ProxyType = 'eip1967' | 'zeppelin' | 'safe' | 'eip1167'

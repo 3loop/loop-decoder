@@ -19,7 +19,6 @@
   "size": "0xb457",
   "stateRoot": "0x745f9c3ca256cbbef71ba81ec4b32d95f53602428ec3bad2881a2a6862659abd",
   "timestamp": "0x66125243",
-  "totalDifficulty": "0xc70d815d562d3cfa955",
   "transactions": [
     {
       "blockHash": "0x3b73e17ed96ca3759b4036882168b1686f7b02ffce344799ee06f3decf640948",

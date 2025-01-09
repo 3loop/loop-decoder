@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import { PublicClient, PublicClientObject, UnknownNetwork } from '../../src/effect.js'
 import { Effect } from 'effect'
 import { createPublicClient, custom } from 'viem'
+import { PROXY_SLOTS, RPC, ZERO_SLOT } from '../constants.js'
 
 export interface MockedTransaction {
   transaction: any
@@ -20,6 +21,7 @@ export const mockedTransport = custom({
       ) as MockedTransaction
       return Promise.resolve(transaction)
     }
+
     if (method === 'eth_getTransactionReceipt') {
       const hash = params[0]
       const exists = fs.existsSync(`./test/mocks/tx/${hash.toLowerCase()}.json`)
@@ -46,43 +48,114 @@ export const mockedTransport = custom({
       return Promise.resolve(JSON.parse(fs.readFileSync(`./test/mocks/tx/${blockNumber}.json`).toString()))
     }
 
-    // TODO: add mocks for storage slots
     if (method === 'eth_getStorageAt') {
-      // NOTE: mock for BLUR
-      if (params[0].toLowerCase() === '0xb2ecfe4e4d61f8790bbb9de2d1259b9e2410cea5') {
-        return Promise.resolve('0x0000000000000000000000005fa60726E62c50Af45Ff2F6280C468DA438A7837')
-      }
-      if (params[0].toLowerCase() === '0x0000000000a39bb272e79075ade125fd351887ac') {
-        return Promise.resolve('0x00000000000000000000000001a656024de4B89e2D0198BF4D468E8fd2358b17')
+      const [address, slot] = params
+
+      if (!PROXY_SLOTS.includes(slot)) {
+        return Promise.resolve(ZERO_SLOT)
       }
 
-      if (params[0].toLowerCase() === '0x2e175f748976cd5cdb98f12d1abc5d137d6c9379') {
-        return Promise.resolve('0x00000000000000000000000001a656024de4B89e2D0198BF4D468E8fd2358b17')
+      const exists = fs.existsSync(`./test/mocks/address/${address.toLowerCase()}.json`)
+      const cachedData = JSON.parse(
+        fs.readFileSync(`./test/mocks/address/${address.toLowerCase()}.json`).toString(),
+      ) as {
+        slots?: Record<string, string>
       }
 
-      // AAVE
-      if (params[0].toLowerCase() === '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2') {
-        return Promise.resolve('0x00000000000000000000000005FAab9E1adbddaD0a08734BE8a52185Fd6558E14')
+      const { slots } = cachedData
+      let slotValue: string | undefined = slots?.[slot]
+
+      if (!exists || !slotValue) {
+        console.log('Making eth_getStorageAt request for', params)
+
+        const resp = await fetch(RPC, {
+          method: 'POST',
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'eth_getStorageAt',
+            params,
+            id: 1,
+          }),
+        })
+
+        const data = (await resp.json()) as { result?: string }
+
+        slotValue = data.result || ZERO_SLOT
+        fs.writeFileSync(
+          `./test/mocks/address/${address.toLowerCase()}.json`,
+          JSON.stringify({ ...cachedData, slots: { ...slots, [slot]: slotValue } }, null, 2),
+        )
       }
-      return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')
+
+      return Promise.resolve(slotValue)
     }
 
     if (method === 'eth_call') {
       // NOTE: mock for Gnosis Safe
-
-      if (params[0].to.toLowerCase() === '0x78c38d0e31592822135c83873e68c7ee4df82586') {
-        return Promise.resolve('0x000000000000000000000000fb1bffc9d739b8d520daf37df666da4c687191ea')
+      const { to, data } = params[0]
+      const exists = fs.existsSync(`./test/mocks/address/${to.toLowerCase()}.json`)
+      const cachedData = JSON.parse(fs.readFileSync(`./test/mocks/address/${to.toLowerCase()}.json`).toString()) as {
+        slots?: Record<string, string>
       }
 
-      if (params[0].to.toLowerCase() === '0xbd4b515ed602792497364de7c306659297378fae') {
-        return Promise.resolve('0x0000000000000000000000003e5c63644e683549055b9be8653de26e0b4cd36e')
+      const { slots } = cachedData
+      let slotValue: string | undefined = slots?.[data]
+
+      if (!exists || !slotValue) {
+        console.log('Making eth_call request for', params)
+        const resp = await fetch(RPC, {
+          method: 'POST',
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'eth_call',
+            params,
+            id: 1,
+          }),
+        })
+
+        const dataResponse = (await resp.json()) as { result?: string }
+
+        slotValue = dataResponse.result || ZERO_SLOT
+        fs.writeFileSync(
+          `./test/mocks/address/${to.toLowerCase()}.json`,
+          JSON.stringify({ ...cachedData, slots: { ...slots, [data]: slotValue } }, null, 2),
+        )
       }
 
-      if (params[0].to.toLowerCase() === '0x2d8880bcc0618dbcc5d516640015a69e28fdc406') {
-        return Promise.resolve('0x000000000000000000000000d9db270c1b5e3bd161e8c8503c55ceabee709552')
+      return Promise.resolve(slotValue)
+    }
+
+    if (method === 'eth_getCode') {
+      const address = params[0]
+      const exists = fs.existsSync(`./test/mocks/address/${address.toLowerCase()}.json`)
+
+      const cachedData = JSON.parse(
+        fs.readFileSync(`./test/mocks/address/${address.toLowerCase()}.json`).toString(),
+      ) as {
+        code: string
       }
 
-      return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000000')
+      let code = cachedData.code
+
+      if (!exists || !code) {
+        console.log('Making eth_getCode request for', params)
+        const resp = await fetch(RPC, {
+          method: 'POST',
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'eth_getCode',
+            params,
+            id: 1,
+          }),
+        })
+        const data = (await resp.json()) as { result?: string }
+        code = data.result || '0x'
+        fs.writeFileSync(
+          `./test/mocks/address/${address.toLowerCase()}.json`,
+          JSON.stringify({ ...cachedData, code }, null, 2),
+        )
+      }
+      return Promise.resolve(code)
     }
 
     throw new Error(`Method ${method} not implemented`)
