@@ -23,13 +23,14 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components'
     Fully written in TypeScript, can be used on both the client side and server side in JS applications.
   </Card>
   <Card title="Highly customizable" icon="puzzle">
-    Provides a set of data loaders to simplify resolution of ABIs and other data required for decoding.
+    Leverage plug-and-play data loaders for ABI and metadata resolution, and connect your own storage for metadata
+    caching.
   </Card>
   <Card title="You only need an RPC" icon="rocket">
-    Optional API providers can be used to fetch contract metadata or you can connect just your storage.
+    The library uses standart JSON RPC methods to fetch transaction data.
   </Card>
   <Card title="Flexible Intepreters" icon="setting">
-    Define any custom interpretation of EVM transactions.
+    Define custom interpretations for EVM transactions or use the default ones.
   </Card>
 </CardGrid>
 

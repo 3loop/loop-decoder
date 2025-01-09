@@ -71,16 +71,16 @@ importers:
         version: link:../../packages/transaction-interpreter
       '@effect/experimental':
         specifier: ^0.30.16
-        version: 0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+        version: 0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
       '@effect/platform':
         specifier: ^0.69.15
         version: 0.69.15(effect@3.10.18)
       '@effect/sql':
         specifier: ^0.18.16
-        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
+        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
       '@effect/sql-pg':
         specifier: ^0.19.5
-        version: 0.19.5(@effect/platform@0.69.15(effect@3.10.18))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18))(effect@3.10.18)
+        version: 0.19.5(@effect/platform@0.69.15(effect@3.10.18))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18))(effect@3.10.18)
       '@jitl/quickjs-singlefile-browser-release-sync':
         specifier: ^0.29.2
         version: 0.29.2
@@ -214,6 +214,9 @@ importers:
       '@effect/sql':
         specifier: ^0.18.16
         version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
+      '@shazow/whatsabi':
+        specifier: ^0.18.0
+        version: 0.18.0(@noble/hashes@1.7.0)(typescript@5.1.3)(zod@3.23.8)
     devDependencies:
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
@@ -367,6 +370,9 @@ packages:
 
   '@adraffy/ens-normalize@1.10.0':
     resolution: {integrity: sha512-nA9XHtlAkYfJxY7bce8DcN7eKxWWCWkU+1GR9d+U6MbNpfwQp8TI7vqOsBsMcHoT4mBu2kypKoSKnghEzOOq5Q==}
+
+  '@adraffy/ens-normalize@1.11.0':
+    resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -1595,9 +1601,17 @@ packages:
   '@noble/curves@1.4.0':
     resolution: {integrity: sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==}
 
+  '@noble/curves@1.8.0':
+    resolution: {integrity: sha512-j84kjAbzEnQHaSIhRPUmB3/eVXu2k3dKPl2LOrR8fSOIL+89U+7lV117EWHtq/GHM3ReGHM46iRBdZfpc4HRUQ==}
+    engines: {node: ^14.21.3 || >=16}
+
   '@noble/hashes@1.4.0':
     resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
     engines: {node: '>= 16'}
+
+  '@noble/hashes@1.7.0':
+    resolution: {integrity: sha512-HXydb0DgzTpDPwbVeDGCG1gIu7X6+AuU6Zl6av/E/KG8LMsvPntvq+w17CHRpKBmN6Ybdrt1eP3k4cj8DJa78w==}
+    engines: {node: ^14.21.3 || >=16}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2117,11 +2131,25 @@ packages:
   '@scure/base@1.1.7':
     resolution: {integrity: sha512-PPNYBslrLNNUQ/Yad37MHYsNQtK67EhWb6WtSvNLLPo7SdVZgkUjD6Dg+5On7zNwmskf8OX7I7Nx5oN+MIWE0g==}
 
+  '@scure/base@1.2.1':
+    resolution: {integrity: sha512-DGmGtC8Tt63J5GfHgfl5CuAXh96VF/LD8K9Hr/Gv0J2lAoRGlPOMpqMpMbCTOoOJMZCk2Xt+DskdDyn6dEFdzQ==}
+
   '@scure/bip32@1.4.0':
     resolution: {integrity: sha512-sVUpc0Vq3tXCkDGYVWGIZTRfnvu8LoTDaev7vbwh0omSvVORONr960MQWdKqJDCReIEmTj3PAr73O3aoxz7OPg==}
 
+  '@scure/bip32@1.6.1':
+    resolution: {integrity: sha512-jSO+5Ud1E588Y+LFo8TaB8JVPNAZw/lGGao+1SepHDeTs2dFLurdNIAgUuDlwezqEjRjElkCJajVrtrZaBxvaQ==}
+
   '@scure/bip39@1.3.0':
     resolution: {integrity: sha512-disdg7gHuTDZtY+ZdkmLpPCk7fxZSu3gBiEGuoC1XYxv9cGx3Z6cpTggCgW6odSOOIXCiDjuGejW+aJKCY/pIQ==}
+
+  '@scure/bip39@1.5.1':
+    resolution: {integrity: sha512-GnlufVSP9UdAo/H2Patfv22VTtpNTyfi+I3qCKpvuB5l1KWzEYx+l2TNpBy9Ksh4xTs3Rn06tBlpWCi/1Vz8gw==}
+
+  '@shazow/whatsabi@0.18.0':
+    resolution: {integrity: sha512-CAM3ORys1LG1D+C65xp2nzvnFVwvXYtH2XfkL1HAmo4/74UfugUadCFkKHZgC1TDyo2rpgnJsX/mSpPN2YJDpA==}
+    peerDependencies:
+      '@noble/hashes': ^1
 
   '@shikijs/core@1.16.1':
     resolution: {integrity: sha512-aI0hBtw+a6KsJp2jcD4YuQqKpeCbURMZbhHVozDknJpm+KJqeMRkEnfBC8BaKE/5XC+uofPgCLsa/TkTk0Ba0w==}
@@ -2479,6 +2507,17 @@ packages:
 
   abitype@1.0.5:
     resolution: {integrity: sha512-YzDhti7cjlfaBhHutMaboYB21Ha3rXR9QTkNJFzYC4kC8YclaiwPBBBJY8ejFdu2wnJeZCVZSMlQJ7fi8S6hsw==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3 >=3.22.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+      zod:
+        optional: true
+
+  abitype@1.0.8:
+    resolution: {integrity: sha512-ZeiI6h3GnW06uYDLx0etQtX/p8E24UaHHBj57RSjK7YBFe7iuVn07EDpOeP451D06sF27VOz9JJPlIKJmXgkEg==}
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3 >=3.22.0
@@ -4943,6 +4982,14 @@ packages:
   outdent@0.5.0:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
 
+  ox@0.2.2:
+    resolution: {integrity: sha512-QWCyFfVk5hFOhg13SGqRKih5B7EBucrf+Z1dfmN9jJQ8MZdrRx9mbD78JQL5ogSzDT7fcHgyMCaXd/3AWn6xHQ==}
+    peerDependencies:
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   p-filter@2.1.0:
     resolution: {integrity: sha512-ZBxxZ5sL2HghephhpGAQdoskxplTwr7ICaehZwLIlfL6acuVgZPm8yBNuRAFBGEqtD/hmUeq9eqLg2ys9Xr/yw==}
     engines: {node: '>=8'}
@@ -6674,6 +6721,8 @@ snapshots:
 
   '@adraffy/ens-normalize@1.10.0': {}
 
+  '@adraffy/ens-normalize@1.11.0': {}
+
   '@alloc/quick-lru@5.2.0': {}
 
   '@ampproject/remapping@2.3.0':
@@ -7179,14 +7228,6 @@ snapshots:
 
   '@ctrl/tinycolor@3.6.1': {}
 
-  '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
-    dependencies:
-      '@effect/platform': 0.69.15(effect@3.10.18)
-      effect: 3.10.18
-      msgpackr: 1.11.0
-    optionalDependencies:
-      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
-
   '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
     dependencies:
       '@effect/platform': 0.69.15(effect@3.10.18)
@@ -7201,20 +7242,13 @@ snapshots:
       find-my-way-ts: 0.1.5
       multipasta: 0.2.5
 
-  '@effect/sql-pg@0.19.5(@effect/platform@0.69.15(effect@3.10.18))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18))(effect@3.10.18)':
+  '@effect/sql-pg@0.19.5(@effect/platform@0.69.15(effect@3.10.18))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18))(effect@3.10.18)':
     dependencies:
       '@effect/platform': 0.69.15(effect@3.10.18)
-      '@effect/sql': 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
+      '@effect/sql': 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
       '@opentelemetry/semantic-conventions': 1.27.0
       effect: 3.10.18
       postgres: 3.4.5
-
-  '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)':
-    dependencies:
-      '@effect/experimental': 0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
-      '@effect/platform': 0.69.15(effect@3.10.18)
-      '@opentelemetry/semantic-conventions': 1.27.0
-      effect: 3.10.18
 
   '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)':
     dependencies:
@@ -7865,7 +7899,13 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.4.0
 
+  '@noble/curves@1.8.0':
+    dependencies:
+      '@noble/hashes': 1.7.0
+
   '@noble/hashes@1.4.0': {}
+
+  '@noble/hashes@1.7.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -8324,16 +8364,37 @@ snapshots:
 
   '@scure/base@1.1.7': {}
 
+  '@scure/base@1.2.1': {}
+
   '@scure/bip32@1.4.0':
     dependencies:
       '@noble/curves': 1.4.0
       '@noble/hashes': 1.4.0
       '@scure/base': 1.1.7
 
+  '@scure/bip32@1.6.1':
+    dependencies:
+      '@noble/curves': 1.8.0
+      '@noble/hashes': 1.7.0
+      '@scure/base': 1.2.1
+
   '@scure/bip39@1.3.0':
     dependencies:
       '@noble/hashes': 1.4.0
       '@scure/base': 1.1.7
+
+  '@scure/bip39@1.5.1':
+    dependencies:
+      '@noble/hashes': 1.7.0
+      '@scure/base': 1.2.1
+
+  '@shazow/whatsabi@0.18.0(@noble/hashes@1.7.0)(typescript@5.1.3)(zod@3.23.8)':
+    dependencies:
+      '@noble/hashes': 1.7.0
+      ox: 0.2.2(typescript@5.1.3)(zod@3.23.8)
+    transitivePeerDependencies:
+      - typescript
+      - zod
 
   '@shikijs/core@1.16.1':
     dependencies:
@@ -8831,6 +8892,11 @@ snapshots:
   abbrev@2.0.0: {}
 
   abitype@1.0.5(typescript@5.1.3)(zod@3.23.8):
+    optionalDependencies:
+      typescript: 5.1.3
+      zod: 3.23.8
+
+  abitype@1.0.8(typescript@5.1.3)(zod@3.23.8):
     optionalDependencies:
       typescript: 5.1.3
       zod: 3.23.8
@@ -9813,7 +9879,7 @@ snapshots:
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
@@ -9861,7 +9927,7 @@ snapshots:
       is-bun-module: 1.1.0
       is-glob: 4.0.3
     optionalDependencies:
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
     transitivePeerDependencies:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-node
@@ -9948,7 +10014,7 @@ snapshots:
       eslint: 8.57.0
       ignore: 5.2.4
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(eslint@8.57.0))(eslint@8.57.0))(eslint@8.57.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.1.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -12314,6 +12380,20 @@ snapshots:
   os-tmpdir@1.0.2: {}
 
   outdent@0.5.0: {}
+
+  ox@0.2.2(typescript@5.1.3)(zod@3.23.8):
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.0
+      '@noble/curves': 1.8.0
+      '@noble/hashes': 1.7.0
+      '@scure/bip32': 1.6.1
+      '@scure/bip39': 1.5.1
+      abitype: 1.0.8(typescript@5.1.3)(zod@3.23.8)
+      eventemitter3: 5.0.1
+    optionalDependencies:
+      typescript: 5.1.3
+    transitivePeerDependencies:
+      - zod
 
   p-filter@2.1.0:
     dependencies:
