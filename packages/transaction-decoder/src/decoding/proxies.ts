@@ -94,8 +94,12 @@ const getProxyTypeFromBytecode = (request: ProxyLoader, code: Hex) =>
     const { client: publicClient } = yield* service.getPublicClient(request.chainID)
 
     //use whatsabi to only resolve proxies with a known bytecode
-    const cachedCodeProvider = whatsabi.providers.WithCachedCode(publicClient, {
-      [request.address]: code,
+    const cachedCodeProvider = yield* Effect.try({
+      try: () =>
+        whatsabi.providers.WithCachedCode(publicClient, {
+          [request.address]: code,
+        }),
+      catch: () => new RPCFetchError(`Get proxy type from bytecode error`),
     })
 
     const result = yield* Effect.tryPromise({
