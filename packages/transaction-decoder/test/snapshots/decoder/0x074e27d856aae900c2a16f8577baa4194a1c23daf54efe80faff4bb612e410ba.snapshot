@@ -27,6 +27,15 @@
       "tokenSymbol": "ERC20",
       "type": "ERC20",
     },
+    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": {
+      "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "chainID": 1,
+      "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "contractName": "Mock ERC20 Contract",
+      "decimals": 18,
+      "tokenSymbol": "ERC20",
+      "type": "ERC20",
+    },
     "0xaeF176EF3501a72608411d8F15f570bc3C36D7fa": {
       "address": "0xaeF176EF3501a72608411d8F15f570bc3C36D7fa",
       "chainID": 1,
@@ -58,11 +67,43 @@
   "interactedAddresses": [
     "0xaeF176EF3501a72608411d8F15f570bc3C36D7fa",
     "0x40A2aCCbd92BCA938b02010E17A5b8929b49130D",
-    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     "0x54CAe6EDCDec4c62AD5f7a8288447EAD0eb2995a",
+    "0xdAC17F958D2ee523a2206206994597C13D831ec7",
     "0x98FB2B6C27A62113a0f89272EbBB6FEb957e966f",
   ],
   "interactions": [
+    {
+      "chainID": 1,
+      "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 449,
+        "params": {},
+      },
+      "signature": "Transfer(address,address,uint256)",
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0x54CAe6EDCDec4c62AD5f7a8288447EAD0eb2995a",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "ExecutionSuccess",
+        "logIndex": 450,
+        "params": {
+          "payment": "0",
+          "txHash": "0xfaacd3855307ba34dbc8e29044e9da6278b34b8d70d23cc6c4464b54829cde55",
+        },
+      },
+      "signature": "ExecutionSuccess(bytes32,uint256)",
+    },
     {
       "chainID": 1,
       "contractAddress": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
@@ -80,6 +121,54 @@
         },
       },
       "signature": "Transfer(address,address,uint256)",
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0x54CAe6EDCDec4c62AD5f7a8288447EAD0eb2995a",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "ExecutionSuccess",
+        "logIndex": 452,
+        "params": {
+          "payment": "0",
+          "txHash": "0xef36325011cd52a5fc40720582aa745c8bfafc0fb1141d26691d20b609b35772",
+        },
+      },
+      "signature": "ExecutionSuccess(bytes32,uint256)",
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "Transfer",
+        "logIndex": 453,
+        "params": {},
+      },
+      "signature": "Transfer(address,address,uint256)",
+    },
+    {
+      "chainID": 1,
+      "contractAddress": "0x54CAe6EDCDec4c62AD5f7a8288447EAD0eb2995a",
+      "contractName": "Mock ERC20 Contract",
+      "contractSymbol": "ERC20",
+      "contractType": "ERC20",
+      "decimals": 18,
+      "event": {
+        "eventName": "ExecutionSuccess",
+        "logIndex": 454,
+        "params": {
+          "payment": "0",
+          "txHash": "0xc4c17c73e77fb75ecbf547b3c173a4cd6ced5b061d8468d1c6267c98e8d2f757",
+        },
+      },
+      "signature": "ExecutionSuccess(bytes32,uint256)",
     },
   ],
   "methodCall": {
@@ -120,6 +209,80 @@
                       "name": "data",
                       "type": "bytes",
                       "value": "0x6a761202000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000e4900a56feb3d92b3d174c98c948e052b13d4c350000000000000000000000000000000000000000000000000000000008f0d180000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000082d4d0c98694ea2d962a2a06faa40512956ac4100f7a109842a730a5f6c2fdafc80cc58080298c7c8b59021df49fc30ab7a1587093901dd4fe750c7d2bc69adc6e1f6513a78ffca68e31715bb2f3eea9ae3a01af0cdbce6db149ed343c96ab6b7f4e5f8c7672cec81c398909c174a49ff8251564c2d1c7f05e0960e06ecadde2340e20000000000000000000000000000000000000000000000000000000000000",
+                      "valueDecoded": {
+                        "name": "execTransaction",
+                        "params": [
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb000000000000000000000000e4900a56feb3d92b3d174c98c948e052b13d4c350000000000000000000000000000000000000000000000000000000008f0d180",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0xe4900A56fEB3D92B3D174C98C948e052b13d4c35",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "150000000",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                          {
+                            "name": "operation",
+                            "type": "uint8",
+                            "value": "0",
+                          },
+                          {
+                            "name": "safeTxGas",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "baseGas",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "gasPrice",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "gasToken",
+                            "type": "address",
+                            "value": "0x0000000000000000000000000000000000000000",
+                          },
+                          {
+                            "name": "refundReceiver",
+                            "type": "address",
+                            "value": "0x0000000000000000000000000000000000000000",
+                          },
+                          {
+                            "name": "signatures",
+                            "type": "bytes",
+                            "value": "0xd4d0c98694ea2d962a2a06faa40512956ac4100f7a109842a730a5f6c2fdafc80cc58080298c7c8b59021df49fc30ab7a1587093901dd4fe750c7d2bc69adc6e1f6513a78ffca68e31715bb2f3eea9ae3a01af0cdbce6db149ed343c96ab6b7f4e5f8c7672cec81c398909c174a49ff8251564c2d1c7f05e0960e06ecadde2340e20",
+                          },
+                        ],
+                        "signature": "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
+                        "type": "function",
+                      },
                     },
                   ],
                   "name": "unknown",
@@ -151,6 +314,80 @@
                       "name": "data",
                       "type": "bytes",
                       "value": "0x6a761202000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000044a9059cbb00000000000000000000000098fb2b6c27a62113a0f89272ebbb6feb957e966f0000000000000000000000000000000000000000000000000000000011e1a300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000082530c6170b6a3bba5b71163e262e54fe8025b982c8394a6c4f0ba6f63bb087bfa5c8b1d862437342777881d92a713068cad958c9c363b8ceb3d4cea9d31fdab3e1fe3902c486c8c7383a65fce33460e81b7489c858400cde3a69869bf388b34f1816207e739e9434bc2525be8199d3a81cf76bcfab3abd818e5766931d54e97ada31f000000000000000000000000000000000000000000000000000000000000",
+                      "valueDecoded": {
+                        "name": "execTransaction",
+                        "params": [
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb00000000000000000000000098fb2b6c27a62113a0f89272ebbb6feb957e966f0000000000000000000000000000000000000000000000000000000011e1a300",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0x98FB2B6C27A62113a0f89272EbBB6FEb957e966f",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "300000000",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                          {
+                            "name": "operation",
+                            "type": "uint8",
+                            "value": "0",
+                          },
+                          {
+                            "name": "safeTxGas",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "baseGas",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "gasPrice",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "gasToken",
+                            "type": "address",
+                            "value": "0x0000000000000000000000000000000000000000",
+                          },
+                          {
+                            "name": "refundReceiver",
+                            "type": "address",
+                            "value": "0x0000000000000000000000000000000000000000",
+                          },
+                          {
+                            "name": "signatures",
+                            "type": "bytes",
+                            "value": "0x530c6170b6a3bba5b71163e262e54fe8025b982c8394a6c4f0ba6f63bb087bfa5c8b1d862437342777881d92a713068cad958c9c363b8ceb3d4cea9d31fdab3e1fe3902c486c8c7383a65fce33460e81b7489c858400cde3a69869bf388b34f1816207e739e9434bc2525be8199d3a81cf76bcfab3abd818e5766931d54e97ada31f",
+                          },
+                        ],
+                        "signature": "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
+                        "type": "function",
+                      },
                     },
                   ],
                   "name": "unknown",
@@ -182,6 +419,80 @@
                       "name": "data",
                       "type": "bytes",
                       "value": "0x6a761202000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000044a9059cbb000000000000000000000000867f9b5a43cf854494702d1709527bc84d02251000000000000000000000000000000000000000000000000000000000e215cec0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000082ed6e888bbd4e34daacadf99abc738d914393b66ee4d91086f2153569870166c32470de38ae2578c3b924416cf0207172e85047fdaea27fb3236f55db6dbcf30d1fadf4732351172ae63817cd40039b75a8803ab9bbb00d17891c98058aed5aa80f2e8e16ea620cdebc10add6c3a83ad83ccc0ae75b1dfae1b1b62cb87c5dd96ac120000000000000000000000000000000000000000000000000000000000000",
+                      "valueDecoded": {
+                        "name": "execTransaction",
+                        "params": [
+                          {
+                            "name": "to",
+                            "type": "address",
+                            "value": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                          },
+                          {
+                            "name": "value",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "data",
+                            "type": "bytes",
+                            "value": "0xa9059cbb000000000000000000000000867f9b5a43cf854494702d1709527bc84d02251000000000000000000000000000000000000000000000000000000000e215cec0",
+                            "valueDecoded": {
+                              "name": "transfer",
+                              "params": [
+                                {
+                                  "name": "_to",
+                                  "type": "address",
+                                  "value": "0x867F9b5a43cF854494702d1709527Bc84d022510",
+                                },
+                                {
+                                  "name": "_value",
+                                  "type": "uint256",
+                                  "value": "3793080000",
+                                },
+                              ],
+                              "signature": "transfer(address,uint256)",
+                              "type": "function",
+                            },
+                          },
+                          {
+                            "name": "operation",
+                            "type": "uint8",
+                            "value": "0",
+                          },
+                          {
+                            "name": "safeTxGas",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "baseGas",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "gasPrice",
+                            "type": "uint256",
+                            "value": "0",
+                          },
+                          {
+                            "name": "gasToken",
+                            "type": "address",
+                            "value": "0x0000000000000000000000000000000000000000",
+                          },
+                          {
+                            "name": "refundReceiver",
+                            "type": "address",
+                            "value": "0x0000000000000000000000000000000000000000",
+                          },
+                          {
+                            "name": "signatures",
+                            "type": "bytes",
+                            "value": "0xed6e888bbd4e34daacadf99abc738d914393b66ee4d91086f2153569870166c32470de38ae2578c3b924416cf0207172e85047fdaea27fb3236f55db6dbcf30d1fadf4732351172ae63817cd40039b75a8803ab9bbb00d17891c98058aed5aa80f2e8e16ea620cdebc10add6c3a83ad83ccc0ae75b1dfae1b1b62cb87c5dd96ac120",
+                          },
+                        ],
+                        "signature": "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)",
+                        "type": "function",
+                      },
                     },
                   ],
                   "name": "unknown",
