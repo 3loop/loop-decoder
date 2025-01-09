@@ -1,5 +1,14 @@
 import { Hex } from 'viem'
 
+export const RPC = 'https://rpc.ankr.com/eth'
+export const ZERO_SLOT = '0x0000000000000000000000000000000000000000000000000000000000000000'
+export const PROXY_SLOTS = [
+  '0x747b7a908f10c8c0afdd3ea97976f30ac0c0d54304254ab3089ae5d161fc727a',
+  '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',
+  '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3',
+  '0xa619486e00000000000000000000000000000000000000000000000000000000',
+] as const
+
 type TXS = readonly {
   hash: Hex
   chainID: number
