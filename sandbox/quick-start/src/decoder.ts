@@ -19,15 +19,17 @@ const getPublicClient = (chainId: number) => {
   }
 }
 
-// Create a config for the ABI loader
-const ABILoaderConfig = ConfigProvider.fromMap(new Map([['ETHERSCAN_API_KEY', 'YourApiKey']]))
+// Create a config for the ABI loader to provide your Etherscan API key
+const Config = ConfigProvider.fromMap(new Map([['ETHERSCAN_API_KEY', 'YourApiKey']]))
+const ABILoaderLayer = Layer.setConfigProvider(Config)
+const abiStore = InMemoryAbiStoreLive.pipe(Layer.provide(ABILoaderLayer))
 
-const ConfigLayer = Layer.setConfigProvider(ABILoaderConfig)
+const contractMetaStore = InMemoryContractMetaStoreLive
 
 const decoder = new TransactionDecoder({
   getPublicClient: getPublicClient,
-  abiStore: InMemoryAbiStoreLive.pipe(Layer.provide(ConfigLayer)),
-  contractMetaStore: InMemoryContractMetaStoreLive,
+  abiStore,
+  contractMetaStore,
 })
 
 export async function main({ hash }: { hash: string }): Promise<string | null> {

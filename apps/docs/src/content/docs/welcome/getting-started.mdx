@@ -7,73 +7,88 @@ import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.m
 import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
 import { Content as RpcProvider } from '../../components/rpc-provider.md'
 
-## Try Loop Decoder
-
-<div style="height: 600px;">
-  <iframe
-    style="width: 100%; height: 100%; border: 0;"
-    src="https://stackblitz.com/github/3loop/loop-decoder/tree/main/sandbox/quick-start?embed=1&file=src/decoder.ts&hideNavigation=1&hideDevTools=true"
-  ></iframe>
-</div>
-
-### Requirements
-
-- TypeScript 5.x
-- `exactOptionalPropertyTypes` and `strict` enabled in your `tsconfig.json`
-
-### Dependencies
-
-To get started, install the package from npm, along with its peer dependencies:
+## Installation
 
 ```sh
 npm i @3loop/transaction-decoder viem effect
 ```
 
-### Quick Start
+### Overview
 
-To begin using the Loop Decoder, you need to create an instance of the LoopDecoder class. At a minimum, you must provide three data loaders:
+To begin using the Loop Decoder, you must provide three components:
 
 - RPC Provider
 - ABI Loader
-- Contract Meta Information Loader
+- Contract Metadata Loader
 
-Loop Decoder has default in-memory implementations for ABI and contract meta-information loaders: `InMemoryAbiStoreLive` and `InMemoryContractMetaStoreLive`. If you need more customization for a storage, see our guide on [How To Decode Transaction](/guides/decode-transaction/).
+This guide demonstrates setup using the default in-memory implementations for data loaders. For custom storage solutions, see our [How To Decode Transaction](/guides/decode-transaction/) guide.
 
-1. `getPublicClient`: This function returns an object with [Viem](https://viem.sh/) `PublicClient` based on the chain ID. For detailed configuration options and trace API settings, see the [RPC Provider](/reference/rpc-provider/) documentation.
+### 1. Set up your RPC Provider
+
+Create a `getPublicClient` function that accepts a chain ID and returns an object with [Viem](https://viem.sh/) `PublicClient`.
 
 <RpcProvider />
 
-2. `abiStore`: To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache.
-   We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
+For detailed configuration options and trace API settings, see the [RPC Provider](/reference/rpc-provider/) documentation.
 
-3. `contractMetaStore`: Create an in-memory cache for contract meta-information. We will automatically retrieve ERC20, ERC721, and ERC1155 token meta information from the contract such as token name, decimals, symbol, etc.
+### 2. Initialize ABI Loader
 
-Finally, you can create a new instance of the LoopDecoder class:
+The `InMemoryAbiStoreLive` provides default ABI loading functionality:
+
+- Fetches ABIs from multiple sources (Etherscan, 4bytes, Openchain, Sourcify)
+- Caches results in memory
+
+```ts
+import { InMemoryAbiStoreLive } from '@3loop/transaction-decoder/in-memory'
+import { ConfigProvider, Layer } from 'effect'
+
+// We use Effect library to provide custom configuration
+const Config = ConfigProvider.fromMap(new Map([['ETHERSCAN_API_KEY', 'YourApiKey']]))
+const ABILoaderLayer = Layer.setConfigProvider(Config)
+const abiStore = InMemoryAbiStoreLive.pipe(Layer.provide(ABILoaderLayer))
+```
+
+For a custom implementation, see our [How To Decode Transaction, ABI Loader](/guides/decode-transaction/#abi-loader) guide.
+
+### 3. Initialize Contract Metadata Loader
+
+The `InMemoryContractMetaStoreLive` handles contract metadata resolution:
+
+- Resolves `ERC20`, `ERC721` and `ERC1155` metadata using RPC calls
+- Caches results in memory
+
+```ts
+import { InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
+
+const contractMetaStore = InMemoryContractMetaStoreLive
+```
+
+For a custom implementation, see our [How To Decode Transaction, Contract Metadata Loader](/guides/decode-transaction/#contract-metadata-loader) guide.
+
+### 4. Final Step
+
+Finally, you can create a new instance of the LoopDecoder class and invoke `decodeTransaction` method with the transaction hash and chain ID:
 
 ```ts
 import { TransactionDecoder } from '@3loop/transaction-decoder'
-import { InMemoryAbiStoreLive, InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
-import { ConfigProvider, Layer } from 'effect'
-
-// Create a config for the ABI loader, provide Etherscan V2 API key
-const ABILoaderConfig = ConfigProvider.fromMap(new Map([['ETHERSCAN_API_KEY', 'YourApiKeyToken']]))
-
-const ConfigLayer = Layer.setConfigProvider(ABILoaderConfig)
 
 const decoder = new TransactionDecoder({
   getPublicClient: getPublicClient,
-  abiStore: InMemoryAbiStoreLive.pipe(Layer.provide(ConfigLayer)),
-  contractMetaStore: InMemoryContractMetaStoreLive.pipe,
+  abiStore,
+  contractMetaStore,
 })
-```
 
-It's important to note that the Loop Decoder does not enforce any specific data source, allowing users of the library to load contract data as they see fit. Depending on the requirements of your application, you can either include the necessary data directly in your code for a small number of contracts or use a database as a cache.
-
-LoopDecoder instances provide a public method, `decodeTransaction`, which fetches and decodes a given transaction:
-
-```ts
-const result = await decoded.decodeTransaction({
+const decoded = await decoder.decodeTransaction({
   chainID: 1,
   hash: '0x...',
 })
 ```
+
+## Live Demo
+
+<div style="height: 600px;">
+  <iframe
+    style="width: 100%; height: 100%; border: 0;"
+    src="https://stackblitz.com/github/3loop/loop-decoder/tree/main/sandbox/quick-start?embed=1&file=src/decoder.ts&hideNavigation=1&hideDevTools=true&terminalHeight=1&hideExplorer=1&devtoolsheight=1&ctl=1"
+  ></iframe>
+</div>
