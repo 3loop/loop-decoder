@@ -1,5 +1,15 @@
 # @3loop/transaction-decoder
 
+## 0.25.0
+
+### Minor Changes
+
+- 607b8c8: Add minimal proxy support using whatsabi
+
+### Patch Changes
+
+- d467b26: Improved perfomance of loading proxies by adding batching and cahching of request
+
 ## 0.24.3
 
 ### Patch Changes
