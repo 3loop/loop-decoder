@@ -9,7 +9,7 @@ Loop Decoder is a TypeScript library with minimal dependencies that transforms b
 
 - Work in any JavaScript environment
 - Minimal external dependencies - you only need an RPC; everything else can be fetched from your own storage.
-- Highly customizable - we don't force you to use a specific API or storage; instead, we provide data loaders.
+- Highly customizable - we don't force you to use a specific API or storage; instead, we provide composable and customizable modules.
 
 ![Loop Decoder architecture](../../../assets/diagram.png)
 
@@ -30,7 +30,11 @@ The minimal configuration for the Transaction Decoder requires an RPC URL, ABIs,
 
 ### Transaction Interpreter
 
-Transaction Interpretation allows you to understand what really happened in any transaction. In Loop Decoder, this is a JavaScript function that takes a Decoded Transaction and selects the most important fields and parameters based on the type of contract interacted with. The goal is to abstract away blockchain and smart contract nuances, producing an object understandable for both technical and non-technical users.
+Transaction Interpretation allows you to understand what really happened in any transaction. In Loop Decoder, this is a JavaScript function that takes a Decoded Transaction and selects the most important fields and parameters based on the type of contract interacted with.
+
+:::caution
+The Transaction Interpreter is still under development and breaking changes are expected.
+:::
 
 For example, the interpretation can construct a one-line description of the transaction:
 

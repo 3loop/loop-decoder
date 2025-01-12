@@ -16,6 +16,13 @@ export default defineConfig({
         github: 'https://github.com/3loop/loop-decoder',
         twitter: 'https://x.com/3loop_io',
       },
+      editLink: {
+        baseUrl: 'https://github.com/3loop/loop-decoder/edit/main/apps/docs/',
+      },
+      components: {
+        Header: './src/components/Header.astro',
+      },
+      lastUpdated: true,
       sidebar: [
         {
           label: 'Welcome',
