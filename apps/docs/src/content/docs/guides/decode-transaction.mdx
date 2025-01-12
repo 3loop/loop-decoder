@@ -1,5 +1,5 @@
 ---
-title: How to decode an Ethereum Transaction
+title: Decode an Ethereum Transaction (detailed)
 description: On this page you will provide a step-by-step guide on how to decode and interpret an Ethereum transaction using Loop Decoder.
 sidebar:
   order: 1
@@ -8,64 +8,87 @@ sidebar:
 import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
 import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
 import { Content as RpcProvider } from '../../components/rpc-provider.md'
+import { Content as AbiStoreInterface } from '../../components/abi-store-interface.md'
+import { Content as MetaStoreInterface } from '../../components/meta-store-interface.md'
 
-In this guide, we will go through the process of decoding an Ethereum transaction using Loop Decoder. For the simplicity of the example, we assume that that contract ABIs involved in the transaction are verified on Etherscan.
+This guide explains how to decode Ethereum transactions using Loop Decoder. We'll cover:
 
-We recomend to copy all snipepts to a typescript project and run it at the end of this guide, or or you can copy the whole example from this file: [Full Example Code](https://stackblitz.com/~/github.com/3loop/loop-decoder/tree/main/sandbox/quick-start). Do not forget to replace the placeholder `YourApiKeyToken` with your own free Etherscan API key.
+- Setting up data loading strategies for ABIs and contract metadata
+- Configuring data stores for Contract ABIs and metadata
+- Decoding transactions
 
-## Prerequisites
+## Installation
 
-### Create a new project
-
-Optionally, you can create a new project to follow along, or skip to [Required packages](#required-packages).
-
-1. Install Bun:
-   First, make sure you have Bun installed on your system. If you haven't installed it yet, you can do so using npm:
-
-```bash
-npm install -g bun
-```
-
-1. Generate and initialize a new project:
+Generate and initialize a new project:
 
 ```bash
 mkdir example-decode && cd example-decode
 bun init
 ```
 
-### Required packages
-
-For this guide, you will need to have the following packages installed:
+Install required packages:
 
 ```bash
 bun install @3loop/transaction-decoder viem
 ```
 
-## Data Sources
+## Setup Loop Decoder
 
-Loop Decoder requires some data sources to be able to decode transactions. We will need an RPC provider, a data source to fetch Contracts ABIs and a data source to fetch contract meta-information, such as token name, decimals, symbol, etc.
+Loop Decoder requires three components:
 
-### RPC Provider
+1. RPC Provider: Fetches raw transaction data
+2. ABI Data Store: Retrieves and caches contract ABIs
+3. Contract Metadata Store: Retrieves and caches contract metadata (e.g., token name, symbol, decimals)
 
-We will start by creating a function which will return an object with PublicClient based on the chain ID. For the sake of this example, we will only support mainnet.
+### 1. RPC Provider
+
+Create a `getPublicClient` function that accepts a chain ID and returns an object with [Viem](https://viem.sh/) `PublicClient`.
 
 <RpcProvider />
 
-### ABI loader
+For detailed configuration options and trace API settings, see the [RPC Provider](/reference/rpc-provider/) documentation.
 
-To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache. We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
+### 2. ABI Data Store
 
-Create a cache for contract ABI and add your free Etherscan API key instead of the placeholder `YourApiKeyToken`:
+The ABI Data Store handles:
+
+- Fetching ABIs using predefined strategies (e.g., Etherscan, 4byte). Some strategies like Etherscan require an API key. See the full list of strategies in [Data Loaders (ABI Strategies)](/reference/data-loaders/#abi-strategies)
+- Caching fetched ABIs
+
+To create a custom ABI Data Store, implement the `VanillaAbiStore` interface:
+
+<AbiStoreInterface />
+
+#### Example: an ABI data store with Etherscan and 4byte strategies and in-memory cache
 
 <MemoryAbiLoader />
 
-### Contract Metadata loader
+:::tip
+You can use persistent data stores, like a database or file system, by redefining the `get` and `set` methods from the example above.
+:::
 
-Create an in-memory cache for contract meta-information. Using `ERC20RPCStrategyResolver` we will automatically retrieve token meta information from the contract such as token name, decimals, symbol, etc.
+### 3. Contract Metadata Store
+
+The Contract Metadata Store handles:
+
+- Fetching contract metadata using predefined strategies (e.g., ERC20, NFT). See the full list of strategies in [Data Loaders (Contract Metadata)](/reference/data-loaders/#contract-metadata)
+- Caching fetched contract metadata
+
+To create a custom Contract Metadata Store, implement the `VanillaContractMetaStore` interface:
+
+<MetaStoreInterface />
+
+#### Example: a Contract Metadata Store with ERC20 strategy and in-memory cache
 
 <MemoryContractLoader />
 
-Finally, you can create a new instance of the LoopDecoder class:
+:::tip
+You can use persistent data stores, like a database or file system, by redefining the `get` and `set` methods from the example above.
+:::
+
+### 4. Initializing Loop Decoder
+
+Finally, you can create a new instance of the TransactionDecoder class:
 
 ```ts
 import { TransactionDecoder } from '@3loop/transaction-decoder'
@@ -77,9 +100,9 @@ const decoder = new TransactionDecoder({
 })
 ```
 
-## Decoding a Transaction
+## Example: Decoding a Transaction
 
-Now that we have all the necessary components, we can start decoding a transaction. For this example, we will use the following transaction:
+Once the `TransactionDecoder` is set up, you can use it to decode a transaction by calling the `decodeTransaction` method:
 
 ```ts
 async function main() {
@@ -96,12 +119,6 @@ async function main() {
 }
 
 main()
-```
-
-Run the script:
-
-```bash
-bun run index.ts
 ```
 
 Expected output:
