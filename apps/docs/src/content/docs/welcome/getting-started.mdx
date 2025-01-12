@@ -13,15 +13,15 @@ import { Content as RpcProvider } from '../../components/rpc-provider.md'
 npm i @3loop/transaction-decoder viem effect
 ```
 
-### Overview
+## Quick Start
 
-To begin using the Loop Decoder, you must provide three components:
+Loop Decoder requires three components:
 
-- RPC Provider
-- ABI Loader
-- Contract Metadata Loader
+1. RPC Provider
+2. ABI Data Store
+3. Contract Metadata Store
 
-This guide demonstrates setup using the default in-memory implementations for data loaders. For custom storage solutions, see our [How To Decode Transaction](/guides/decode-transaction/) guide.
+This guide demonstrates setup using the default in-memory implementations for Data Stores. For custom storage solutions, see our [How To Decode Transaction](/guides/decode-transaction/) guide.
 
 ### 1. Set up your RPC Provider
 
@@ -31,9 +31,9 @@ Create a `getPublicClient` function that accepts a chain ID and returns an objec
 
 For detailed configuration options and trace API settings, see the [RPC Provider](/reference/rpc-provider/) documentation.
 
-### 2. Initialize ABI Loader
+### 2. Initialize ABI Data Store
 
-The `InMemoryAbiStoreLive` provides default ABI loading functionality:
+The `InMemoryAbiStoreLive` provides default ABI loading and caching functionality:
 
 - Fetches ABIs from multiple sources (Etherscan, 4bytes, Openchain, Sourcify)
 - Caches results in memory
@@ -48,9 +48,9 @@ const ABILoaderLayer = Layer.setConfigProvider(Config)
 const abiStore = InMemoryAbiStoreLive.pipe(Layer.provide(ABILoaderLayer))
 ```
 
-For a custom implementation, see our [How To Decode Transaction, ABI Loader](/guides/decode-transaction/#abi-loader) guide.
+For a custom implementation, see our [How To Decode Transaction (ABI Data Store)](/guides/decode-transaction/#2-abi-data-store) guide.
 
-### 3. Initialize Contract Metadata Loader
+### 3. Initialize Contract Metadata Store
 
 The `InMemoryContractMetaStoreLive` handles contract metadata resolution:
 
@@ -63,9 +63,9 @@ import { InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-mem
 const contractMetaStore = InMemoryContractMetaStoreLive
 ```
 
-For a custom implementation, see our [How To Decode Transaction, Contract Metadata Loader](/guides/decode-transaction/#contract-metadata-loader) guide.
+For a custom implementation, see our [How To Decode Transaction (Contract Metadata Store)](/guides/decode-transaction/#3-contract-metadata-store) guide.
 
-### 4. Final Step
+### 4. Decode a Transaction
 
 Finally, you can create a new instance of the LoopDecoder class and invoke `decodeTransaction` method with the transaction hash and chain ID:
 
