@@ -1,85 +1,26 @@
 ---
-title: How to decode a Calldata
-description: On this page you will provide a step-by-step guide on how to decode and interpret a Calldata using Loop Decoder.
+title: Decoding Calldata
+description: On this page you will provide a guide on how to decode and interpret a Calldata using Loop Decoder.
 sidebar:
   order: 2
 ---
 
-import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
-import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
-import { Content as RpcProvider } from '../../components/rpc-provider.md'
+Loop Decoder provides a `decodeCalldata` method that decodes a transaction calldata. This method handles special cases:
 
-In this guide, we will go through the process of decoding EVM Calldata using Loop Decoder. As an example we will decode a Calldata for Gnosis Safe Multisend transaction that has deep nested calls.
+- Gnosis Safe Multisend or Multy Transfer transactions
+- Multicalls and deeply nested calls
+- Proxy contract resolutions
 
-We recomend to copy all snipepts to a typescript project and run it at the end of this guide, or or you can copy the whole example from this file: [Full Example Code](https://stackblitz.com/~/github.com/3loop/loop-decoder/tree/main/sandbox/quick-start). Do not forget to replace the placeholder `YourApiKeyToken` with your own free Etherscan API key.
+### Setting up Loop Decoder
 
-## Prerequisites
+To use `decodeCalldata` method, you need to setup a `TransactionDecoder` instance with the necessary data stores. For setup instructions, refer to:
 
-### Create a new project
+- Setup with default in-memory data stores (the quickest way): [Getting Started](/welcome/getting-started/)
+- Setup with customizable data stores: [How To Decode Transaction (detailed)](/guides/decode-transaction/)
 
-Optionally, you can create a new project to follow along, or skip to [Required packages](#required-packages).
+### Decoding Calldata
 
-1. Install Bun:
-   First, make sure you have Bun installed on your system. If you haven't installed it yet, you can do so using npm:
-
-```bash
-npm install -g bun
-```
-
-1. Generate and initialize a new project:
-
-```bash
-mkdir example-decode && cd example-decode
-bun init
-```
-
-### Required packages
-
-For this guide, you will need to have the following packages installed:
-
-```bash
-bun install @3loop/transaction-decoder viem
-```
-
-## Data Sources
-
-Loop Decoder requires some data sources to be able to decode transactions. We will need an RPC provider, a data source to fetch Contracts ABIs and a data source to fetch contract meta-information, such as token name, decimals, symbol, etc.
-
-### RPC Provider
-
-We will start by creating a function which will return an object with PublicClient based on the chain ID. For the sake of this example, we will only support mainnet.
-
-<RpcProvider />
-
-### ABI loader
-
-To avoid making unecessary calls to third-party APIs, Loop Decoder uses an API that allows cache. For this example, we will keep it simple and use an in-memory cache. We will also use some strategies to download contract ABIs from Etherscan and 4byte.directory. You can find more information about the strategies in the [Strategies](/reference/data-loaders/) reference.
-
-Create a cache for contract ABI and add your free Etherscan API key instead of the placeholder `YourApiKeyToken`:
-
-<MemoryAbiLoader />
-
-### Contract Metadata loader
-
-Create an in-memory cache for contract meta-information. Using `ERC20RPCStrategyResolver` we will automatically retrieve token meta information from the contract such as token name, decimals, symbol, etc.
-
-<MemoryContractLoader />
-
-Finally, you can create a new instance of the LoopDecoder class:
-
-```ts
-import { TransactionDecoder } from '@3loop/transaction-decoder'
-
-const decoder = new TransactionDecoder({
-  getPublicClient: getPublicClient,
-  abiStore: abiStore,
-  contractMetaStore: contractMetaStore,
-})
-```
-
-## Decoding a Calldata
-
-Now that we have all the necessary components, we can start decoding a Calldata. For this example, we will use the following Calldata:
+In the example below, we will decode a transaction calldata for for Gnosis Safe Multisend transaction that has deep nested calls.
 
 ```ts
 async function main() {
@@ -97,12 +38,6 @@ async function main() {
 }
 
 main()
-```
-
-Run the script:
-
-```bash
-bun run index.ts
 ```
 
 Expected output:
@@ -140,15 +75,9 @@ Expected output:
                     "type": "address",
                     "value": "0x2D8880BcC0618DBCC5d516640015A69e28fdC406"
                   },
-                  {
-                    "name": "value",
-                    "type": "uint256",
-                    "value": "0"
-                  },
-                  {
-                    "name": "dataLength",
-                    "type": "uint256",
-                    "value": "1544"
-                  },
                   //...
 ```
+
+### Try it live
+
+Try decoding the above or any other calldata in our [Playground](https://loop-decoder-web.vercel.app/calldata).

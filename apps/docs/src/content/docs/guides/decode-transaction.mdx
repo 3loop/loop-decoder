@@ -59,7 +59,7 @@ To create a custom ABI Data Store, implement the `VanillaAbiStore` interface:
 
 <AbiStoreInterface />
 
-#### Example: an ABI data store with Etherscan and 4byte strategies and in-memory cache
+#### Example: an ABI data store with Etherscan and 4byte data loaders and in-memory cache
 
 <MemoryAbiLoader />
 
@@ -78,7 +78,7 @@ To create a custom Contract Metadata Store, implement the `VanillaContractMetaSt
 
 <MetaStoreInterface />
 
-#### Example: a Contract Metadata Store with ERC20 strategy and in-memory cache
+#### Example: a Contract Metadata Store with ERC20 data loader and in-memory cache
 
 <MemoryContractLoader />
 
@@ -121,7 +121,7 @@ async function main() {
 main()
 ```
 
-Expected output:
+Check the full expected output in our [Playground](https://loop-decoder-web.vercel.app/decode/1/0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7) or see it below:
 
 ```json
 {
@@ -161,3 +161,7 @@ Expected output:
   // ...
 }
 ```
+
+## Try it live
+
+Try decoding the above or any other transactions in the our playground [here](https://loop-decoder-web.vercel.app/decode).
