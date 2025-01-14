@@ -2,14 +2,28 @@
 title: RPC Provider
 description: Configuration options for the RPC Provider
 sidebar:
-  order: 4
+  order: 5
 ---
 
 import { Content as RpcProvider } from '../../components/rpc-provider.md'
+import { Content as EffectRpc } from '../../components/effect-rpc.md'
+import { Tabs, TabItem } from '@astrojs/starlight/components'
 
 Loop Decoder requires an RPC provider to fetch transaction data. To configure RPC providers, implement a `getPublicClient` function that returns a `PublicClientObject` based on the chain ID.
 
-<RpcProvider />
+<Tabs>
+  <TabItem label="Effect API">
+    <EffectRpc />
+  </TabItem>
+  <TabItem label="Vanilla JS API">
+    <RpcProvider />
+  </TabItem>
+</Tabs>
+
+### Code Examples
+
+1. RPC Provider (Effect API) - [Decoder API](https://github.com/3loop/decoder-api/blob/87bec4e70b9df36b62e8d2cf78721a7304e84ed6/src/decoder/provider.ts)
+2. RPC Provider (Vanilla JS API) - [Farcaster on-chain alerts bot](https://github.com/3loop/farcaster-onchain-alerts-bot/blob/f1b90c9de7550abcd4ad1097fba5c2eb5dc259df/src/decoder/decoder.ts#L90-L105)
 
 ## PublicClientObject Structure
 

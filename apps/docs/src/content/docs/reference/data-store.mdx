@@ -1,0 +1,217 @@
+---
+title: Data Store
+description: Data Storages are simple APIs that implement a key-value store for persistent cache.
+sidebar:
+  order: 2
+---
+
+import { Content as VanillaABI } from '../../components/vanilla-abi-store-interface.md'
+import { Content as VanillaMeta } from '../../components/vanilla-meta-store-interface.md'
+import { Content as EffectABI } from '../../components/effect-abi-store-interface.md'
+import { Content as EffectMeta } from '../../components/effect-meta-store-interface.md'
+import { Content as MemoryAbiLoader } from '../../components/memory-abi-loader.md'
+import { Content as MemoryContractLoader } from '../../components/memory-contract-loader.md'
+
+Loop Decoder relies on two Data Stores - `AbiStore` and `ContractMetadataStore`. These stores are used for:
+
+- Retrieving and caching data
+- Fetching data from external sources using [Data Loaders](../data-loaders) (when not available in the cache)
+
+The Data Store can be customized to suit different needs. Here are some common use cases and implementations:
+
+- In-memory store: The simplest option, ideal for testing and development, available in Built-in Stores.
+- Persistent store: Ideal for production environment and when you work with a large number of contracts that you do not know in advance. The store can get and set data to any external database. `SQL` is available in Built-in Stores.
+- Static mapping: For applications that work with a fixed set of contracts, the store can get data from a hardcoded set of ABIs and metadata.
+- REST API client: For browser-based applications, enabling ABI and contract metadata retrieval from a server
+
+A store also requires a set of strategies that we cover separately in the [Data Loaders](../data-loaders) section.
+
+### Built-in Stores
+
+Loop Decoder provides two stores that can be used out of the box:
+
+#### 1. In-memory stores (Vanilla JS API)
+
+Located at `@3loop/transaction-decoder/in-memory`, ideal for testing and development purposes.
+
+- `InMemoryAbiStore` - caches the resolved ABI in memory
+- `InMemoryContractMetaStore` - caches the resolved contract metadata in memory
+
+[See the Getting Started guide for a detailed example](/welcome/getting-started/).
+
+#### 2. SQL stores (Effect API)
+
+Located at `@3loop/transaction-decoder/sql`, a persistent store that can be used in production for enhancing the performance of the decoder. While using this store, you do not need to write your own database schema, and `get` or `set` methods.
+
+- `SqlAbiStore` - caches the resolved ABI in any SQL database supported by `@effect/sql`
+- `SqlContractMetaStore` - caches the resolved contract metadata in any SQL database supported by `@effect/sql`
+
+[See the Decoding Transaction with SQLite Data Store guide](/guides/sql-stores).
+
+## Code examples
+
+1. Built-in In-memory stores (Vanilla JS API) - [Quick start demo code](https://github.com/3loop/loop-decoder/blob/88bc99b4d64a9db66dc75f44d1dfb04a0dc32e37/sandbox/quick-start/src/decoder.ts)
+2. Built-in SQL stores (Effect API) - [Loop Decoder Web playground](https://github.com/3loop/loop-decoder/blob/88bc99b4d64a9db66dc75f44d1dfb04a0dc32e37/apps/web/src/lib/decode.ts#L32-L58)
+3. Custom In-memory stores (Vanilla JS API) - [Farcaster on-chain alerts bot](https://github.com/3loop/farcaster-onchain-alerts-bot/blob/f1b90c9de7550abcd4ad1097fba5c2eb5dc259df/src/decoder/decoder.ts)
+4. Custom SQL stores (Effect API) - [Decoder API, ABI Store](https://github.com/3loop/decoder-api/blob/87bec4e70b9df36b62e8d2cf78721a7304e84ed6/src/decoder/abi-loader.ts) and [Contract Metadata Store](https://github.com/3loop/decoder-api/blob/87bec4e70b9df36b62e8d2cf78721a7304e84ed6/src/decoder/meta-loader.ts)
+
+## Custom Data Stores (Effect API)
+
+### Implementation example
+
+Custom SQL stores with Effect API - Decoder API, [ABI Store](https://github.com/3loop/decoder-api/blob/87bec4e70b9df36b62e8d2cf78721a7304e84ed6/src/decoder/abi-loader.ts) and [Contract Metadata Store](https://github.com/3loop/decoder-api/blob/87bec4e70b9df36b62e8d2cf78721a7304e84ed6/src/decoder/meta-loader.ts)
+
+### AbiStore
+
+The full interface of ABI store is:
+
+<EffectABI />
+
+ABI Store Interface requires 2 methods: `set` and `get` to store and retrieve the ABI of a contract. Optionally, you can provide a batch get method `getMany` for further optimization. Because our API supports ABI fragments, the get method will receive both the contract address and the fragment signature.
+
+```typescript
+interface AbiParams {
+  chainID: number
+  address: string
+  event?: string | undefined // event signature
+  signature?: string | undefined // function signature
+}
+```
+
+The `set` method will receive a key of the type `AbiParams` and and `ContractAbiResult`. You can choose to store the data in the best format that fits your database.
+
+```typescript
+interface FunctionFragmentABI {
+  type: 'func'
+  abi: string
+  address: string
+  chainID: number
+  signature: string
+}
+
+interface EventFragmentABI {
+  type: 'event'
+  abi: string
+  address: string
+  chainID: number
+  event: string
+}
+
+interface AddressABI {
+  type: 'address'
+  abi: string
+  address: string
+  chainID: number
+}
+
+export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI
+
+export interface ContractAbiSuccess {
+  status: 'success'
+  result: ContractABI
+}
+
+export interface ContractAbiNotFound {
+  status: 'not-found'
+  result: null
+}
+
+export interface ContractAbiEmpty {
+  status: 'empty'
+  result: null
+}
+
+export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | ContractAbiEmpty
+```
+
+### ContractMetadataStore
+
+The full interface of Contract Metadata Store is:
+
+<EffectMeta />
+
+Similar to the ABI Store, the Contract Metadata Store Interface requires 2 methods `set`, `get`, and optionally `getMany` to store and retrieve the contract metadata.
+
+The `get` method will receive the contract address and the chain ID as input.
+
+```typescript
+interface ContractMetaParams {
+  address: string
+  chainID: number
+}
+```
+
+And, the `set` method will be called with 2 pramaters, the key in the same format as the `get` method, and the metadata in a format of `ContractMetaResult`.
+
+```typescript
+interface ContractMetaSuccess {
+  status: 'success'
+  result: ContractData
+}
+
+interface ContractMetaNotFound {
+  status: 'not-found'
+  result: null
+}
+
+interface ContractMetaEmpty {
+  status: 'empty'
+  result: null
+}
+
+export type ContractMetaResult = ContractMetaSuccess | ContractMetaNotFound | ContractMetaEmpty
+```
+
+Contract metadata is a map of the following interface:
+
+```typescript
+export interface ContractData {
+  address: string
+  contractName: string
+  contractAddress: string
+  tokenSymbol: string
+  decimals?: number
+  type: ContractType
+  chainID: number
+}
+```
+
+### Stored Statuses
+
+You can notice that the `AbiStore` and `ContractMetadataStore` interfaces are very similar, and both have a status for the set and get methods. Both stores can return three states:
+
+1. `success` - The requested data is found in the store.
+2. `not-found` - The requested data is found in the store, but is missing a value. This means that we have tried to resolve it from a third party, but it was missing there.
+3. `empty` - The requested data is not found in the store, which means that it has never been requested before.
+
+We have two states that can return an empty result - `not-found` and `empty`. We want to be able to skip the Data Loader strategy in cases where we know it's not available (`not-found` state), as this can significantly reduce the number of requests and improve performance.
+
+It is possible that a `not-found` item will become available later in the future. Therefore, we encourage storing a `timestamp` and removing the `not-found` items to be able to check them again.
+
+## Custom Data Stores (Vanilla JS API)
+
+### Differences from Effect API
+
+The Vanilla JS API for defining custom data stores differs from the Effect API in the following ways:
+
+- The `get` method is a JS async function (vs Effect TS generator function)
+- The `set` method is a JS async function (vs Effect TS generator function)
+- The `getMany` method is not supported
+
+Everything else, including received and returned types, is the same as in the Effect API.
+
+### Implementation example
+
+Custom In-memory stores with Vanilla JS API - [Farcaster on-chain alerts bot](https://github.com/3loop/farcaster-onchain-alerts-bot/blob/f1b90c9de7550abcd4ad1097fba5c2eb5dc259df/src/decoder/decoder.ts).
+
+### AbiStore
+
+The full interface of ABI store is:
+
+<VanillaABI />
+
+### ContractMetadataStore
+
+The full interface of Contract Metadata Store is:
+
+<VanillaMeta />

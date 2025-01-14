@@ -1,0 +1,101 @@
+---
+title: Data Loaders
+description: Data Loaders used to fetch ABI and Contract Metadata required for decoding transactions
+sidebar:
+  order: 3
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components'
+
+Data Loaders are mechanisms for retrieving the necessary ABI and Contract Metadata for transaction decoding. They are responsible for:
+
+- Resolving ABIs and Contract Metadata using specified strategies and third-party APIs
+- Automatically batching requests when processing logs and traces in parallel
+- Caching request results in the [Data Store](/reference/data-store)
+
+Loop Decoder implements optimizations to minimize API requests to third-party services. For example, when a contract’s ABI is resolved via Etherscan, it is cached in the store. If the ABI is requested again, the store provides the cached version, avoiding redundant API calls.
+
+## ABI Strategies
+
+ABI strategies will receive the contract address, and event or function signature as input and would return the ABI as a stringified JSON. Loop Decoder provides some strategies out of the box:
+
+- `EtherscanStrategyResolver` - resolves the ABI from Etherscan, requires an API key to work properly
+- `EtherscanV2StrategyResolver` - resolves the ABI from Etherscan v2, requires an API key to work properly
+- `SourcifyStrategyResolver` - resolves the ABI from Sourcify
+- `FourByteStrategyResolver` - resolves the ABI from 4byte.directory
+- `OpenchainStrategyResolver` - resolves the ABI from Openchain
+- `BlockscoutStrategyResolver` - resolves the ABI from Blockscout
+
+You can create your strategy by implementing the `GetContractABIStrategy` Effect RequestResolver.
+
+## Contract Metadata Strategies
+
+Contract metadata is a collection of information about a contract, such as the contract's name, symbol, and decimals.
+
+Loop Decoder provides some strategies out of the box:
+
+- `ERC20RPCStrategyResolver` - resolves the contract metadata of an ERC20 token from the RPC
+- `NFTRPCStrategyResolver` - resolves the contract metadata of an NFT token (ERC721, ERC1155) from the RPC
+- `ProxyRPCStrategyResolver` - resolves the contract metadata of a Gnosis Safe proxy contract from the RPC
+
+## Code Examples
+
+### Initializing ABI Strategies
+
+<Tabs>
+  <TabItem label="Effect API">
+```typescript
+const AbiStoreLive = SqlAbiStore.make({
+  default: [
+    EtherscanV2StrategyResolver({
+      apikey: process.env.ETHERSCAN_API_KEY,
+    }),
+    FourByteStrategyResolver(),
+  ],
+  //...
+})
+```
+  </TabItem>
+  <TabItem label="Vanilla JS API">
+```typescript
+const abiStore: VanillaAbiStore = {
+  strategies: [
+    EtherscanStrategyResolver({
+      apikey: process.env.ETHERSCAN_API_KEY || '',
+    }),
+    FourByteStrategyResolver(),
+  ],
+  //...
+}
+```
+  </TabItem>
+</Tabs>
+
+### Initializing Contract Metadata Strategies
+
+<Tabs>
+  <TabItem label="Effect API">
+```typescript
+const MetaStoreLive = Layer.unwrapEffect(
+  Effect.gen(function* () {
+    const service = yield* PublicClient
+
+    return SqlContractMetaStore.make({
+      default: [ERC20RPCStrategyResolver(service), NFTRPCStrategyResolver(service)],
+    })
+
+}),
+)
+
+````
+  </TabItem>
+  <TabItem label="Vanilla JS API">
+```typescript
+const contractMetaStore: VanillaContractMetaStore = {
+  strategies: [ERC20RPCStrategyResolver, NFTRPCStrategyResolver],
+  //...
+}
+````
+
+  </TabItem>
+</Tabs>

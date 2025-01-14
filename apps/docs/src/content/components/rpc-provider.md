@@ -1,4 +1,4 @@
-```ts title="index.ts"
+```ts title="provider.ts"
 import { createPublicClient, http } from 'viem'
 
 // Create a public client for the Ethereum Mainnet network
