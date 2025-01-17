@@ -179,12 +179,17 @@ export const DEFAULT_CHAIN_ID = 1
 
 const generateNavItems = (transactions: any, path: string) => {
   return transactions.map((tx: any) => ({
-    href: `/${path}/${tx.chainID}/${tx.hash}`,
+    url: `/${path}/${tx.chainID}/${tx.hash}`,
     title: `${tx.name}`,
   }))
 }
 
-export const geSidebarNavItems = (path: string) =>
-  Object.fromEntries(Object.entries(EXAMPLE_TXS).map(([key, value]) => [key, generateNavItems(value, path)]))
+export const geSidebarNavItems = (path: string) => {
+  return Object.entries(EXAMPLE_TXS).map(([key, value]) => ({
+    title: key,
+    url: `#`,
+    items: generateNavItems(value, path) as { url: string; title: string }[],
+  }))
+}
 
 export const INTERPRETER_REPO = 'https://github.com/3loop/loop-decoder/tree/main/packages/transaction-interpreter'
