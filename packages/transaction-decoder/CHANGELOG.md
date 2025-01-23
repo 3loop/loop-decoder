@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.25.1
+
+### Patch Changes
+
+- 47e002c: Fix type error in recurive calldata decoding
+
 ## 0.25.0
 
 ### Minor Changes
