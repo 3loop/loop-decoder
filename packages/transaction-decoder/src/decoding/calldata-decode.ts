@@ -28,15 +28,18 @@ const decodeBytesRecursively = (
       node.components.some((c) => callDataKeys.includes(c.name)) &&
       node.components.some((c) => addressKeys.includes(c.name))
     ) {
-      const toAddress = node.components.find((c) => addressKeys.includes(c.name))?.value as Address | undefined
-      return {
-        ...node,
-        components: yield* Effect.all(
-          node.components.map((n) => decodeBytesRecursively(n, chainID, toAddress)),
-          {
-            concurrency: 'unbounded',
-          },
-        ),
+      const toAddress = node.components.find((c) => addressKeys.includes(c.name))?.value as string | undefined
+
+      if (toAddress && isAddress(toAddress)) {
+        return {
+          ...node,
+          components: yield* Effect.all(
+            node.components.map((n) => decodeBytesRecursively(n, chainID, toAddress)),
+            {
+              concurrency: 'unbounded',
+            },
+          ),
+        }
       }
     }
 
@@ -52,19 +55,23 @@ const decodeBytesRecursively = (
       }
     }
 
-    if (isCallDataNode && address) {
-      const decoded = yield* decodeMethod({
-        data: node.value as Hex,
-        chainID,
-        contractAddress: address,
-      }).pipe(Effect.orElseSucceed(() => null))
+    if (isCallDataNode && address && isAddress(address)) {
+      const nodeValue = node.value as string
 
-      return decoded
-        ? {
-            ...node,
-            valueDecoded: decoded,
-          }
-        : node
+      if (nodeValue.startsWith('0x')) {
+        const decoded = yield* decodeMethod({
+          data: nodeValue as Hex,
+          chainID,
+          contractAddress: address,
+        }).pipe(Effect.orElseSucceed(() => null))
+
+        return decoded
+          ? {
+              ...node,
+              valueDecoded: decoded,
+            }
+          : node
+      }
     }
 
     return node
@@ -191,10 +198,12 @@ export const decodeMethod = ({
 
       if (hasCalldataParam || hasTuppleParams) {
         const targetAddressParam = decoded.params.find((p) => addressKeys.includes(p.name))
-        const targetAddress = targetAddressParam?.value as Address | undefined
+        const targetAddress = targetAddressParam?.value as string | undefined
 
         const decodedParams = yield* Effect.all(
-          decoded.params.map((p) => decodeBytesRecursively(p, chainID, targetAddress)),
+          decoded.params.map((p) =>
+            decodeBytesRecursively(p, chainID, targetAddress && isAddress(targetAddress) ? targetAddress : undefined),
+          ),
           {
             concurrency: 'unbounded',
           },
