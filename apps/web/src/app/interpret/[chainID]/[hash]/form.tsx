@@ -18,11 +18,12 @@ interface FormProps {
   chainID: number
   decoded?: DecodedTransaction
   currentHash?: string
+  error?: string
 }
 
 const PATH = 'interpret'
 
-export default function DecodingForm({ decoded, currentHash, chainID }: FormProps) {
+export default function DecodingForm({ decoded, currentHash, chainID, error }: FormProps) {
   const [result, setResult] = React.useState<Interpretation>()
   const [persistedSchema, setSchema] = useLocalStorage(decoded?.toAddress ?? 'unknown', '')
 
@@ -109,47 +110,51 @@ export default function DecodingForm({ decoded, currentHash, chainID }: FormProp
           </div>
         </form>
 
-        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 h-full">
-          <div className="flex flex-col gap-2 lg:col-span-2 min-h-[40vh] lg:min-h-[initial]">
-            <Label>
-              Interpretation:{' '}
-              <a
-                href={interpreterSourceLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-blue-500 hover:underline"
-              >
-                (Source Code)
-              </a>
-            </Label>
+        {error ? (
+          <div className="text-red-500 p-4 bg-red-50 rounded-md whitespace-pre-line">{error}</div>
+        ) : (
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 h-full">
+            <div className="flex flex-col gap-2 lg:col-span-2 min-h-[40vh] lg:min-h-[initial]">
+              <Label>
+                Interpretation:{' '}
+                <a
+                  href={interpreterSourceLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-500 hover:underline"
+                >
+                  (Source Code)
+                </a>
+              </Label>
 
-            <CodeBlock
-              language="javascript"
-              value={schema ?? ''}
-              onChange={(value) => setSchema(value)}
-              lineNumbers={true}
-              readonly={false}
-            />
-          </div>
-
-          <div className="flex flex-col gap-2  min-h-[40vh] lg:min-h-[initial]">
-            <Label>Decoded transaction:</Label>
-            <CodeBlock language="json" value={JSON.stringify(decoded, null, 2)} readonly={true} lineNumbers={false} />
-          </div>
-
-          <div className="flex flex-col gap-2  min-h-[40vh] lg:min-h-[initial]">
-            <div className="flex flex-row justify-between items-center">
-              <Label>Result:</Label>
+              <CodeBlock
+                language="javascript"
+                value={schema ?? ''}
+                onChange={(value) => setSchema(value)}
+                lineNumbers={true}
+                readonly={false}
+              />
             </div>
 
-            <CodeBlock
-              language="json"
-              value={result?.error ? result?.error : JSON.stringify(result?.interpretation, null, 2)}
-              readonly={true}
-              lineNumbers={false}
-            />
+            <div className="flex flex-col gap-2  min-h-[40vh] lg:min-h-[initial]">
+              <Label>Decoded transaction:</Label>
+              <CodeBlock language="json" value={JSON.stringify(decoded, null, 2)} readonly={true} lineNumbers={false} />
+            </div>
+
+            <div className="flex flex-col gap-2  min-h-[40vh] lg:min-h-[initial]">
+              <div className="flex flex-row justify-between items-center">
+                <Label>Result:</Label>
+              </div>
+
+              <CodeBlock
+                language="json"
+                value={result?.error ? result?.error : JSON.stringify(result?.interpretation, null, 2)}
+                readonly={true}
+                lineNumbers={false}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="md:order-2">
