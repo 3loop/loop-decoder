@@ -18,7 +18,7 @@ async function getListOfDecodedTransactions(
     const txs = await getTransactions(1, contract)
     const decodedTxs = await Promise.all(txs.map(({ hash }) => decodeTransaction({ hash, chainID: chainID })))
 
-    return decodedTxs
+    return decodedTxs.map(({ decoded }) => decoded)
   } catch (e) {
     console.error(e)
     return []

@@ -72,13 +72,18 @@ const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer) as Layer.Layer<
 
 const runtime = ManagedRuntime.make(Layer.provide(MainLayer, CacheLayer))
 
+interface DecodeTransactionResult {
+  decoded?: DecodedTransaction
+  error?: string
+}
+
 export async function decodeTransaction({
   chainID,
   hash,
 }: {
   chainID: number
   hash: string
-}): Promise<DecodedTransaction | undefined> {
+}): Promise<DecodeTransactionResult> {
   // NOTE: For unknonw reason the context of main layer is still missing the SqlClient in the type
   const runnable = decodeTransactionByHash(hash as Hex, chainID)
 
@@ -88,12 +93,16 @@ export async function decodeTransaction({
     const result = await runtime.runPromise(runnable)
     const endTime = performance.now()
     console.log(`Decode transaction took ${endTime - startTime}ms`)
-    return result
+    return { decoded: result }
   } catch (error: unknown) {
     const endTime = performance.now()
-    console.error('Decode error', JSON.stringify(error, null, 2))
+    const message = error instanceof Error ? JSON.parse(error.message) : 'Failed to decode transaction'
+    console.log(message)
     console.log(`Failed decode transaction took ${endTime - startTime}ms`)
-    return undefined
+    return {
+      error:
+        'Transaction decoding failed. Please check if you have selected the correct chain. \n\n Note that this is a demo playground and we may not be able to retrieve the data for this particular transaction or contract with our test Data Loaders.',
+    }
   }
 }
 

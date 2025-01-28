@@ -13,11 +13,12 @@ interface FormProps {
   chainID: number
   decoded?: DecodedTransaction
   currentHash?: string
+  error?: string
 }
 
 const PATH = 'decode'
 
-export default function DecodingForm({ decoded, currentHash, chainID }: FormProps) {
+export default function DecodingForm({ decoded, currentHash, chainID, error }: FormProps) {
   const router = useRouter()
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,9 +57,13 @@ export default function DecodingForm({ decoded, currentHash, chainID }: FormProp
         </form>
 
         <div className="grid gap-6 h-full">
-          <div className="flex flex-col gap-2  min-h-[40vh] lg:min-h-[initial]">
+          <div className="flex flex-col gap-2 min-h-[40vh] lg:min-h-[initial]">
             <Label>Decoded transaction:</Label>
-            <CodeBlock language="json" value={JSON.stringify(decoded, null, 2)} readonly={true} lineNumbers={false} />
+            {error ? (
+              <div className="text-red-500 p-4 bg-red-50 rounded-md whitespace-pre-line">{error}</div>
+            ) : (
+              <CodeBlock language="json" value={JSON.stringify(decoded, null, 2)} readonly={true} lineNumbers={false} />
+            )}
           </div>
         </div>
       </div>
