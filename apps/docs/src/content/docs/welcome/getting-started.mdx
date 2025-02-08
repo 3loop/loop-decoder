@@ -40,12 +40,15 @@ The `InMemoryAbiStoreLive` provides default ABI loading and caching functionalit
 
 ```ts
 import { InMemoryAbiStoreLive } from '@3loop/transaction-decoder/in-memory'
-import { ConfigProvider, Layer } from 'effect'
+import { EtherscanV2StrategyResolver } from '@3loop/transaction-decoder'
 
-// We use Effect library to provide custom configuration
-const Config = ConfigProvider.fromMap(new Map([['ETHERSCAN_API_KEY', 'YourApiKey']]))
-const ABILoaderLayer = Layer.setConfigProvider(Config)
-const abiStore = InMemoryAbiStoreLive.pipe(Layer.provide(ABILoaderLayer))
+const abiStore = InMemoryAbiStoreLive.make({
+  default: [
+    EtherscanV2StrategyResolver({
+      apikey: 'YourApiKey', // provide Etherscan V2 API key
+    }),
+  ],
+})
 ```
 
 For a custom implementation, see our [How To Decode Transaction (ABI Data Store)](/guides/decode-transaction/#2-abi-data-store) guide.
@@ -59,8 +62,17 @@ The `InMemoryContractMetaStoreLive` handles contract metadata resolution:
 
 ```ts
 import { InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
+import { Layer } from 'effect'
 
-const contractMetaStore = InMemoryContractMetaStoreLive
+const contractMetaStore = Layer.unwrapEffect(
+  Effect.gen(function* () {
+    const service = yield* PublicClient
+
+    return InMemoryContractMetaStoreLive.make({
+      default: [ERC20RPCStrategyResolver(service), ProxyRPCStrategyResolver(service)],
+    })
+  }),
+)
 ```
 
 For a custom implementation, see our [How To Decode Transaction (Contract Metadata Store)](/guides/decode-transaction/#3-contract-metadata-store) guide.
