@@ -61,8 +61,9 @@ The `InMemoryContractMetaStoreLive` handles contract metadata resolution:
 - Caches results in memory
 
 ```ts
+import { ERC20RPCStrategyResolver, ProxyRPCStrategyResolver, PublicClient } from '@3loop/transaction-decoder'
 import { InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
-import { Layer } from 'effect'
+import { Effect, Layer } from 'effect'
 
 const contractMetaStore = Layer.unwrapEffect(
   Effect.gen(function* () {
