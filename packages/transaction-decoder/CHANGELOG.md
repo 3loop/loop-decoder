@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.26.0
+
+### Minor Changes
+
+- be8bc09: Make in-memory store more flexible by folllowing the same API as SQL
+
 ## 0.25.1
 
 ### Patch Changes
