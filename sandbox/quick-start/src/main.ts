@@ -11,7 +11,7 @@ const hash = '0xc0bd04d7e94542e58709f51879f64946ff4a744e1c37f5f920cea3d478e115d7
 
 appElement.innerHTML = `
   <div>
-    <a>Decoded Transaction ${hash}</a>
+    <a>Decoded Transaction (don't forget to set your Etherscan API key) ${hash}</a>
     <pre id="json">${await main({ hash }).catch((err) => {
       console.error('Failed to decode transaction:', err)
       return 'Error decoding transaction'

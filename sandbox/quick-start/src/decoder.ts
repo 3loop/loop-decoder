@@ -1,7 +1,13 @@
-import { TransactionDecoder } from '@3loop/transaction-decoder'
+import {
+  ERC20RPCStrategyResolver,
+  ProxyRPCStrategyResolver,
+  PublicClient,
+  TransactionDecoder,
+} from '@3loop/transaction-decoder'
 import { createPublicClient, http } from 'viem'
 import { InMemoryAbiStoreLive, InMemoryContractMetaStoreLive } from '@3loop/transaction-decoder/in-memory'
-import { ConfigProvider, Layer } from 'effect'
+import { EtherscanV2StrategyResolver } from '@3loop/transaction-decoder'
+import { Effect, Layer } from 'effect'
 
 /*
  * Example of decoding a transaction by hash
@@ -19,12 +25,23 @@ const getPublicClient = (chainId: number) => {
   }
 }
 
-// Create a config for the ABI loader to provide your Etherscan API key
-const Config = ConfigProvider.fromMap(new Map([['ETHERSCAN_API_KEY', 'YourApiKey']]))
-const ABILoaderLayer = Layer.setConfigProvider(Config)
-const abiStore = InMemoryAbiStoreLive.pipe(Layer.provide(ABILoaderLayer))
+const contractMetaStore = Layer.unwrapEffect(
+  Effect.gen(function* () {
+    const service = yield* PublicClient
 
-const contractMetaStore = InMemoryContractMetaStoreLive
+    return InMemoryContractMetaStoreLive.make({
+      default: [ERC20RPCStrategyResolver(service), ProxyRPCStrategyResolver(service)],
+    })
+  }),
+)
+
+const abiStore = InMemoryAbiStoreLive.make({
+  default: [
+    EtherscanV2StrategyResolver({
+      apikey: 'YourApiKey', // provide Etherscan V2 API key
+    }),
+  ],
+})
 
 const decoder = new TransactionDecoder({
   getPublicClient: getPublicClient,
