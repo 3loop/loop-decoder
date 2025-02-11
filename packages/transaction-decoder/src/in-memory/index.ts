@@ -1,2 +1,2 @@
-export * from './abi-store.js'
-export * from './contract-meta-store.js'
+export * as InMemoryAbiStoreLive from './abi-store.js'
+export * as InMemoryContractMetaStoreLive from './contract-meta-store.js'

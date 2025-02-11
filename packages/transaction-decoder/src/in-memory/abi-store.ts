@@ -1,47 +1,13 @@
-import {
-  EtherscanStrategyResolver,
-  FourByteStrategyResolver,
-  ContractABI,
-  AbiStore,
-  SourcifyStrategyResolver,
-  OpenchainStrategyResolver,
-  EtherscanV2StrategyResolver,
-} from '../effect.js'
-import { Config, Effect, Layer } from 'effect'
+import { ContractABI, AbiStore } from '../effect.js'
+import { Effect, Layer } from 'effect'
 
 const abiCache = new Map<string, ContractABI>()
 
-export const InMemoryAbiStoreLive = Layer.effect(
-  AbiStore,
-  Effect.gen(function* () {
-    const etherscanApiKey = yield* Config.string('ETHERSCAN_API_KEY').pipe(
-      Effect.catchTag('ConfigError', () => {
-        return Effect.succeed(undefined)
-      }),
-    )
-    const etherscanEndpoint = yield* Config.string('ETHERSCAN_ENDPOINT').pipe(Effect.orElseSucceed(() => undefined))
-
-    const etherscanStrategy =
-      etherscanEndpoint && etherscanApiKey
-        ? EtherscanStrategyResolver({
-            apikey: etherscanApiKey,
-            endpoint: etherscanEndpoint,
-          })
-        : etherscanApiKey
-        ? EtherscanV2StrategyResolver({
-            apikey: etherscanApiKey,
-          })
-        : undefined
-
-    return AbiStore.of({
-      strategies: {
-        default: [
-          etherscanStrategy,
-          SourcifyStrategyResolver(),
-          OpenchainStrategyResolver(),
-          FourByteStrategyResolver(),
-        ].filter(Boolean),
-      },
+export const make = (strategies: AbiStore['strategies']) =>
+  Layer.succeed(
+    AbiStore,
+    AbiStore.of({
+      strategies,
       set: (_key, value) =>
         Effect.sync(() => {
           if (value.status === 'success') {
@@ -82,6 +48,5 @@ export const InMemoryAbiStoreLive = Layer.effect(
             result: null,
           }
         }),
-    })
-  }),
-)
+    }),
+  )
