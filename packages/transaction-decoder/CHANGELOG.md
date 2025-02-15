@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.26.2
+
+### Patch Changes
+
+- a8d9d5b: SQL Storage filter success matches from database for cases when multiple matches are stored in database
+
 ## 0.26.1
 
 ### Patch Changes
