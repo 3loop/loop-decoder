@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.26.1
+
+### Patch Changes
+
+- bb03946: Bump effect and viem versions
+
 ## 0.26.0
 
 ### Minor Changes
