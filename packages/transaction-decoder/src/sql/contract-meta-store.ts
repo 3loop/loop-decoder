@@ -77,7 +77,9 @@ export const make = (strategies: ContractMetaStore['strategies']) =>
               Effect.catchAll(() => Effect.succeed([])),
             )
 
-            const item = items[0]
+            const successItems = items.filter((item) => item.status === 'success')
+
+            const item = successItems[0]
 
             if (item != null && item.status === 'success') {
               return {
@@ -92,7 +94,7 @@ export const make = (strategies: ContractMetaStore['strategies']) =>
                   chainID,
                 } as ContractData,
               }
-            } else if (item != null && item.status === 'not-found') {
+            } else if (items[0] != null && items[0].status === 'not-found') {
               return {
                 status: 'not-found',
                 result: null,
