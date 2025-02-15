@@ -1,5 +1,13 @@
 # @3loop/transaction-interpreter
 
+## 0.11.18
+
+### Patch Changes
+
+- bb03946: Bump effect and viem versions
+- Updated dependencies [bb03946]
+  - @3loop/transaction-decoder@0.26.1
+
 ## 0.11.17
 
 ### Patch Changes
