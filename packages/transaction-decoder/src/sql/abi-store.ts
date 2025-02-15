@@ -107,13 +107,15 @@ export const make = (strategies: AbiStore['strategies']) =>
               Effect.catchAll(() => Effect.succeed([])),
             )
 
+            const successItems = items.filter((item) => item.status === 'success')
+
             const item =
-              items.find((item) => {
+              successItems.find((item) => {
                 // Prioritize address over fragments
                 return item.type === 'address'
-              }) ?? items[0]
+              }) ?? successItems[0]
 
-            if (item != null && item.status === 'success') {
+            if (item != null) {
               return {
                 status: 'success',
                 result: {
@@ -125,7 +127,7 @@ export const make = (strategies: AbiStore['strategies']) =>
                   abi: item.abi,
                 },
               } as ContractAbiResult
-            } else if (item != null && item.status === 'not-found') {
+            } else if (items[0] != null && items[0].status === 'not-found') {
               return {
                 status: 'not-found',
                 result: null,
