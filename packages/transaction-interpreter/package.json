@@ -37,11 +37,16 @@
     "fix": "eslint --ignore-path .eslintignore --ext .ts . --fix"
   },
   "dependencies": {
-    "@3loop/transaction-decoder": "workspace:^",
-    "quickjs-emscripten": "^0.29.2"
+    "@3loop/transaction-decoder": "workspace:^"
   },
   "peerDependencies": {
-    "effect": "^3.10.18"
+    "effect": ">=3.13.0",
+    "quickjs-emscripten": ">=0.29.1"
+  },
+  "peerDependenciesMeta": {
+    "quickjs-emscripten": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -58,7 +63,7 @@
     "chalk": "^5.3.0",
     "chokidar": "^3.6.0",
     "commander": "^12.1.0",
-    "effect": "^3.10.18",
+    "effect": "^3.13.0",
     "esbuild": "^0.21.5",
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",

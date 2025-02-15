@@ -70,17 +70,17 @@ importers:
         specifier: workspace:*
         version: link:../../packages/transaction-interpreter
       '@effect/experimental':
-        specifier: ^0.30.16
-        version: 0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+        specifier: ^0.41.1
+        version: 0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
       '@effect/platform':
-        specifier: ^0.69.15
-        version: 0.69.15(effect@3.10.18)
+        specifier: ^0.77.1
+        version: 0.77.1(effect@3.13.1)
       '@effect/sql':
-        specifier: ^0.18.16
-        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
+        specifier: ^0.30.1
+        version: 0.30.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)
       '@effect/sql-pg':
-        specifier: ^0.19.5
-        version: 0.19.5(@effect/platform@0.69.15(effect@3.10.18))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18))(effect@3.10.18)
+        specifier: ^0.31.1
+        version: 0.31.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(@effect/sql@0.30.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1))(effect@3.13.1)
       '@jitl/quickjs-singlefile-browser-release-sync':
         specifier: ^0.29.2
         version: 0.29.2
@@ -139,8 +139,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       effect:
-        specifier: ^3.10.18
-        version: 3.10.18
+        specifier: ^3.13.0
+        version: 3.13.1
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -184,8 +184,8 @@ importers:
         specifier: ^2.16.0
         version: 2.16.0(react@18.2.0)
       viem:
-        specifier: ^2.21.1
-        version: 2.21.1(bufferutil@4.0.8)(typescript@5.1.3)(utf-8-validate@6.0.4)(zod@3.23.8)
+        specifier: ^2.23.2
+        version: 2.23.2(bufferutil@4.0.8)(typescript@5.1.3)(utf-8-validate@6.0.4)(zod@3.23.8)
     devDependencies:
       bufferutil:
         specifier: ^4.0.8
@@ -218,11 +218,11 @@ importers:
   packages/transaction-decoder:
     dependencies:
       '@effect/sql':
-        specifier: ^0.18.16
-        version: 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
+        specifier: '>=0.30.0'
+        version: 0.30.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)
       '@shazow/whatsabi':
         specifier: ^0.18.0
-        version: 0.18.0(@noble/hashes@1.7.0)(typescript@5.1.3)(zod@3.23.8)
+        version: 0.18.0(@noble/hashes@1.7.1)(typescript@5.1.3)(zod@3.23.8)
     devDependencies:
       '@total-typescript/ts-reset':
         specifier: ^0.5.1
@@ -240,8 +240,8 @@ importers:
         specifier: 0.34.2
         version: 0.34.2(vitest@0.34.2)
       effect:
-        specifier: ^3.10.18
-        version: 3.10.18
+        specifier: ^3.13.0
+        version: 3.13.1
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -273,8 +273,8 @@ importers:
         specifier: 5.1.3
         version: 5.1.3
       viem:
-        specifier: ^2.21.1
-        version: 2.21.1(bufferutil@4.0.8)(typescript@5.1.3)(utf-8-validate@6.0.4)(zod@3.23.8)
+        specifier: ^2.23.2
+        version: 2.23.2(bufferutil@4.0.8)(typescript@5.1.3)(utf-8-validate@6.0.4)(zod@3.23.8)
       vite:
         specifier: 4.4.9
         version: 4.4.9(@types/node@20.16.3)
@@ -290,9 +290,6 @@ importers:
       '@3loop/transaction-decoder':
         specifier: workspace:^
         version: link:../transaction-decoder
-      quickjs-emscripten:
-        specifier: ^0.29.2
-        version: 0.29.2
     devDependencies:
       '@babel/core':
         specifier: ^7.25.2
@@ -337,8 +334,8 @@ importers:
         specifier: ^12.1.0
         version: 12.1.0
       effect:
-        specifier: ^3.10.18
-        version: 3.10.18
+        specifier: ^3.13.0
+        version: 3.13.1
       esbuild:
         specifier: ^0.21.5
         version: 0.21.5
@@ -357,6 +354,9 @@ importers:
       prettier:
         specifier: ^2.8.8
         version: 2.8.8
+      quickjs-emscripten:
+        specifier: ^0.29.1
+        version: 0.29.2
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -373,9 +373,6 @@ importers:
   packages/tsconfig: {}
 
 packages:
-
-  '@adraffy/ens-normalize@1.10.0':
-    resolution: {integrity: sha512-nA9XHtlAkYfJxY7bce8DcN7eKxWWCWkU+1GR9d+U6MbNpfwQp8TI7vqOsBsMcHoT4mBu2kypKoSKnghEzOOq5Q==}
 
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
@@ -649,12 +646,12 @@ packages:
     resolution: {integrity: sha512-SITSV6aIXsuVNV3f3O0f2n/cgyEDWoSqtZMYiAmcsYHydcKrOz3gUxB/iXd/Qf08+IZX4KpgNbvUdMBmWz+kcA==}
     engines: {node: '>=10'}
 
-  '@effect/experimental@0.30.16':
-    resolution: {integrity: sha512-xDXSfjiZloRmmaCT4sVCPxn0rfN/txFtiVhBMfB97Lo8TWsgCdYKiMw6w7m7/enO5gOOF3TGtUhSeISh9GqIjA==}
+  '@effect/experimental@0.41.1':
+    resolution: {integrity: sha512-+dYypZmeTOgfTora6tJ5SCaAxWs25NX9pjm/dX60tnsEEuB2YzFRGbshFmbTx0KcDPKZBplKEoxbuADSTZz4mw==}
     peerDependencies:
-      '@effect/platform': ^0.69.15
-      '@effect/platform-node': ^0.64.16
-      effect: ^3.10.9
+      '@effect/platform': ^0.77.1
+      '@effect/platform-node': ^0.73.1
+      effect: ^3.13.1
       ioredis: ^5
       lmdb: ^3
       ws: ^8
@@ -668,24 +665,25 @@ packages:
       ws:
         optional: true
 
-  '@effect/platform@0.69.15':
-    resolution: {integrity: sha512-e5oLVmi12NyyPaCsGwYGIztWxZ5z6bDbYB+7S6muXZXrESOgDeHECBlZxqQdq1g3EURrZ85cOl9v+QO4KJYwNA==}
+  '@effect/platform@0.77.1':
+    resolution: {integrity: sha512-3oHbKiOLN7AIjyucZW+kH5ebG1PhEEBrsdd+HWbDQbAG0gVZfgOUmXR9cyM6M9L+9oVPgOW5mIgcEi6RvD02Cw==}
     peerDependencies:
-      effect: ^3.10.9
+      effect: ^3.13.1
 
-  '@effect/sql-pg@0.19.5':
-    resolution: {integrity: sha512-DWNNvyM+yC8+glr2XKWtQn+gTms2S6SOrN/SOW6E7qQ7rbKX6n3JSxoIkhy3eUuN514onOmiPzcVMyH8foWZMg==}
+  '@effect/sql-pg@0.31.1':
+    resolution: {integrity: sha512-jzAfvTKERRLtGYUBQtoT95tcIleJ7HLXKdLnbPM3nnver5nPjtQNIc4sZ9xkmQojGGtXxXigf+RtzyJ1W2x6yw==}
     peerDependencies:
-      '@effect/platform': ^0.69.15
-      '@effect/sql': ^0.18.16
-      effect: ^3.10.9
+      '@effect/experimental': ^0.41.1
+      '@effect/platform': ^0.77.1
+      '@effect/sql': ^0.30.1
+      effect: ^3.13.1
 
-  '@effect/sql@0.18.16':
-    resolution: {integrity: sha512-KEKvEI0RxiG6fbKwCMMUaiCtBqkBCGMQAeAaUE6ZhP7H2OG02MxZg4CQZHiAHp2IgDGOXFUahO11xnwcyQOQtA==}
+  '@effect/sql@0.30.1':
+    resolution: {integrity: sha512-him+yKMTBk46yHACBx72z1oVscsNGFpcAAub41sAIXdneVKjFQ9uQFwrS5NppIjo6zfxVdwMTuKM5+jhatviCA==}
     peerDependencies:
-      '@effect/experimental': ^0.30.16
-      '@effect/platform': ^0.69.15
-      effect: ^3.10.9
+      '@effect/experimental': ^0.41.1
+      '@effect/platform': ^0.77.1
+      effect: ^3.13.1
 
   '@emmetio/abbreviation@2.3.3':
     resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
@@ -1604,19 +1602,12 @@ packages:
   '@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1':
     resolution: {integrity: sha512-54/JRvkLIzzDWshCWfuhadfrfZVPiElY8Fcgmg1HroEly/EDSszzhBAsarCux+D/kOslTRquNzuyGSmUSTTHGg==}
 
-  '@noble/curves@1.4.0':
-    resolution: {integrity: sha512-p+4cb332SFCrReJkCYe8Xzm0OWi4Jji5jVdIZRL/PmacmDkFNw6MrrV+gGpiPxLHbV+zKFRywUWbaseT+tZRXg==}
-
-  '@noble/curves@1.8.0':
-    resolution: {integrity: sha512-j84kjAbzEnQHaSIhRPUmB3/eVXu2k3dKPl2LOrR8fSOIL+89U+7lV117EWHtq/GHM3ReGHM46iRBdZfpc4HRUQ==}
+  '@noble/curves@1.8.1':
+    resolution: {integrity: sha512-warwspo+UYUPep0Q+vtdVB4Ugn8GGQj8iyB3gnRWsztmUHTI3S1nhdiWNsPUGL0vud7JlRRk1XEu7Lq1KGTnMQ==}
     engines: {node: ^14.21.3 || >=16}
 
-  '@noble/hashes@1.4.0':
-    resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
-    engines: {node: '>= 16'}
-
-  '@noble/hashes@1.7.0':
-    resolution: {integrity: sha512-HXydb0DgzTpDPwbVeDGCG1gIu7X6+AuU6Zl6av/E/KG8LMsvPntvq+w17CHRpKBmN6Ybdrt1eP3k4cj8DJa78w==}
+  '@noble/hashes@1.7.1':
+    resolution: {integrity: sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==}
     engines: {node: ^14.21.3 || >=16}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -2264,23 +2255,14 @@ packages:
   '@rushstack/eslint-patch@1.10.4':
     resolution: {integrity: sha512-WJgX9nzTqknM393q1QJDJmoW28kUfEnybeTfVNcNAPnIx210RXm2DiXiHzfNPJNIUUb1tJnz/l4QGtJ30PgWmA==}
 
-  '@scure/base@1.1.7':
-    resolution: {integrity: sha512-PPNYBslrLNNUQ/Yad37MHYsNQtK67EhWb6WtSvNLLPo7SdVZgkUjD6Dg+5On7zNwmskf8OX7I7Nx5oN+MIWE0g==}
+  '@scure/base@1.2.4':
+    resolution: {integrity: sha512-5Yy9czTO47mqz+/J8GM6GIId4umdCk1wc1q8rKERQulIoc8VP9pzDcghv10Tl2E7R96ZUx/PhND3ESYUQX8NuQ==}
 
-  '@scure/base@1.2.1':
-    resolution: {integrity: sha512-DGmGtC8Tt63J5GfHgfl5CuAXh96VF/LD8K9Hr/Gv0J2lAoRGlPOMpqMpMbCTOoOJMZCk2Xt+DskdDyn6dEFdzQ==}
+  '@scure/bip32@1.6.2':
+    resolution: {integrity: sha512-t96EPDMbtGgtb7onKKqxRLfE5g05k7uHnHRM2xdE6BP/ZmxaLtPek4J4KfVn/90IQNrU1IOAqMgiDtUdtbe3nw==}
 
-  '@scure/bip32@1.4.0':
-    resolution: {integrity: sha512-sVUpc0Vq3tXCkDGYVWGIZTRfnvu8LoTDaev7vbwh0omSvVORONr960MQWdKqJDCReIEmTj3PAr73O3aoxz7OPg==}
-
-  '@scure/bip32@1.6.1':
-    resolution: {integrity: sha512-jSO+5Ud1E588Y+LFo8TaB8JVPNAZw/lGGao+1SepHDeTs2dFLurdNIAgUuDlwezqEjRjElkCJajVrtrZaBxvaQ==}
-
-  '@scure/bip39@1.3.0':
-    resolution: {integrity: sha512-disdg7gHuTDZtY+ZdkmLpPCk7fxZSu3gBiEGuoC1XYxv9cGx3Z6cpTggCgW6odSOOIXCiDjuGejW+aJKCY/pIQ==}
-
-  '@scure/bip39@1.5.1':
-    resolution: {integrity: sha512-GnlufVSP9UdAo/H2Patfv22VTtpNTyfi+I3qCKpvuB5l1KWzEYx+l2TNpBy9Ksh4xTs3Rn06tBlpWCi/1Vz8gw==}
+  '@scure/bip39@1.5.4':
+    resolution: {integrity: sha512-TFM4ni0vKvCfBpohoh+/lY05i9gRbSwXWngAsF4CABQxoaOHijxuaZ2R6cStDQ5CHtHO9aGJTr4ksVJASRRyMA==}
 
   '@shazow/whatsabi@0.18.0':
     resolution: {integrity: sha512-CAM3ORys1LG1D+C65xp2nzvnFVwvXYtH2XfkL1HAmo4/74UfugUadCFkKHZgC1TDyo2rpgnJsX/mSpPN2YJDpA==}
@@ -2295,6 +2277,9 @@ packages:
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
+
+  '@standard-schema/spec@1.0.0':
+    resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
 
   '@swc/helpers@0.5.1':
     resolution: {integrity: sha512-sJ902EfIzn1Fa+qYmjdQqh8tPsoxyBz+8yBKC2HKUxyezKJFwPGOn7pv4WY6QuQW//ySQi5lJjA/ZT9sNWWNTg==}
@@ -2640,17 +2625,6 @@ packages:
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
-  abitype@1.0.5:
-    resolution: {integrity: sha512-YzDhti7cjlfaBhHutMaboYB21Ha3rXR9QTkNJFzYC4kC8YclaiwPBBBJY8ejFdu2wnJeZCVZSMlQJ7fi8S6hsw==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3 >=3.22.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
 
   abitype@1.0.8:
     resolution: {integrity: sha512-ZeiI6h3GnW06uYDLx0etQtX/p8E24UaHHBj57RSjK7YBFe7iuVn07EDpOeP451D06sF27VOz9JJPlIKJmXgkEg==}
@@ -3288,8 +3262,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  effect@3.10.18:
-    resolution: {integrity: sha512-e1FzuPGidu81zD75MecPHFAI3TPd9Gf6ysMnG8zcdU4EyL9W74bKa6/6wbM+OrEElA4ulSDSEDdU4KIgrNIUbw==}
+  effect@3.13.1:
+    resolution: {integrity: sha512-YbA45m51eZapqy/ptZvIIZi+XBj13fPCzbiDRLgxZTEUhKuf4xLzuuSsKc61Y3SIscMM2o+VPht2ty+bVEQHQQ==}
 
   electron-to-chromium@1.5.14:
     resolution: {integrity: sha512-bEfPECb3fJ15eaDnu9LEJ2vPGD6W1vt7vZleSVyFhYuMIKm3vz/g9lt7IvEzgdwj58RjbPKUF2rXTCN/UW47tQ==}
@@ -3708,8 +3682,8 @@ packages:
     resolution: {integrity: sha512-hMQ4CX1p1izmuLYyZqLMO/qGNw10wSv9QDCPfzXfyFrOaCSSoRfqE1Kf1s5an66J5JZC62NewG+mK49jOCtQew==}
     engines: {node: '>=4'}
 
-  fast-check@3.22.0:
-    resolution: {integrity: sha512-8HKz3qXqnHYp/VCNn2qfjHdAdcI8zcSqOyX64GOMukp7SL2bfzfeDKjSd+UyECtejccaZv3LcvZTm9YDD22iCQ==}
+  fast-check@3.23.2:
+    resolution: {integrity: sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==}
     engines: {node: '>=8.0.0'}
 
   fast-deep-equal@3.1.3:
@@ -4339,8 +4313,8 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  isows@1.0.4:
-    resolution: {integrity: sha512-hEzjY+x9u9hPmBom9IIAqdJCwNLax+xrPb51vEPpERoFlIxgmZcHzsT5jKG06nvInKOBGvReAVz80Umed5CczQ==}
+  isows@1.0.6:
+    resolution: {integrity: sha512-lPHCayd40oW98/I0uvgaHKWCSvkzY27LjWLbtzOm64yQ+G3Q5npjjbdppU65iZXkK1Zt+kH9pfegli0AYfwYYw==}
     peerDependencies:
       ws: '*'
 
@@ -5120,6 +5094,14 @@ packages:
 
   ox@0.2.2:
     resolution: {integrity: sha512-QWCyFfVk5hFOhg13SGqRKih5B7EBucrf+Z1dfmN9jJQ8MZdrRx9mbD78JQL5ogSzDT7fcHgyMCaXd/3AWn6xHQ==}
+    peerDependencies:
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  ox@0.6.7:
+    resolution: {integrity: sha512-17Gk/eFsFRAZ80p5eKqv89a57uXjd3NgIf1CaXojATPBuujVc/fQSVhBeAU9JCRB+k7J50WQAyWTxK19T9GgbA==}
     peerDependencies:
       typescript: '>=5.4.0'
     peerDependenciesMeta:
@@ -6425,6 +6407,10 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  uuid@11.0.5:
+    resolution: {integrity: sha512-508e6IcKLrhxKdBbcA2b4KQZlLVp2+J5UwQ6F7Drckkc5N9ZJwFa4TgWtsww9UG8fGHbm6gbV19TdM5pQ4GaIA==}
+    hasBin: true
+
   uvu@0.5.6:
     resolution: {integrity: sha512-+g8ENReyr8YsOc6fv/NVJs2vFdHBnBNdfE49rshrTzDWOlUx4Gq7KOS2GD8eqhy2j+Ejq29+SbKH8yjkAqXqoA==}
     engines: {node: '>=8'}
@@ -6467,8 +6453,8 @@ packages:
   vfile@6.0.3:
     resolution: {integrity: sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q==}
 
-  viem@2.21.1:
-    resolution: {integrity: sha512-nlIc2LLS6aqkngULS9UJ2Sg3nHKAgF9bbpDUwjUoAUBijd69mrCWPBXQ8jmbzcx12uZUfd9Nc//CHgSVZiMwyg==}
+  viem@2.23.2:
+    resolution: {integrity: sha512-NVmW/E0c5crMOtbEAqMF0e3NmvQykFXhLOc/CkLIXOlzHSA6KXVz3CYVmaKqBF8/xtjsjHAGjdJN3Ru1kFJLaA==}
     peerDependencies:
       typescript: '>=5.0.4'
     peerDependenciesMeta:
@@ -6708,9 +6694,6 @@ packages:
   web-namespaces@2.0.1:
     resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
 
-  webauthn-p256@0.0.5:
-    resolution: {integrity: sha512-drMGNWKdaixZNobeORVIqq7k5DsRC9FnG201K2QjeOoQLmtSDaSsVZdkg6n5jUALJKcAG++zBPJXmv6hy0nWFg==}
-
   webidl-conversions@4.0.2:
     resolution: {integrity: sha512-YQ+BmxuTgd6UXZW3+ICGfyqRyHXVlD5GtQr5+qjiNW7bF0cqrzX500HVXPBOvgXb5YnzDd+h0zqyv61KUD7+Sg==}
 
@@ -6788,18 +6771,6 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
-
-  ws@8.17.1:
-    resolution: {integrity: sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
 
   ws@8.18.0:
     resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
@@ -6894,8 +6865,6 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
-
-  '@adraffy/ens-normalize@1.10.0': {}
 
   '@adraffy/ens-normalize@1.11.0': {}
 
@@ -7404,49 +7373,37 @@ snapshots:
 
   '@ctrl/tinycolor@3.6.1': {}
 
-  '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
+  '@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
     dependencies:
-      '@effect/platform': 0.69.15(effect@3.10.18)
-      effect: 3.10.18
+      '@effect/platform': 0.77.1(effect@3.13.1)
+      effect: 3.13.1
       msgpackr: 1.11.0
-    optionalDependencies:
-      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
-
-  '@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
-    dependencies:
-      '@effect/platform': 0.69.15(effect@3.10.18)
-      effect: 3.10.18
-      msgpackr: 1.11.0
+      uuid: 11.0.5
     optionalDependencies:
       ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
 
-  '@effect/platform@0.69.15(effect@3.10.18)':
+  '@effect/platform@0.77.1(effect@3.13.1)':
     dependencies:
-      effect: 3.10.18
+      effect: 3.13.1
       find-my-way-ts: 0.1.5
       multipasta: 0.2.5
 
-  '@effect/sql-pg@0.19.5(@effect/platform@0.69.15(effect@3.10.18))(@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18))(effect@3.10.18)':
+  '@effect/sql-pg@0.31.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(@effect/sql@0.30.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1))(effect@3.13.1)':
     dependencies:
-      '@effect/platform': 0.69.15(effect@3.10.18)
-      '@effect/sql': 0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)
+      '@effect/experimental': 0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform': 0.77.1(effect@3.13.1)
+      '@effect/sql': 0.30.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)
       '@opentelemetry/semantic-conventions': 1.27.0
-      effect: 3.10.18
+      effect: 3.13.1
       postgres: 3.4.5
 
-  '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)':
+  '@effect/sql@0.30.1(@effect/experimental@0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)':
     dependencies:
-      '@effect/experimental': 0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
-      '@effect/platform': 0.69.15(effect@3.10.18)
+      '@effect/experimental': 0.41.1(@effect/platform@0.77.1(effect@3.13.1))(effect@3.13.1)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      '@effect/platform': 0.77.1(effect@3.13.1)
       '@opentelemetry/semantic-conventions': 1.27.0
-      effect: 3.10.18
-
-  '@effect/sql@0.18.16(@effect/experimental@0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)))(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)':
-    dependencies:
-      '@effect/experimental': 0.30.16(@effect/platform@0.69.15(effect@3.10.18))(effect@3.10.18)(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
-      '@effect/platform': 0.69.15(effect@3.10.18)
-      '@opentelemetry/semantic-conventions': 1.27.0
-      effect: 3.10.18
+      effect: 3.13.1
+      uuid: 11.0.5
 
   '@emmetio/abbreviation@2.3.3':
     dependencies:
@@ -8086,17 +8043,11 @@ snapshots:
     dependencies:
       eslint-scope: 5.1.1
 
-  '@noble/curves@1.4.0':
+  '@noble/curves@1.8.1':
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.7.1
 
-  '@noble/curves@1.8.0':
-    dependencies:
-      '@noble/hashes': 1.7.0
-
-  '@noble/hashes@1.4.0': {}
-
-  '@noble/hashes@1.7.0': {}
+  '@noble/hashes@1.7.1': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -8671,35 +8622,22 @@ snapshots:
 
   '@rushstack/eslint-patch@1.10.4': {}
 
-  '@scure/base@1.1.7': {}
+  '@scure/base@1.2.4': {}
 
-  '@scure/base@1.2.1': {}
-
-  '@scure/bip32@1.4.0':
+  '@scure/bip32@1.6.2':
     dependencies:
-      '@noble/curves': 1.4.0
-      '@noble/hashes': 1.4.0
-      '@scure/base': 1.1.7
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/base': 1.2.4
 
-  '@scure/bip32@1.6.1':
+  '@scure/bip39@1.5.4':
     dependencies:
-      '@noble/curves': 1.8.0
-      '@noble/hashes': 1.7.0
-      '@scure/base': 1.2.1
+      '@noble/hashes': 1.7.1
+      '@scure/base': 1.2.4
 
-  '@scure/bip39@1.3.0':
+  '@shazow/whatsabi@0.18.0(@noble/hashes@1.7.1)(typescript@5.1.3)(zod@3.23.8)':
     dependencies:
-      '@noble/hashes': 1.4.0
-      '@scure/base': 1.1.7
-
-  '@scure/bip39@1.5.1':
-    dependencies:
-      '@noble/hashes': 1.7.0
-      '@scure/base': 1.2.1
-
-  '@shazow/whatsabi@0.18.0(@noble/hashes@1.7.0)(typescript@5.1.3)(zod@3.23.8)':
-    dependencies:
-      '@noble/hashes': 1.7.0
+      '@noble/hashes': 1.7.1
       ox: 0.2.2(typescript@5.1.3)(zod@3.23.8)
     transitivePeerDependencies:
       - typescript
@@ -8713,6 +8651,8 @@ snapshots:
   '@shikijs/vscode-textmate@9.2.0': {}
 
   '@sinclair/typebox@0.27.8': {}
+
+  '@standard-schema/spec@1.0.0': {}
 
   '@swc/helpers@0.5.1':
     dependencies:
@@ -9076,7 +9016,7 @@ snapshots:
       '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0)(typescript@5.6.3)
       '@typescript-eslint/parser': 7.18.0(eslint@8.57.0)(typescript@5.6.3)
       eslint-config-prettier: 9.1.0(eslint@8.57.0)
-      eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0))
+      eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.29.1)
       eslint-import-resolver-typescript: 3.6.3(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0)
       eslint-plugin-eslint-comments: 3.2.0(eslint@8.57.0)
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
@@ -9199,11 +9139,6 @@ snapshots:
   '@vscode/l10n@0.0.18': {}
 
   abbrev@2.0.0: {}
-
-  abitype@1.0.5(typescript@5.1.3)(zod@3.23.8):
-    optionalDependencies:
-      typescript: 5.1.3
-      zod: 3.23.8
 
   abitype@1.0.8(typescript@5.1.3)(zod@3.23.8):
     optionalDependencies:
@@ -9924,9 +9859,10 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@3.10.18:
+  effect@3.13.1:
     dependencies:
-      fast-check: 3.22.0
+      '@standard-schema/spec': 1.0.0
+      fast-check: 3.23.2
 
   electron-to-chromium@1.5.14: {}
 
@@ -10212,7 +10148,7 @@ snapshots:
       eslint: 8.57.0
       eslint-plugin-turbo: 2.1.1(eslint@8.57.0)
 
-  eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)):
+  eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.29.1):
     dependencies:
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
 
@@ -10249,7 +10185,7 @@ snapshots:
       debug: 4.3.6
       enhanced-resolve: 5.17.1
       eslint: 8.57.0
-      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.8.0
       is-bun-module: 1.1.0
@@ -10293,7 +10229,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0):
+  eslint-module-utils@2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -10360,7 +10296,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+      eslint-module-utils: 2.8.2(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.6.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -10679,7 +10615,7 @@ snapshots:
       iconv-lite: 0.4.24
       tmp: 0.0.33
 
-  fast-check@3.22.0:
+  fast-check@3.23.2:
     dependencies:
       pure-rand: 6.1.0
 
@@ -11419,9 +11355,9 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  isows@1.0.4(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)):
+  isows@1.0.6(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)):
     dependencies:
-      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
 
   istanbul-lib-coverage@3.2.2: {}
 
@@ -12693,10 +12629,24 @@ snapshots:
   ox@0.2.2(typescript@5.1.3)(zod@3.23.8):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.8.0
-      '@noble/hashes': 1.7.0
-      '@scure/bip32': 1.6.1
-      '@scure/bip39': 1.5.1
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.6.2
+      '@scure/bip39': 1.5.4
+      abitype: 1.0.8(typescript@5.1.3)(zod@3.23.8)
+      eventemitter3: 5.0.1
+    optionalDependencies:
+      typescript: 5.1.3
+    transitivePeerDependencies:
+      - zod
+
+  ox@0.6.7(typescript@5.1.3)(zod@3.23.8):
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.6.2
+      '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@5.1.3)(zod@3.23.8)
       eventemitter3: 5.0.1
     optionalDependencies:
@@ -14232,6 +14182,8 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
+  uuid@11.0.5: {}
+
   uvu@0.5.6:
     dependencies:
       dequal: 2.0.3
@@ -14305,17 +14257,16 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.2
 
-  viem@2.21.1(bufferutil@4.0.8)(typescript@5.1.3)(utf-8-validate@6.0.4)(zod@3.23.8):
+  viem@2.23.2(bufferutil@4.0.8)(typescript@5.1.3)(utf-8-validate@6.0.4)(zod@3.23.8):
     dependencies:
-      '@adraffy/ens-normalize': 1.10.0
-      '@noble/curves': 1.4.0
-      '@noble/hashes': 1.4.0
-      '@scure/bip32': 1.4.0
-      '@scure/bip39': 1.3.0
-      abitype: 1.0.5(typescript@5.1.3)(zod@3.23.8)
-      isows: 1.0.4(ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4))
-      webauthn-p256: 0.0.5
-      ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4)
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.6.2
+      '@scure/bip39': 1.5.4
+      abitype: 1.0.8(typescript@5.1.3)(zod@3.23.8)
+      isows: 1.0.6(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+      ox: 0.6.7(typescript@5.1.3)(zod@3.23.8)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4)
     optionalDependencies:
       typescript: 5.1.3
     transitivePeerDependencies:
@@ -14534,11 +14485,6 @@ snapshots:
 
   web-namespaces@2.0.1: {}
 
-  webauthn-p256@0.0.5:
-    dependencies:
-      '@noble/curves': 1.4.0
-      '@noble/hashes': 1.4.0
-
   webidl-conversions@4.0.2: {}
 
   whatwg-url@7.1.0:
@@ -14644,11 +14590,6 @@ snapshots:
       strip-ansi: 7.1.0
 
   wrappy@1.0.2: {}
-
-  ws@8.17.1(bufferutil@4.0.8)(utf-8-validate@6.0.4):
-    optionalDependencies:
-      bufferutil: 4.0.8
-      utf-8-validate: 6.0.4
 
   ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.4):
     optionalDependencies:
