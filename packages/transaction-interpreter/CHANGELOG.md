@@ -1,5 +1,12 @@
 # @3loop/transaction-interpreter
 
+## 0.11.19
+
+### Patch Changes
+
+- Updated dependencies [a8d9d5b]
+  - @3loop/transaction-decoder@0.26.2
+
 ## 0.11.18
 
 ### Patch Changes
