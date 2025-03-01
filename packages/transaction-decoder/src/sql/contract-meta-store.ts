@@ -1,10 +1,11 @@
 import { SqlClient } from '@effect/sql'
 import { Effect, Layer } from 'effect'
-import { ContractData, ContractMetaStore } from '../effect.js'
+import { ContractData } from '../effect.js'
+import * as ContractMetaStore from '../contract-meta-store.js'
 
-export const make = (strategies: ContractMetaStore['strategies']) =>
+export const make = (strategies: ContractMetaStore.ContractMetaStore['strategies']) =>
   Layer.effect(
-    ContractMetaStore,
+    ContractMetaStore.ContractMetaStore,
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
       const table = sql('_loop_decoder_contract_meta_')
@@ -26,7 +27,7 @@ export const make = (strategies: ContractMetaStore['strategies']) =>
         Effect.catchAll(() => Effect.dieMessage('Failed to create contractMeta table')),
       )
 
-      return ContractMetaStore.of({
+      return yield* ContractMetaStore.make({
         strategies,
         set: (key, value) =>
           Effect.gen(function* () {

@@ -1,4 +1,4 @@
-import { PrimaryKey, RequestResolver, Schema, SchemaAST } from 'effect'
+import { Effect, RateLimiter } from 'effect'
 
 export interface FetchABIParams {
   readonly chainID: number
@@ -41,25 +41,19 @@ interface AddressABI {
 
 export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI
 
+export type RateLimiterOptions = RateLimiter.RateLimiter.Options
+
 export interface ContractAbiResolverStrategy {
   type: 'address' | 'fragment'
   id: string
-  resolver: RequestResolver.RequestResolver<GetContractABIStrategy, never>
+  rateLimit?: RateLimiterOptions
+  resolver: (_: GetContractABIStrategyParams) => Effect.Effect<ContractABI[], ResolveStrategyABIError>
 }
 
-class SchemaContractAbi extends Schema.make<ContractABI>(SchemaAST.objectKeyword) {}
-export class GetContractABIStrategy extends Schema.TaggedRequest<GetContractABIStrategy>()('GetContractABIStrategy', {
-  failure: Schema.instanceOf(ResolveStrategyABIError),
-  success: Schema.Array(SchemaContractAbi),
-  payload: {
-    chainId: Schema.Number,
-    address: Schema.String,
-    strategyId: Schema.String,
-    event: Schema.optional(Schema.String),
-    signature: Schema.optional(Schema.String),
-  },
-}) {
-  [PrimaryKey.symbol]() {
-    return `abi-strategy::${this.chainId}:${this.address}:${this.event}:${this.signature}:${this.strategyId}`
-  }
+export interface GetContractABIStrategyParams {
+  chainId: number
+  address: string
+  strategyId: string
+  event?: string
+  signature?: string
 }

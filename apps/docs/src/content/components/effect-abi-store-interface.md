@@ -1,8 +1,8 @@
 ```ts
-export interface AbiStore<Key = AbiParams, Value = ContractAbiResult> {
+export interface AbiStore {
   readonly strategies: Record<ChainOrDefault, readonly ContractAbiResolverStrategy[]>
-  readonly set: (key: Key, value: Value) => Effect.Effect<void, never>
-  readonly get: (arg: Key) => Effect.Effect<Value, never>
-  readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value>, never>
+  readonly set: (key: AbiParams, value: ContractAbiResult) => Effect.Effect<void, never>
+  readonly get: (arg: AbiParams) => Effect.Effect<ContractAbiResult, never>
+  readonly getMany?: (arg: Array<AbiParams>) => Effect.Effect<Array<ContractAbiResult>, never>
 }
 ```

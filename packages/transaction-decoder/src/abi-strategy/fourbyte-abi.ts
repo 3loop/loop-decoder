@@ -1,4 +1,4 @@
-import { Effect, RequestResolver } from 'effect'
+import { Effect } from 'effect'
 import * as RequestModel from './request-model.js'
 import { parseAbiItem } from 'viem'
 
@@ -25,7 +25,7 @@ async function fetchABI({
   event,
   signature,
   chainId,
-}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI[]> {
+}: RequestModel.GetContractABIStrategyParams): Promise<RequestModel.ContractABI[]> {
   if (signature != null) {
     const full_match = await fetch(`${endpoint}/signatures/?hex_signature=${signature}`)
     if (full_match.status === 200) {
@@ -62,7 +62,7 @@ export const FourByteStrategyResolver = (): RequestModel.ContractAbiResolverStra
   return {
     id: 'fourbyte-strategy',
     type: 'fragment',
-    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+    resolver: (req: RequestModel.GetContractABIStrategyParams) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchABI(req),
@@ -71,6 +71,5 @@ export const FourByteStrategyResolver = (): RequestModel.ContractAbiResolverStra
         'AbiStrategy.FourByteStrategyResolver',
         { attributes: { chainId: req.chainId, address: req.address } },
       ),
-    ),
   }
 }

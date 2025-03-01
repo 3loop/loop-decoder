@@ -1,6 +1,8 @@
 export * from './abi-loader.js'
+export * as AbiStore from './abi-store.js'
 export * from './abi-strategy/index.js'
 export * from './contract-meta-loader.js'
+export * as ContractMetaStore from './contract-meta-store.js'
 export * from './meta-strategy/index.js'
 export * from './public-client.js'
 export * from './transaction-decoder.js'

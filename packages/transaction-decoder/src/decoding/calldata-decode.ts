@@ -1,11 +1,12 @@
 import { Effect } from 'effect'
 import { Hex, Address, encodeFunctionData, isAddress, getAddress } from 'viem'
-import { AbiParams, AbiStore, ContractAbiResult, getAndCacheAbi, MissingABIError } from '../abi-loader.js'
+import { getAndCacheAbi, MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
 import { TreeNode } from '../types.js'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { SAFE_MULTISEND_ABI, SAFE_MULTISEND_SIGNATURE } from './constants.js'
 import { getProxyImplementation } from './proxies.js'
+import { AbiStore } from '../abi-store.js'
 
 const callDataKeys = ['callData', 'data', '_data']
 const addressKeys = ['to', 'target', '_target']
@@ -17,7 +18,7 @@ const decodeBytesRecursively = (
 ): Effect.Effect<
   TreeNode,
   AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
-  AbiStore<AbiParams, ContractAbiResult> | PublicClient
+  AbiStore | PublicClient
 > =>
   Effect.gen(function* () {
     const isCallDataNode =
@@ -84,7 +85,7 @@ const decodeGnosisMultisendParams = (
 ): Effect.Effect<
   TreeNode[],
   AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
-  AbiStore<AbiParams, ContractAbiResult> | PublicClient
+  AbiStore | PublicClient
 > =>
   Effect.gen(function* () {
     if (inputParams.length === 0) {

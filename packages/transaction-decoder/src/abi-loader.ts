@@ -1,53 +1,7 @@
-import {
-  Context,
-  Effect,
-  Either,
-  RequestResolver,
-  Request,
-  Array,
-  pipe,
-  Data,
-  PrimaryKey,
-  Schema,
-  SchemaAST,
-} from 'effect'
-import { ContractABI, ContractAbiResolverStrategy, GetContractABIStrategy } from './abi-strategy/request-model.js'
+import { Effect, Either, RequestResolver, Request, Array, pipe, Data, PrimaryKey, Schema, SchemaAST } from 'effect'
+import { ContractABI } from './abi-strategy/request-model.js'
 import { Abi } from 'viem'
-
-export interface AbiParams {
-  chainID: number
-  address: string
-  event?: string | undefined
-  signature?: string | undefined
-}
-
-export interface ContractAbiSuccess {
-  status: 'success'
-  result: ContractABI
-}
-
-export interface ContractAbiNotFound {
-  status: 'not-found'
-  result: null
-}
-
-export interface ContractAbiEmpty {
-  status: 'empty'
-  result: null
-}
-
-export type ContractAbiResult = ContractAbiSuccess | ContractAbiNotFound | ContractAbiEmpty
-
-type ChainOrDefault = number | 'default'
-
-export interface AbiStore<Key = AbiParams, Value = ContractAbiResult> {
-  readonly strategies: Record<ChainOrDefault, readonly ContractAbiResolverStrategy[]>
-  readonly set: (key: Key, value: Value) => Effect.Effect<void, never>
-  readonly get: (arg: Key) => Effect.Effect<Value, never>
-  readonly getMany?: (arg: Array<Key>) => Effect.Effect<Array<Value>, never>
-}
-
-export const AbiStore = Context.GenericTag<AbiStore>('@3loop-decoder/AbiStore')
+import { AbiParams, AbiStore } from './abi-store.js'
 
 interface LoadParameters {
   readonly chainID: number
@@ -174,7 +128,7 @@ const getBestMatch = (abi: ContractABI | null) => {
 const AbiLoaderRequestResolver: Effect.Effect<
   RequestResolver.RequestResolver<AbiLoader, never>,
   never,
-  AbiStore<AbiParams, ContractAbiResult>
+  AbiStore
 > = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
   Effect.gen(function* () {
     if (requests.length === 0) return
@@ -218,19 +172,12 @@ const AbiLoaderRequestResolver: Effect.Effect<
         const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? []).filter(
           (strategy) => strategy.type === 'address',
         )
-
         return Effect.validateFirst(allAvailableStrategies, (strategy) => {
-          return pipe(
-            Effect.request(
-              new GetContractABIStrategy({
-                address: req.address,
-                chainId: req.chainID,
-                strategyId: strategy.id,
-              }),
-              strategy.resolver,
-            ),
-            Effect.withRequestCaching(true),
-          )
+          return strategy.resolver({
+            address: req.address,
+            chainId: req.chainID,
+            strategyId: strategy.id,
+          })
         }).pipe(
           Effect.map(Either.left),
           Effect.orElseSucceed(() => Either.right(req)),
@@ -238,7 +185,6 @@ const AbiLoaderRequestResolver: Effect.Effect<
       },
       {
         concurrency: 'unbounded',
-        batching: true,
       },
     )
 
@@ -254,19 +200,13 @@ const AbiLoaderRequestResolver: Effect.Effect<
 
         // TODO: Distinct the errors and missing data, so we can retry on errors
         return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-          pipe(
-            Effect.request(
-              new GetContractABIStrategy({
-                address,
-                chainId: chainID,
-                event,
-                signature,
-                strategyId: strategy.id,
-              }),
-              strategy.resolver,
-            ),
-            Effect.withRequestCaching(true),
-          ),
+          strategy.resolver({
+            address,
+            chainId: chainID,
+            event,
+            signature,
+            strategyId: strategy.id,
+          }),
         ).pipe(Effect.orElseSucceed(() => null))
       },
       {

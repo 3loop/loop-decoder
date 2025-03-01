@@ -1,12 +1,13 @@
-import { ContractABI, AbiStore } from '../effect.js'
 import { Effect, Layer } from 'effect'
+import * as AbiStore from '../abi-store.js'
+import { ContractABI } from '../abi-strategy/request-model.js'
 
 const abiCache = new Map<string, ContractABI>()
 
-export const make = (strategies: AbiStore['strategies']) =>
-  Layer.succeed(
-    AbiStore,
-    AbiStore.of({
+export const make = (strategies: AbiStore.AbiStore['strategies']) =>
+  Layer.scoped(
+    AbiStore.AbiStore,
+    AbiStore.make({
       strategies,
       set: (_key, value) =>
         Effect.sync(() => {

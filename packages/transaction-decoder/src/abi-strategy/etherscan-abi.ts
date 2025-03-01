@@ -1,4 +1,4 @@
-import { Effect, RequestResolver } from 'effect'
+import { Effect } from 'effect'
 import * as RequestModel from './request-model.js'
 
 const endpoints: { [k: number]: string } = {
@@ -48,7 +48,7 @@ const endpoints: { [k: number]: string } = {
 }
 
 async function fetchContractABI(
-  { address, chainId }: RequestModel.GetContractABIStrategy,
+  { address, chainId }: RequestModel.GetContractABIStrategyParams,
   config?: { apikey?: string; endpoint?: string },
 ): Promise<RequestModel.ContractABI[]> {
   const endpoint = config?.endpoint ?? endpoints[chainId]
@@ -88,7 +88,7 @@ export const EtherscanStrategyResolver = (config?: {
   return {
     id: 'etherscan-strategy',
     type: 'address',
-    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+    resolver: (req: RequestModel.GetContractABIStrategyParams) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchContractABI(req, config),
@@ -97,6 +97,5 @@ export const EtherscanStrategyResolver = (config?: {
         'AbiStrategy.EtherscanStrategyResolver',
         { attributes: { chainId: req.chainId, address: req.address } },
       ),
-    ),
   }
 }
