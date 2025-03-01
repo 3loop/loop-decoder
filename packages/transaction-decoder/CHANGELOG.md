@@ -1,5 +1,20 @@
 # @3loop/transaction-decoder
 
+## 0.27.0
+
+### Minor Changes
+
+- d7ee3d8: BREAKING CHANGE: Changing the interface we use to declare ABI strategies and adding rate limiter per strategy. The Breaking Change will only affect you if you are declaring the store layers manually, if you are using the default stores you will not be affected.
+
+  Example usage:
+
+  ```ts
+  EtherscanV2StrategyResolver({
+    apikey: apikey,
+    rateLimit: { limit: 5, interval: '2 seconds', algorithm: 'fixed-window' },
+  })
+  ```
+
 ## 0.26.2
 
 ### Patch Changes
