@@ -6,14 +6,13 @@ import * as EffectContractMetaStore from './contract-meta-store.js'
 import type { ContractAbiResolverStrategy } from './abi-strategy/index.js'
 import type { Hex } from 'viem'
 import type { ContractMetaResolverStrategy } from './meta-strategy/request-model.js'
-import { Scope } from 'effect/Scope'
 
 export interface TransactionDecoderOptions {
   getPublicClient: (chainID: number) => PublicClientObject | undefined
   abiStore: VanillaAbiStore | Layer.Layer<EffectAbiStore.AbiStore>
   contractMetaStore:
-  | VanillaContractMetaStore
-  | Layer.Layer<EffectContractMetaStore.ContractMetaStore, never, PublicClient>
+    | VanillaContractMetaStore
+    | Layer.Layer<EffectContractMetaStore.ContractMetaStore, never, PublicClient>
   logLevel?: LogLevel.Literal
 }
 

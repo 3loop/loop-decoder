@@ -1,5 +1,4 @@
 import { Effect, RateLimiter } from 'effect'
-import { DurationInput } from 'effect/Duration'
 
 export interface FetchABIParams {
   readonly chainID: number

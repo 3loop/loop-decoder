@@ -3,7 +3,7 @@ import { Effect, Layer } from 'effect'
 import { SqlClient } from '@effect/sql'
 
 export const make = (strategies: AbiStore.AbiStore['strategies']) =>
-  Layer.effect(
+  Layer.scoped(
     AbiStore.AbiStore,
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient

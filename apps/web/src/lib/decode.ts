@@ -10,12 +10,6 @@ import {
   FourByteStrategyResolver,
   OpenchainStrategyResolver,
   SourcifyStrategyResolver,
-  AbiStore,
-  AbiParams,
-  ContractAbiResult,
-  ContractMetaStore,
-  ContractMetaParams,
-  ContractMetaResult,
   PublicClient,
   ERC20RPCStrategyResolver,
   NFTRPCStrategyResolver,
@@ -24,10 +18,6 @@ import {
 import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sql'
 import { Hex } from 'viem'
 import { DatabaseLive } from './database'
-import { PgClient } from '@effect/sql-pg/PgClient'
-import { SqlClient } from '@effect/sql/SqlClient'
-import { ConfigError } from 'effect/ConfigError'
-import { SqlError } from '@effect/sql/SqlError'
 
 const AbiStoreLive = Layer.unwrapEffect(
   Effect.gen(function* () {
@@ -60,15 +50,7 @@ const CacheLayer = Layer.setRequestCache(Request.makeCache({ capacity: 100, time
 const DataLayer = Layer.mergeAll(RPCProviderLive, DatabaseLive)
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, MetaStoreLive)
 
-const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer) as Layer.Layer<
-  | AbiStore<AbiParams, ContractAbiResult>
-  | ContractMetaStore<ContractMetaParams, ContractMetaResult>
-  | PublicClient
-  | PgClient
-  | SqlClient,
-  ConfigError | SqlError,
-  never
->
+const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer)
 
 const runtime = ManagedRuntime.make(Layer.provide(MainLayer, CacheLayer))
 

@@ -5,7 +5,7 @@ import { ContractABI } from '../abi-strategy/request-model.js'
 const abiCache = new Map<string, ContractABI>()
 
 export const make = (strategies: AbiStore.AbiStore['strategies']) =>
-  Layer.effect(
+  Layer.scoped(
     AbiStore.AbiStore,
     AbiStore.make({
       strategies,
