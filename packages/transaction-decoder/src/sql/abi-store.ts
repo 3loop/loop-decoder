@@ -1,10 +1,10 @@
-import { AbiStore, ContractAbiResult } from '../effect.js'
+import * as AbiStore from '../abi-store.js'
 import { Effect, Layer } from 'effect'
 import { SqlClient } from '@effect/sql'
 
-export const make = (strategies: AbiStore['strategies']) =>
+export const make = (strategies: AbiStore.AbiStore['strategies']) =>
   Layer.effect(
-    AbiStore,
+    AbiStore.AbiStore,
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
 
@@ -34,7 +34,7 @@ export const make = (strategies: AbiStore['strategies']) =>
         Effect.catchAll(() => Effect.dieMessage('Failed to create contractAbi table')),
       )
 
-      return AbiStore.of({
+      return yield* AbiStore.make({
         strategies,
         set: (key, value) =>
           Effect.gen(function* () {
@@ -126,7 +126,7 @@ export const make = (strategies: AbiStore['strategies']) =>
                   chainID,
                   abi: item.abi,
                 },
-              } as ContractAbiResult
+              } as AbiStore.ContractAbiResult
             } else if (items[0] != null && items[0].status === 'not-found') {
               return {
                 status: 'not-found',

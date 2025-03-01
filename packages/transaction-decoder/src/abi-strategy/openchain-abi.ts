@@ -1,4 +1,4 @@
-import { Effect, RequestResolver } from 'effect'
+import { Effect } from 'effect'
 import * as RequestModel from './request-model.js'
 import { parseAbiItem } from 'viem'
 
@@ -43,7 +43,7 @@ async function fetchABI({
   chainId,
   signature,
   event,
-}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI[]> {
+}: RequestModel.GetContractABIStrategyParams): Promise<RequestModel.ContractABI[]> {
   if (signature != null) {
     const response = await fetch(`${endpoint}?function=${signature}`, options)
     if (response.status === 200) {
@@ -80,7 +80,7 @@ export const OpenchainStrategyResolver = (): RequestModel.ContractAbiResolverStr
   return {
     id: 'openchain-strategy',
     type: 'fragment',
-    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+    resolver: (req: RequestModel.GetContractABIStrategyParams) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchABI(req),
@@ -89,6 +89,5 @@ export const OpenchainStrategyResolver = (): RequestModel.ContractAbiResolverStr
         'AbiStrategy.OpenchainStrategyResolver',
         { attributes: { chainId: req.chainId, address: req.address } },
       ),
-    ),
   }
 }

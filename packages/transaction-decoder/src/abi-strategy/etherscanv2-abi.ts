@@ -1,10 +1,10 @@
-import { Effect, RequestResolver } from 'effect'
+import { Effect } from 'effect'
 import * as RequestModel from './request-model.js'
 
 const endpoint = 'https://api.etherscan.io/v2/api'
 
 async function fetchContractABI(
-  { address, chainId }: RequestModel.GetContractABIStrategy,
+  { address, chainId }: RequestModel.GetContractABIStrategyParams,
   config?: { apikey?: string },
 ): Promise<RequestModel.ContractABI[]> {
   const params: Record<string, string> = {
@@ -34,14 +34,26 @@ async function fetchContractABI(
     ]
   }
 
-  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainId}`)
+  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainId}`, {
+    cause: json,
+  })
 }
 
-export const EtherscanV2StrategyResolver = (config?: { apikey?: string }): RequestModel.ContractAbiResolverStrategy => {
+export const EtherscanV2StrategyResolver = (config?: {
+  apikey?: string
+  rateLimit?: RequestModel.RateLimiterOptions
+}): RequestModel.ContractAbiResolverStrategy => {
   return {
     id: 'etherscanV2-strategy',
     type: 'address',
-    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+    // NOTE: time is longer than one second, because the etherscan will limit by the time request arrives at their server
+    // and our rate limiter will limit by the time it was sent
+    rateLimit: config?.rateLimit ?? {
+      limit: 5,
+      interval: '2 seconds',
+      algorithm: 'fixed-window',
+    },
+    resolver: (req: RequestModel.GetContractABIStrategyParams) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchContractABI(req, config),
@@ -50,6 +62,5 @@ export const EtherscanV2StrategyResolver = (config?: { apikey?: string }): Reque
         'AbiStrategy.EtherscanV2StrategyResolver',
         { attributes: { chainId: req.chainId, address: req.address } },
       ),
-    ),
   }
 }

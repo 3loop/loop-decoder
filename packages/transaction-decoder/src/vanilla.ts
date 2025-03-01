@@ -1,45 +1,43 @@
 import { Effect, Logger, LogLevel, ManagedRuntime, Layer } from 'effect'
 import { PublicClient, PublicClientObject, UnknownNetwork } from './public-client.js'
 import { decodeTransactionByHash, decodeCalldata } from './transaction-decoder.js'
-import { ContractAbiResult, AbiStore as EffectAbiStore, AbiParams } from './abi-loader.js'
-import {
-  ContractMetaParams,
-  ContractMetaResult,
-  ContractMetaStore as EffectContractMetaStore,
-} from './contract-meta-loader.js'
+import * as EffectAbiStore from './abi-store.js'
+import * as EffectContractMetaStore from './contract-meta-store.js'
 import type { ContractAbiResolverStrategy } from './abi-strategy/index.js'
 import type { Hex } from 'viem'
 import type { ContractMetaResolverStrategy } from './meta-strategy/request-model.js'
+import { Scope } from 'effect/Scope'
 
 export interface TransactionDecoderOptions {
   getPublicClient: (chainID: number) => PublicClientObject | undefined
-  abiStore: VanillaAbiStore | Layer.Layer<EffectAbiStore<AbiParams, ContractAbiResult>>
+  abiStore: VanillaAbiStore | Layer.Layer<EffectAbiStore.AbiStore>
   contractMetaStore:
-    | VanillaContractMetaStore
-    | Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>, never, PublicClient>
+  | VanillaContractMetaStore
+  | Layer.Layer<EffectContractMetaStore.ContractMetaStore, never, PublicClient>
   logLevel?: LogLevel.Literal
 }
 
 export interface VanillaAbiStore {
   strategies?: readonly ContractAbiResolverStrategy[]
-  get: (key: AbiParams) => Promise<ContractAbiResult>
-  set: (key: AbiParams, val: ContractAbiResult) => Promise<void>
+  get: (key: EffectAbiStore.AbiParams) => Promise<EffectAbiStore.ContractAbiResult>
+  set: (key: EffectAbiStore.AbiParams, val: EffectAbiStore.ContractAbiResult) => Promise<void>
 }
 
 type VanillaContractMetaStategy = (client: PublicClient) => ContractMetaResolverStrategy
 
 export interface VanillaContractMetaStore {
   strategies?: readonly VanillaContractMetaStategy[]
-  get: (key: ContractMetaParams) => Promise<ContractMetaResult>
-  set: (key: ContractMetaParams, val: ContractMetaResult) => Promise<void>
+  get: (key: EffectContractMetaStore.ContractMetaParams) => Promise<EffectContractMetaStore.ContractMetaResult>
+  set: (
+    key: EffectContractMetaStore.ContractMetaParams,
+    val: EffectContractMetaStore.ContractMetaResult,
+  ) => Promise<void>
 }
 
 // TODO: allow adding custom strategies to vanilla API
 export class TransactionDecoder {
   private readonly runtime: ManagedRuntime.ManagedRuntime<
-    | PublicClient
-    | EffectAbiStore<AbiParams, ContractAbiResult>
-    | EffectContractMetaStore<ContractMetaParams, ContractMetaResult>,
+    PublicClient | EffectAbiStore.AbiStore | EffectContractMetaStore.ContractMetaStore,
     never
   >
 
@@ -60,40 +58,35 @@ export class TransactionDecoder {
       },
     })
 
-    let AbiStoreLive: Layer.Layer<EffectAbiStore<AbiParams, ContractAbiResult>>
+    let AbiStoreLive: Layer.Layer<EffectAbiStore.AbiStore>
 
     if (Layer.isLayer(abiStore)) {
-      AbiStoreLive = abiStore as Layer.Layer<EffectAbiStore<AbiParams, ContractAbiResult>>
+      AbiStoreLive = abiStore as Layer.Layer<EffectAbiStore.AbiStore>
     } else {
       const store = abiStore as VanillaAbiStore
-      AbiStoreLive = Layer.succeed(
-        EffectAbiStore,
-        EffectAbiStore.of({
-          strategies: { default: store.strategies ?? [] },
-          get: (key) => Effect.promise(() => store.get(key)),
-          set: (key, val) => Effect.promise(() => store.set(key, val)),
-        }),
-      )
+      AbiStoreLive = EffectAbiStore.layer({
+        strategies: { default: store.strategies ?? [] },
+        get: (key) => Effect.promise(() => store.get(key)),
+        set: (key, val) => Effect.promise(() => store.set(key, val)),
+      })
     }
 
-    let MetaStoreLive: Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>, never, PublicClient>
+    let MetaStoreLive: Layer.Layer<EffectContractMetaStore.ContractMetaStore, never, PublicClient>
 
     if (Layer.isLayer(contractMetaStore)) {
-      MetaStoreLive = contractMetaStore as Layer.Layer<EffectContractMetaStore<ContractMetaParams, ContractMetaResult>>
+      MetaStoreLive = contractMetaStore as Layer.Layer<EffectContractMetaStore.ContractMetaStore>
     } else {
       const store = contractMetaStore as VanillaContractMetaStore
-      MetaStoreLive = Layer.succeed(
-        EffectContractMetaStore,
-        EffectContractMetaStore.of({
-          strategies: { default: (store.strategies ?? [])?.map((strategy) => strategy(PublicClientLive)) },
-          get: (key) => Effect.promise(() => store.get(key)),
-          set: (key, val) => Effect.promise(() => store.set(key, val)),
-        }),
-      )
+      MetaStoreLive = EffectContractMetaStore.layer({
+        strategies: { default: (store.strategies ?? [])?.map((strategy) => strategy(PublicClientLive)) },
+        get: (key) => Effect.promise(() => store.get(key)),
+        set: (key, val) => Effect.promise(() => store.set(key, val)),
+      })
     }
 
     const LoadersLayer = Layer.provideMerge(AbiStoreLive, MetaStoreLive)
-    const MainLayer = LoadersLayer.pipe(Layer.provideMerge(Layer.succeed(PublicClient, PublicClientLive))).pipe(
+    const MainLayer = LoadersLayer.pipe(
+      Layer.provideMerge(Layer.succeed(PublicClient, PublicClientLive)),
       Layer.provide(Logger.minimumLogLevel(LogLevel.fromLiteral(logLevel))),
     )
 

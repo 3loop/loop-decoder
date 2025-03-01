@@ -1,9 +1,9 @@
 import * as RequestModel from './request-model.js'
-import { Effect, RequestResolver } from 'effect'
+import { Effect } from 'effect'
 import { PublicClient } from '../public-client.js'
 import { erc20Abi, getAddress, getContract } from 'viem'
 
-const getLocalFragments = (service: PublicClient, { address, chainId }: RequestModel.GetContractABIStrategy) =>
+const getLocalFragments = (service: PublicClient, { address, chainId }: RequestModel.GetContractABIStrategyParams) =>
   Effect.gen(function* () {
     if (!address)
       return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId))
@@ -53,10 +53,9 @@ export const ExperimentalErc20AbiStrategyResolver = (
   return {
     id: 'experimental-erc20-strategy',
     type: 'address',
-    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+    resolver: (req: RequestModel.GetContractABIStrategyParams) =>
       Effect.withSpan(getLocalFragments(service, req), 'AbiStrategy.ExperimentalErc20AbiStrategyResolver', {
         attributes: { chainId: req.chainId, address: req.address },
       }),
-    ),
   }
 }

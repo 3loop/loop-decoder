@@ -1,5 +1,5 @@
 import { getAddress } from 'viem'
-import { Effect, RequestResolver } from 'effect'
+import { Effect } from 'effect'
 import * as RequestModel from './request-model.js'
 
 interface SourcifyResponse {
@@ -13,7 +13,7 @@ const endpoint = 'https://repo.sourcify.dev/contracts/'
 async function fetchContractABI({
   address,
   chainId,
-}: RequestModel.GetContractABIStrategy): Promise<RequestModel.ContractABI[]> {
+}: RequestModel.GetContractABIStrategyParams): Promise<RequestModel.ContractABI[]> {
   const normalisedAddress = getAddress(address)
 
   const full_match = await fetch(`${endpoint}/full_match/${chainId}/${normalisedAddress}/metadata.json`)
@@ -51,7 +51,7 @@ export const SourcifyStrategyResolver = (): RequestModel.ContractAbiResolverStra
   return {
     id: 'sourcify-strategy',
     type: 'address',
-    resolver: RequestResolver.fromEffect((req: RequestModel.GetContractABIStrategy) =>
+    resolver: (req: RequestModel.GetContractABIStrategyParams) =>
       Effect.withSpan(
         Effect.tryPromise({
           try: () => fetchContractABI(req),
@@ -60,6 +60,5 @@ export const SourcifyStrategyResolver = (): RequestModel.ContractAbiResolverStra
         'AbiStrategy.SourcifyStrategyResolver',
         { attributes: { chainId: req.chainId, address: req.address } },
       ),
-    ),
   }
 }
