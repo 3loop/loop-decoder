@@ -4,7 +4,7 @@ import { TransactionDecoder } from '../src/vanilla.js'
 import fs from 'fs'
 import { createPublicClient } from 'viem'
 import { goerli } from 'viem/chains'
-import { ERC20RPCStrategyResolver } from '../src/effect.js'
+import { ERC20RPCStrategyResolver } from '../src/index.js'
 import { TEST_TRANSACTIONS } from './constants.js'
 
 describe('Transaction Decoder', () => {

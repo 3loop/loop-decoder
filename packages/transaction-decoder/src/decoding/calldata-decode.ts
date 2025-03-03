@@ -6,7 +6,7 @@ import { TreeNode } from '../types.js'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { SAFE_MULTISEND_ABI, SAFE_MULTISEND_SIGNATURE } from './constants.js'
 import { getProxyImplementation } from './proxies.js'
-import { AbiStore } from '../abi-store.js'
+import * as AbiStore from '../abi-store.js'
 
 const callDataKeys = ['callData', 'data', '_data']
 const addressKeys = ['to', 'target', '_target']
@@ -18,7 +18,7 @@ const decodeBytesRecursively = (
 ): Effect.Effect<
   TreeNode,
   AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
-  AbiStore | PublicClient
+  AbiStore.AbiStore | PublicClient
 > =>
   Effect.gen(function* () {
     const isCallDataNode =
@@ -85,7 +85,7 @@ const decodeGnosisMultisendParams = (
 ): Effect.Effect<
   TreeNode[],
   AbiDecoder.DecodeError | MissingABIError | RPCFetchError | UnknownNetwork,
-  AbiStore | PublicClient
+  AbiStore.AbiStore | PublicClient
 > =>
   Effect.gen(function* () {
     if (inputParams.length === 0) {

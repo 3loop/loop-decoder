@@ -1,4 +1,4 @@
-import { DecodeResult } from '@3loop/transaction-decoder'
+import type { DecodeResult } from '@3loop/transaction-decoder'
 
 export interface CalldataParams {
   data: string

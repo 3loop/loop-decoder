@@ -2,7 +2,7 @@
 import { Effect, Match } from 'effect'
 import fs from 'node:fs'
 import * as AbiStore from '../../src/abi-store.js'
-import { FourByteStrategyResolver } from '../../src/effect.js'
+import { FourByteStrategyResolver } from '../../src/index.js'
 import { EtherscanStrategyResolver } from '../../src/abi-strategy/index.js'
 
 export const MockedAbiStoreLive = AbiStore.layer({

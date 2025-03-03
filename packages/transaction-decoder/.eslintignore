@@ -1,4 +1,4 @@
 /dist
 jest.config.js
-*.d.ts
+*.tsbuildinfo
 /example

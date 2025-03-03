@@ -3,7 +3,7 @@ import { ContractData } from './types.js'
 import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
 import { Address } from 'viem'
 import { ZERO_ADDRESS } from './decoding/constants.js'
-import { ContractMetaStore } from './contract-meta-store.js'
+import * as ContractMetaStore from './contract-meta-store.js'
 
 class SchemaContractData extends Schema.make<ContractData>(SchemaAST.objectKeyword) {}
 class SchemaAddress extends Schema.make<Address>(SchemaAST.stringKeyword) {}
@@ -27,7 +27,7 @@ function makeKey(key: ContractMetaLoader) {
 
 const getMany = (requests: Array<ContractMetaLoader>) =>
   Effect.gen(function* () {
-    const { getMany, get } = yield* ContractMetaStore
+    const { getMany, get } = yield* ContractMetaStore.ContractMetaStore
 
     if (getMany != null) {
       return yield* getMany(requests)
@@ -44,7 +44,7 @@ const getMany = (requests: Array<ContractMetaLoader>) =>
 
 const setValue = ({ chainID, address }: ContractMetaLoader, result: ContractData | null) =>
   Effect.gen(function* () {
-    const { set } = yield* ContractMetaStore
+    const { set } = yield* ContractMetaStore.ContractMetaStore
     if (result == null) return
     // NOTE: Now when RPC fails if we store not-found it causes issues and not retries, for now we will just always retry
     yield* set(
@@ -82,7 +82,7 @@ const setValue = ({ chainID, address }: ContractMetaLoader, result: ContractData
  */
 const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<ContractMetaLoader>) =>
   Effect.gen(function* () {
-    const { strategies } = yield* ContractMetaStore
+    const { strategies } = yield* ContractMetaStore.ContractMetaStore
 
     const groups = Array.groupBy(requests, makeKey)
     const uniqueRequests = Object.values(groups).map((group) => group[0])
@@ -149,7 +149,7 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
       { discard: true },
     )
   }),
-).pipe(RequestResolver.contextFromServices(ContractMetaStore), Effect.withRequestCaching(true))
+).pipe(RequestResolver.contextFromServices(ContractMetaStore.ContractMetaStore), Effect.withRequestCaching(true))
 
 export const getAndCacheContractMeta = ({
   chainID,

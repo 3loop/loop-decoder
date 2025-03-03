@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { Effect, Layer, pipe } from 'effect'
-import { decodeTransactionByHash, decodeCalldata } from '../src/effect.js'
+import { decodeTransactionByHash, decodeCalldata } from '../src/index.js'
 import { PublicClient } from '../src/public-client.js'
 import { MockedRPCProvider, MockedTransaction } from './mocks/json-rpc-mock.js'
 import { CALLDATA_TRANSACTIONS, FAILED_TRANSACTIONS, TEST_TRANSACTIONS } from './constants.js'
