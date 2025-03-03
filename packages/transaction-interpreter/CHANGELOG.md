@@ -1,5 +1,13 @@
 # @3loop/transaction-interpreter
 
+## 0.11.21
+
+### Patch Changes
+
+- de087ad: Update typescript config, compilation and fix type inference
+- Updated dependencies [de087ad]
+  - @3loop/transaction-decoder@0.27.1
+
 ## 0.11.20
 
 ### Patch Changes
