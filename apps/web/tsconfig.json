@@ -1,8 +1,6 @@
 {
-  "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
     "strict": true,
-    "target": "ES2015",
     "isolatedModules": true,
     "downlevelIteration": true,
     "exactOptionalPropertyTypes": false,
@@ -14,7 +12,17 @@
     "paths": {
       "@/*": ["./src/*"],
       "@3loop/transaction-decoder/*": ["../../packages/transaction-decoder/dist/*"]
-    }
+    },
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "preserve"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,7 +1,7 @@
 import { SqlClient } from '@effect/sql'
 import { Effect, Layer } from 'effect'
-import { ContractData } from '../effect.js'
 import * as ContractMetaStore from '../contract-meta-store.js'
+import { ContractData } from '../types.js'
 
 export const make = (strategies: ContractMetaStore.ContractMetaStore['strategies']) =>
   Layer.effect(

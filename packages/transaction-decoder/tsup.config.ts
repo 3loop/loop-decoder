@@ -5,9 +5,7 @@ import { defineConfig } from 'tsup'
 const entries = globSync('src/**/*.ts')
 
 export default defineConfig({
-  dts: true,
   bundle: false,
-  splitting: false,
   treeshake: true,
   sourcemap: true,
   format: ['esm', 'cjs'],

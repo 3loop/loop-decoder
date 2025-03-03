@@ -1,7 +1,7 @@
 import { Effect, Either, RequestResolver, Request, Array, pipe, Data, PrimaryKey, Schema, SchemaAST } from 'effect'
 import { ContractABI } from './abi-strategy/request-model.js'
 import { Abi } from 'viem'
-import { AbiParams, AbiStore } from './abi-store.js'
+import * as AbiStore from './abi-store.js'
 
 interface LoadParameters {
   readonly chainID: number
@@ -49,9 +49,9 @@ function makeRequestKey(key: AbiLoader) {
   return `abi::${key.chainID}:${key.address}:${key.event}:${key.signature}`
 }
 
-const getMany = (requests: Array<AbiParams>) =>
+const getMany = (requests: Array<AbiStore.AbiParams>) =>
   Effect.gen(function* () {
-    const { getMany, get } = yield* AbiStore
+    const { getMany, get } = yield* AbiStore.AbiStore
 
     if (getMany != null) {
       return yield* getMany(requests)
@@ -68,7 +68,7 @@ const getMany = (requests: Array<AbiParams>) =>
 
 const setValue = (key: AbiLoader, abi: ContractABI | null) =>
   Effect.gen(function* () {
-    const { set } = yield* AbiStore
+    const { set } = yield* AbiStore.AbiStore
     yield* set(
       {
         chainID: key.chainID,
@@ -128,12 +128,12 @@ const getBestMatch = (abi: ContractABI | null) => {
 const AbiLoaderRequestResolver: Effect.Effect<
   RequestResolver.RequestResolver<AbiLoader, never>,
   never,
-  AbiStore
+  AbiStore.AbiStore
 > = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
   Effect.gen(function* () {
     if (requests.length === 0) return
 
-    const { strategies } = yield* AbiStore
+    const { strategies } = yield* AbiStore.AbiStore
 
     const requestGroups = Array.groupBy(requests, makeRequestKey)
     const uniqueRequests = Object.values(requestGroups).map((group) => group[0])
@@ -239,7 +239,7 @@ const AbiLoaderRequestResolver: Effect.Effect<
       },
     )
   }),
-).pipe(RequestResolver.contextFromServices(AbiStore), Effect.withRequestCaching(true))
+).pipe(RequestResolver.contextFromServices(AbiStore.AbiStore), Effect.withRequestCaching(true))
 
 // TODO: When failing to decode with one ABI, we should retry with other resolved ABIs
 // We can decode with Effect.validateFirst(abis, (abi) => decodeMethod(input as Hex, abi)) and to find the first ABIs
@@ -247,7 +247,7 @@ const AbiLoaderRequestResolver: Effect.Effect<
 // how to handle the strategy resolver in this case. Currently, we stop at first successful strategy, which might result
 // in a missing Fragment. We treat this issue as a minor one for now, as we epect it to occur rarely on contracts that
 // are not verified and with a non standard events structure.
-export const getAndCacheAbi = (params: AbiParams) =>
+export const getAndCacheAbi = (params: AbiStore.AbiParams) =>
   Effect.gen(function* () {
     if (params.event === '0x' || params.signature === '0x') {
       return yield* Effect.fail(new EmptyCalldataError(params))

@@ -1,3 +1,7 @@
 {
-  "extends": "tsconfig/base.json"
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "references": [{ "path": "./packages/transaction-decoder" }, { "path": "./packages/transaction-interpreter" }]
 }

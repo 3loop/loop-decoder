@@ -2,7 +2,6 @@ import path from 'path'
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  dts: true,
   bundle: false,
   treeshake: true,
   target: 'node16',
