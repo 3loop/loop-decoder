@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.22
+
+### Patch Changes
+
+- 2299c92: Fix small issue in 0x interpreter
+
 ## 0.11.21
 
 ### Patch Changes
