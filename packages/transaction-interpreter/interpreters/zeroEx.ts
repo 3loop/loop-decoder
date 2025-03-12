@@ -37,7 +37,7 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
   } else {
     netReceived = getNetTransfers({
       transfers: filteredTransfers,
-      toAddresses: [event.toAddress],
+      toAddresses: [event.fromAddress],
       type: ['ERC20', 'native'],
     }).filter((t) => !sentTokens.includes(t.asset.address))
   }
@@ -68,4 +68,5 @@ export const contracts = [
 
   //Settlers
   '8453:0xbc3c5ca50b6a215edf00815965485527f26f5da8',
+  '8453:0x5c9bdc801a600c006c388fc032dcb27355154cc9',
 ]
