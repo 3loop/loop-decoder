@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.23
+
+### Patch Changes
+
+- eede51e: Add rb interpreter
+
 ## 0.11.22
 
 ### Patch Changes
