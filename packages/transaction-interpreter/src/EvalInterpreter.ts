@@ -23,14 +23,28 @@ const make = Effect.succeed({
       id: `${decodedTx.chainID}:${decodedTx.toAddress}`,
     }
   },
-  interpretTx: (decodedTx: DecodedTransaction, interpreter: Interpreter) =>
+  interpretTx: (
+    decodedTx: DecodedTransaction,
+    interpreter: Interpreter,
+    options?: {
+      interpretAsUserAddress?: string
+    },
+  ) =>
     Effect.sync(() => {
       // TODO: add ability to surpress warning on acknowledge
       Effect.logWarning('Using eval in production can result in security vulnerabilities. Use at your own risk.')
 
-      const input = stringify(decodedTx)
-      const code = interpreter.schema
-      const result = localEval(code, input)
+      let input
+      if (options?.interpretAsUserAddress) {
+        input = stringify({
+          ...decodedTx,
+          fromAddress: options.interpretAsUserAddress,
+        })
+      } else {
+        input = stringify(decodedTx)
+      }
+
+      const result = localEval(interpreter.schema, input)
       return result
     }).pipe(Effect.withSpan('TransactionInterpreter.interpretTx')),
 })
