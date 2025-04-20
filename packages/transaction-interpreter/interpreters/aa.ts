@@ -1,16 +1,10 @@
-import {
-  assetsReceived,
-  assetsSent,
-  categorizedDefaultEvent,
-  displayAddress,
-  displayAsset,
-  toAssetTransfer,
-} from './std.js'
+import { assetsReceived, assetsSent, genericInterpreter, displayAddress, displayAsset, toAssetTransfer } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
-  const newEvent = categorizedDefaultEvent(event)
+  const newEvent = genericInterpreter(event)
+
   const userOpEvents = event.interactions.filter((e) => e.event.eventName === 'UserOperationEvent')
 
   if (newEvent.type !== 'unknown') {

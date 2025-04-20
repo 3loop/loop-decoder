@@ -1,10 +1,10 @@
-import { assetsReceived, assetsSent, formatNumber, categorizedDefaultEvent, displayAsset } from './std.js'
+import { assetsReceived, assetsSent, formatNumber, genericInterpreter, displayAsset } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
-  const newEvent = categorizedDefaultEvent(event)
+  const newEvent = genericInterpreter(event)
 
   switch (methodName) {
     case 'approve': {

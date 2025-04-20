@@ -2,7 +2,7 @@ import {
   displayAsset,
   formatNumber,
   NULL_ADDRESS,
-  categorizedDefaultEvent,
+  genericInterpreter,
   toAssetTransfer,
   assetsSent,
   assetsReceived,
@@ -22,7 +22,7 @@ import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
   const methodName = event.methodCall.name
-  const newEvent = categorizedDefaultEvent(event)
+  const newEvent = genericInterpreter(event)
   const { assetsMinted, assetsBurned } = newEvent
 
   const purchaseOrSaleEvent = event.interactions.find(

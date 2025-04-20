@@ -1,9 +1,9 @@
-import { assetsReceived, categorizedDefaultEvent, displayAsset, getNetTransfers, filterTransfers } from './std.js'
+import { assetsReceived, genericInterpreter, displayAsset, getNetTransfers, filterTransfers } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
-  const newEvent = categorizedDefaultEvent(event)
+  const newEvent = genericInterpreter(event)
 
   if (newEvent.type !== 'unknown') return newEvent
 
@@ -49,6 +49,10 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
       ...newEvent,
       type: 'swap',
       action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
+      context: {
+        sent: [netSent[0]],
+        received: [netReceived[0]],
+      },
       assetsReceived: assetsReceived(
         filteredTransfers.filter((t) => receivedTokens.includes(t.address)),
         event.fromAddress,
