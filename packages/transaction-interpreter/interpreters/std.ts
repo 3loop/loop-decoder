@@ -1,4 +1,4 @@
-import type { AssetTransfer, InterpretedTransaction, Payment } from '@/types.js'
+import type { AssetTransfer, InterpretedTransaction, InterpretedSwapTransaction } from '@/types.js'
 import { Asset, DecodedTransaction } from '@3loop/transaction-decoder'
 
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -12,6 +12,8 @@ interface FilterOptions {
   excludeDuplicates?: boolean
   sumUpRepeated?: boolean
 }
+
+type Payment = Omit<AssetTransfer, 'to' | 'from'>
 
 export const filterTransfers = (transfers: Asset[], filters: FilterOptions = {}): Asset[] => {
   let filtered = [...transfers]
@@ -307,7 +309,40 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
   return newEvent
 }
 
-export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedTransaction {
+// ------------------------------------------------------------------------------
+// Generic Interpreters
+
+export function genericSwapInterpreter(event: DecodedTransaction): InterpretedTransaction {
+  const newEvent = defaultEvent(event)
+
+  const netSent = getNetTransfers({
+    transfers: event.transfers,
+    fromAddresses: [event.fromAddress],
+  })
+
+  const netReceived = getNetTransfers({
+    transfers: event.transfers,
+    toAddresses: [event.fromAddress],
+  })
+
+  if (isSwap(event)) {
+    const swapEvent: InterpretedSwapTransaction = {
+      ...newEvent,
+      type: 'swap',
+      action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
+      context: {
+        sent: [netSent[0]],
+        received: [netReceived[0]],
+      },
+    }
+
+    return swapEvent
+  }
+
+  return newEvent
+}
+
+export function genericInterpreter(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = defaultEvent(event)
   const transfers = filterTransfers(event.transfers, {
     excludeDuplicates: true,
@@ -365,7 +400,9 @@ export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedT
       nonZeroTransfers[0].to.toLowerCase() === event.fromAddress.toLowerCase()
         ? event.fromAddress
         : nonZeroTransfers[0].from
+
     const asset = toAssetTransfer(nonZeroTransfers[0])
+
     return {
       ...newEvent,
       type: 'transfer-token',
@@ -375,22 +412,9 @@ export function categorizedDefaultEvent(event: DecodedTransaction): InterpretedT
     }
   }
 
+  //Generic Swap Interpreter
   if (isSwap(event)) {
-    const netSent = getNetTransfers({
-      transfers: event.transfers,
-      fromAddresses: [event.fromAddress],
-    })
-
-    const netReceived = getNetTransfers({
-      transfers: event.transfers,
-      toAddresses: [event.fromAddress],
-    })
-
-    return {
-      ...newEvent,
-      type: 'swap',
-      action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
-    }
+    return genericSwapInterpreter(event)
   }
 
   return newEvent

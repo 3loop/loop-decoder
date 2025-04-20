@@ -49,18 +49,32 @@ export type AssetTransfer = {
   asset: Asset
 }
 
-export type Payment = Omit<AssetTransfer, 'to' | 'from'>
-
-export type InterpretedTransaction = {
+export interface GenericInterpretedTransaction {
+  type: TransactionType
   chain: number
   action: string
   txHash: string
   timestamp: number
   user: Address
   method: string | null
-  type: TransactionType
   assetsSent: AssetTransfer[]
   assetsReceived: AssetTransfer[]
   assetsMinted?: AssetTransfer[]
   assetsBurned?: AssetTransfer[]
 }
+
+export interface InterpretedSwapTransaction extends GenericInterpretedTransaction {
+  type: 'swap'
+  context: {
+    sent: {
+      amount: string
+      asset: Asset
+    }[]
+    received: {
+      amount: string
+      asset: Asset
+    }[]
+  }
+}
+
+export type InterpretedTransaction = GenericInterpretedTransaction | InterpretedSwapTransaction

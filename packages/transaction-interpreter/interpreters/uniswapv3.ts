@@ -1,30 +1,9 @@
-import { displayAsset, defaultEvent, getNetTransfers, isSwap } from './std.js'
+import { genericSwapInterpreter } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
 export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
-  const newEvent = defaultEvent(event)
-  const hasSwap = event.traceCalls.some((call) => call.name === 'swap')
-
-  if (hasSwap && isSwap(event)) {
-    const netSent = getNetTransfers({
-      transfers: event.transfers,
-      fromAddresses: [event.fromAddress],
-    })
-
-    const netReceived = getNetTransfers({
-      transfers: event.transfers,
-      toAddresses: [event.fromAddress],
-    })
-
-    return {
-      ...newEvent,
-      type: 'swap',
-      action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
-    }
-  }
-
-  return newEvent
+  return genericSwapInterpreter(event)
 }
 
 export const contracts = [
