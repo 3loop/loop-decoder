@@ -22,11 +22,22 @@ const make = Effect.gen(function* () {
         id: `${decodedTx.chainID}:${decodedTx.toAddress}`,
       }
     },
-    interpretTx: (decodedTx: DecodedTransaction, interpreter: Interpreter) =>
+    interpretTx: (
+      decodedTx: DecodedTransaction,
+      interpreter: Interpreter,
+      options?: { interpretAsUserAddress?: string },
+    ) =>
       Effect.gen(function* () {
-        const input = stringify(decodedTx)
-        const code = interpreter.schema
-        const result = yield* vm.eval(code + '\n' + 'transformEvent(' + input + ')')
+        let input
+        if (options?.interpretAsUserAddress) {
+          input = stringify({
+            ...decodedTx,
+            fromAddress: options.interpretAsUserAddress,
+          })
+        } else {
+          input = stringify(decodedTx)
+        }
+        const result = yield* vm.eval(interpreter.schema + '\n' + 'transformEvent(' + input + ')')
         return result
       }).pipe(Effect.withSpan('TransactionInterpreter.interpretTx')),
   }

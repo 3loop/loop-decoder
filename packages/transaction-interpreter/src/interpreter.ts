@@ -8,6 +8,9 @@ export interface TransactionInterpreter {
   readonly interpretTx: (
     decodedTx: DecodedTransaction,
     interpreter: Interpreter,
+    options?: {
+      interpretAsUserAddress?: string
+    },
   ) => Effect.Effect<InterpretedTransaction, InterpreterError, never>
 }
 
