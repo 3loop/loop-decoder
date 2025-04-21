@@ -1,5 +1,12 @@
 # @3loop/transaction-interpreter
 
+## 0.11.24
+
+### Patch Changes
+
+- 90248c1: Add options parameter to the transaction interpreter
+- c7c0819: Add context field to the intepreted swap transacitons
+
 ## 0.11.23
 
 ### Patch Changes
