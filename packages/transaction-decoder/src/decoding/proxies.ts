@@ -167,7 +167,7 @@ export const GetProxyResolver = RequestResolver.fromEffect(
       const code = codeResult.right
 
       //If code is empty and it is EOA, return empty result
-      if (!code) return undefined
+      if (!code || code === '0x') return undefined
 
       let proxySlots: StorageSlot[] | undefined
 
@@ -213,8 +213,8 @@ export const GetProxyResolver = RequestResolver.fromEffect(
       )
 
       const res = yield* Effect.all(effects, {
-        concurrency: 'inherit',
-        batching: 'inherit',
+        concurrency: 'unbounded',
+        batching: true,
         mode: 'either',
       })
 

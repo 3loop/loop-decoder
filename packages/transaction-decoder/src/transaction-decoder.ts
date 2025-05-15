@@ -8,7 +8,7 @@ import * as CalldataDecode from './decoding/calldata-decode.js'
 import type { DecodedTransaction, Interaction, ContractData, DecodeResult } from './types.js'
 import { TxType } from './types.js'
 import type { TraceLog } from './schema/trace.js'
-import { getAssetsTransfers } from './transformers/tokens.js'
+import { getAssetTransfers } from './transformers/transfers.js'
 import { getAndCacheContractMeta } from './contract-meta-loader.js'
 import { chainIdToNetwork } from './helpers/networks.js'
 import { stringify } from './helpers/stringify.js'
@@ -112,24 +112,31 @@ export const decodeTransaction = ({
     const decodedDataRight = Either.isRight(decodedData) ? decodedData.right : undefined
     const decodedErrorTraceRight = decodedErrorTrace.filter(Either.isRight).map((r) => r.right)
 
-    const logsErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
-
-    if (logsErrors.length > 0) {
-      yield* Effect.logError(`Logs decode errors: ${stringify(logsErrors)}`)
+    const logsDecodeErrors = decodedLogs.filter(Either.isLeft).map((r) => r.left)
+    if (logsDecodeErrors.length > 0) {
+      yield* Effect.logError(`Logs decode errors: ${stringify(logsDecodeErrors)}`)
     }
 
     if (!nativeTransfer && Either.isLeft(decodedData)) {
       yield* Effect.logError(`Data decode error: ${decodedData.left}`)
     }
 
-    const traceErrors = decodedTrace.filter(Either.isLeft).map((r) => r.left)
-    if (traceErrors.length > 0) {
-      yield* Effect.logError(`Trace decode errors: ${stringify(traceErrors)}`)
+    const traceDecodeErrors = decodedTrace
+      .filter(Either.isLeft)
+      .map((r) => r.left)
+      .filter((error, index, self) => self.findIndex((e) => e.message === error.message) === index)
+
+    if (traceDecodeErrors.length > 0) {
+      yield* Effect.logError(`Trace decode errors: ${stringify(traceDecodeErrors)}`)
     }
 
-    const errorTraceErrors = decodedErrorTrace.filter(Either.isLeft).map((r) => r.left)
-    if (errorTraceErrors.length > 0) {
-      yield* Effect.logError(`ErrorTrace decode errors: ${stringify(errorTraceErrors)}`)
+    const errorTraceDecodeErrors = decodedErrorTrace
+      .filter(Either.isLeft)
+      .map((r) => r.left)
+      .filter((error, index, self) => self.findIndex((e) => e.message === error.message) === index)
+
+    if (errorTraceDecodeErrors.length > 0) {
+      yield* Effect.logError(`ErrorTrace decode errors: ${stringify(errorTraceDecodeErrors)}`)
     }
 
     const interactions: Interaction[] = TraceDecoder.augmentTraceLogs(transaction, decodedLogsRight, trace)
@@ -163,6 +170,12 @@ export const decodeTransaction = ({
 
     const contractMeta = contractsMeta[contractAddress]
 
+    const transfersResult = yield* getAssetTransfers(interactions, value, receipt.from, receipt.to!)
+
+    if (transfersResult.errors.length > 0) {
+      yield* Effect.logError(`Transfers decode errors: ${stringify(transfersResult.errors)}`)
+    }
+
     const decodedTx: DecodedTransaction = {
       txHash: transaction.hash,
       txType: nativeTransfer ? TxType.TRANSFER : TxType.CONTRACT_INTERACTION,
@@ -187,7 +200,7 @@ export const decodeTransaction = ({
       timestamp,
       txIndex: receipt.transactionIndex,
       reverted: receipt.status === 'reverted', // will return true if status==undefined
-      transfers: getAssetsTransfers(interactions, value, receipt.from, receipt.to!),
+      transfers: transfersResult.transfers,
       interactedAddresses,
       addressesMeta: contractsMeta,
       errors: decodedErrorTraceRight.length > 0 ? decodedErrorTraceRight : null,
