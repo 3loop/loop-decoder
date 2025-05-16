@@ -1,5 +1,14 @@
 # @3loop/transaction-interpreter
 
+## 0.11.25
+
+### Patch Changes
+
+- a9a60c3: Bump effect to latest version
+- Updated dependencies [a9a60c3]
+- Updated dependencies [0294025]
+  - @3loop/transaction-decoder@0.27.2
+
 ## 0.11.24
 
 ### Patch Changes
