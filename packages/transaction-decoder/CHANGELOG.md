@@ -1,5 +1,12 @@
 # @3loop/transaction-decoder
 
+## 0.27.2
+
+### Patch Changes
+
+- a9a60c3: Bump effect to latest version
+- 0294025: Errors logging improvements
+
 ## 0.27.1
 
 ### Patch Changes
