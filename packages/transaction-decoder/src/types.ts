@@ -19,7 +19,7 @@ export interface Tree extends Node {
 
 export interface InputArg extends Node {
   value: string | string[]
-  valueDecoded?: DecodeResult | DecodeResult[]
+  valueDecoded?: DecodeResult | DecodeResult[] | TreeNode | TreeNode[]
   components?: never
 }
 
