@@ -63,9 +63,27 @@ export const EXAMPLE_TXS = {
   ],
   'Account Abstraction': [
     {
-      name: 'handleOps',
-      hash: '0xcc1f4e40e1186503bb19b5716c8527947ab4c7e972b79d3d64ad8a015cf10ff8',
-      chainID: 1,
+      name: 'Gnosis 1',
+      hash: '0xc7e7f073a1a92008ca40b2fabda1a03dd6911b421c6389e902f1b09bd8f7a7a0',
+      chainID: 100,
+      interpreter: 'aa',
+    },
+    {
+      name: 'Gnosis 2',
+      hash: '0xba2f3cc1e570d98368ec3d2a5e5cf5a80afc45f00639f7317ee19d00b8be6f09',
+      chainID: 100,
+      interpreter: 'aa',
+    },
+    {
+      name: 'Base 1',
+      hash: '0xc78ddb79bd7b9b1994b2680fbe51a33cc5e46a89edae6e3476ed1356277a1ad0',
+      chainID: 8453,
+      interpreter: 'aa',
+    },
+    {
+      name: 'Base 2',
+      hash: '0xe3fe2af860750fff01d1cc3a88e03daecd9fbb56b6894a9a2bdcb4d6f81cf0a3',
+      chainID: 8453,
       interpreter: 'aa',
     },
   ],
@@ -148,6 +166,12 @@ export const supportedChains: {
     traceAPI: 'geth',
   },
   {
+    name: 'Gnosis mainnet',
+    chainID: 100,
+    rpcUrl: process.env.GNOSIS_RPC_URL as string,
+    // traceAPI: 'geth',
+  },
+  {
     name: 'Polygon Mainnet',
     chainID: 137,
     rpcUrl: (process.env.POLYGON_RPC_URL as string) ?? 'https://rpc.ankr.com/polygon',
@@ -163,12 +187,6 @@ export const supportedChains: {
     name: 'Arbitrum One',
     chainID: 42161,
     rpcUrl: process.env.ARBITRUM_RPC_URL as string,
-    traceAPI: 'geth',
-  },
-  {
-    name: 'Manta pacific',
-    chainID: 169,
-    rpcUrl: (process.env.MANTA_RPC_URL as string) ?? 'https://pacific-rpc.manta.network/http',
     traceAPI: 'geth',
   },
 ]

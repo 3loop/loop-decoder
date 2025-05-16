@@ -2,6 +2,8 @@ import { Effect, Either, RequestResolver, Request, Array, pipe, Data, PrimaryKey
 import { ContractABI } from './abi-strategy/request-model.js'
 import { Abi } from 'viem'
 import * as AbiStore from './abi-store.js'
+import { AA_ABIS, SAFE_MULTISEND_ABI } from './decoding/constants.js'
+import { SAFE_MULTISEND_SIGNATURE } from './decoding/constants.js'
 
 interface LoadParameters {
   readonly chainID: number
@@ -251,6 +253,14 @@ export const getAndCacheAbi = (params: AbiStore.AbiParams) =>
   Effect.gen(function* () {
     if (params.event === '0x' || params.signature === '0x') {
       return yield* Effect.fail(new EmptyCalldataError(params))
+    }
+
+    if (params.signature && params.signature === SAFE_MULTISEND_SIGNATURE) {
+      return yield* Effect.succeed(SAFE_MULTISEND_ABI)
+    }
+
+    if (params.signature && AA_ABIS[params.signature]) {
+      return yield* Effect.succeed(AA_ABIS[params.signature])
     }
 
     return yield* Effect.request(new AbiLoader(params), AbiLoaderRequestResolver)
