@@ -1,15 +1,15 @@
 import { Effect } from 'effect'
-import { Hex, Address, encodeFunctionData, isAddress, getAddress } from 'viem'
+import { Hex, Address, encodeFunctionData, isAddress, getAddress, Abi } from 'viem'
 import { getAndCacheAbi, MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
 import { TreeNode } from '../types.js'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
-import { SAFE_MULTISEND_ABI, SAFE_MULTISEND_SIGNATURE } from './constants.js'
+import { AA_ABIS, SAFE_MULTISEND_ABI, SAFE_MULTISEND_SIGNATURE, SAFE_MULTISEND_NESTED_ABI } from './constants.js'
 import { getProxyImplementation } from './proxies.js'
 import * as AbiStore from '../abi-store.js'
 
-const callDataKeys = ['callData', 'data', '_data']
-const addressKeys = ['to', 'target', '_target']
+const callDataKeys = ['callData', 'data', '_data', 'targetCallData']
+const addressKeys = ['to', 'target', '_target', 'sender']
 
 const decodeBytesRecursively = (
   node: TreeNode,
@@ -112,12 +112,12 @@ const decodeGnosisMultisendParams = (
     const txsEncoded = yield* Effect.try({
       try: () =>
         encodeFunctionData({
-          abi: SAFE_MULTISEND_ABI,
+          abi: SAFE_MULTISEND_NESTED_ABI,
           args: [txs],
         }),
       catch: (error) => new AbiDecoder.DecodeError(`Could not encode multisend transactions`, error),
     })
-    const txsDecoded = yield* AbiDecoder.decodeMethod(txsEncoded, SAFE_MULTISEND_ABI)
+    const txsDecoded = yield* AbiDecoder.decodeMethod(txsEncoded, SAFE_MULTISEND_NESTED_ABI)
 
     if (!txsDecoded || !txsDecoded.params) {
       return inputParams
@@ -157,21 +157,29 @@ export const decodeMethod = ({
     const signature = data.slice(0, 10)
 
     let implementationAddress: Address | undefined
+    let abi: Abi | undefined
 
-    if (isAddress(contractAddress)) {
-      //if contract is a proxy, get the implementation address
-      const implementation = yield* getProxyImplementation({ address: getAddress(contractAddress), chainID })
+    if (signature && AA_ABIS[signature]) {
+      //SPECIAL CASE: Account abstraction operations
+      abi = AA_ABIS[signature]
+    } else if (signature === SAFE_MULTISEND_SIGNATURE) {
+      //SPECIAL CASE: Gnosis Safe multisend
+      abi = SAFE_MULTISEND_ABI
+    } else {
+      if (isAddress(contractAddress)) {
+        const implementation = yield* getProxyImplementation({ address: getAddress(contractAddress), chainID })
 
-      if (implementation) {
-        implementationAddress = implementation.address
+        if (implementation) {
+          implementationAddress = implementation.address
+        }
       }
-    }
 
-    const abi = yield* getAndCacheAbi({
-      address: implementationAddress ?? contractAddress,
-      signature,
-      chainID,
-    })
+      abi = yield* getAndCacheAbi({
+        address: implementationAddress ?? contractAddress,
+        signature,
+        chainID,
+      })
+    }
 
     const decoded = yield* AbiDecoder.decodeMethod(data, abi)
 
@@ -179,9 +187,9 @@ export const decodeMethod = ({
       return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${data}`)
     }
 
-    //MULTISEND: decode the params for the multisend contract which is also related to the safe smart account
+    //MULTISEND: decode nested params for the multisend of the safe smart account
     if (
-      decoded.signature === SAFE_MULTISEND_SIGNATURE &&
+      (signature === SAFE_MULTISEND_SIGNATURE || decoded.signature === 'multiSend(bytes)') &&
       decoded.params != null &&
       decoded.params.find((p) => p.name === 'transactions')
     ) {
