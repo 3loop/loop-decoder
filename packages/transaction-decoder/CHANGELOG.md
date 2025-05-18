@@ -1,5 +1,16 @@
 # @3loop/transaction-decoder
 
+## 0.28.0
+
+### Minor Changes
+
+- 24d5c09: Add decoding of Account Abstraciton user operations
+
+### Patch Changes
+
+- a9a60c3: Bump effect to latest version
+- 0294025: Errors logging improvements
+
 ## 0.27.1
 
 ### Patch Changes
