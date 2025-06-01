@@ -1,6 +1,6 @@
 import { Effect, RequestResolver, Request, Array, Either, pipe, Schema, PrimaryKey, SchemaAST } from 'effect'
 import { ContractData } from './types.js'
-import { GetContractMetaStrategy } from './meta-strategy/request-model.js'
+import * as MetaStrategyExecutor from './meta-strategy/strategy-executor.js'
 import { Address } from 'viem'
 import { ZERO_ADDRESS } from './decoding/constants.js'
 import * as ContractMetaStore from './contract-meta-store.js'
@@ -79,10 +79,22 @@ const setValue = ({ chainID, address }: ContractMetaLoader, result: ContractData
  * inside the resolver's body. We use the `makeKey` function to generate a unique key
  * for each request and group them by that key. We then load the metadata for the unique
  * requests and resolve the pending requests in a group with the same result
+ *
+ * **Circuit Breaking and Resilience**
+ *
+ * The ContractMetaLoader now includes circuit breaking and intelligent concurrency management
+ * by reusing the same resilience infrastructure as the ABI loader:
+ * - Strategy-level circuit breakers prevent cascading failures
+ * - Adaptive concurrency based on success rates and chain health
+ * - Timeout protection for all external strategy calls
+ * - Progressive degradation when strategies become unhealthy
+ * - Request pooling with back-pressure handling
+ * - Shared circuit breaker and request pool instances with ABI loader for consistent behavior
  */
 const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<ContractMetaLoader>) =>
   Effect.gen(function* () {
-    const { strategies } = yield* ContractMetaStore.ContractMetaStore
+    const { strategies, circuitBreaker, requestPool } = yield* ContractMetaStore.ContractMetaStore
+    const metaStrategyExecutor = MetaStrategyExecutor.make(circuitBreaker, requestPool)
 
     const groups = Array.groupBy(requests, makeKey)
     const uniqueRequests = Object.values(groups).map((group) => group[0])
@@ -111,28 +123,31 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
       },
     )
 
-    // Fetch ContractMeta from the strategies
+    // Get optimal concurrency for each chain
+    const concurrencyMap = new Map<number, number>()
+    for (const req of remaining) {
+      if (!concurrencyMap.has(req.chainID)) {
+        const optimalConcurrency = yield* requestPool.getOptimalConcurrency(req.chainID)
+        concurrencyMap.set(req.chainID, optimalConcurrency)
+      }
+    }
+
+    // Fetch ContractMeta from the strategies using circuit breaker and request pool
     const strategyResults = yield* Effect.forEach(
       remaining,
       ({ chainID, address }) => {
         const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
-        // TODO: Distinct the errors and missing data, so we can retry on errors
-        return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-          pipe(
-            Effect.request(
-              new GetContractMetaStrategy({
-                address,
-                chainId: chainID,
-                strategyId: strategy.id,
-              }),
-              strategy.resolver,
-            ),
-            Effect.withRequestCaching(true),
-          ),
-        ).pipe(Effect.orElseSucceed(() => null))
+        return metaStrategyExecutor.executeStrategiesSequentially(allAvailableStrategies, {
+          address,
+          chainId: chainID,
+          strategyId: 'meta-batch',
+        })
       },
-      { concurrency: 'unbounded', batching: true },
+      {
+        concurrency: Math.min(...[...concurrencyMap.values()], 25), // Conservative concurrency
+        batching: true,
+      },
     )
 
     // Store results and resolve pending requests
