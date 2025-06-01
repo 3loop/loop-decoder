@@ -1,6 +1,8 @@
-import { Context, Effect, Layer } from 'effect'
+import { Context, Effect, Layer, MetricLabel } from 'effect'
 import { ContractData } from './types.js'
 import { ContractMetaResolverStrategy } from './meta-strategy/request-model.js'
+import * as CircuitBreaker from './circuit-breaker/circuit-breaker.js'
+import * as RequestPool from './circuit-breaker/request-pool.js'
 
 type ChainOrDefault = number | 'default'
 
@@ -43,9 +45,25 @@ export interface ContractMetaStore {
    */
   readonly get: (arg: ContractMetaParams) => Effect.Effect<ContractMetaResult, never>
   readonly getMany?: (arg: Array<ContractMetaParams>) => Effect.Effect<Array<ContractMetaResult>, never>
+  readonly circuitBreaker: CircuitBreaker.CircuitBreaker<unknown>
+  readonly requestPool: RequestPool.RequestPool
 }
 
 export const ContractMetaStore = Context.GenericTag<ContractMetaStore>('@3loop-decoder/ContractMetaStore')
 
-export const make = (args: ContractMetaStore) => Effect.succeed(ContractMetaStore.of(args))
-export const layer = (args: ContractMetaStore) => Layer.effect(ContractMetaStore, make(args))
+export const make = (args: Omit<ContractMetaStore, 'circuitBreaker' | 'requestPool'>) =>
+  Effect.gen(function* () {
+    const circuitBreaker = yield* CircuitBreaker.make({
+      metricLabels: [MetricLabel.make('service', 'contract-meta-loader')],
+    })
+
+    const requestPool = yield* RequestPool.make({ metricLabels: [MetricLabel.make('service', 'contract-meta-loader')] })
+
+    return {
+      ...args,
+      circuitBreaker,
+      requestPool,
+    }
+  })
+export const layer = (args: Omit<ContractMetaStore, 'circuitBreaker' | 'requestPool'>) =>
+  Layer.effect(ContractMetaStore, make(args))

@@ -2,8 +2,8 @@ import { Effect, Either, RequestResolver, Request, Array, pipe, Data, PrimaryKey
 import { ContractABI } from './abi-strategy/request-model.js'
 import { Abi } from 'viem'
 import * as AbiStore from './abi-store.js'
-import { AA_ABIS, SAFE_MULTISEND_ABI } from './decoding/constants.js'
-import { SAFE_MULTISEND_SIGNATURE } from './decoding/constants.js'
+import * as StrategyExecutorModule from './abi-strategy/strategy-executor.js'
+import { SAFE_MULTISEND_SIGNATURE, SAFE_MULTISEND_ABI, AA_ABIS } from './decoding/constants.js'
 
 interface LoadParameters {
   readonly chainID: number
@@ -126,16 +126,22 @@ const getBestMatch = (abi: ContractABI | null) => {
  * for each request and group them by that key. We then load the ABI for the unique
  * requests and resolve the pending requests in a group with the same result.
  *
+ * **Circuit Breaking and Resilience**
+ *
+ * The AbiLoader now includes circuit breaking and intelligent concurrency management:
+ * - Strategy-level circuit breakers prevent cascading failures
+ * - Adaptive concurrency based on success rates and chain health
+ * - Timeout protection for all external strategy calls
+ * - Progressive degradation when strategies become unhealthy
+ * - Request pooling with back-pressure handling
  */
-const AbiLoaderRequestResolver: Effect.Effect<
-  RequestResolver.RequestResolver<AbiLoader, never>,
-  never,
-  AbiStore.AbiStore
-> = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
+
+export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
   Effect.gen(function* () {
     if (requests.length === 0) return
 
-    const { strategies } = yield* AbiStore.AbiStore
+    const { strategies, circuitBreaker, requestPool } = yield* AbiStore.AbiStore
+    const strategyExecutor = StrategyExecutorModule.make(circuitBreaker, requestPool)
 
     const requestGroups = Array.groupBy(requests, makeRequestKey)
     const uniqueRequests = Object.values(requestGroups).map((group) => group[0])
@@ -167,6 +173,15 @@ const AbiLoaderRequestResolver: Effect.Effect<
       },
     )
 
+    // Get optimal concurrency for each chain
+    const concurrencyMap = new Map<number, number>()
+    for (const req of remaining) {
+      if (!concurrencyMap.has(req.chainID)) {
+        const optimalConcurrency = yield* requestPool.getOptimalConcurrency(req.chainID)
+        concurrencyMap.set(req.chainID, optimalConcurrency)
+      }
+    }
+
     // NOTE: Firstly we batch strategies by address because in a transaction most of events and traces are from the same abi
     const response = yield* Effect.forEach(
       remaining,
@@ -174,19 +189,17 @@ const AbiLoaderRequestResolver: Effect.Effect<
         const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? []).filter(
           (strategy) => strategy.type === 'address',
         )
-        return Effect.validateFirst(allAvailableStrategies, (strategy) => {
-          return strategy.resolver({
+
+        return strategyExecutor
+          .executeStrategiesSequentially(allAvailableStrategies, {
             address: req.address,
             chainId: req.chainID,
-            strategyId: strategy.id,
+            strategyId: 'address-batch',
           })
-        }).pipe(
-          Effect.map(Either.left),
-          Effect.orElseSucceed(() => Either.right(req)),
-        )
+          .pipe(Effect.map((result) => (result ? Either.left(result) : Either.right(req))))
       },
       {
-        concurrency: 'unbounded',
+        concurrency: Math.min(...[...concurrencyMap.values()], 50), // Use minimum to be conservative
       },
     )
 
@@ -200,19 +213,16 @@ const AbiLoaderRequestResolver: Effect.Effect<
           (strategy) => strategy.type === 'fragment',
         )
 
-        // TODO: Distinct the errors and missing data, so we can retry on errors
-        return Effect.validateFirst(allAvailableStrategies, (strategy) =>
-          strategy.resolver({
-            address,
-            chainId: chainID,
-            event,
-            signature,
-            strategyId: strategy.id,
-          }),
-        ).pipe(Effect.orElseSucceed(() => null))
+        return strategyExecutor.executeStrategiesSequentially(allAvailableStrategies, {
+          address,
+          chainId: chainID,
+          event,
+          signature,
+          strategyId: 'fragment-batch',
+        })
       },
       {
-        concurrency: 'unbounded',
+        concurrency: Math.min(...[...concurrencyMap.values()], 25), // More conservative for fragments
         batching: true,
       },
     )
@@ -247,8 +257,9 @@ const AbiLoaderRequestResolver: Effect.Effect<
 // We can decode with Effect.validateFirst(abis, (abi) => decodeMethod(input as Hex, abi)) and to find the first ABIs
 // that decodes successfully. We might enforce a sorted array to prioritize the address match. We will have to think
 // how to handle the strategy resolver in this case. Currently, we stop at first successful strategy, which might result
-// in a missing Fragment. We treat this issue as a minor one for now, as we epect it to occur rarely on contracts that
+// in a missing Fragment. We treat this issue as a minor one for now, as we expect it to occur rarely on contracts that
 // are not verified and with a non standard events structure.
+
 export const getAndCacheAbi = (params: AbiStore.AbiParams) =>
   Effect.gen(function* () {
     if (params.event === '0x' || params.signature === '0x') {
