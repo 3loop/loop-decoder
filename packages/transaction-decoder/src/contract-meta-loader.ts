@@ -138,11 +138,16 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
       ({ chainID, address }) => {
         const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? [])
 
-        return metaStrategyExecutor.executeStrategiesSequentially(allAvailableStrategies, {
-          address,
-          chainId: chainID,
-          strategyId: 'meta-batch',
-        })
+        return metaStrategyExecutor
+          .executeStrategiesSequentially(allAvailableStrategies, {
+            address,
+            chainId: chainID,
+            strategyId: 'meta-batch',
+          })
+          .pipe(
+            Effect.tapError(Effect.logWarning),
+            Effect.orElseSucceed(() => null),
+          )
       },
       {
         concurrency: Math.min(...[...concurrencyMap.values()], 25), // Conservative concurrency

@@ -1,8 +1,17 @@
-import { Effect, Schedule, Duration, pipe } from 'effect'
+import { Effect, Schedule, Duration, pipe, Data } from 'effect'
 import { GetContractABIStrategyParams, ContractAbiResolverStrategy } from '../abi-strategy/request-model.js'
 import type { CircuitBreaker } from '../circuit-breaker/circuit-breaker.js'
 import { RequestPool } from '../circuit-breaker/request-pool.js'
 import * as Constants from '../circuit-breaker/constants.js'
+
+export class MissingHealthyStrategy extends Data.TaggedError('MissingHealthyStrategy')<{
+  chainId: number
+  strategies: string[]
+}> {
+  constructor(params: { chainId: number; strategies: string[] }) {
+    super(params)
+  }
+}
 
 export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) => {
   const executeStrategy = (strategy: ContractAbiResolverStrategy, params: GetContractABIStrategyParams) => {
@@ -44,14 +53,16 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
       }
 
       if (healthyStrategies.length === 0) {
-        yield* Effect.logWarning(`No healthy strategies available for chain ${params.chainId}`)
-        return null
+        return yield* Effect.fail(
+          new MissingHealthyStrategy({
+            chainId: params.chainId,
+            strategies: strategies.map((s) => s.id),
+          }),
+        )
       }
 
       // Try strategies one by one until one succeeds
-      return yield* Effect.validateFirst(healthyStrategies, (strategy) => executeStrategy(strategy, params)).pipe(
-        Effect.orElseSucceed(() => null),
-      )
+      return yield* Effect.validateFirst(healthyStrategies, (strategy) => executeStrategy(strategy, params))
     })
 
   return {

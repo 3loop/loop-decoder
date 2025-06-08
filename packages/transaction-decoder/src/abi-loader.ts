@@ -61,7 +61,7 @@ const getMany = (requests: Array<AbiStore.AbiParams>) =>
       return yield* Effect.all(
         requests.map(({ chainID, address, event, signature }) => get({ chainID, address, event, signature })),
         {
-          concurrency: 'inherit',
+          concurrency: 'unbounded',
           batching: 'inherit',
         },
       )
@@ -170,6 +170,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
       },
       {
         discard: true,
+        concurrency: 'unbounded',
       },
     )
 
@@ -182,6 +183,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
       }
     }
 
+    const concurrency = Math.min(...[...concurrencyMap.values(), 50]) // Use minimum concurrency across all chains, capped at 25
     // NOTE: Firstly we batch strategies by address because in a transaction most of events and traces are from the same abi
     const response = yield* Effect.forEach(
       remaining,
@@ -196,10 +198,14 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
             chainId: req.chainID,
             strategyId: 'address-batch',
           })
-          .pipe(Effect.map((result) => (result ? Either.left(result) : Either.right(req))))
+          .pipe(
+            Effect.tapError(Effect.logWarning),
+            Effect.orElseSucceed(() => null),
+            Effect.map((result) => (result ? Either.left(result) : Either.right(req))),
+          )
       },
       {
-        concurrency: Math.min(...[...concurrencyMap.values()], 50), // Use minimum to be conservative
+        concurrency,
       },
     )
 
@@ -213,16 +219,21 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
           (strategy) => strategy.type === 'fragment',
         )
 
-        return strategyExecutor.executeStrategiesSequentially(allAvailableStrategies, {
-          address,
-          chainId: chainID,
-          event,
-          signature,
-          strategyId: 'fragment-batch',
-        })
+        return strategyExecutor
+          .executeStrategiesSequentially(allAvailableStrategies, {
+            address,
+            chainId: chainID,
+            event,
+            signature,
+            strategyId: 'fragment-batch',
+          })
+          .pipe(
+            Effect.tapError(Effect.logWarning),
+            Effect.orElseSucceed(() => null),
+          ) // If no strategies found, return null
       },
       {
-        concurrency: Math.min(...[...concurrencyMap.values()], 25), // More conservative for fragments
+        concurrency,
         batching: true,
       },
     )
