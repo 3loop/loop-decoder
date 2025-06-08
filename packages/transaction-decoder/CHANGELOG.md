@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.29.0
+
+### Minor Changes
+
+- 4401d28: Implement circuit breaker and request pool for abi and meta strategies
+
 ## 0.28.0
 
 ### Minor Changes
