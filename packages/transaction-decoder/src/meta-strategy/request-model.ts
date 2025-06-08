@@ -18,6 +18,16 @@ export class ResolveStrategyMetaError {
   ) {}
 }
 
+export class MissingMetaError {
+  readonly _tag = 'MissingMetaError'
+  constructor(
+    readonly address: Address,
+    readonly chainId: number,
+    readonly strategyId: string,
+    readonly message: string = 'Missing contract metadata',
+  ) {}
+}
+
 export interface ContractMetaResolverStrategy {
   id: string
   resolver: RequestResolver.RequestResolver<GetContractMetaStrategy, never>
@@ -32,6 +42,7 @@ export class GetContractMetaStrategy extends Schema.TaggedRequest<GetContractMet
       Schema.instanceOf(ResolveStrategyMetaError),
       Schema.instanceOf(UnknownNetwork),
       Schema.instanceOf(RPCFetchError),
+      Schema.instanceOf(MissingMetaError),
     ),
     success: SchemaContractData,
     payload: {
