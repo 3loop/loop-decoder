@@ -31,7 +31,7 @@ export class EmptyCalldataError extends Data.TaggedError('DecodeError')<
   }
 }
 
-class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) {}
+class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) { }
 class AbiLoader extends Schema.TaggedRequest<AbiLoader>()('AbiLoader', {
   failure: Schema.instanceOf(MissingABIError),
   success: SchemaAbi, // Abi
@@ -184,6 +184,9 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     }
 
     const concurrency = Math.min(...[...concurrencyMap.values(), 50]) // Use minimum concurrency across all chains, capped at 25
+
+    yield* Effect.logDebug(`Executing ${remaining.length} remaining requests with concurrency ${concurrency}`)
+
     // NOTE: Firstly we batch strategies by address because in a transaction most of events and traces are from the same abi
     const response = yield* Effect.forEach(
       remaining,
@@ -211,6 +214,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
 
     const [addressStrategyResults, notFound] = Array.partitionMap(response, (res) => res)
 
+    yield* Effect.logDebug(`Address strategies resolved ${addressStrategyResults.length} ABIs, ${notFound.length} not found`)
     // NOTE: Secondly we request strategies to fetch fragments
     const fragmentStrategyResults = yield* Effect.forEach(
       notFound,
