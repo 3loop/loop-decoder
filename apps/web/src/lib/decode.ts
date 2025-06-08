@@ -21,7 +21,7 @@ import { DatabaseLive } from './database'
 
 const LogLevelLive = Layer.unwrapEffect(
   Effect.gen(function* () {
-    const level = LogLevel.All
+    const level = LogLevel.Warning
     return Logger.minimumLogLevel(level)
   }),
 )
@@ -57,9 +57,7 @@ const CacheLayer = Layer.setRequestCache(Request.makeCache({ capacity: 100, time
 const DataLayer = Layer.mergeAll(RPCProviderLive, DatabaseLive)
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, MetaStoreLive)
 
-const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer).pipe(
-  Layer.provide(LogLevelLive),
-)
+const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer).pipe(Layer.provide(LogLevelLive))
 
 const runtime = ManagedRuntime.make(Layer.provide(MainLayer, CacheLayer))
 

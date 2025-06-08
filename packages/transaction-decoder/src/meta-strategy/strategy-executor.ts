@@ -31,11 +31,6 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
       ),
       Effect.withRequestCaching(true),
       Effect.timeout(Duration.decode(Constants.STRATEGY_TIMEOUT)),
-      Effect.retry(
-        Schedule.exponential(Duration.decode(Constants.INITIAL_RETRY_DELAY)).pipe(
-          Schedule.compose(Schedule.recurs(Constants.DEFAULT_RETRY_TIMES)),
-        ),
-      ),
       // Treate MissingMetaError as a success for circuit breaker
       Effect.catchTag('MissingMetaError', (error) => {
         return Effect.gen(function* () {
@@ -43,6 +38,11 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
           return yield* Effect.succeed(error)
         })
       }),
+      Effect.retry(
+        Schedule.exponential(Duration.decode(Constants.INITIAL_RETRY_DELAY)).pipe(
+          Schedule.compose(Schedule.recurs(Constants.DEFAULT_RETRY_TIMES)),
+        ),
+      ),
       (effect) => circuitBreaker.withCircuitBreaker(strategy.id, effect),
       (effect) => requestPool.withPoolManagement(params.chainId, effect),
       Effect.flatMap((data) => (data instanceof MissingMetaError ? Effect.fail(data) : Effect.succeed(data))),

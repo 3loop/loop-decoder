@@ -5,8 +5,8 @@ import { Address } from 'viem'
 import { ZERO_ADDRESS } from './decoding/constants.js'
 import * as ContractMetaStore from './contract-meta-store.js'
 
-class SchemaContractData extends Schema.make<ContractData>(SchemaAST.objectKeyword) { }
-class SchemaAddress extends Schema.make<Address>(SchemaAST.stringKeyword) { }
+class SchemaContractData extends Schema.make<ContractData>(SchemaAST.objectKeyword) {}
+class SchemaAddress extends Schema.make<Address>(SchemaAST.stringKeyword) {}
 
 class ContractMetaLoader extends Schema.TaggedRequest<ContractMetaLoader>()('ContractMetaLoader', {
   failure: Schema.Never,
@@ -120,7 +120,7 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
       },
       {
         discard: true,
-        concurrency: 'unbounded'
+        concurrency: 'unbounded',
       },
     )
 

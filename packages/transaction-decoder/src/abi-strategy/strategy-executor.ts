@@ -18,11 +18,6 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
     return pipe(
       strategy.resolver(params),
       Effect.timeout(Duration.decode(Constants.STRATEGY_TIMEOUT)),
-      Effect.retry(
-        Schedule.exponential(Duration.decode(Constants.INITIAL_RETRY_DELAY)).pipe(
-          Schedule.compose(Schedule.recurs(Constants.DEFAULT_RETRY_TIMES)),
-        ),
-      ),
       Effect.catchTag('MissingABIStrategyError', (error) => {
         // Log error but don't fail the entire operation
         return Effect.gen(function* () {
@@ -30,6 +25,11 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
           return yield* Effect.succeed(error)
         })
       }),
+      Effect.retry(
+        Schedule.exponential(Duration.decode(Constants.INITIAL_RETRY_DELAY)).pipe(
+          Schedule.compose(Schedule.recurs(Constants.DEFAULT_RETRY_TIMES)),
+        ),
+      ),
       (effect) => circuitBreaker.withCircuitBreaker(strategy.id, effect),
       (effect) => requestPool.withPoolManagement(params.chainId, effect),
       Effect.flatMap((data) => (data instanceof MissingABIStrategyError ? Effect.fail(data) : Effect.succeed(data))),

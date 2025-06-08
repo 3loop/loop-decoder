@@ -31,7 +31,7 @@ export class EmptyCalldataError extends Data.TaggedError('DecodeError')<
   }
 }
 
-class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) { }
+class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) {}
 class AbiLoader extends Schema.TaggedRequest<AbiLoader>()('AbiLoader', {
   failure: Schema.instanceOf(MissingABIError),
   success: SchemaAbi, // Abi
@@ -214,7 +214,9 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
 
     const [addressStrategyResults, notFound] = Array.partitionMap(response, (res) => res)
 
-    yield* Effect.logDebug(`Address strategies resolved ${addressStrategyResults.length} ABIs, ${notFound.length} not found`)
+    yield* Effect.logDebug(
+      `Address strategies resolved ${addressStrategyResults.length} ABIs, ${notFound.length} not found`,
+    )
     // NOTE: Secondly we request strategies to fetch fragments
     const fragmentStrategyResults = yield* Effect.forEach(
       notFound,
