@@ -16,6 +16,18 @@ export class ResolveStrategyABIError {
   ) {}
 }
 
+export class MissingABIStrategyError {
+  readonly _tag = 'MissingABIStrategyError'
+  constructor(
+    readonly address: string,
+    readonly chainId: number,
+    readonly strategyId: string,
+    readonly event?: string,
+    readonly signature?: string,
+    readonly message: string = 'Missing contract ABI',
+  ) {}
+}
+
 interface FunctionFragmentABI {
   type: 'func'
   abi: string
@@ -47,7 +59,9 @@ export interface ContractAbiResolverStrategy {
   type: 'address' | 'fragment'
   id: string
   rateLimit?: RateLimiterOptions
-  resolver: (_: GetContractABIStrategyParams) => Effect.Effect<ContractABI[], ResolveStrategyABIError>
+  resolver: (
+    _: GetContractABIStrategyParams,
+  ) => Effect.Effect<ContractABI[], ResolveStrategyABIError | MissingABIStrategyError>
 }
 
 export interface GetContractABIStrategyParams {

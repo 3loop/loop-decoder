@@ -41,7 +41,17 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient): RequestM
         },
       )
 
-      if (!isERC721 && !isERC1155) return yield* Effect.fail(fail)
+      if (!isERC721 && !isERC1155) {
+        // Contract exists but doesn't support NFT interfaces - this is a "no data found" case
+        return yield* Effect.fail(
+          new RequestModel.MissingMetaError(
+            address,
+            chainId,
+            'nft-rpc-strategy',
+            'Contract is not an NFT (ERC721/ERC1155)',
+          ),
+        )
+      }
 
       const erc721inst = getContract({
         abi: erc721Abi,

@@ -1,5 +1,5 @@
 import { getProvider, RPCProviderLive } from './rpc-provider'
-import { Config, Effect, Layer, ManagedRuntime, Request } from 'effect'
+import { Config, Effect, Layer, Logger, LogLevel, ManagedRuntime, Request } from 'effect'
 import {
   DecodedTransaction,
   DecodeResult,
@@ -18,6 +18,13 @@ import {
 import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sql'
 import { Hex } from 'viem'
 import { DatabaseLive } from './database'
+
+const LogLevelLive = Layer.unwrapEffect(
+  Effect.gen(function* () {
+    const level = LogLevel.Warning
+    return Logger.minimumLogLevel(level)
+  }),
+)
 
 const AbiStoreLive = Layer.unwrapEffect(
   Effect.gen(function* () {
@@ -50,7 +57,7 @@ const CacheLayer = Layer.setRequestCache(Request.makeCache({ capacity: 100, time
 const DataLayer = Layer.mergeAll(RPCProviderLive, DatabaseLive)
 const LoadersLayer = Layer.mergeAll(AbiStoreLive, MetaStoreLive)
 
-const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer)
+const MainLayer = Layer.provideMerge(LoadersLayer, DataLayer).pipe(Layer.provide(LogLevelLive))
 
 const runtime = ManagedRuntime.make(Layer.provide(MainLayer, CacheLayer))
 

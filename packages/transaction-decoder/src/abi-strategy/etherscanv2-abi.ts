@@ -3,40 +3,67 @@ import * as RequestModel from './request-model.js'
 
 const endpoint = 'https://api.etherscan.io/v2/api'
 
+type FetchResult =
+  | { type: 'success'; data: RequestModel.ContractABI[] }
+  | { type: 'missing'; reason: string }
+  | { type: 'error'; cause: unknown }
+
 async function fetchContractABI(
   { address, chainId }: RequestModel.GetContractABIStrategyParams,
   config?: { apikey?: string },
-): Promise<RequestModel.ContractABI[]> {
-  const params: Record<string, string> = {
-    module: 'contract',
-    action: 'getabi',
-    chainId: chainId.toString(),
-    address,
+): Promise<FetchResult> {
+  try {
+    const params: Record<string, string> = {
+      module: 'contract',
+      action: 'getabi',
+      chainId: chainId.toString(),
+      address,
+    }
+
+    if (config?.apikey) {
+      params['apikey'] = config.apikey
+    }
+
+    const searchParams = new URLSearchParams(params)
+
+    const response = await fetch(`${endpoint}?${searchParams.toString()}`)
+    const json = (await response.json()) as { status: string; result: string }
+
+    if (json.status === '1') {
+      return {
+        type: 'success',
+        data: [
+          {
+            type: 'address',
+            address,
+            chainID: chainId,
+            abi: json.result,
+          },
+        ],
+      }
+    }
+
+    // If the API request was successful but no ABI was found
+    if (
+      json.status === '0' &&
+      (json.result === 'Contract source code not verified' || json.result.includes('not verified'))
+    ) {
+      return {
+        type: 'missing',
+        reason: `No verified ABI found: ${json.result}`,
+      }
+    }
+
+    return {
+      type: 'error',
+      cause: json,
+    }
+  } catch (error) {
+    return {
+      type: 'error',
+      cause: error,
+    }
   }
-
-  if (config?.apikey) {
-    params['apikey'] = config.apikey
-  }
-
-  const searchParams = new URLSearchParams(params)
-
-  const response = await fetch(`${endpoint}?${searchParams.toString()}`)
-  const json = (await response.json()) as { status: string; result: string }
-
-  if (json.status === '1') {
-    return [
-      {
-        type: 'address',
-        address,
-        chainID: chainId,
-        abi: json.result,
-      },
-    ]
-  }
-
-  throw new Error(`Failed to fetch ABI for ${address} on chain ${chainId}`, {
-    cause: json,
-  })
 }
 
 export const EtherscanV2StrategyResolver = (config?: {
@@ -55,9 +82,25 @@ export const EtherscanV2StrategyResolver = (config?: {
     },
     resolver: (req: RequestModel.GetContractABIStrategyParams) =>
       Effect.withSpan(
-        Effect.tryPromise({
-          try: () => fetchContractABI(req, config),
-          catch: () => new RequestModel.ResolveStrategyABIError('etherscanV2', req.address, req.chainId),
+        Effect.gen(function* () {
+          const result = yield* Effect.promise(() => fetchContractABI(req, config))
+
+          if (result.type === 'success') {
+            return result.data
+          } else if (result.type === 'missing') {
+            return yield* Effect.fail(
+              new RequestModel.MissingABIStrategyError(
+                req.address,
+                req.chainId,
+                'etherscanV2-strategy',
+                undefined,
+                undefined,
+                result.reason,
+              ),
+            )
+          } else {
+            return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('etherscanV2', req.address, req.chainId))
+          }
         }),
         'AbiStrategy.EtherscanV2StrategyResolver',
         { attributes: { chainId: req.chainId, address: req.address } },
