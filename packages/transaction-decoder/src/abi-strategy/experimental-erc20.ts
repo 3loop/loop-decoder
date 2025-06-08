@@ -44,7 +44,17 @@ const getLocalFragments = (service: PublicClient, { address, chainId }: RequestM
       ] as RequestModel.ContractABI[]
     }
 
-    return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId))
+    // Contract exists but is not an ERC20 token - this is a "no data found" case
+    return yield* Effect.fail(
+      new RequestModel.MissingABIStrategyError(
+        address,
+        chainId,
+        'experimental-erc20-strategy',
+        undefined,
+        undefined,
+        'Contract is not an ERC20 token',
+      ),
+    )
   })
 
 export const ExperimentalErc20AbiStrategyResolver = (

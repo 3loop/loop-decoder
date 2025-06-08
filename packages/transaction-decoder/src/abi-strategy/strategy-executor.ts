@@ -1,5 +1,5 @@
 import { Effect, Schedule, Duration, pipe, Data } from 'effect'
-import { GetContractABIStrategyParams, ContractAbiResolverStrategy, MissingABIError } from './request-model.js'
+import { GetContractABIStrategyParams, ContractAbiResolverStrategy, MissingABIStrategyError } from './request-model.js'
 import type { CircuitBreaker } from '../circuit-breaker/circuit-breaker.js'
 import { RequestPool } from '../circuit-breaker/request-pool.js'
 import * as Constants from '../circuit-breaker/constants.js'
@@ -23,7 +23,7 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
           Schedule.compose(Schedule.recurs(Constants.DEFAULT_RETRY_TIMES)),
         ),
       ),
-      Effect.catchTag('MissingABIError', (error) => {
+      Effect.catchTag('MissingABIStrategyError', (error) => {
         // Log error but don't fail the entire operation
         return Effect.gen(function* () {
           yield* Effect.logWarning(`Strategy ${strategy.id} found no ABI: ${error.message}`)
@@ -32,7 +32,7 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
       }),
       (effect) => circuitBreaker.withCircuitBreaker(strategy.id, effect),
       (effect) => requestPool.withPoolManagement(params.chainId, effect),
-      Effect.flatMap((data) => (data instanceof MissingABIError ? Effect.fail(data) : Effect.succeed(data))),
+      Effect.flatMap((data) => (data instanceof MissingABIStrategyError ? Effect.fail(data) : Effect.succeed(data))),
     )
   }
 

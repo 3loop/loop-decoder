@@ -11,10 +11,16 @@ export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) => ({
       const proxyResult = yield* getProxyImplementation({ address, chainID: chainId })
       const { address: implementationAddress, type: proxyType } = proxyResult ?? {}
 
-      const fail = new RequestModel.ResolveStrategyMetaError('ProxyRPCStrategy', address, chainId)
-
       if (!implementationAddress || !proxyType) {
-        return yield* Effect.fail(fail)
+        // Contract exists but is not a recognized proxy - this is a "no data found" case
+        return yield* Effect.fail(
+          new RequestModel.MissingMetaError(
+            address,
+            chainId,
+            'proxy-rpc-strategy',
+            'Contract is not a recognized proxy',
+          ),
+        )
       }
 
       let meta: ContractData | undefined
@@ -39,7 +45,10 @@ export const ProxyRPCStrategyResolver = (publicClientLive: PublicClient) => ({
       // }
 
       if (!meta) {
-        return yield* Effect.fail(fail)
+        // Proxy detected but not supported type - this is a "no data found" case
+        return yield* Effect.fail(
+          new RequestModel.MissingMetaError(address, chainId, 'proxy-rpc-strategy', 'Proxy type not supported'),
+        )
       }
 
       return meta

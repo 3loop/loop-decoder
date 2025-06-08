@@ -44,7 +44,10 @@ export const ERC20RPCStrategyResolver = (
       })
 
       if (decimalsResponse.status !== 'success') {
-        return yield* Effect.fail(fail)
+        // Contract exists but doesn't have ERC20 decimals - this is a "no data found" case
+        return yield* Effect.fail(
+          new RequestModel.MissingMetaError(address, chainId, 'erc20-rpc-strategy', 'Contract is not an ERC20 token'),
+        )
       }
 
       const meta: ContractData = {
