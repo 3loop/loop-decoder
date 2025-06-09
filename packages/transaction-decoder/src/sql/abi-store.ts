@@ -139,6 +139,93 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
               result: null,
             }
           }),
+
+        getMany: (keys) =>
+          Effect.gen(function* () {
+            if (keys.length === 0) {
+              return []
+            }
+
+            // Build a batch query for all the keys
+            const conditions = keys.map(({ address, signature, event, chainID }) => {
+              const addressQuery = sql.and([
+                sql`address = ${address.toLowerCase()}`,
+                sql`chain = ${chainID}`,
+                sql`type = 'address'`,
+              ])
+
+              const signatureQuery = signature
+                ? sql.and([sql`signature = ${signature}`, sql`type = 'func'`])
+                : undefined
+              const eventQuery = event ? sql.and([sql`event = ${event}`, sql`type = 'event'`]) : undefined
+
+              return signature == null && event == null
+                ? addressQuery
+                : sql.or([addressQuery, signatureQuery, eventQuery].filter(Boolean))
+            })
+
+            const batchQuery = sql.or(conditions)
+
+            const allItems = yield* sql`SELECT * FROM ${table} WHERE ${batchQuery}`.pipe(
+              Effect.tapError(Effect.logError),
+              Effect.catchAll(() => Effect.succeed([])),
+            )
+
+            // Process results for each key
+            return keys.map(({ address, signature, event, chainID }) => {
+              const keyItems = allItems.filter((item) => {
+                // Match by address and chain
+                if (
+                  typeof item.address === 'string' &&
+                  item.address.toLowerCase() === address.toLowerCase() &&
+                  item.chain === chainID
+                ) {
+                  return true
+                }
+                // Match by signature
+                if (signature && item.signature === signature && item.type === 'func') {
+                  return true
+                }
+                // Match by event
+                if (event && item.event === event && item.type === 'event') {
+                  return true
+                }
+                return false
+              })
+
+              const successItems = keyItems.filter((item) => item.status === 'success')
+
+              const item =
+                successItems.find((item) => {
+                  // Prioritize address over fragments
+                  return item.type === 'address'
+                }) ?? successItems[0]
+
+              if (item != null) {
+                return {
+                  status: 'success',
+                  result: {
+                    type: item.type,
+                    event: item.event,
+                    signature: item.signature,
+                    address,
+                    chainID,
+                    abi: item.abi,
+                  },
+                } as AbiStore.ContractAbiResult
+              } else if (keyItems[0] != null && keyItems[0].status === 'not-found') {
+                return {
+                  status: 'not-found',
+                  result: null,
+                }
+              }
+
+              return {
+                status: 'empty',
+                result: null,
+              }
+            })
+          }),
       })
     }),
   )

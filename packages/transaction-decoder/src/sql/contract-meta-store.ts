@@ -107,6 +107,65 @@ export const make = (strategies: ContractMetaStore.ContractMetaStore['strategies
               result: null,
             }
           }),
+        getMany: (params) =>
+          Effect.gen(function* () {
+            if (params.length === 0) {
+              return []
+            }
+
+            // Build WHERE conditions for batch select using OR clauses
+            const whereConditions = params.map(({ address, chainID }) =>
+              sql.and([sql`address = ${address.toLowerCase()}`, sql`chain = ${chainID}`]),
+            )
+
+            const items = yield* sql`
+              SELECT * FROM ${table}
+              WHERE ${sql.or(whereConditions)}
+            `.pipe(
+              Effect.tapError(Effect.logError),
+              Effect.catchAll(() => Effect.succeed([])),
+            )
+
+            // Create a map for O(1) lookup of results
+            const itemsMap = new Map<string, any>()
+            items.forEach((item) => {
+              const address =
+                typeof item.address === 'string' ? item.address.toLowerCase() : String(item.address).toLowerCase()
+              const key = `${address}-${item.chain}`
+              itemsMap.set(key, item)
+            })
+
+            // Build results array in the same order as input params
+            return params.map(({ address, chainID }) => {
+              const key = `${address.toLowerCase()}-${chainID}`
+              const item = itemsMap.get(key)
+
+              if (item && item.status === 'success') {
+                return {
+                  status: 'success',
+                  result: {
+                    contractAddress: address,
+                    contractName: item.contract_name,
+                    tokenSymbol: item.token_symbol,
+                    decimals: item.decimals,
+                    type: item.type,
+                    address,
+                    chainID,
+                  } as ContractData,
+                }
+              } else if (item && item.status === 'not-found') {
+                return {
+                  status: 'not-found',
+                  result: null,
+                }
+              }
+
+              return {
+                status: 'empty',
+                result: null,
+              }
+            }) as ContractMetaStore.ContractMetaResult[]
+          }),
       })
     }),
   )
