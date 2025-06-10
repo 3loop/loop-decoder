@@ -3,6 +3,60 @@ import { Effect, Layer } from 'effect'
 import * as ContractMetaStore from '../contract-meta-store.js'
 import { ContractData } from '../types.js'
 
+// Utility function to build query conditions for a single key
+const buildQueryForKey = (sql: SqlClient.SqlClient, { address, chainID }: { address: string; chainID: number }) => {
+  return sql.and([sql`address = ${address.toLowerCase()}`, sql`chain = ${chainID}`])
+}
+
+// Convert database items to result format
+const createResult = (
+  items: readonly any[],
+  address: string,
+  chainID: number,
+): ContractMetaStore.ContractMetaResult => {
+  const successItems = items.filter((item) => item.status === 'success')
+  const item = successItems[0]
+
+  if (item != null && item.status === 'success') {
+    return {
+      status: 'success',
+      result: {
+        contractAddress: address,
+        contractName: item.contract_name,
+        tokenSymbol: item.token_symbol,
+        decimals: item.decimals,
+        type: item.type,
+        address,
+        chainID,
+      } as ContractData,
+    }
+  } else if (items[0] != null && items[0].status === 'not-found') {
+    return {
+      status: 'not-found',
+      result: null,
+    }
+  }
+
+  return {
+    status: 'empty',
+    result: null,
+  }
+}
+
+// Build lookup map for efficient batch processing
+const buildLookupMap = (allItems: readonly any[]) => {
+  const lookupMap = new Map<string, any>()
+
+  for (const item of allItems) {
+    if (typeof item.address === 'string' && typeof item.chain === 'number') {
+      const key = `${item.address.toLowerCase()}-${item.chain}`
+      lookupMap.set(key, item)
+    }
+  }
+
+  return lookupMap
+}
+
 export const make = (strategies: ContractMetaStore.ContractMetaStore['strategies']) =>
   Layer.effect(
     ContractMetaStore.ContractMetaStore,
@@ -68,103 +122,49 @@ export const make = (strategies: ContractMetaStore.ContractMetaStore['strategies
             Effect.tapError(Effect.logError),
             Effect.catchAll(() => Effect.succeed(null)),
           ),
+
         get: ({ address, chainID }) =>
           Effect.gen(function* () {
-            const items = yield* sql`
-            SELECT * FROM ${table}
-            WHERE ${sql.and([sql`address = ${address.toLowerCase()}`, sql`chain = ${chainID}`])}
-          `.pipe(
-              Effect.tapError(Effect.logError),
-              Effect.catchAll(() => Effect.succeed([])),
-            )
-
-            const successItems = items.filter((item) => item.status === 'success')
-
-            const item = successItems[0]
-
-            if (item != null && item.status === 'success') {
-              return {
-                status: 'success',
-                result: {
-                  contractAddress: address,
-                  contractName: item.contract_name,
-                  tokenSymbol: item.token_symbol,
-                  decimals: item.decimals,
-                  type: item.type,
-                  address,
-                  chainID,
-                } as ContractData,
-              }
-            } else if (items[0] != null && items[0].status === 'not-found') {
-              return {
-                status: 'not-found',
-                result: null,
-              }
-            }
-
-            return {
-              status: 'empty',
-              result: null,
-            }
-          }),
-        getMany: (params) =>
-          Effect.gen(function* () {
-            if (params.length === 0) {
-              return []
-            }
-
-            // Build WHERE conditions for batch select using OR clauses
-            const whereConditions = params.map(({ address, chainID }) =>
-              sql.and([sql`address = ${address.toLowerCase()}`, sql`chain = ${chainID}`]),
-            )
+            const query = buildQueryForKey(sql, { address, chainID })
 
             const items = yield* sql`
               SELECT * FROM ${table}
-              WHERE ${sql.or(whereConditions)}
+              WHERE ${query}
             `.pipe(
               Effect.tapError(Effect.logError),
               Effect.catchAll(() => Effect.succeed([])),
             )
 
-            // Create a map for O(1) lookup of results
-            const itemsMap = new Map<string, any>()
-            items.forEach((item) => {
-              const address =
-                typeof item.address === 'string' ? item.address.toLowerCase() : String(item.address).toLowerCase()
-              const key = `${address}-${item.chain}`
-              itemsMap.set(key, item)
-            })
+            return createResult(items, address, chainID)
+          }),
 
-            // Build results array in the same order as input params
+        getMany: (params) =>
+          Effect.gen(function* () {
+            if (params.length === 0) return []
+
+            // Single database query for all keys
+            const conditions = params.map((key) => buildQueryForKey(sql, key))
+            const batchQuery = sql.or(conditions)
+
+            const allItems = yield* sql`
+              SELECT * FROM ${table}
+              WHERE ${batchQuery}
+            `.pipe(
+              Effect.tapError(Effect.logError),
+              Effect.catchAll(() => Effect.succeed([])),
+            )
+
+            // Build efficient lookup map once
+            const lookupMap = buildLookupMap(allItems)
+
+            // Process results for each key using lookup map
             return params.map(({ address, chainID }) => {
               const key = `${address.toLowerCase()}-${chainID}`
-              const item = itemsMap.get(key)
+              const item = lookupMap.get(key)
+              const items = item ? [item] : []
 
-              if (item && item.status === 'success') {
-                return {
-                  status: 'success',
-                  result: {
-                    contractAddress: address,
-                    contractName: item.contract_name,
-                    tokenSymbol: item.token_symbol,
-                    decimals: item.decimals,
-                    type: item.type,
-                    address,
-                    chainID,
-                  } as ContractData,
-                }
-              } else if (item && item.status === 'not-found') {
-                return {
-                  status: 'not-found',
-                  result: null,
-                }
-              }
-
-              return {
-                status: 'empty',
-                result: null,
-              }
-            }) as ContractMetaStore.ContractMetaResult[]
+              return createResult(items, address, chainID)
+            })
           }),
       })
     }),
