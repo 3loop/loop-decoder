@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.29.1
+
+### Patch Changes
+
+- 7a408f8: Update ABI strategy errors and log levels
+
 ## 0.29.0
 
 ### Minor Changes
