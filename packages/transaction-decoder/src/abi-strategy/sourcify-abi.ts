@@ -96,7 +96,9 @@ export const SourcifyStrategyResolver = (): RequestModel.ContractAbiResolverStra
               ),
             )
           } else {
-            return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('sourcify', req.address, req.chainId))
+            return yield* Effect.fail(
+              new RequestModel.ResolveStrategyABIError('sourcify', req.address, req.chainId, String(result.cause)),
+            )
           }
         }),
         'AbiStrategy.SourcifyStrategyResolver',

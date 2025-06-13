@@ -119,7 +119,12 @@ export const FourByteStrategyResolver = (): RequestModel.ContractAbiResolverStra
             )
           } else {
             return yield* Effect.fail(
-              new RequestModel.ResolveStrategyABIError('4byte.directory', req.address, req.chainId),
+              new RequestModel.ResolveStrategyABIError(
+                '4byte.directory',
+                req.address,
+                req.chainId,
+                String(result.cause),
+              ),
             )
           }
         }),

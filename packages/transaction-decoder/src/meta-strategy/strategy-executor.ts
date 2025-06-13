@@ -34,7 +34,7 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
       // Treate MissingMetaError as a success for circuit breaker
       Effect.catchTag('MissingMetaError', (error) => {
         return Effect.gen(function* () {
-          yield* Effect.logWarning(`Meta strategy ${strategy.id} found no metadata: ${error.message}`)
+          yield* Effect.logDebug(`Meta strategy ${strategy.id} found no metadata: ${error.message}`)
           return yield* Effect.succeed(error)
         })
       }),

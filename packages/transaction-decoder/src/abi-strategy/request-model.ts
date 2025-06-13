@@ -1,4 +1,4 @@
-import { Effect, RateLimiter } from 'effect'
+import { Data, Effect, RateLimiter } from 'effect'
 
 export interface FetchABIParams {
   readonly chainID: number
@@ -7,25 +7,35 @@ export interface FetchABIParams {
   readonly signature?: string | undefined
 }
 
-export class ResolveStrategyABIError {
-  readonly _tag = 'ResolveStrategyABIError'
-  constructor(
-    readonly resolverName: string,
-    readonly address: string,
-    readonly chain: number,
-  ) {}
+export class ResolveStrategyABIError extends Data.TaggedError('ResolveStrategyABIError')<{
+  resolver: string
+  address: string
+  chainID: number
+  message: string
+}> {
+  constructor(resolver: string, address: string, chainID: number, message: string) {
+    super({ resolver, address, chainID, message })
+  }
 }
 
-export class MissingABIStrategyError {
-  readonly _tag = 'MissingABIStrategyError'
+export class MissingABIStrategyError extends Data.TaggedError('MissingABIStrategyError')<{
+  address: string
+  chainId: number
+  strategyId: string
+  event?: string
+  signature?: string
+  message: string
+}> {
   constructor(
-    readonly address: string,
-    readonly chainId: number,
-    readonly strategyId: string,
-    readonly event?: string,
-    readonly signature?: string,
-    readonly message: string = 'Missing contract ABI',
-  ) {}
+    address: string,
+    chainId: number,
+    strategyId: string,
+    event?: string,
+    signature?: string,
+    message = 'Missing contract ABI',
+  ) {
+    super({ address, chainId, strategyId, event, signature, message })
+  }
 }
 
 interface FunctionFragmentABI {

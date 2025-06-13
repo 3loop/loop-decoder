@@ -91,7 +91,9 @@ export const BlockscoutStrategyResolver = (config: {
               ),
             )
           } else {
-            return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('Blockscout', req.address, req.chainId))
+            return yield* Effect.fail(
+              new RequestModel.ResolveStrategyABIError('Blockscout', req.address, req.chainId, String(result.cause)),
+            )
           }
         }),
         'AbiStrategy.BlockscoutStrategyResolver',
