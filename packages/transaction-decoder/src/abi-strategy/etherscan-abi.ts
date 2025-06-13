@@ -136,7 +136,9 @@ export const EtherscanStrategyResolver = (config?: {
               ),
             )
           } else {
-            return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('etherscan', req.address, req.chainId))
+            return yield* Effect.fail(
+              new RequestModel.ResolveStrategyABIError('etherscan', req.address, req.chainId, String(result.cause)),
+            )
           }
         }),
         'AbiStrategy.EtherscanStrategyResolver',

@@ -6,13 +6,15 @@ import { erc20Abi, getAddress, getContract } from 'viem'
 const getLocalFragments = (service: PublicClient, { address, chainId }: RequestModel.GetContractABIStrategyParams) =>
   Effect.gen(function* () {
     if (!address)
-      return yield* Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId))
+      return yield* Effect.fail(
+        new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId, 'Address is required'),
+      )
 
     const client = yield* service
       .getPublicClient(chainId)
       .pipe(
-        Effect.catchAll(() =>
-          Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId)),
+        Effect.catchAll((e) =>
+          Effect.fail(new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId, String(e))),
         ),
       )
 
@@ -23,14 +25,12 @@ const getLocalFragments = (service: PublicClient, { address, chainId }: RequestM
           address: getAddress(address),
           client: client.client,
         }),
-      catch: () => {
-        throw new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId)
-      },
+      catch: (e) => new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId, String(e)),
     })
 
     const decimals = yield* Effect.tryPromise({
       try: () => inst.read.decimals(),
-      catch: () => new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId),
+      catch: (e) => new RequestModel.ResolveStrategyABIError('local-strategy', address, chainId, String(e)),
     })
 
     if (decimals != null) {

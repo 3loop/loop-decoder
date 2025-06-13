@@ -21,7 +21,7 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
       Effect.catchTag('MissingABIStrategyError', (error) => {
         // Log error but don't fail the entire operation
         return Effect.gen(function* () {
-          yield* Effect.logWarning(`Strategy ${strategy.id} found no ABI: ${error.message}`)
+          yield* Effect.logDebug(`Strategy ${strategy.id} found no ABI: ${error.message}`)
           return yield* Effect.succeed(error)
         })
       }),

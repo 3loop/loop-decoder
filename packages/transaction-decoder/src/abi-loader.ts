@@ -202,7 +202,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
             strategyId: 'address-batch',
           })
           .pipe(
-            Effect.tapError(Effect.logWarning),
+            Effect.tapError(Effect.logDebug),
             Effect.orElseSucceed(() => null),
             Effect.map((result) => (result ? Either.left(result) : Either.right(req))),
           )
@@ -234,7 +234,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
             strategyId: 'fragment-batch',
           })
           .pipe(
-            Effect.tapError(Effect.logWarning),
+            Effect.tapError(Effect.logDebug),
             Effect.orElseSucceed(() => null),
           ) // If no strategies found, return null
       },

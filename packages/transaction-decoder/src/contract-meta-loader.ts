@@ -150,7 +150,7 @@ const ContractMetaLoaderRequestResolver = RequestResolver.makeBatched((requests:
             strategyId: 'meta-batch',
           })
           .pipe(
-            Effect.tapError(Effect.logWarning),
+            Effect.tapError(Effect.logDebug),
             Effect.orElseSucceed(() => null),
           )
       },
