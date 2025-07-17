@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.29.2
+
+### Patch Changes
+
+- c197f2d: Implement getMany for meta and abi sql store
+
 ## 0.29.1
 
 ### Patch Changes
