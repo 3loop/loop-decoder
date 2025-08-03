@@ -16,30 +16,34 @@ export const MockedAbiStoreLive = AbiStore.layer({
           ]
         : [],
   },
-  set: (key, response) =>
+  set: (key, abis) =>
     Effect.gen(function* () {
-      if (response.status !== 'success') return
+      for (const abi of abis) {
+        if (abi.status !== 'success') continue
 
-      const { key, value } = Match.value(response.result).pipe(
-        Match.when({ type: 'address' } as const, (value) => ({
-          key: value.address.toLowerCase(),
-          value: value.abi,
-        })),
-        Match.when({ type: 'func' } as const, (value) => ({
-          key: value.signature.toLowerCase(),
-          value: value.abi,
-        })),
-        Match.when({ type: 'event' } as const, (value) => ({
-          key: value.event.toLowerCase(),
-          value: value.abi,
-        })),
-        Match.exhaustive,
-      )
+        const { key, value } = Match.value(abi).pipe(
+          Match.when({ type: 'address' } as const, (value) => ({
+            key: value.address.toLowerCase(),
+            value: value.abi,
+          })),
+          Match.when({ type: 'func' } as const, (value) => ({
+            key: value.signature.toLowerCase(),
+            value: value.abi,
+          })),
+          Match.when({ type: 'event' } as const, (value) => ({
+            key: value.event.toLowerCase(),
+            value: value.abi,
+          })),
+          Match.exhaustive,
+        )
 
-      yield* Effect.sync(() => fs.writeFileSync(`./test/mocks/abi/${key}.json`, value))
+        yield* Effect.sync(() => fs.writeFileSync(`./test/mocks/abi/${key}.json`, value))
+      }
     }),
   get: ({ address, signature, event }) =>
     Effect.gen(function* () {
+      const results: AbiStore.ContractAbiResult = []
+
       const addressExists = yield* Effect.sync(() => fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`))
 
       if (addressExists) {
@@ -47,15 +51,13 @@ export const MockedAbiStoreLive = AbiStore.layer({
           () => fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
         )
 
-        return {
+        results.push({
+          type: 'address',
+          abi,
+          address,
+          chainID: 1,
           status: 'success',
-          result: {
-            type: 'address',
-            abi,
-            address,
-            chainID: 1,
-          },
-        }
+        })
       }
 
       const sig = signature ?? event
@@ -69,34 +71,27 @@ export const MockedAbiStoreLive = AbiStore.layer({
           )
 
           if (signature) {
-            return {
+            results.push({
+              type: 'func',
+              abi: signatureAbi,
+              address,
+              chainID: 1,
+              signature,
               status: 'success',
-              result: {
-                type: 'func',
-                abi: signatureAbi,
-                address,
-                chainID: 1,
-                signature,
-              },
-            }
+            })
           } else if (event) {
-            return {
+            results.push({
+              type: 'event',
+              abi: signatureAbi,
+              address,
+              chainID: 1,
+              event,
               status: 'success',
-              result: {
-                type: 'event',
-                abi: signatureAbi,
-                address,
-                chainID: 1,
-                event,
-              },
-            }
+            })
           }
         }
       }
 
-      return {
-        status: 'empty',
-        result: null,
-      }
+      return results
     }),
 })

@@ -44,6 +44,10 @@ interface FunctionFragmentABI {
   address: string
   chainID: number
   signature: string
+  id?: string | number
+  source?: string
+  status: 'success' | 'invalid' | 'not-found'
+  timestamp?: string
 }
 
 interface EventFragmentABI {
@@ -52,6 +56,10 @@ interface EventFragmentABI {
   address: string
   chainID: number
   event: string
+  id?: string | number
+  source?: string
+  status: 'success' | 'invalid' | 'not-found'
+  timestamp?: string
 }
 
 interface AddressABI {
@@ -59,6 +67,10 @@ interface AddressABI {
   abi: string
   address: string
   chainID: number
+  id?: string | number
+  source?: string
+  status: 'success' | 'invalid' | 'not-found'
+  timestamp?: string
 }
 
 export type ContractABI = FunctionFragmentABI | EventFragmentABI | AddressABI

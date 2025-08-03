@@ -26,15 +26,13 @@ describe('Transaction Decoder', () => {
           const addressExists = fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`)
 
           if (addressExists) {
-            return {
+            return [{
+              type: 'address',
+              abi: fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
+              address,
+              chainID: 5,
               status: 'success',
-              result: {
-                type: 'address',
-                abi: fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
-                address,
-                chainID: 5,
-              },
-            }
+            }]
           }
 
           const sig = signature ?? event
@@ -42,34 +40,27 @@ describe('Transaction Decoder', () => {
             const signatureAbi = fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString()
 
             if (signature) {
-              return {
+              return [{
+                type: 'func',
+                abi: signatureAbi,
+                address,
+                chainID: 1,
+                signature,
                 status: 'success',
-                result: {
-                  type: 'func',
-                  abi: signatureAbi,
-                  address,
-                  chainID: 1,
-                  signature,
-                },
-              }
+              }]
             } else if (event) {
-              return {
+              return [{
+                type: 'event',
+                abi: signatureAbi,
+                address,
+                chainID: 1,
+                event,
                 status: 'success',
-                result: {
-                  type: 'event',
-                  abi: signatureAbi,
-                  address,
-                  chainID: 1,
-                  event,
-                },
-              }
+              }]
             }
           }
 
-          return {
-            status: 'empty',
-            result: null,
-          }
+          return []
         },
         set: async () => {
           console.debug('Not implemented')

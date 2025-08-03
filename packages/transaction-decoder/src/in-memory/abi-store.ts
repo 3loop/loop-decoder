@@ -11,42 +11,48 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
       strategies,
       set: (_key, value) =>
         Effect.sync(() => {
-          if (value.status === 'success') {
-            if (value.result.type === 'address') {
-              abiCache.set(value.result.address, value.result)
-            } else if (value.result.type === 'event') {
-              abiCache.set(value.result.event, value.result)
-            } else if (value.result.type === 'func') {
-              abiCache.set(value.result.signature, value.result)
+          for (const abi of value) {
+            if (abi.type === 'address') {
+              abiCache.set(abi.address, abi)
+            } else if (abi.type === 'event') {
+              abiCache.set(abi.event, abi)
+            } else if (abi.type === 'func') {
+              abiCache.set(abi.signature, abi)
             }
           }
         }),
       get: (key) =>
         Effect.sync(() => {
+          const results: ContractABI[] = []
+
+          // Collect all matching ABIs
           if (abiCache.has(key.address)) {
-            return {
-              status: 'success',
-              result: abiCache.get(key.address)!,
-            }
+            results.push(abiCache.get(key.address)!)
           }
 
           if (key.event && abiCache.has(key.event)) {
-            return {
-              status: 'success',
-              result: abiCache.get(key.event)!,
-            }
+            results.push(abiCache.get(key.event)!)
           }
 
           if (key.signature && abiCache.has(key.signature)) {
-            return {
-              status: 'success',
-              result: abiCache.get(key.signature)!,
-            }
+            results.push(abiCache.get(key.signature)!)
           }
 
-          return {
-            status: 'empty',
-            result: null,
+          return results
+        }),
+      updateStatus: (id, status) =>
+        Effect.sync(() => {
+          // For in-memory store, we need to find the ABI by ID and update its status
+          // Since we don't have ID-based lookup in memory, we'll iterate through cache
+          for (const [key, abi] of abiCache.entries()) {
+            if (abi.id === id) {
+              // Create a new ABI object with updated status
+              // Note: For in-memory, we can't actually change the status of the result
+              // since it's used in ContractAbiResult. This is a limitation of the in-memory approach.
+              // In practice, you'd want to remove invalid ABIs from cache or mark them differently.
+              abiCache.delete(key)
+              break
+            }
           }
         }),
     }),

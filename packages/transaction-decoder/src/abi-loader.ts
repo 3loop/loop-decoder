@@ -71,6 +71,7 @@ const getMany = (requests: Array<AbiStore.AbiParams>) =>
 const setValue = (key: AbiLoader, abi: ContractABI | null) =>
   Effect.gen(function* () {
     const { set } = yield* AbiStore.AbiStore
+    const abiWithStatus = abi ? { ...abi, status: 'success' as const } : null
     yield* set(
       {
         chainID: key.chainID,
@@ -78,18 +79,59 @@ const setValue = (key: AbiLoader, abi: ContractABI | null) =>
         event: key.event,
         signature: key.signature,
       },
-      abi == null ? { status: 'not-found', result: null } : { status: 'success', result: abi },
+      abiWithStatus ? [abiWithStatus] : [],
     )
   })
 
-const getBestMatch = (abi: ContractABI | null) => {
-  if (abi == null) return null
+/**
+ * Selects the best ABI from multiple matches based on priority rules:
+ * 1. Prioritize 'success' status over 'invalid' or 'not-found'
+ * 2. Prioritize 'address' type over fragments ('func', 'event')
+ * 3. Prioritize known sources over 'unknown'
+ * 4. Prioritize newer timestamps
+ */
+export const selectBestAbi = (abis: ContractABI[]): ContractABI | null => {
+  if (abis.length === 0) return null
+  if (abis.length === 1) return abis[0]
 
-  if (abi.type === 'address') {
-    return JSON.parse(abi.abi) as Abi
+  // Sort by priority criteria
+  const sorted = abis.sort((a, b) => {
+    // 1. Prioritize 'success' status over others
+    const aStatusPriority = a.status === 'success' ? 2 : a.status === 'invalid' ? 1 : 0
+    const bStatusPriority = b.status === 'success' ? 2 : b.status === 'invalid' ? 1 : 0
+    if (aStatusPriority !== bStatusPriority) return bStatusPriority - aStatusPriority
+
+    // 2. Prioritize address type over fragments
+    if (a.type === 'address' && b.type !== 'address') return -1
+    if (b.type === 'address' && a.type !== 'address') return 1
+
+    // 3. Prioritize known sources over unknown
+    const aSourcePriority = a.source === 'unknown' ? 0 : 1
+    const bSourcePriority = b.source === 'unknown' ? 0 : 1
+    if (aSourcePriority !== bSourcePriority) return bSourcePriority - aSourcePriority
+
+    // 4. Prioritize newer timestamps
+    if (a.timestamp && b.timestamp) {
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    }
+
+    return 0
+  })
+
+  return sorted[0]
+}
+
+const getBestMatch = (abis: ContractABI[]) => {
+  if (abis.length === 0) return null
+
+  const bestAbi = selectBestAbi(abis)
+  if (bestAbi == null) return null
+
+  if (bestAbi.type === 'address') {
+    return JSON.parse(bestAbi.abi) as Abi
   }
 
-  return JSON.parse(`[${abi.abi}]`) as Abi
+  return JSON.parse(`[${bestAbi.abi}]`) as Abi
 }
 
 /**
@@ -149,10 +191,12 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     const [remaining, cachedResults] = yield* pipe(
       getMany(uniqueRequests),
       Effect.map(
-        Array.partitionMap((resp, i) => {
-          return resp.status === 'empty'
+        Array.partitionMap((abis, i) => {
+          // Filter out invalid/not-found ABIs and check if we have any valid ones
+          const validAbis = abis.filter(abi => abi.status === 'success')
+          return validAbis.length === 0
             ? Either.left(uniqueRequests[i])
-            : Either.right([uniqueRequests[i], resp.result] as const)
+            : Either.right([uniqueRequests[i], validAbis] as const)
         }),
       ),
       Effect.orElseSucceed(() => [uniqueRequests, []] as const),
@@ -161,9 +205,9 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     //  Resolve ABI from the store
     yield* Effect.forEach(
       cachedResults,
-      ([request, abi]) => {
+      ([request, abis]) => {
         const group = requestGroups[makeRequestKey(request)]
-        const bestMatch = getBestMatch(abi)
+        const bestMatch = getBestMatch(abis)
         const result = bestMatch ? Effect.succeed(bestMatch) : Effect.fail(new MissingABIError(request))
 
         return Effect.forEach(group, (req) => Request.completeEffect(req, result), { discard: true })
@@ -252,7 +296,8 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
       (abis, i) => {
         const request = remaining[i]
         const abi = abis?.[0] ?? null
-        const bestMatch = getBestMatch(abi)
+        const abiArray = abi ? [{ ...abi, status: 'success' as const }] : []
+        const bestMatch = getBestMatch(abiArray)
         const result = bestMatch ? Effect.succeed(bestMatch) : Effect.fail(new MissingABIError(request))
         const group = requestGroups[makeRequestKey(request)]
 
