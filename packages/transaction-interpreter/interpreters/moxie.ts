@@ -48,8 +48,9 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
       return {
         ...newEvent,
         type: 'stake-token',
-        action: `Bought and Locked ${formatNumber(bougt[0].amount)} Fan Tokens of ${bougt[0].asset
-          ?.name} for ${displayAsset(sold[0])}`,
+        action: `Bought and Locked ${formatNumber(bougt[0].amount)} Fan Tokens of ${
+          bougt[0].asset?.name
+        } for ${displayAsset(sold[0])}`,
       }
     }
 

@@ -1,6 +1,7 @@
 import * as AbiStore from '../abi-store.js'
 import { Effect, Layer } from 'effect'
 import { SqlClient } from '@effect/sql'
+import { runMigrations, migration } from './migrations.js'
 
 // Utility function to build query conditions for a single key
 const buildQueryForKey = (
@@ -21,39 +22,20 @@ const buildQueryForKey = (
     : sql.or([addressQuery, signatureQuery, eventQuery].filter(Boolean))
 }
 
-// Convert database items to result format
+// Convert database items to result format - returns all ABIs with their individual status
 const createResult = (items: readonly any[], address: string, chainID: number): AbiStore.ContractAbiResult => {
-  const successItems = items.filter((item) => item.status === 'success')
-
-  const item =
-    successItems.find((item) => {
-      // Prioritize address over fragments
-      return item.type === 'address'
-    }) ?? successItems[0]
-
-  if (item != null) {
-    return {
-      status: 'success',
-      result: {
-        type: item.type,
-        event: item.event,
-        signature: item.signature,
-        address,
-        chainID,
-        abi: item.abi,
-      },
-    } as AbiStore.ContractAbiResult
-  } else if (items[0] != null && items[0].status === 'not-found') {
-    return {
-      status: 'not-found',
-      result: null,
-    }
-  }
-
-  return {
-    status: 'empty',
-    result: null,
-  }
+  return items.map((item) => ({
+    type: item.type,
+    event: item.event,
+    signature: item.signature,
+    address,
+    chainID,
+    abi: item.abi,
+    id: item.id,
+    source: item.source || 'unknown',
+    status: item.status as 'success' | 'invalid' | 'not-found',
+    timestamp: item.timestamp,
+  }))
 }
 
 // Build single lookup map with prefixed keys
@@ -94,7 +76,8 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
     Effect.gen(function* () {
       const sql = yield* SqlClient.SqlClient
 
-      const table = sql('_loop_decoder_contract_abi_v2')
+      const tableV3 = sql('_loop_decoder_contract_abi_v3')
+      const tableV2 = sql('_loop_decoder_contract_abi_v2')
       const id = sql.onDialectOrElse({
         sqlite: () => sql`id INTEGER PRIMARY KEY AUTOINCREMENT,`,
         pg: () => sql`id SERIAL PRIMARY KEY,`,
@@ -102,69 +85,104 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
         orElse: () => sql``,
       })
 
-      // TODO; add timestamp to the table
-      yield* sql`
-        CREATE TABLE IF NOT EXISTS ${table} (
-          ${id}
-          type TEXT NOT NULL,
-          address TEXT,
-          event TEXT,
-          signature TEXT,
-          chain INTEGER,
-          abi TEXT,
-          status TEXT NOT NULL,
-          timestamp TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-      `.pipe(
-        Effect.tapError(Effect.logError),
-        Effect.catchAll(() => Effect.dieMessage('Failed to create contractAbi table')),
-      )
+      // TODO: Allow skipping migrations if users want to apply it manually
+      // Run structured migrations (idempotent, transactional)
+      yield* runMigrations([
+        migration('001_create_contract_abi_v3', (q) =>
+          Effect.gen(function* () {
+            yield* q`CREATE TABLE IF NOT EXISTS ${tableV3} (
+            ${id}
+            type TEXT NOT NULL,
+            address TEXT,
+            event TEXT,
+            signature TEXT,
+            chain INTEGER,
+            abi TEXT,
+            status TEXT NOT NULL,
+            timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
+            source TEXT DEFAULT 'unknown'
+          )`
+
+            const tsCoalesce = q.onDialectOrElse({
+              sqlite: () => q`COALESCE(timestamp, CURRENT_TIMESTAMP)`,
+              pg: () => q`COALESCE(timestamp, CURRENT_TIMESTAMP)`,
+              mysql: () => q`IFNULL(timestamp, CURRENT_TIMESTAMP)`,
+              orElse: () => q`CURRENT_TIMESTAMP`,
+            })
+
+            yield* q`
+              INSERT INTO ${tableV3} (type, address, chain, abi, status, timestamp, source)
+              SELECT 'address' as type, v.address, v.chain, v.abi, v.status, ${tsCoalesce} as timestamp, 'unknown' as source
+              FROM ${tableV2} as v
+              WHERE v.type = 'address'
+                AND v.address IS NOT NULL AND v.chain IS NOT NULL
+                AND NOT EXISTS (
+                  SELECT 1 FROM ${tableV3} t
+                  WHERE t.type = 'address' AND t.address = v.address AND t.chain = v.chain
+                )
+            `.pipe(Effect.catchAll(Effect.logError))
+
+            yield* q`
+              INSERT INTO ${tableV3} (type, signature, abi, status, timestamp, source)
+              SELECT 'func' as type, v.signature, v.abi, v.status, ${tsCoalesce} as timestamp, 'unknown' as source
+              FROM ${tableV2} as v
+              WHERE v.type = 'func' AND v.signature IS NOT NULL
+                AND NOT EXISTS (
+                  SELECT 1 FROM ${tableV3} t
+                  WHERE t.type = 'func' AND t.signature = v.signature
+                )
+            `.pipe(Effect.catchAll(Effect.logError))
+
+            yield* q`
+              INSERT INTO ${tableV3} (type, event, abi, status, timestamp, source)
+              SELECT 'event' as type, v.event, v.abi, v.status, ${tsCoalesce} as timestamp, 'unknown' as source
+              FROM ${tableV2} as v
+              WHERE v.type = 'event' AND v.event IS NOT NULL
+                AND NOT EXISTS (
+                  SELECT 1 FROM ${tableV3} t
+                  WHERE t.type = 'event' AND t.event = v.event
+                )
+            `.pipe(Effect.catchAll(Effect.logError))
+          }),
+        ),
+      ])
+
+      const table = tableV3
 
       return yield* AbiStore.make({
         strategies,
-        set: (key, value) =>
+        set: (key, abi) =>
           Effect.gen(function* () {
             const normalizedAddress = key.address.toLowerCase()
-            if (value.status === 'success' && value.result.type === 'address') {
-              const result = value.result
+
+            if (abi.type === 'address') {
               yield* sql`
-              INSERT INTO ${table}
-               ${sql.insert([
-                 {
-                   type: result.type,
-                   address: normalizedAddress,
-                   chain: key.chainID,
-                   abi: result.abi,
-                   status: 'success',
-                 },
-               ])}
-            `
-            } else if (value.status === 'success') {
-              const result = value.result
-              yield* sql`
-              INSERT INTO ${table}
-              ${sql.insert([
-                {
-                  type: result.type,
-                  event: 'event' in result ? result.event : null,
-                  signature: 'signature' in result ? result.signature : null,
-                  abi: result.abi,
-                  status: 'success',
-                },
-              ])}
-            `
+                INSERT INTO ${table}
+                ${sql.insert([
+                  {
+                    type: abi.type,
+                    address: normalizedAddress,
+                    chain: key.chainID,
+                    abi: abi.abi,
+                    status: abi.status,
+                    source: abi.source || 'unknown',
+                  },
+                ])}
+              `
             } else {
               yield* sql`
-              INSERT INTO ${table}
-              ${sql.insert([
-                {
-                  type: 'address',
-                  address: normalizedAddress,
-                  chain: key.chainID,
-                  status: 'not-found',
-                },
-              ])}
-            `
+                INSERT INTO ${table}
+                ${sql.insert([
+                  {
+                    type: abi.type,
+                    event: 'event' in abi ? abi.event : null,
+                    signature: 'signature' in abi ? abi.signature : null,
+                    abi: abi.abi,
+                    status: abi.status,
+                    source: abi.source || 'unknown',
+                  },
+                ])}
+              `
             }
           }).pipe(
             Effect.tapError(Effect.logError),
@@ -225,6 +243,18 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
               }
               return createResult(keyItems, address, chainID)
             })
+          }),
+
+        updateStatus: (id, status) =>
+          Effect.gen(function* () {
+            yield* sql`
+              UPDATE ${table}
+              SET status = ${status}
+              WHERE id = ${id}
+            `.pipe(
+              Effect.tapError(Effect.logError),
+              Effect.catchAll(() => Effect.succeed(null)),
+            )
           }),
       })
     }),
