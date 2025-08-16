@@ -1,7 +1,8 @@
 import { Effect } from 'effect'
 import { Hex, Address, encodeFunctionData, isAddress, getAddress } from 'viem'
-import { getAndCacheAbi, MissingABIError } from '../abi-loader.js'
+import { MissingABIError } from '../abi-loader.js'
 import * as AbiDecoder from './abi-decode.js'
+import { validateAndDecodeWithABIs } from './abi-decode.js'
 import { TreeNode } from '../types.js'
 import { PublicClient, RPCFetchError, UnknownNetwork } from '../public-client.js'
 import { SAFE_MULTISEND_SIGNATURE, SAFE_MULTISEND_NESTED_ABI } from './constants.js'
@@ -166,16 +167,11 @@ export const decodeMethod = ({
       }
     }
 
-    const abi = yield* getAndCacheAbi({
+    const decoded = yield* validateAndDecodeWithABIs(data, {
       address: implementationAddress ?? contractAddress,
       signature,
       chainID,
     })
-    const decoded = yield* AbiDecoder.decodeMethod(data, abi)
-
-    if (decoded == null) {
-      return yield* new AbiDecoder.DecodeError(`Failed to decode method: ${data}`)
-    }
 
     //MULTISEND: decode nested params for the multisend of the safe smart account
     if (

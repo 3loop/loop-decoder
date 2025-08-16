@@ -1,9 +1,10 @@
-import { Effect, Either, RequestResolver, Request, Array, pipe, Data, PrimaryKey, Schema, SchemaAST } from 'effect'
+import { Effect, Either, RequestResolver, Request, Array, Data, PrimaryKey, Schema, SchemaAST } from 'effect'
 import { ContractABI } from './abi-strategy/request-model.js'
 import { Abi } from 'viem'
 import * as AbiStore from './abi-store.js'
 import * as StrategyExecutorModule from './abi-strategy/strategy-executor.js'
 import { SAFE_MULTISEND_SIGNATURE, SAFE_MULTISEND_ABI, AA_ABIS } from './decoding/constants.js'
+import { errorFunctionSignatures, solidityError, solidityPanic } from './helpers/error.js'
 
 interface LoadParameters {
   readonly chainID: number
@@ -34,7 +35,7 @@ export class EmptyCalldataError extends Data.TaggedError('DecodeError')<
 class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) {}
 class AbiLoader extends Schema.TaggedRequest<AbiLoader>()('AbiLoader', {
   failure: Schema.instanceOf(MissingABIError),
-  success: SchemaAbi, // Abi
+  success: Schema.Array(Schema.Struct({ abi: SchemaAbi, id: Schema.optional(Schema.String) })),
   payload: {
     chainID: Schema.Number,
     address: Schema.String,
@@ -78,19 +79,18 @@ const setValue = (key: AbiLoader, abi: ContractABI | null) =>
         event: key.event,
         signature: key.signature,
       },
-      abi == null ? { status: 'not-found', result: null } : { status: 'success', result: abi },
+      abi == null
+        ? {
+            type: 'func' as const,
+            abi: '',
+            address: key.address,
+            chainID: key.chainID,
+            signature: key.signature || '',
+            status: 'not-found' as const,
+          }
+        : { ...abi, status: 'success' as const },
     )
   })
-
-const getBestMatch = (abi: ContractABI | null) => {
-  if (abi == null) return null
-
-  if (abi.type === 'address') {
-    return JSON.parse(abi.abi) as Abi
-  }
-
-  return JSON.parse(`[${abi.abi}]`) as Abi
-}
 
 /**
  * Data loader for contracts abi
@@ -146,27 +146,41 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     const requestGroups = Array.groupBy(requests, makeRequestKey)
     const uniqueRequests = Object.values(requestGroups).map((group) => group[0])
 
-    const [remaining, cachedResults] = yield* pipe(
-      getMany(uniqueRequests),
-      Effect.map(
-        Array.partitionMap((resp, i) => {
-          return resp.status === 'empty'
-            ? Either.left(uniqueRequests[i])
-            : Either.right([uniqueRequests[i], resp.result] as const)
-        }),
-      ),
-      Effect.orElseSucceed(() => [uniqueRequests, []] as const),
-    )
+    const allCachedData = yield* getMany(uniqueRequests)
+
+    // Create a map of invalid sources for each request
+    const invalidSourcesMap = new Map<string, string[]>()
+    allCachedData.forEach((abis, i) => {
+      const request = uniqueRequests[i]
+      const invalid = abis
+        .filter((abi) => abi.status === 'invalid')
+        .map((abi) => abi.source)
+        .filter(Boolean) as string[]
+
+      invalidSourcesMap.set(makeRequestKey(request), invalid)
+    })
+
+    const [remaining, cachedResults] = Array.partitionMap(allCachedData, (abis, i) => {
+      // Filter out invalid/not-found ABIs and check if we have any valid ones
+      const validAbis = abis.filter((abi) => abi.status === 'success')
+      return validAbis.length === 0
+        ? Either.left(uniqueRequests[i])
+        : Either.right([uniqueRequests[i], validAbis] as const)
+    })
 
     //  Resolve ABI from the store
     yield* Effect.forEach(
       cachedResults,
-      ([request, abi]) => {
+      ([request, abis]) => {
         const group = requestGroups[makeRequestKey(request)]
-        const bestMatch = getBestMatch(abi)
-        const result = bestMatch ? Effect.succeed(bestMatch) : Effect.fail(new MissingABIError(request))
+        const allMatches = abis.map((abi) => {
+          const parsedAbi = abi.type === 'address' ? (JSON.parse(abi.abi) as Abi) : (JSON.parse(`[${abi.abi}]`) as Abi)
+          return { abi: parsedAbi, id: abi.id }
+        })
 
-        return Effect.forEach(group, (req) => Request.completeEffect(req, result), { discard: true })
+        return Effect.forEach(group, (req) => Request.completeEffect(req, Effect.succeed(allMatches)), {
+          discard: true,
+        })
       },
       {
         discard: true,
@@ -191,9 +205,14 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     const response = yield* Effect.forEach(
       remaining,
       (req) => {
-        const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? []).filter(
-          (strategy) => strategy.type === 'address',
-        )
+        const invalidSources = invalidSourcesMap.get(makeRequestKey(req)) ?? []
+        const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? [])
+          .filter((strategy) => strategy.type === 'address')
+          .filter((strategy) => !invalidSources.includes(strategy.id))
+
+        if (allAvailableStrategies.length === 0) {
+          return Effect.succeed(Either.right(req))
+        }
 
         return strategyExecutor
           .executeStrategiesSequentially(allAvailableStrategies, {
@@ -220,17 +239,22 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     // NOTE: Secondly we request strategies to fetch fragments
     const fragmentStrategyResults = yield* Effect.forEach(
       notFound,
-      ({ chainID, address, event, signature }) => {
-        const allAvailableStrategies = Array.prependAll(strategies.default, strategies[chainID] ?? []).filter(
-          (strategy) => strategy.type === 'fragment',
-        )
+      (req) => {
+        const invalidSources = invalidSourcesMap.get(makeRequestKey(req)) ?? []
+        const allAvailableStrategies = Array.prependAll(strategies.default, strategies[req.chainID] ?? [])
+          .filter((strategy) => strategy.type === 'fragment')
+          .filter((strategy) => !invalidSources.includes(strategy.id))
+
+        if (allAvailableStrategies.length === 0) {
+          return Effect.succeed(null)
+        }
 
         return strategyExecutor
           .executeStrategiesSequentially(allAvailableStrategies, {
-            address,
-            chainId: chainID,
-            event,
-            signature,
+            address: req.address,
+            chainId: req.chainID,
+            event: req.event,
+            signature: req.signature,
             strategyId: 'fragment-batch',
           })
           .pipe(
@@ -244,20 +268,44 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
       },
     )
 
-    const strategyResults = Array.appendAll(addressStrategyResults, fragmentStrategyResults)
+    // Create a map to track which requests got results from address strategies
+    const addressResultsMap = new Map<string, ContractABI[]>()
+    addressStrategyResults.forEach((abis, i) => {
+      const request = remaining[i]
+      if (abis && abis.length > 0) {
+        addressResultsMap.set(makeRequestKey(request), abis)
+      }
+    })
 
-    // Store results and resolve pending requests
+    // Create a map to track which requests got results from fragment strategies
+    const fragmentResultsMap = new Map<string, ContractABI[]>()
+    fragmentStrategyResults.forEach((abis, i) => {
+      const request = notFound[i]
+      if (abis && abis.length > 0) {
+        fragmentResultsMap.set(makeRequestKey(request), abis)
+      }
+    })
+
+    // Resolve all remaining requests
     yield* Effect.forEach(
-      strategyResults,
-      (abis, i) => {
-        const request = remaining[i]
-        const abi = abis?.[0] ?? null
-        const bestMatch = getBestMatch(abi)
-        const result = bestMatch ? Effect.succeed(bestMatch) : Effect.fail(new MissingABIError(request))
+      remaining,
+      (request) => {
         const group = requestGroups[makeRequestKey(request)]
+        const addressAbis = addressResultsMap.get(makeRequestKey(request)) || []
+        const fragmentAbis = fragmentResultsMap.get(makeRequestKey(request)) || []
+        const allAbis = [...addressAbis, ...fragmentAbis]
+        const firstAbi = allAbis[0] || null
+
+        const allMatches = allAbis.map((abi) => {
+          const parsedAbi = abi.type === 'address' ? (JSON.parse(abi.abi) as Abi) : (JSON.parse(`[${abi.abi}]`) as Abi)
+          // TODO: We should figure out how to handle the db ID here, maybe we need to start providing the ids before inserting
+          return { abi: parsedAbi, id: undefined }
+        })
+
+        const result = allMatches.length > 0 ? Effect.succeed(allMatches) : Effect.fail(new MissingABIError(request))
 
         return Effect.zipRight(
-          setValue(request, abi),
+          setValue(request, firstAbi),
           Effect.forEach(group, (req) => Request.completeEffect(req, result), { discard: true }),
         )
       },
@@ -283,12 +331,17 @@ export const getAndCacheAbi = (params: AbiStore.AbiParams) =>
       return yield* Effect.fail(new EmptyCalldataError(params))
     }
 
+    if (params.signature && errorFunctionSignatures.includes(params.signature)) {
+      const errorAbis: Abi = [...solidityPanic, ...solidityError]
+      return [{ abi: errorAbis, id: undefined }]
+    }
+
     if (params.signature && params.signature === SAFE_MULTISEND_SIGNATURE) {
-      return yield* Effect.succeed(SAFE_MULTISEND_ABI)
+      return [{ abi: SAFE_MULTISEND_ABI, id: undefined }]
     }
 
     if (params.signature && AA_ABIS[params.signature]) {
-      return yield* Effect.succeed(AA_ABIS[params.signature])
+      return [{ abi: AA_ABIS[params.signature], id: undefined }]
     }
 
     return yield* Effect.request(new AbiLoader(params), AbiLoaderRequestResolver)

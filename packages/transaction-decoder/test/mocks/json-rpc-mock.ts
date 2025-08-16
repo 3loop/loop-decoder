@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import * as fs from 'node:fs'
 import { PublicClient, PublicClientObject, UnknownNetwork } from '../../src/index.js'
 import { Effect } from 'effect'
 import { createPublicClient, custom } from 'viem'

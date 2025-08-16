@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { MockedTransaction, mockedTransport } from './mocks/json-rpc-mock.js'
 import { TransactionDecoder } from '../src/vanilla.js'
-import fs from 'fs'
+import * as fs from 'fs'
 import { createPublicClient } from 'viem'
 import { goerli } from 'viem/chains'
 import { ERC20RPCStrategyResolver } from '../src/index.js'
@@ -26,15 +26,15 @@ describe('Transaction Decoder', () => {
           const addressExists = fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`)
 
           if (addressExists) {
-            return {
-              status: 'success',
-              result: {
+            return [
+              {
                 type: 'address',
                 abi: fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
                 address,
                 chainID: 5,
+                status: 'success',
               },
-            }
+            ]
           }
 
           const sig = signature ?? event
@@ -42,34 +42,31 @@ describe('Transaction Decoder', () => {
             const signatureAbi = fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString()
 
             if (signature) {
-              return {
-                status: 'success',
-                result: {
+              return [
+                {
                   type: 'func',
                   abi: signatureAbi,
                   address,
                   chainID: 1,
                   signature,
+                  status: 'success',
                 },
-              }
+              ]
             } else if (event) {
-              return {
-                status: 'success',
-                result: {
+              return [
+                {
                   type: 'event',
                   abi: signatureAbi,
                   address,
                   chainID: 1,
                   event,
+                  status: 'success',
                 },
-              }
+              ]
             }
           }
 
-          return {
-            status: 'empty',
-            result: null,
-          }
+          return []
         },
         set: async () => {
           console.debug('Not implemented')

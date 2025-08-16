@@ -6,7 +6,7 @@ import { MockedRPCProvider, MockedTransaction } from './mocks/json-rpc-mock.js'
 import { CALLDATA_TRANSACTIONS, FAILED_TRANSACTIONS, TEST_TRANSACTIONS } from './constants.js'
 import { MockedAbiStoreLive } from './mocks/abi-loader-mock.js'
 import { MockedMetaStoreLive } from './mocks/meta-loader-mock.js'
-import fs from 'fs'
+import * as fs from 'fs'
 
 describe('Transaction Decoder', () => {
   test.each(TEST_TRANSACTIONS)('Resolve and decode transaction %', async ({ hash, chainID }) => {

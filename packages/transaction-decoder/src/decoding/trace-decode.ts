@@ -2,10 +2,12 @@ import { Effect } from 'effect'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
 import { DecodeError, decodeMethod } from './abi-decode.js'
-import { getAndCacheAbi } from '../abi-loader.js'
+
+import { validateAndDecodeWithABIs } from './abi-decode.js'
 import { type Hex, type GetTransactionReturnType, Abi, getAddress } from 'viem'
 import { stringify } from '../helpers/stringify.js'
 import { errorFunctionSignatures, panicReasons, solidityError, solidityPanic } from '../helpers/error.js'
+import { e } from 'vitest/dist/types-63abf2e0.js'
 
 //because some transactions are multicalls, we need to get the second level calls
 //to decode the actual method calls
@@ -29,13 +31,11 @@ const decodeTraceLog = (call: TraceLog, transaction: GetTransactionReturnType) =
       const signature = call.action.input.slice(0, 10)
       const contractAddress = to
 
-      const abi = yield* getAndCacheAbi({
+      const method = yield* validateAndDecodeWithABIs(input as Hex, {
         address: contractAddress,
         signature,
         chainID,
       })
-
-      const method = yield* decodeMethod(input as Hex, abi)
 
       return {
         ...method,
@@ -53,21 +53,11 @@ const decodeTraceLogOutput = (call: TraceLog, chainID: number) =>
       const data = call.result.output as Hex
       const signature = data.slice(0, 10)
 
-      //standart error functions
-      let abi: Abi = [...solidityPanic, ...solidityError]
-
-      //custom error function
-      if (!errorFunctionSignatures.includes(signature)) {
-        const abi_ = yield* getAndCacheAbi({
-          address: '',
-          signature,
-          chainID,
-        })
-
-        abi = [...abi, ...abi_]
-      }
-
-      return yield* decodeMethod(data as Hex, abi)
+      return yield* validateAndDecodeWithABIs(data as Hex, {
+        address: '',
+        signature,
+        chainID,
+      })
     }
   })
 
