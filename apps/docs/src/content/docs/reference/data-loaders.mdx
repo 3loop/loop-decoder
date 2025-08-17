@@ -10,10 +10,11 @@ import { Tabs, TabItem } from '@astrojs/starlight/components'
 Data Loaders are mechanisms for retrieving the necessary ABI and Contract Metadata for transaction decoding. They are responsible for:
 
 - Resolving ABIs and Contract Metadata using specified strategies and third-party APIs
-- Automatically batching requests when processing logs and traces in parallel
-- Caching request results in the [Data Store](/reference/data-store)
+- Automatically batching requests and deduplicating identical lookups during parallel log/trace processing
+- Caching results and negative lookups in the [Data Store](/reference/data-store)
+- Applying rate limits, circuit breaking, and adaptive concurrency via a shared request pool
 
-Loop Decoder implements optimizations to minimize API requests to third-party services. For example, when a contract’s ABI is resolved via Etherscan, it is cached in the store. If the ABI is requested again, the store provides the cached version, avoiding redundant API calls.
+Loop Decoder implements optimizations to minimize API requests to third-party services. For example, when a contract’s ABI is resolved via Etherscan, it is cached in the store. If the ABI is requested again, the store provides the cached version, avoiding redundant API calls. When a source returns no result, a `not-found` entry can be stored to skip repeated attempts temporarily.
 
 ## ABI Strategies
 

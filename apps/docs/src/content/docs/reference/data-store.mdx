@@ -67,7 +67,7 @@ The full interface of ABI store is:
 
 <EffectABI />
 
-ABI Store Interface requires 2 methods: `set` and `get` to store and retrieve the ABI of a contract. Optionally, you can provide a batch get method `getMany` for further optimization. Because our API supports ABI fragments, the get method will receive both the contract address and the fragment signature.
+ABI Store Interface requires `set` and `get` to store and retrieve ABIs. Optionally, you can provide a batch get method `getMany` and an `updateStatus` helper used by the decoder to mark ABIs invalid after failed decode attempts. Because our API supports ABI fragments, the get method will receive both the contract address and the fragment signature.
 
 ```typescript
 interface AbiParams {

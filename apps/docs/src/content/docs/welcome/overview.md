@@ -26,7 +26,7 @@ The Transaction Decoder package transforms raw transactions, including calldata,
 
 See the Decoded Transaction section in our [playground](https://loop-decoder-web.vercel.app/) for transaction examples.
 
-The minimal configuration for the Transaction Decoder requires an RPC URL, ABIs, and contract metadata stores, which can be in-memory (see the [Data Store](/reference/data-store/) section). We also provide data loaders for popular APIs like Etherscan (see the full list in the [ABI Strategies](/reference/data-loaders/) section). These loaders request contract metadata and cache it in your specified store. The decoder supports RPCs with both Debug (Geth tracers) and Trace (OpenEthereum/Parity and Erigon tracers) APIs.
+The minimal configuration for the Transaction Decoder requires an RPC URL, ABIs, and contract metadata stores, which can be in-memory (see the [Data Store](/reference/data-store/) section). We also provide data loaders for popular APIs like Etherscan (see the full list in the [ABI Strategies](/reference/data-loaders/) section). These loaders fetch ABIs/metadata, cache results and negative lookups in your store, and avoid querying sources previously marked invalid for a key. The decoder supports RPCs with both Debug (Geth tracers) and Trace (OpenEthereum/Parity and Erigon tracers) APIs.
 
 ### Transaction Interpreter
 
