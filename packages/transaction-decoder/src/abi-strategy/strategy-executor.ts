@@ -13,10 +13,17 @@ export class MissingHealthyStrategy extends Data.TaggedError('MissingHealthyStra
   }
 }
 
+interface ExecuteParams {
+  chainId: number
+  address: string
+  event?: string
+  signature?: string
+}
+
 export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) => {
-  const executeStrategy = (strategy: ContractAbiResolverStrategy, params: GetContractABIStrategyParams) => {
+  const executeStrategy = (strategy: ContractAbiResolverStrategy, params: ExecuteParams) => {
     return pipe(
-      strategy.resolver(params),
+      strategy.resolver({ ...params, strategyId: strategy.id }),
       Effect.timeout(Duration.decode(Constants.STRATEGY_TIMEOUT)),
       Effect.catchTag('MissingABIStrategyError', (error) => {
         // Log error but don't fail the entire operation
@@ -32,14 +39,20 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
       ),
       (effect) => circuitBreaker.withCircuitBreaker(strategy.id, effect),
       (effect) => requestPool.withPoolManagement(params.chainId, effect),
-      Effect.flatMap((data) => (data instanceof MissingABIStrategyError ? Effect.fail(data) : Effect.succeed(data))),
+      Effect.flatMap((data) =>
+        data instanceof MissingABIStrategyError
+          ? Effect.fail(data)
+          : Effect.succeed(
+              data.map((abi) => ({
+                ...abi,
+                strategyId: strategy.id,
+              })),
+            ),
+      ),
     )
   }
 
-  const executeStrategiesSequentially = (
-    strategies: ContractAbiResolverStrategy[],
-    params: GetContractABIStrategyParams,
-  ) =>
+  const executeStrategiesSequentially = (strategies: ContractAbiResolverStrategy[], params: ExecuteParams) =>
     Effect.gen(function* () {
       // Filter out unhealthy strategies first
       const healthyStrategies: ContractAbiResolverStrategy[] = []
@@ -60,6 +73,10 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
             strategies: strategies.map((s) => s.id),
           }),
         )
+      }
+
+      if (params.address.toLowerCase() === '0x49828c61a923624e22ce5b169be2bd650abc9bc8') {
+        console.log('ABIS; ', params, healthyStrategies) // Debugging line
       }
 
       // Try strategies one by one until one succeeds

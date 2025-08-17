@@ -69,7 +69,7 @@ const getMany = (requests: Array<AbiStore.AbiParams>) =>
     }
   })
 
-const setValue = (key: AbiLoader, abi: ContractABI | null) =>
+const setValue = (key: AbiLoader, abi: (ContractABI & { strategyId: string }) | null) =>
   Effect.gen(function* () {
     const { set } = yield* AbiStore.AbiStore
     yield* set(
@@ -88,7 +88,11 @@ const setValue = (key: AbiLoader, abi: ContractABI | null) =>
             signature: key.signature || '',
             status: 'not-found' as const,
           }
-        : { ...abi, status: 'success' as const },
+        : {
+            ...abi,
+            source: abi.strategyId,
+            status: 'success' as const,
+          },
     )
   })
 
@@ -218,7 +222,6 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
           .executeStrategiesSequentially(allAvailableStrategies, {
             address: req.address,
             chainId: req.chainID,
-            strategyId: 'address-batch',
           })
           .pipe(
             Effect.tapError(Effect.logDebug),
@@ -255,7 +258,6 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
             chainId: req.chainID,
             event: req.event,
             signature: req.signature,
-            strategyId: 'fragment-batch',
           })
           .pipe(
             Effect.tapError(Effect.logDebug),
@@ -269,7 +271,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     )
 
     // Create a map to track which requests got results from address strategies
-    const addressResultsMap = new Map<string, ContractABI[]>()
+    const addressResultsMap = new Map<string, (ContractABI & { strategyId: string })[]>()
     addressStrategyResults.forEach((abis, i) => {
       const request = remaining[i]
       if (abis && abis.length > 0) {
@@ -278,7 +280,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
     })
 
     // Create a map to track which requests got results from fragment strategies
-    const fragmentResultsMap = new Map<string, ContractABI[]>()
+    const fragmentResultsMap = new Map<string, (ContractABI & { strategyId: string })[]>()
     fragmentStrategyResults.forEach((abis, i) => {
       const request = notFound[i]
       if (abis && abis.length > 0) {
@@ -294,7 +296,6 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
         const addressAbis = addressResultsMap.get(makeRequestKey(request)) || []
         const fragmentAbis = fragmentResultsMap.get(makeRequestKey(request)) || []
         const allAbis = [...addressAbis, ...fragmentAbis]
-        const firstAbi = allAbis[0] || null
 
         const allMatches = allAbis.map((abi) => {
           const parsedAbi = abi.type === 'address' ? (JSON.parse(abi.abi) as Abi) : (JSON.parse(`[${abi.abi}]`) as Abi)
@@ -304,8 +305,16 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
 
         const result = allMatches.length > 0 ? Effect.succeed(allMatches) : Effect.fail(new MissingABIError(request))
 
+        const cacheEffect =
+          allAbis.length > 0
+            ? Effect.forEach(allAbis, (abi) => setValue(request, abi), {
+                discard: true,
+                concurrency: 'unbounded',
+              })
+            : setValue(request, null)
+
         return Effect.zipRight(
-          setValue(request, firstAbi),
+          cacheEffect,
           Effect.forEach(group, (req) => Request.completeEffect(req, result), { discard: true }),
         )
       },
