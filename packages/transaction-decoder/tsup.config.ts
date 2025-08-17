@@ -1,4 +1,4 @@
-import path from 'path'
+import * as path from 'path'
 import { globSync } from 'glob'
 import { defineConfig } from 'tsup'
 

@@ -105,15 +105,19 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
           )`.pipe(Effect.tapError((error) => Effect.logError(`Failed to create v3 table during migration: ${error}`)))
 
             // Check if v2 table exists before attempting migration
-            const v2TableExists = yield* q.onDialectOrElse({
-              sqlite: () => q`SELECT name FROM sqlite_master WHERE type='table' AND name='_loop_decoder_contract_abi_v2'`,
-              pg: () => q`SELECT tablename FROM pg_tables WHERE tablename='_loop_decoder_contract_abi_v2'`,
-              mysql: () => q`SELECT table_name FROM information_schema.tables WHERE table_name='_loop_decoder_contract_abi_v2'`,
-              orElse: () => q`SELECT COUNT(*) as count FROM ${tableV2} WHERE 1=0`, // Try to query table directly
-            }).pipe(
-              Effect.map((rows) => rows.length > 0),
-              Effect.catchAll(() => Effect.succeed(false)),
-            )
+            const v2TableExists = yield* q
+              .onDialectOrElse({
+                sqlite: () =>
+                  q`SELECT name FROM sqlite_master WHERE type='table' AND name='_loop_decoder_contract_abi_v2'`,
+                pg: () => q`SELECT tablename FROM pg_tables WHERE tablename='_loop_decoder_contract_abi_v2'`,
+                mysql: () =>
+                  q`SELECT table_name FROM information_schema.tables WHERE table_name='_loop_decoder_contract_abi_v2'`,
+                orElse: () => q`SELECT COUNT(*) as count FROM ${tableV2} WHERE 1=0`, // Try to query table directly
+              })
+              .pipe(
+                Effect.map((rows) => rows.length > 0),
+                Effect.catchAll(() => Effect.succeed(false)),
+              )
 
             if (!v2TableExists) {
               yield* Effect.logInfo('No v2 table found, skipping data migration')
@@ -172,9 +176,7 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
               )
             `.pipe(
               Effect.tap(() => Effect.logInfo('Successfully migrated ABIs from v2 to v3 table with preserved IDs')),
-              Effect.tapError((error) =>
-                Effect.logError(`Failed to migrate ABIs from v2 to v3 table: ${error}`)
-              )
+              Effect.tapError((error) => Effect.logError(`Failed to migrate ABIs from v2 to v3 table: ${error}`)),
             )
           }),
         ),
@@ -218,8 +220,10 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
           }).pipe(
             Effect.tapError((error) =>
               Effect.logError(
-                `Failed to insert ABI into database for ${abi.type} key (address: ${key.address}, chainID: ${key.chainID
-                }). ABI status: ${abi.status}, ABI length: ${abi.abi?.length || 'null'}, source: ${abi.source || 'unknown'
+                `Failed to insert ABI into database for ${abi.type} key (address: ${key.address}, chainID: ${
+                  key.chainID
+                }). ABI status: ${abi.status}, ABI length: ${abi.abi?.length || 'null'}, source: ${
+                  abi.source || 'unknown'
                 }. Error: ${error}`,
               ),
             ),
@@ -235,7 +239,8 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
             const items = yield* sql` SELECT * FROM ${table} WHERE ${query}`.pipe(
               Effect.tapError((error) =>
                 Effect.logError(
-                  `Failed to query ABI from database for key (address: ${address}, signature: ${signature || 'none'
+                  `Failed to query ABI from database for key (address: ${address}, signature: ${
+                    signature || 'none'
                   }, event: ${event || 'none'}, chainID: ${chainID}): ${error}`,
                 ),
               ),

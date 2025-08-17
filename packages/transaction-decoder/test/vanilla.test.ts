@@ -28,6 +28,7 @@ describe('Transaction Decoder', () => {
           if (addressExists) {
             return [
               {
+                id: `${address.toLowerCase()}-address`,
                 type: 'address',
                 abi: fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
                 address,
@@ -44,6 +45,7 @@ describe('Transaction Decoder', () => {
             if (signature) {
               return [
                 {
+                  id: `${address.toLowerCase()}-${signature.toLowerCase()}-func`,
                   type: 'func',
                   abi: signatureAbi,
                   address,
@@ -55,6 +57,7 @@ describe('Transaction Decoder', () => {
             } else if (event) {
               return [
                 {
+                  id: `${address.toLowerCase()}-${event.toLowerCase()}-event`,
                   type: 'event',
                   abi: signatureAbi,
                   address,

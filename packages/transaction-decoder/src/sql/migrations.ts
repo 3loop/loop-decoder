@@ -1,5 +1,5 @@
 import { Effect } from 'effect'
-import { SqlClient } from '@effect/sql'
+import { SqlClient, type SqlError } from '@effect/sql'
 
 // _loop_decoder_migrations (
 //   id TEXT PRIMARY KEY,          -- usually a timestamped name like 001_init
@@ -8,7 +8,7 @@ import { SqlClient } from '@effect/sql'
 
 export type Migration = {
   id: string
-  up: (sql: SqlClient.SqlClient) => Effect.Effect<void, unknown, unknown>
+  up: (sql: SqlClient.SqlClient) => Effect.Effect<void, SqlError.SqlError, never>
 }
 
 const MIGRATIONS_TABLE = '_loop_decoder_migrations'
@@ -45,24 +45,24 @@ export const runMigrations = (migrations: readonly Migration[]) =>
 
     // compute latest applied (lexicographic order). Expect zero-padded ids like 001_...
     const latest = yield* getLatestAppliedMigration(sql).pipe(
-      Effect.tapError((error) =>
-        Effect.logError(`Migration failed: ${error}`)
-      ),
+      Effect.tapError((error) => Effect.logError(`Migration failed: ${error}`)),
     )
 
     // filter only migrations with id greater than latest
     const pending = latest == null ? migrations : migrations.filter((m) => m.id > latest)
 
-    yield* Effect.forEach(pending, (m) =>
-      Effect.gen(function* () {
-        // First run the migration
-        yield* m.up(sql)
+    yield* Effect.forEach(
+      pending,
+      (m) =>
+        Effect.gen(function* () {
+          // First run the migration
+          yield* m.up(sql)
 
-        // Only mark as applied if migration succeeded
-        const table = sql(MIGRATIONS_TABLE)
-        yield* sql`INSERT INTO ${table} (id) VALUES (${m.id})`
-      }),
-      { discard: true }
+          // Only mark as applied if migration succeeded
+          const table = sql(MIGRATIONS_TABLE)
+          yield* sql`INSERT INTO ${table} (id) VALUES (${m.id})`
+        }),
+      { discard: true },
     )
   })
 // Helpers to define migrations succinctly
