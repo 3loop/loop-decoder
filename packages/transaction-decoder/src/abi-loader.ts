@@ -140,6 +140,7 @@ const setValue = (key: AbiLoader, abi: (ContractABI & { strategyId: string }) | 
  * - Request pooling with back-pressure handling
  */
 
+// TODO: there is an overfetching, find why
 export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: Array<AbiLoader>) =>
   Effect.gen(function* () {
     if (requests.length === 0) return

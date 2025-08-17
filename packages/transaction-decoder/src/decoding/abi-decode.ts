@@ -159,6 +159,8 @@ export const validateAndDecodeEventWithABIs = (
   params: AbiStore.AbiParams,
 ): Effect.Effect<{ eventName: string; args: any; abiItem: Abi }, DecodeError, AbiStore.AbiStore> =>
   Effect.gen(function* () {
+    const { updateStatus } = yield* AbiStore.AbiStore
+
     const abiWithIds = yield* getAndCacheAbi(params)
 
     const validationEffects = abiWithIds.map(({ abi, id }) =>
@@ -173,8 +175,10 @@ export const validateAndDecodeEventWithABIs = (
       }).pipe(
         Effect.catchAll((error: DecodeError) => {
           return Effect.gen(function* () {
-            // Note: We don't mark ABIs as invalid for event decoding failures
-            // as the same ABI might work for other events on the same contract
+            if (updateStatus && id != null) {
+              // Mark this ABI as invalid when it fails
+              yield* updateStatus(id, 'invalid').pipe(Effect.catchAll(() => Effect.void))
+            }
             return yield* Effect.fail(error)
           })
         }),

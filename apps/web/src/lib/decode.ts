@@ -19,12 +19,7 @@ import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sq
 import { Hex } from 'viem'
 import { DatabaseLive } from './database'
 
-const LogLevelLive = Layer.unwrapEffect(
-  Effect.gen(function* () {
-    const level = LogLevel.Warning
-    return Logger.minimumLogLevel(level)
-  }),
-)
+const LogLevelLive = Logger.minimumLogLevel(LogLevel.Warning)
 
 const AbiStoreLive = Layer.unwrapEffect(
   Effect.gen(function* () {

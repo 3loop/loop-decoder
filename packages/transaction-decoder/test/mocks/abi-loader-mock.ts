@@ -45,8 +45,8 @@ export const MockedAbiStoreLive = AbiStore.layer({
       const addressExists = yield* Effect.sync(() => fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`))
 
       if (addressExists) {
-        const abi = yield* Effect.sync(() =>
-          fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
+        const abi = yield* Effect.sync(
+          () => fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
         )
 
         results.push({
@@ -65,8 +65,8 @@ export const MockedAbiStoreLive = AbiStore.layer({
         const signatureExists = yield* Effect.sync(() => fs.existsSync(`./test/mocks/abi/${sig.toLowerCase()}.json`))
 
         if (signatureExists) {
-          const signatureAbi = yield* Effect.sync(() =>
-            fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString(),
+          const signatureAbi = yield* Effect.sync(
+            () => fs.readFileSync(`./test/mocks/abi/${sig.toLowerCase()}.json`)?.toString(),
           )
 
           if (signature) {

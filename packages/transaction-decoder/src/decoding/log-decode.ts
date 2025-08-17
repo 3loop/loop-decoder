@@ -31,16 +31,15 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
       chainID: Number(transaction.chainId),
     })
 
-    // Try to decode with all available ABIs for this event
-    const {
-      eventName,
-      args,
-      abiItem,
-    } = yield* AbiDecoder.validateAndDecodeEventWithABIs(logItem.topics, logItem.data, {
-      address: abiAddress,
-      event: logItem.topics[0],
-      chainID,
-    })
+    const { eventName, args, abiItem } = yield* AbiDecoder.validateAndDecodeEventWithABIs(
+      logItem.topics,
+      logItem.data,
+      {
+        address: abiAddress,
+        event: logItem.topics[0],
+        chainID,
+      },
+    )
 
     const fragment = yield* Effect.try({
       try: () => getAbiItem({ abi: abiItem, name: eventName }),
