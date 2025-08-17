@@ -1,13 +1,11 @@
 import { Effect } from 'effect'
 import type { DecodeTraceResult, Interaction, InteractionEvent } from '../types.js'
 import type { CallTraceLog, TraceLog } from '../schema/trace.js'
-import { DecodeError, decodeMethod } from './abi-decode.js'
-
+import { DecodeError } from './abi-decode.js'
 import { validateAndDecodeWithABIs } from './abi-decode.js'
-import { type Hex, type GetTransactionReturnType, Abi, getAddress } from 'viem'
+import { type Hex, type GetTransactionReturnType, getAddress } from 'viem'
 import { stringify } from '../helpers/stringify.js'
-import { errorFunctionSignatures, panicReasons, solidityError, solidityPanic } from '../helpers/error.js'
-import { e } from 'vitest/dist/types-63abf2e0.js'
+import { panicReasons } from '../helpers/error.js'
 
 //because some transactions are multicalls, we need to get the second level calls
 //to decode the actual method calls
