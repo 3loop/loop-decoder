@@ -85,7 +85,7 @@ export async function decodeTransaction({
     return { decoded: result }
   } catch (error: unknown) {
     const endTime = performance.now()
-    const message = error instanceof Error ? JSON.parse(error.message) : 'Failed to decode transaction'
+    const message = error instanceof Error ? error.message : 'Failed to decode transaction'
     console.log(message)
     console.log(`Failed decode transaction took ${endTime - startTime}ms`)
     return {

@@ -44,22 +44,26 @@ export const runMigrations = (migrations: readonly Migration[]) =>
     yield* ensureMigrationsTable(sql)
 
     // compute latest applied (lexicographic order). Expect zero-padded ids like 001_...
-    const latest = yield* getLatestAppliedMigration(sql)
+    const latest = yield* getLatestAppliedMigration(sql).pipe(
+      Effect.tapError((error) =>
+        Effect.logError(`Migration failed: ${error}`)
+      ),
+    )
 
     // filter only migrations with id greater than latest
     const pending = latest == null ? migrations : migrations.filter((m) => m.id > latest)
 
-    for (const m of pending) {
-      // Run each migration in a transaction when supported
-      yield* sql.withTransaction(
-        Effect.gen(function* () {
-          const table = sql(MIGRATIONS_TABLE)
-          // record as applied
-          yield* sql`INSERT INTO ${table} (id) VALUES (${m.id})`
-        }),
-      )
-    }
-  })
+    yield* Effect.forEach(pending, (m) =>
+      Effect.gen(function* () {
+        // First run the migration
+        yield* m.up(sql)
 
+        // Only mark as applied if migration succeeded
+        const table = sql(MIGRATIONS_TABLE)
+        yield* sql`INSERT INTO ${table} (id) VALUES (${m.id})`
+      }),
+      { discard: true }
+    )
+  })
 // Helpers to define migrations succinctly
 export const migration = (id: string, up: Migration['up']): Migration => ({ id, up })

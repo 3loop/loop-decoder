@@ -90,6 +90,7 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
       yield* runMigrations([
         migration('001_create_contract_abi_v3', (q) =>
           Effect.gen(function* () {
+            // Create the v3 table first
             yield* q`CREATE TABLE IF NOT EXISTS ${tableV3} (
             ${id}
             type TEXT NOT NULL,
@@ -101,7 +102,36 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
             status TEXT NOT NULL,
             timestamp TEXT DEFAULT CURRENT_TIMESTAMP,
             source TEXT DEFAULT 'unknown'
-          )`
+          )`.pipe(Effect.tapError((error) => Effect.logError(`Failed to create v3 table during migration: ${error}`)))
+
+            // Check if v2 table exists before attempting migration
+            const v2TableExists = yield* q.onDialectOrElse({
+              sqlite: () => q`SELECT name FROM sqlite_master WHERE type='table' AND name='_loop_decoder_contract_abi_v2'`,
+              pg: () => q`SELECT tablename FROM pg_tables WHERE tablename='_loop_decoder_contract_abi_v2'`,
+              mysql: () => q`SELECT table_name FROM information_schema.tables WHERE table_name='_loop_decoder_contract_abi_v2'`,
+              orElse: () => q`SELECT COUNT(*) as count FROM ${tableV2} WHERE 1=0`, // Try to query table directly
+            }).pipe(
+              Effect.map((rows) => rows.length > 0),
+              Effect.catchAll(() => Effect.succeed(false)),
+            )
+
+            if (!v2TableExists) {
+              yield* Effect.logInfo('No v2 table found, skipping data migration')
+              return
+            }
+
+            // Check if there's any data to migrate
+            const v2Count = yield* q`SELECT COUNT(*) as count FROM ${tableV2}`.pipe(
+              Effect.map((rows) => rows[0]?.count || 0),
+              Effect.catchAll(() => Effect.succeed(0)),
+            )
+
+            if (v2Count === 0) {
+              yield* Effect.logInfo('v2 table is empty, skipping data migration')
+              return
+            }
+
+            yield* Effect.logInfo(`Starting migration of ${v2Count} records from v2 to v3 table`)
 
             const tsCoalesce = q.onDialectOrElse({
               sqlite: () => q`COALESCE(timestamp, CURRENT_TIMESTAMP)`,
@@ -110,39 +140,42 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
               orElse: () => q`CURRENT_TIMESTAMP`,
             })
 
+            // Migrate data with improved error handling, preserving IDs
             yield* q`
-              INSERT INTO ${tableV3} (type, address, chain, abi, status, timestamp, source)
-              SELECT 'address' as type, v.address, v.chain, v.abi, v.status, ${tsCoalesce} as timestamp, 'unknown' as source
+              INSERT INTO ${tableV3} (
+                id,
+                type,
+                address,
+                chain,
+                signature,
+                event,
+                abi,
+                status,
+                timestamp,
+                source
+              )
+              SELECT
+                v.id,
+                v.type,
+                v.address,
+                v.chain,
+                v.signature,
+                v.event,
+                v.abi,
+                v.status,
+                ${tsCoalesce} as timestamp,
+                'unknown' as source
               FROM ${tableV2} as v
-              WHERE v.type = 'address'
-                AND v.address IS NOT NULL AND v.chain IS NOT NULL
-                AND NOT EXISTS (
-                  SELECT 1 FROM ${tableV3} t
-                  WHERE t.type = 'address' AND t.address = v.address AND t.chain = v.chain
-                )
-            `.pipe(Effect.catchAll(Effect.logError))
-
-            yield* q`
-              INSERT INTO ${tableV3} (type, signature, abi, status, timestamp, source)
-              SELECT 'func' as type, v.signature, v.abi, v.status, ${tsCoalesce} as timestamp, 'unknown' as source
-              FROM ${tableV2} as v
-              WHERE v.type = 'func' AND v.signature IS NOT NULL
-                AND NOT EXISTS (
-                  SELECT 1 FROM ${tableV3} t
-                  WHERE t.type = 'func' AND t.signature = v.signature
-                )
-            `.pipe(Effect.catchAll(Effect.logError))
-
-            yield* q`
-              INSERT INTO ${tableV3} (type, event, abi, status, timestamp, source)
-              SELECT 'event' as type, v.event, v.abi, v.status, ${tsCoalesce} as timestamp, 'unknown' as source
-              FROM ${tableV2} as v
-              WHERE v.type = 'event' AND v.event IS NOT NULL
-                AND NOT EXISTS (
-                  SELECT 1 FROM ${tableV3} t
-                  WHERE t.type = 'event' AND t.event = v.event
-                )
-            `.pipe(Effect.catchAll(Effect.logError))
+              WHERE NOT EXISTS (
+                SELECT 1 FROM ${tableV3} t
+                WHERE t.id = v.id
+              )
+            `.pipe(
+              Effect.tap(() => Effect.logInfo('Successfully migrated ABIs from v2 to v3 table with preserved IDs')),
+              Effect.tapError((error) =>
+                Effect.logError(`Failed to migrate ABIs from v2 to v3 table: ${error}`)
+              )
+            )
           }),
         ),
       ])
@@ -156,36 +189,40 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
             const normalizedAddress = key.address.toLowerCase()
 
             if (abi.type === 'address') {
+              const insertData = {
+                type: abi.type,
+                address: normalizedAddress,
+                chain: key.chainID,
+                abi: abi.abi,
+                status: abi.status,
+                source: abi.source || 'unknown',
+              }
               yield* sql`
                 INSERT INTO ${table}
-                ${sql.insert([
-                  {
-                    type: abi.type,
-                    address: normalizedAddress,
-                    chain: key.chainID,
-                    abi: abi.abi,
-                    status: abi.status,
-                    source: abi.source || 'unknown',
-                  },
-                ])}
+                ${sql.insert([insertData])}
               `
             } else {
+              const insertData = {
+                type: abi.type,
+                event: 'event' in abi ? abi.event : null,
+                signature: 'signature' in abi ? abi.signature : null,
+                abi: abi.abi,
+                status: abi.status,
+                source: abi.source || 'unknown',
+              }
               yield* sql`
                 INSERT INTO ${table}
-                ${sql.insert([
-                  {
-                    type: abi.type,
-                    event: 'event' in abi ? abi.event : null,
-                    signature: 'signature' in abi ? abi.signature : null,
-                    abi: abi.abi,
-                    status: abi.status,
-                    source: abi.source || 'unknown',
-                  },
-                ])}
+                ${sql.insert([insertData])}
               `
             }
           }).pipe(
-            Effect.tapError(Effect.logError),
+            Effect.tapError((error) =>
+              Effect.logError(
+                `Failed to insert ABI into database for ${abi.type} key (address: ${key.address}, chainID: ${key.chainID
+                }). ABI status: ${abi.status}, ABI length: ${abi.abi?.length || 'null'}, source: ${abi.source || 'unknown'
+                }. Error: ${error}`,
+              ),
+            ),
             Effect.catchAll(() => {
               return Effect.succeed(null)
             }),
@@ -196,7 +233,12 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
             const query = buildQueryForKey(sql, { address, signature, event, chainID })
 
             const items = yield* sql` SELECT * FROM ${table} WHERE ${query}`.pipe(
-              Effect.tapError(Effect.logError),
+              Effect.tapError((error) =>
+                Effect.logError(
+                  `Failed to query ABI from database for key (address: ${address}, signature: ${signature || 'none'
+                  }, event: ${event || 'none'}, chainID: ${chainID}): ${error}`,
+                ),
+              ),
               Effect.catchAll(() => Effect.succeed([])),
             )
 
@@ -212,7 +254,9 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
             const batchQuery = sql.or(conditions)
 
             const allItems = yield* sql`SELECT * FROM ${table} WHERE ${batchQuery}`.pipe(
-              Effect.tapError(Effect.logError),
+              Effect.tapError((error) =>
+                Effect.logError(`Failed to query ABIs from database for batch of ${keys.length} keys: ${error}`),
+              ),
               Effect.catchAll(() => Effect.succeed([])),
             )
 
@@ -252,7 +296,9 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
               SET status = ${status}
               WHERE id = ${id}
             `.pipe(
-              Effect.tapError(Effect.logError),
+              Effect.tapError((error) =>
+                Effect.logError(`Failed to update ABI status in database for id ${id} to status '${status}': ${error}`),
+              ),
               Effect.catchAll(() => Effect.succeed(null)),
             )
           }),
