@@ -1,5 +1,5 @@
 import { Effect, Schedule, Duration, pipe, Data } from 'effect'
-import { GetContractABIStrategyParams, ContractAbiResolverStrategy, MissingABIStrategyError } from './request-model.js'
+import { ContractAbiResolverStrategy, MissingABIStrategyError } from './request-model.js'
 import type { CircuitBreaker } from '../circuit-breaker/circuit-breaker.js'
 import { RequestPool } from '../circuit-breaker/request-pool.js'
 import * as Constants from '../circuit-breaker/constants.js'
