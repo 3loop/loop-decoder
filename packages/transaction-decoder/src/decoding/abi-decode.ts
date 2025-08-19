@@ -196,7 +196,7 @@ export const decodeEventLog = (
   Effect.gen(function* () {
     const { eventName, args = {} } = yield* Effect.try({
       try: () =>
-        viemDecodeEventLog({ abi, topics: topics as [] | [`0x${string}`, ...`0x${string}`[]], data, strict: false }),
+        viemDecodeEventLog({ abi, topics: topics as [] | [`0x${string}`, ...`0x${string}`[]], data, strict: true }),
       catch: (error) => new DecodeError(`Could not decode event log`, error),
     })
 
