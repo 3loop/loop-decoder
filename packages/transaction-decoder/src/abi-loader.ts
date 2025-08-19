@@ -304,8 +304,6 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
           return { abi: parsedAbi, id: undefined }
         })
 
-        const result = allMatches.length > 0 ? Effect.succeed(allMatches) : Effect.fail(new MissingABIError(request))
-
         const cacheEffect =
           allAbis.length > 0
             ? Effect.forEach(allAbis, (abi) => setValue(request, abi), {
@@ -316,7 +314,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
 
         return Effect.zipRight(
           cacheEffect,
-          Effect.forEach(group, (req) => Request.completeEffect(req, result), { discard: true }),
+          Effect.forEach(group, (req) => Request.completeEffect(req, Effect.succeed(allMatches)), { discard: true }),
         )
       },
       {
