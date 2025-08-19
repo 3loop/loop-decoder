@@ -1,6 +1,6 @@
 import { Effect, Either, RequestResolver, Request, Array, Data, PrimaryKey, Schema, SchemaAST } from 'effect'
 import { ContractABI } from './abi-strategy/request-model.js'
-import { Abi } from 'viem'
+import { Abi, erc20Abi, erc721Abi } from 'viem'
 import * as AbiStore from './abi-store.js'
 import * as StrategyExecutorModule from './abi-strategy/strategy-executor.js'
 import { SAFE_MULTISEND_SIGNATURE, SAFE_MULTISEND_ABI, AA_ABIS } from './decoding/constants.js'
@@ -32,7 +32,7 @@ export class EmptyCalldataError extends Data.TaggedError('DecodeError')<
   }
 }
 
-class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) {}
+class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) { }
 class AbiLoader extends Schema.TaggedRequest<AbiLoader>()('AbiLoader', {
   failure: Schema.instanceOf(MissingABIError),
   success: Schema.Array(Schema.Struct({ abi: SchemaAbi, id: Schema.optional(Schema.String) })),
@@ -81,18 +81,18 @@ const setValue = (key: AbiLoader, abi: (ContractABI & { strategyId: string }) | 
       },
       abi == null
         ? {
-            type: 'func' as const,
-            abi: '',
-            address: key.address,
-            chainID: key.chainID,
-            signature: key.signature || '',
-            status: 'not-found' as const,
-          }
+          type: 'func' as const,
+          abi: '',
+          address: key.address,
+          chainID: key.chainID,
+          signature: key.signature || '',
+          status: 'not-found' as const,
+        }
         : {
-            ...abi,
-            source: abi.strategyId,
-            status: 'success' as const,
-          },
+          ...abi,
+          source: abi.strategyId,
+          status: 'success' as const,
+        },
     )
   })
 
@@ -309,9 +309,9 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
         const cacheEffect =
           allAbis.length > 0
             ? Effect.forEach(allAbis, (abi) => setValue(request, abi), {
-                discard: true,
-                concurrency: 'unbounded',
-              })
+              discard: true,
+              concurrency: 'unbounded',
+            })
             : setValue(request, null)
 
         return Effect.zipRight(
@@ -335,6 +335,8 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
 // in a missing Fragment. We treat this issue as a minor one for now, as we expect it to occur rarely on contracts that
 // are not verified and with a non standard events structure.
 
+const errorAbis: Abi = [...solidityPanic, ...solidityError]
+
 export const getAndCacheAbi = (params: AbiStore.AbiParams) =>
   Effect.gen(function* () {
     if (params.event === '0x' || params.signature === '0x') {
@@ -342,7 +344,6 @@ export const getAndCacheAbi = (params: AbiStore.AbiParams) =>
     }
 
     if (params.signature && errorFunctionSignatures.includes(params.signature)) {
-      const errorAbis: Abi = [...solidityPanic, ...solidityError]
       return [{ abi: errorAbis, id: undefined }]
     }
 
@@ -354,7 +355,11 @@ export const getAndCacheAbi = (params: AbiStore.AbiParams) =>
       return [{ abi: AA_ABIS[params.signature], id: undefined }]
     }
 
-    return yield* Effect.request(new AbiLoader(params), AbiLoaderRequestResolver)
+    const abis = yield* Effect.request(new AbiLoader(params), AbiLoaderRequestResolver)
+    return Array.appendAll(abis, [
+      { abi: erc20Abi, id: undefined },
+      { abi: erc721Abi, id: undefined },
+    ])
   }).pipe(
     Effect.withSpan('AbiLoader.GetAndCacheAbi', {
       attributes: {
