@@ -312,7 +312,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
               discard: true,
               concurrency: 'unbounded',
             })
-            : setValue(request, null)
+            : Effect.void
 
         return Effect.zipRight(
           cacheEffect,

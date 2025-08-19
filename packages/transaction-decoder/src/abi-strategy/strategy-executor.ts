@@ -43,11 +43,11 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
         data instanceof MissingABIStrategyError
           ? Effect.fail(data)
           : Effect.succeed(
-              data.map((abi) => ({
-                ...abi,
-                strategyId: strategy.id,
-              })),
-            ),
+            data.map((abi) => ({
+              ...abi,
+              strategyId: strategy.id,
+            })),
+          ),
       ),
     )
   }
@@ -73,10 +73,6 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
             strategies: strategies.map((s) => s.id),
           }),
         )
-      }
-
-      if (params.address.toLowerCase() === '0x49828c61a923624e22ce5b169be2bd650abc9bc8') {
-        console.log('ABIS; ', params, healthyStrategies) // Debugging line
       }
 
       // Try strategies one by one until one succeeds
