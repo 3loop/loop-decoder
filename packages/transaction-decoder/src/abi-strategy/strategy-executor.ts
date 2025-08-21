@@ -43,11 +43,11 @@ export const make = (circuitBreaker: CircuitBreaker, requestPool: RequestPool) =
         data instanceof MissingABIStrategyError
           ? Effect.fail(data)
           : Effect.succeed(
-            data.map((abi) => ({
-              ...abi,
-              strategyId: strategy.id,
-            })),
-          ),
+              data.map((abi) => ({
+                ...abi,
+                strategyId: strategy.id,
+              })),
+            ),
       ),
     )
   }

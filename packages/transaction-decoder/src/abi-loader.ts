@@ -32,7 +32,7 @@ export class EmptyCalldataError extends Data.TaggedError('DecodeError')<
   }
 }
 
-class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) { }
+class SchemaAbi extends Schema.make<Abi>(SchemaAST.objectKeyword) {}
 class AbiLoader extends Schema.TaggedRequest<AbiLoader>()('AbiLoader', {
   failure: Schema.instanceOf(MissingABIError),
   success: Schema.Array(Schema.Struct({ abi: SchemaAbi, id: Schema.optional(Schema.String) })),
@@ -81,18 +81,18 @@ const setValue = (key: AbiLoader, abi: (ContractABI & { strategyId: string }) | 
       },
       abi == null
         ? {
-          type: 'func' as const,
-          abi: '',
-          address: key.address,
-          chainID: key.chainID,
-          signature: key.signature || '',
-          status: 'not-found' as const,
-        }
+            type: 'func' as const,
+            abi: '',
+            address: key.address,
+            chainID: key.chainID,
+            signature: key.signature || '',
+            status: 'not-found' as const,
+          }
         : {
-          ...abi,
-          source: abi.strategyId,
-          status: 'success' as const,
-        },
+            ...abi,
+            source: abi.strategyId,
+            status: 'success' as const,
+          },
     )
   })
 
@@ -307,9 +307,9 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
         const cacheEffect =
           allAbis.length > 0
             ? Effect.forEach(allAbis, (abi) => setValue(request, abi), {
-              discard: true,
-              concurrency: 'unbounded',
-            })
+                discard: true,
+                concurrency: 'unbounded',
+              })
             : Effect.void
 
         return Effect.zipRight(
