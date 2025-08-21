@@ -1,4 +1,4 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import { convertAbiToFragments } from '../../src/helpers/abi.js'
 
 export async function main(abiPath: string) {

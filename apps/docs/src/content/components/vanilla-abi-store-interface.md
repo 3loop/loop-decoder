@@ -2,6 +2,6 @@
 export interface VanillaAbiStore {
   strategies?: readonly ContractAbiResolverStrategy[]
   get: (key: AbiParams) => Promise<ContractAbiResult>
-  set: (key: AbiParams, val: ContractAbiResult) => Promise<void>
+  set: (key: AbiParams, val: ContractABI) => Promise<void>
 }
 ```

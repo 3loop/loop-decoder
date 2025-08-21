@@ -1,6 +1,6 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
 import { Effect, Match } from 'effect'
-import fs from 'node:fs'
+import * as fs from 'node:fs'
 import * as AbiStore from '../../src/abi-store.js'
 import { FourByteStrategyResolver } from '../../src/index.js'
 import { EtherscanStrategyResolver } from '../../src/abi-strategy/index.js'
@@ -20,18 +20,18 @@ export const MockedAbiStoreLive = AbiStore.layer({
     Effect.gen(function* () {
       if (response.status !== 'success') return
 
-      const { key, value } = Match.value(response.result).pipe(
-        Match.when({ type: 'address' } as const, (value) => ({
-          key: value.address.toLowerCase(),
-          value: value.abi,
+      const { key, value } = Match.value(response).pipe(
+        Match.when({ type: 'address' }, (response) => ({
+          key: response.address.toLowerCase(),
+          value: response.abi,
         })),
-        Match.when({ type: 'func' } as const, (value) => ({
-          key: value.signature.toLowerCase(),
-          value: value.abi,
+        Match.when({ type: 'func' }, (response) => ({
+          key: response.signature.toLowerCase(),
+          value: response.abi,
         })),
-        Match.when({ type: 'event' } as const, (value) => ({
-          key: value.event.toLowerCase(),
-          value: value.abi,
+        Match.when({ type: 'event' }, (response) => ({
+          key: response.event.toLowerCase(),
+          value: response.abi,
         })),
         Match.exhaustive,
       )
@@ -40,6 +40,8 @@ export const MockedAbiStoreLive = AbiStore.layer({
     }),
   get: ({ address, signature, event }) =>
     Effect.gen(function* () {
+      const results: AbiStore.ContractAbiResult = []
+
       const addressExists = yield* Effect.sync(() => fs.existsSync(`./test/mocks/abi/${address.toLowerCase()}.json`))
 
       if (addressExists) {
@@ -47,15 +49,14 @@ export const MockedAbiStoreLive = AbiStore.layer({
           () => fs.readFileSync(`./test/mocks/abi/${address.toLowerCase()}.json`)?.toString(),
         )
 
-        return {
+        results.push({
+          id: `${address.toLowerCase()}-address`,
+          type: 'address',
+          abi,
+          address,
+          chainID: 1,
           status: 'success',
-          result: {
-            type: 'address',
-            abi,
-            address,
-            chainID: 1,
-          },
-        }
+        })
       }
 
       const sig = signature ?? event
@@ -69,34 +70,29 @@ export const MockedAbiStoreLive = AbiStore.layer({
           )
 
           if (signature) {
-            return {
+            results.push({
+              id: `${address.toLowerCase()}-${signature.toLowerCase()}-func`,
+              type: 'func',
+              abi: signatureAbi,
+              address,
+              chainID: 1,
+              signature,
               status: 'success',
-              result: {
-                type: 'func',
-                abi: signatureAbi,
-                address,
-                chainID: 1,
-                signature,
-              },
-            }
+            })
           } else if (event) {
-            return {
+            results.push({
+              id: `${address.toLowerCase()}-${event.toLowerCase()}-event`,
+              type: 'event',
+              abi: signatureAbi,
+              address,
+              chainID: 1,
+              event,
               status: 'success',
-              result: {
-                type: 'event',
-                abi: signatureAbi,
-                address,
-                chainID: 1,
-                event,
-              },
-            }
+            })
           }
         }
       }
 
-      return {
-        status: 'empty',
-        result: null,
-      }
+      return results
     }),
 })

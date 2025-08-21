@@ -4,6 +4,7 @@ import { decodeTransactionByHash, decodeCalldata } from './transaction-decoder.j
 import * as EffectAbiStore from './abi-store.js'
 import * as EffectContractMetaStore from './contract-meta-store.js'
 import type { ContractAbiResolverStrategy } from './abi-strategy/index.js'
+import type { ContractABI } from './abi-strategy/request-model.js'
 import type { Hex } from 'viem'
 import type { ContractMetaResolverStrategy } from './meta-strategy/request-model.js'
 
@@ -19,7 +20,7 @@ export interface TransactionDecoderOptions {
 export interface VanillaAbiStore {
   strategies?: readonly ContractAbiResolverStrategy[]
   get: (key: EffectAbiStore.AbiParams) => Promise<EffectAbiStore.ContractAbiResult>
-  set: (key: EffectAbiStore.AbiParams, val: EffectAbiStore.ContractAbiResult) => Promise<void>
+  set: (key: EffectAbiStore.AbiParams, val: ContractABI) => Promise<void>
 }
 
 type VanillaContractMetaStategy = (client: PublicClient) => ContractMetaResolverStrategy

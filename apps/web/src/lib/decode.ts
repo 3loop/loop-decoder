@@ -19,12 +19,7 @@ import { SqlAbiStore, SqlContractMetaStore } from '@3loop/transaction-decoder/sq
 import { Hex } from 'viem'
 import { DatabaseLive } from './database'
 
-const LogLevelLive = Layer.unwrapEffect(
-  Effect.gen(function* () {
-    const level = LogLevel.Warning
-    return Logger.minimumLogLevel(level)
-  }),
-)
+const LogLevelLive = Logger.minimumLogLevel(LogLevel.Warning)
 
 const AbiStoreLive = Layer.unwrapEffect(
   Effect.gen(function* () {
@@ -85,7 +80,7 @@ export async function decodeTransaction({
     return { decoded: result }
   } catch (error: unknown) {
     const endTime = performance.now()
-    const message = error instanceof Error ? JSON.parse(error.message) : 'Failed to decode transaction'
+    const message = error instanceof Error ? error.message : 'Failed to decode transaction'
     console.log(message)
     console.log(`Failed decode transaction took ${endTime - startTime}ms`)
     return {

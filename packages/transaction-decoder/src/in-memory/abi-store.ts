@@ -1,7 +1,9 @@
 import { Effect, Layer } from 'effect'
 import * as AbiStore from '../abi-store.js'
 import { ContractABI } from '../abi-strategy/request-model.js'
+import { CachedContractABI } from '../abi-store.js'
 
+// Keyed by composite: kind|key|source to allow per-strategy replacement
 const abiCache = new Map<string, ContractABI>()
 
 export const make = (strategies: AbiStore.AbiStore['strategies']) =>
@@ -9,44 +11,59 @@ export const make = (strategies: AbiStore.AbiStore['strategies']) =>
     AbiStore.AbiStore,
     AbiStore.make({
       strategies,
-      set: (_key, value) =>
+      set: (_key, abi) =>
         Effect.sync(() => {
-          if (value.status === 'success') {
-            if (value.result.type === 'address') {
-              abiCache.set(value.result.address, value.result)
-            } else if (value.result.type === 'event') {
-              abiCache.set(value.result.event, value.result)
-            } else if (value.result.type === 'func') {
-              abiCache.set(value.result.signature, value.result)
-            }
+          const source = abi.source ?? 'unknown'
+          if (abi.type === 'address') {
+            abiCache.set(`addr|${abi.address}|${source}`.toLowerCase(), abi)
+          } else if (abi.type === 'event') {
+            abiCache.set(`event|${abi.event}|${source}`, abi)
+          } else if (abi.type === 'func') {
+            abiCache.set(`sig|${abi.signature}|${source}`, abi)
           }
         }),
       get: (key) =>
         Effect.sync(() => {
-          if (abiCache.has(key.address)) {
-            return {
-              status: 'success',
-              result: abiCache.get(key.address)!,
+          const results: CachedContractABI[] = []
+
+          // If a specific strategy is requested via mark on keys in future, we return union of all strategies for that key
+          const prefixAddr = `addr|${key.address}|`.toLowerCase()
+          const prefixSig = key.signature ? `sig|${key.signature}|` : undefined
+          const prefixEvt = key.event ? `event|${key.event}|` : undefined
+
+          for (const [k, v] of abiCache.entries()) {
+            if (
+              k.startsWith(prefixAddr) ||
+              (prefixSig && k.startsWith(prefixSig)) ||
+              (prefixEvt && k.startsWith(prefixEvt))
+            ) {
+              // Convert ContractABI to CachedContractABI
+              const cachedAbi: CachedContractABI = {
+                ...v,
+                id: k, // Use cache key as ID for in-memory storage
+                status: 'success',
+                source: k.split('|')[2] || undefined,
+                timestamp: undefined,
+              }
+              results.push(cachedAbi)
             }
           }
 
-          if (key.event && abiCache.has(key.event)) {
-            return {
-              status: 'success',
-              result: abiCache.get(key.event)!,
+          return results
+        }),
+      updateStatus: (id, status) =>
+        Effect.sync(() => {
+          // For in-memory store, we need to find the ABI by ID and update its status
+          // Since we use cache key as ID, we can find it directly
+          for (const [key] of abiCache.entries()) {
+            if (key === id) {
+              // Create a new ABI object with updated status
+              // Note: For in-memory, we can't actually change the status of the result
+              // since it's used in ContractAbiResult. This is a limitation of the in-memory approach.
+              // In practice, you'd want to remove invalid ABIs from cache or mark them differently.
+              abiCache.delete(key)
+              break
             }
-          }
-
-          if (key.signature && abiCache.has(key.signature)) {
-            return {
-              status: 'success',
-              result: abiCache.get(key.signature)!,
-            }
-          }
-
-          return {
-            status: 'empty',
-            result: null,
           }
         }),
     }),

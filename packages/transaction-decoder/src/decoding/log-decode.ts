@@ -1,10 +1,11 @@
-import { type GetTransactionReturnType, type Log, decodeEventLog, getAbiItem, getAddress } from 'viem'
+import { type GetTransactionReturnType, type Log, getAbiItem, getAddress } from 'viem'
 import { Effect } from 'effect'
 import type { DecodedLogEvent, Interaction, RawDecodedLog } from '../types.js'
 import { getProxyImplementation } from './proxies.js'
-import { getAndCacheAbi } from '../abi-loader.js'
+
 import { getAndCacheContractMeta } from '../contract-meta-loader.js'
 import * as AbiDecoder from './abi-decode.js'
+
 import { stringify } from '../helpers/stringify.js'
 import { formatAbiItem } from 'viem/utils'
 
@@ -25,40 +26,20 @@ const decodedLog = (transaction: GetTransactionReturnType, logItem: Log) =>
     const implementation = yield* getProxyImplementation({ address, chainID })
     const abiAddress = implementation?.address ?? address
 
-    const [abiItem, contractData] = yield* Effect.all(
-      [
-        getAndCacheAbi({
-          address: abiAddress,
-          event: logItem.topics[0],
-          chainID,
-        }),
-        getAndCacheContractMeta({
-          address,
-          chainID: Number(transaction.chainId),
-        }),
-      ],
-      {
-        concurrency: 'unbounded',
-        batching: true,
-      },
-    )
-
-    const { eventName, args: args_ } = yield* Effect.try({
-      try: () =>
-        decodeEventLog({
-          abi: abiItem,
-          topics: logItem.topics,
-          data: logItem.data,
-          strict: false,
-        }),
-      catch: (err) => new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`, err),
+    const contractData = yield* getAndCacheContractMeta({
+      address,
+      chainID: Number(transaction.chainId),
     })
 
-    if (eventName == null) {
-      return yield* new AbiDecoder.DecodeError(`Could not decode log ${abiAddress}`)
-    }
-
-    const args = args_ as any
+    const { eventName, args, abiItem } = yield* AbiDecoder.validateAndDecodeEventWithABIs(
+      logItem.topics,
+      logItem.data,
+      {
+        address: abiAddress,
+        event: logItem.topics[0],
+        chainID,
+      },
+    )
 
     const fragment = yield* Effect.try({
       try: () => getAbiItem({ abi: abiItem, name: eventName }),
