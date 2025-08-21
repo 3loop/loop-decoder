@@ -83,7 +83,11 @@
       "event": {
         "eventName": "Transfer",
         "logIndex": 90,
-        "params": {},
+        "params": {
+          "from": "0x928c2909847B884ba5Dd473568De6382b028F7b8",
+          "to": "0x22b81A596d3A1f727801bac52FC1B6c258765f48",
+          "tokenId": "1772",
+        },
       },
       "signature": "Transfer(address,address,uint256)",
     },
@@ -97,7 +101,11 @@
       "event": {
         "eventName": "Transfer",
         "logIndex": 91,
-        "params": {},
+        "params": {
+          "from": "0x906A43Ef2107aC308335a3809f07bAa9644d46F6",
+          "to": "0x22b81A596d3A1f727801bac52FC1B6c258765f48",
+          "tokenId": "599",
+        },
       },
       "signature": "Transfer(address,address,uint256)",
     },
@@ -111,7 +119,11 @@
       "event": {
         "eventName": "Transfer",
         "logIndex": 92,
-        "params": {},
+        "params": {
+          "from": "0x928c2909847B884ba5Dd473568De6382b028F7b8",
+          "to": "0x22b81A596d3A1f727801bac52FC1B6c258765f48",
+          "tokenId": "755",
+        },
       },
       "signature": "Transfer(address,address,uint256)",
     },
@@ -1107,6 +1119,33 @@
     },
   ],
   "transfers": [
+    {
+      "address": "0xA4084B46F01d518616B0cDcC557b7f7E0cF8Bd50",
+      "amount": "0",
+      "from": "0x928c2909847B884ba5Dd473568De6382b028F7b8",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0x22b81A596d3A1f727801bac52FC1B6c258765f48",
+      "type": "ERC20",
+    },
+    {
+      "address": "0xA4084B46F01d518616B0cDcC557b7f7E0cF8Bd50",
+      "amount": "0",
+      "from": "0x906A43Ef2107aC308335a3809f07bAa9644d46F6",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0x22b81A596d3A1f727801bac52FC1B6c258765f48",
+      "type": "ERC20",
+    },
+    {
+      "address": "0xA4084B46F01d518616B0cDcC557b7f7E0cF8Bd50",
+      "amount": "0",
+      "from": "0x928c2909847B884ba5Dd473568De6382b028F7b8",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0x22b81A596d3A1f727801bac52FC1B6c258765f48",
+      "type": "ERC20",
+    },
     {
       "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "amount": "0.285",

@@ -97,9 +97,9 @@
     "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
     "0xe1C83D448788af03049c7239da79007536F8AFfD",
     "0x000000000022D473030F116dDEE9F6B43aC78BA3",
-    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-    "0x81FbEf4704776cc5bBa0A5dF3a90056d2C6900B3",
     "0x12D737470fB3ec6C3DeEC9b518100Bec9D520144",
+    "0x81FbEf4704776cc5bBa0A5dF3a90056d2C6900B3",
+    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "0x38F5E5b4DA37531a6e85161e337e0238bB27aa90",
   ],
   "interactions": [
@@ -131,7 +131,11 @@
       "event": {
         "eventName": "Transfer",
         "logIndex": 198,
-        "params": {},
+        "params": {
+          "from": "0xe1C83D448788af03049c7239da79007536F8AFfD",
+          "to": "0x12D737470fB3ec6C3DeEC9b518100Bec9D520144",
+          "value": "5765",
+        },
       },
       "signature": "Transfer(address,address,uint256)",
     },
@@ -163,7 +167,11 @@
       "event": {
         "eventName": "Transfer",
         "logIndex": 200,
-        "params": {},
+        "params": {
+          "from": "0x12D737470fB3ec6C3DeEC9b518100Bec9D520144",
+          "to": "0x81FbEf4704776cc5bBa0A5dF3a90056d2C6900B3",
+          "value": "5765",
+        },
       },
       "signature": "Transfer(address,address,uint256)",
     },
@@ -468,6 +476,24 @@
     },
   ],
   "transfers": [
+    {
+      "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+      "amount": "0.000000000000005765",
+      "from": "0xe1C83D448788af03049c7239da79007536F8AFfD",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0x12D737470fB3ec6C3DeEC9b518100Bec9D520144",
+      "type": "ERC20",
+    },
+    {
+      "address": "0xEB4C2781e4ebA804CE9a9803C67d0893436bB27D",
+      "amount": "0.000000000000005765",
+      "from": "0x12D737470fB3ec6C3DeEC9b518100Bec9D520144",
+      "name": "Mock ERC20 Contract",
+      "symbol": "ERC20",
+      "to": "0x81FbEf4704776cc5bBa0A5dF3a90056d2C6900B3",
+      "type": "ERC20",
+    },
     {
       "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
       "amount": "0.001361017781386941",
