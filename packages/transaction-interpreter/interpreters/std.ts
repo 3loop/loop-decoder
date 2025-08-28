@@ -69,22 +69,43 @@ export function toAssetTransfer(transfer: Asset): AssetTransfer {
   }
 }
 
-export function assetsSent(transfers: Asset[], address: string): AssetTransfer[] {
+export function assetsSent(transfers: Asset[], fromAddress: string): AssetTransfer[] {
   const filtered = filterTransfers(transfers, {
     excludeZero: true,
-    excludeNull: address !== NULL_ADDRESS,
+    excludeNull: fromAddress !== NULL_ADDRESS,
   })
 
-  return filtered.filter((t) => t.from.toLowerCase() === address.toLowerCase()).map(toAssetTransfer)
+  return filtered.filter((t) => t.from.toLowerCase() === fromAddress.toLowerCase()).map(toAssetTransfer)
 }
 
-export function assetsReceived(transfers: Asset[], address: string): AssetTransfer[] {
+export function assetsReceived(transfers: Asset[], toAddress: string): AssetTransfer[] {
   const filtered = filterTransfers(transfers, {
     excludeZero: true,
-    excludeNull: address !== NULL_ADDRESS,
   })
 
-  return filtered.filter((t) => t.to.toLowerCase() === address.toLowerCase()).map(toAssetTransfer)
+  return filtered.filter((t) => t.to.toLowerCase() === toAddress.toLowerCase()).map(toAssetTransfer)
+}
+
+function assetsMinted(transfers: Asset[], toAddress: string): AssetTransfer[] {
+  const filtered = filterTransfers(transfers, {
+    excludeZero: true,
+  })
+
+  return filtered
+    .filter((t) => t.from.toLowerCase() === NULL_ADDRESS)
+    .filter((t) => t.to.toLowerCase() === toAddress.toLowerCase())
+    .map(toAssetTransfer)
+}
+
+function assetsBurned(transfers: Asset[], fromAddress: string): AssetTransfer[] {
+  const filtered = filterTransfers(transfers, {
+    excludeZero: true,
+  })
+
+  return filtered
+    .filter((t) => t.to.toLowerCase() === NULL_ADDRESS)
+    .filter((t) => t.from.toLowerCase() === fromAddress.toLowerCase())
+    .map(toAssetTransfer)
 }
 
 export function getNetTransfers({
@@ -265,8 +286,8 @@ export function displayAssets(assets: Payment[]) {
 export function isSwap(event: DecodedTransaction): boolean {
   if (event.transfers.some((t) => t.type !== 'ERC20' && t.type !== 'native')) return false
 
-  const minted = assetsSent(event.transfers, NULL_ADDRESS)
-  const burned = assetsReceived(event.transfers, NULL_ADDRESS)
+  const minted = assetsMinted(event.transfers, event.fromAddress)
+  const burned = assetsBurned(event.transfers, event.fromAddress)
 
   if (minted.length > 0 || burned.length > 0) return false
 
@@ -289,8 +310,8 @@ export function isSwap(event: DecodedTransaction): boolean {
 }
 
 export function defaultEvent(event: DecodedTransaction): InterpretedTransaction {
-  const burned = assetsReceived(event.transfers, NULL_ADDRESS)
-  const minted = assetsSent(event.transfers, NULL_ADDRESS)
+  const burned = assetsBurned(event.transfers, event.fromAddress)
+  const minted = assetsMinted(event.transfers, event.fromAddress)
 
   const newEvent = {
     type: 'unknown' as const,
