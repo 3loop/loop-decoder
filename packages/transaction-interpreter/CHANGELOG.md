@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.11.30
+
+### Patch Changes
+
+- c9b3fe6: Fix getting minted and burned assets in standart interpreter logic
+
 ## 0.11.29
 
 ### Patch Changes
