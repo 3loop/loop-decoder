@@ -21,8 +21,9 @@ const fallbackInterpreter = standardLibrary + '\n' + '/**PLACE_FALLBACK_CONTENT*
 // TODO: Add a default interpreter as a fallback
 function getInterpreter(tx: DecodedTransaction): string | undefined {
   const { chainID, toAddress, contractType } = tx
-  const key = `${chainID}:${toAddress}`.toLowerCase()
-  const id = contractToName[key]
+  const keyWithChainID = `${chainID}:${toAddress}`.toLowerCase()
+  const keyByAddress = `${toAddress}`.toLowerCase()
+  const id = contractToName[keyWithChainID] || contractToName[keyByAddress]
 
   //if there is a contract mapping, return the contract interpreter
   if (id) {

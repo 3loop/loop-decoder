@@ -336,17 +336,17 @@ export function defaultEvent(event: DecodedTransaction): InterpretedTransaction 
 export function genericSwapInterpreter(event: DecodedTransaction): InterpretedTransaction {
   const newEvent = defaultEvent(event)
 
-  const netSent = getNetTransfers({
-    transfers: event.transfers,
-    fromAddresses: [event.fromAddress],
-  })
-
-  const netReceived = getNetTransfers({
-    transfers: event.transfers,
-    toAddresses: [event.fromAddress],
-  })
-
   if (isSwap(event)) {
+    const netSent = getNetTransfers({
+      transfers: event.transfers,
+      fromAddresses: [event.fromAddress],
+    })
+
+    const netReceived = getNetTransfers({
+      transfers: event.transfers,
+      toAddresses: [event.fromAddress],
+    })
+
     const swapEvent: InterpretedSwapTransaction = {
       ...newEvent,
       type: 'swap',
