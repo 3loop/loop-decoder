@@ -1,4 +1,4 @@
-import { assetsReceived, assetsSent, genericInterpreter, displayAddress, displayAsset, toAssetTransfer } from './std.js'
+import { genericInterpreter } from './std.js'
 import type { InterpretedTransaction } from '@/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 
@@ -17,27 +17,12 @@ export function transformEvent(event: DecodedTransaction): InterpretedTransactio
       sender: string
     }
 
-    //detect single transfer
-    const transfers = event.transfers
-      .filter((t) => (t.from === sender || t.to === sender) && t.type !== 'native')
-      .map(toAssetTransfer)
-    if (transfers.length === 1) {
-      return {
-        ...newEvent,
-        type: 'transfer-token',
-        action: `Sent ${displayAsset(transfers[0])}`,
-        assetsSent: assetsSent(event.transfers, sender),
-        assetsReceived: assetsReceived(event.transfers, sender),
-      }
-    }
-
-    return {
-      ...newEvent,
-      type: 'account-abstraction',
-      action: `Account Abstraction transaction by ${displayAddress(sender)}`,
-      assetsSent: assetsSent(event.transfers, sender),
-      assetsReceived: assetsReceived(event.transfers, sender),
-    }
+    // if there is only one userOpEvent, we can use the sender as the fromAddress
+    // to try to use the generic interpreter to interpret the transaction
+    return genericInterpreter({
+      ...event,
+      fromAddress: sender,
+    })
   }
 
   if (userOpEvents.length > 1) {
