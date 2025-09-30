@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.30.1
+
+### Patch Changes
+
+- 8c5a9af: Bump whatsabi
+
 ## 0.30.0
 
 ### Minor Changes
