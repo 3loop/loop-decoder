@@ -10,6 +10,10 @@ import { Steps } from '@astrojs/starlight/components'
 
 In this guide, you will learn how to create a Farcaster bot that sends human-readable alerts about transactions happening on-chain. You can customize this bot for any EVM-compatible blockchain, and you don't need any specific knowledge about EVM transaction decoding and interpretation.
 
+:::tip
+Jump to the repo to view the full code example [3loop/farcaster-onchain-alerts-bot](https://github.com/3loop/farcaster-onchain-alerts-bot)
+:::
+
 :::note
 For the demo, we've used a [friend.tech](https://www.friend.tech) smart contract to track trading activity on the Base Mainnet network. By modifying the contract address and environment variables, you can create a bot to track smart contracts on any other EVM chain.
 :::
@@ -72,8 +76,12 @@ The `constants.ts` file contains the RPC URL and configuration. The Base RPCs do
 ```ts title="src/constants.ts"
 export const RPC = {
   8453: {
-    url: `wss://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-    traceAPI: 'none',
+    // Transaciton decoder by default needs archive node for transaction tracing
+    // becasue Alchemy free plan does not provide archive nodes, we use a different RPC here
+    archiveUrl: process.env.ARCHIVE_RPC_URL,
+
+    // Provide "none" when transaciton tracing is not needed
+    traceAPI: 'geth',
   },
 }
 ```
@@ -85,18 +93,11 @@ import { createPublicClient } from 'viem'
 
 const getPublicClient = (chainId: number) => {
   const rpc = RPC[chainId as keyof typeof RPC]
-
-  if (!rpc) {
-    throw new Error(`Missing RPC provider for chain ID ${chainId}`)
-  }
+  if (!rpc) throw new Error(`Missing RPC provider for chain ID ${chainId}`)
 
   return {
-    client: createPublicClient({
-      transport: webSocket(rpc.url),
-    }),
-    config: {
-      traceAPI: rpc.traceAPI,
-    },
+    client: createPublicClient({ transport: http(rpc.archiveUrl) }),
+    config: { traceAPI: rpc.traceAPI },
   }
 }
 ```
@@ -140,7 +141,7 @@ const decoded = await decoder.decodeTransaction({
 })
 ```
 
-The `decodeTransaction` method returns a `DecodedTransaction` object, which you can inspect using our [playground](https://loop-decoder-web.vercel.app/). [Here](https://loop-decoder-web.vercel.app/tx/8453/0x3bc635e07e1cec2b73a896e6d130cffde6b3eeb419f91ea79028927fb7a66a07) is an example of the Friend.tech transaction.
+The `decodeTransaction` method returns a `DecodedTransaction` object, which you can inspect using our [playground](https://loop-decoder-web.vercel.app/). [Here](https://loop-decoder-web.vercel.app/interpret/8453/0x3bc635e07e1cec2b73a896e6d130cffde6b3eeb419f91ea79028927fb7a66a07) is an example of the Friend.tech transaction.
 
 To interpret a decoded transaction, the `interpreter.ts` file contains a `transformEvent` function that transforms the `DecodedTransaction` and adds an action description. You can test the `transformEvent` function by putting it into the Interpretation field on the playground with the Friend.tech [example](https://loop-decoder-web.vercel.app/tx/8453/0x3bc635e07e1cec2b73a896e6d130cffde6b3eeb419f91ea79028927fb7a66a07), and pressing "Interpret".
 
@@ -158,8 +159,12 @@ export const CHAIN_ID = 8453
 In the program's entry point, we start a WebSocket subscription for new transactions using Alchemy's WebSocket RPC.
 
 ```ts title="src/index.ts"
+const wsClient = createPublicClient({
+  transport: webSocket(ALCHEMY_WS_RPC_URL),
+})
+
 async function createSubscription(address: string) {
-  await publicClient.transport.subscribe({
+  await wsClient.transport.subscribe({
     method: 'eth_subscribe',
     params: [
       //@ts-ignore
