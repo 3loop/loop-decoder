@@ -9,60 +9,46 @@ import {
 // Create an in-memory cache for the ABIs
 const abiCache = new Map<string, ContractABI>()
 
+// ABI store implementation with caching and multiple resolution strategies
 const abiStore: VanillaAbiStore = {
-  // Define the strategies to use for fetching the ABIs
   strategies: [
-    EtherscanStrategyResolver({
-      apikey: 'YourApiKeyToken',
+    // List of stratagies to resolve new ABIs
+    EtherscanV2StrategyResolver({
+      apikey: process.env.ETHERSCAN_API_KEY || '',
     }),
     FourByteStrategyResolver(),
   ],
 
-  // Get the ABI from the cache
-  // Get it by contract address, event name or signature hash
+  // Get ABI from memory by address, event or signature
+  // Can be returned the list of all possible ABIs
   get: async ({ address, event, signature }) => {
-    const value = abiCache.get(address)
-    if (value) {
-      return {
-        status: 'success',
-        result: value,
-      }
-    } else if (event) {
-      const value = abiCache.get(event)
-      if (value) {
-        return {
-          status: 'success',
-          result: value,
-        }
-      }
-    } else if (signature) {
-      const value = abiCache.get(signature)
-      if (value) {
-        return {
-          status: 'success',
-          result: value,
-        }
-      }
-    }
+    const key = address?.toLowerCase() || event || signature
+    if (!key) return []
 
-    return {
-      status: 'empty',
-      result: null,
-    }
+    const cached = abiCache.get(key)
+    return cached
+      ? [
+          {
+            ...cached,
+            id: key,
+            source: 'etherscan',
+            status: 'success',
+          },
+        ]
+      : []
   },
 
-  // Set the ABI in the cache
-  // Store it by contract address, event name or signature hash
-  set: async (_key, value) => {
-    if (value.status === 'success') {
-      if (value.result.type === 'address') {
-        abiCache.set(value.result.address, value.result)
-      } else if (value.result.type === 'event') {
-        abiCache.set(value.result.event, value.result)
-      } else if (value.result.type === 'func') {
-        abiCache.set(value.result.signature, value.result)
-      }
-    }
+  set: async (_key, abi) => {
+    const key =
+      abi.type === 'address'
+        ? abi.address.toLowerCase()
+        : abi.type === 'event'
+        ? abi.event
+        : abi.type === 'func'
+        ? abi.signature
+        : null
+
+    if (key) abiCache.set(key, abi)
   },
 }
 ```
