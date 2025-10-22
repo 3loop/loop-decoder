@@ -1,4 +1,4 @@
-import { ContractData, ContractType } from '../types.js'
+import { ContractData } from '../types.js'
 import * as RequestModel from './request-model.js'
 import { Effect, RequestResolver } from 'effect'
 import { PublicClient } from '../public-client.js'
@@ -53,38 +53,61 @@ export const NFTRPCStrategyResolver = (publicClientLive: PublicClient): RequestM
         )
       }
 
-      const erc721inst = getContract({
-        abi: erc721Abi,
-        address: contractAddress,
-        client,
-      })
+      let meta: ContractData | undefined
 
-      const [name, symbol] = yield* Effect.all(
-        [
-          Effect.tryPromise({
-            try: () => erc721inst.read.name(),
-            catch: () => fail,
-          }),
-          Effect.tryPromise({
-            try: () => erc721inst.read.symbol(),
-            catch: () => fail,
-          }),
-        ],
-        {
-          concurrency: 'inherit',
-          batching: 'inherit',
-        },
-      )
+      if (isERC721) {
+        const erc721inst = getContract({
+          abi: erc721Abi,
+          address: contractAddress,
+          client,
+        })
 
-      const type: ContractType = isERC1155 ? 'ERC1155' : 'ERC721'
+        const [name, symbol] = yield* Effect.all(
+          [
+            Effect.tryPromise({
+              try: () => erc721inst.read.name(),
+              catch: () => fail,
+            }),
+            Effect.tryPromise({
+              try: () => erc721inst.read.symbol(),
+              catch: () => fail,
+            }),
+          ],
+          {
+            concurrency: 'inherit',
+            batching: 'inherit',
+          },
+        )
 
-      const meta: ContractData = {
-        address,
-        contractAddress: address,
-        contractName: name,
-        tokenSymbol: symbol,
-        type,
-        chainID: chainId,
+        meta = {
+          address,
+          contractAddress: address,
+          contractName: name,
+          tokenSymbol: symbol,
+          type: 'ERC721',
+          chainID: chainId,
+        }
+      }
+
+      if (isERC1155) {
+        meta = {
+          address,
+          contractAddress: address,
+          type: 'ERC1155',
+          chainID: chainId,
+        }
+      }
+
+      if (!meta) {
+        // Contract exists but doesn't support NFT interfaces - this is a "no data found" case
+        return yield* Effect.fail(
+          new RequestModel.MissingMetaError(
+            address,
+            chainId,
+            'nft-rpc-strategy',
+            'Contract is not an NFT (ERC721/ERC1155)',
+          ),
+        )
       }
 
       return meta
