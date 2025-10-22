@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.30.2
+
+### Patch Changes
+
+- 5784e07: Fix metadata resolution for ERC1155 - do not resolve name and symbol for ERC1155
+
 ## 0.30.1
 
 ### Patch Changes
