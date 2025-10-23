@@ -1,16 +1,24 @@
 import { stringify } from './helpers/stringify.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import { Effect, Layer } from 'effect'
-import { Interpreter } from './types.js'
+import { Interpreter, InterpreterOptions } from './types.js'
 import { getInterpreter } from './interpreters.js'
 import { TransactionInterpreter } from './interpreter.js'
+import { InterpreterError } from './quickjs.js'
 
-function localEval(code: string, input: string) {
+async function localEval(code: string, input: string) {
   const fn = new Function(`with(this) { ${code}; return transformEvent(${input}) }`)
-  return fn.call({})
+  const result = fn.call({})
+
+  // Check if result is a promise and await it
+  if (result && typeof result.then === 'function') {
+    return await result
+  }
+
+  return result
 }
 
-const make = Effect.succeed({
+const make = {
   // NOTE: We could export this separately to allow bundling the interpreters separately
   findInterpreter: (decodedTx: DecodedTransaction) => {
     if (!decodedTx.toAddress) return undefined
@@ -24,29 +32,38 @@ const make = Effect.succeed({
     }
   },
   interpretTx: (
-    decodedTx: DecodedTransaction,
+    decodedTransaction: DecodedTransaction,
     interpreter: Interpreter,
     options?: {
       interpretAsUserAddress?: string
     },
   ) =>
-    Effect.sync(() => {
-      // TODO: add ability to surpress warning on acknowledge
-      Effect.logWarning('Using eval in production can result in security vulnerabilities. Use at your own risk.')
-
-      let input
-      if (options?.interpretAsUserAddress) {
-        input = stringify({
-          ...decodedTx,
-          fromAddress: options.interpretAsUserAddress,
-        })
-      } else {
-        input = stringify(decodedTx)
-      }
-
-      const result = localEval(interpreter.schema, input)
-      return result
+    Effect.tryPromise({
+      try: async () => {
+        // TODO: add ability to surpress warning on acknowledge
+        Effect.logWarning('Using eval in production can result in security vulnerabilities. Use at your own risk.')
+        const input = stringify(decodedTransaction) + (options ? `,${stringify(options)}` : '')
+        const result = await localEval(interpreter.schema, input)
+        return result
+      },
+      catch: (error) => new InterpreterError(error),
     }).pipe(Effect.withSpan('TransactionInterpreter.interpretTx')),
-})
 
-export const EvalInterpreterLive = Layer.scoped(TransactionInterpreter, make)
+  interpretTransaction: (
+    decodedTransaction: DecodedTransaction,
+    interpreter: Interpreter,
+    options?: InterpreterOptions,
+  ) =>
+    Effect.tryPromise({
+      try: async () => {
+        // TODO: add ability to surpress warning on acknowledge
+        Effect.logWarning('Using eval in production can result in security vulnerabilities. Use at your own risk.')
+        const input = stringify(decodedTransaction) + (options ? `,${stringify(options)}` : '')
+        const result = await localEval(interpreter.schema, input)
+        return result
+      },
+      catch: (error) => new InterpreterError(error),
+    }).pipe(Effect.withSpan('TransactionInterpreter.interpretTransaction')),
+}
+
+export const EvalInterpreterLive = Layer.scoped(TransactionInterpreter, Effect.succeed(make))

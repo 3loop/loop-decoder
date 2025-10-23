@@ -234,21 +234,21 @@ export const formatNumber = (numberString: string, precision = 3): string => {
   if ((integerPart && integerPart.length < 3 && !decimalPart) || (decimalPart && decimalPart.startsWith('000')))
     return numberString
 
+  // Apply rounding first to get the correct integer and decimal parts
+  const rounded = num.toFixed(precision)
+  const [roundedIntegerPart, roundedDecimalPart] = rounded.split('.')
+
   // Format the integer part manually
   let formattedIntegerPart = ''
-  for (let i = 0; i < integerPart.length; i++) {
-    if (i > 0 && (integerPart.length - i) % 3 === 0) {
+  for (let i = 0; i < roundedIntegerPart.length; i++) {
+    if (i > 0 && (roundedIntegerPart.length - i) % 3 === 0) {
       formattedIntegerPart += ','
     }
-    formattedIntegerPart += integerPart[i]
+    formattedIntegerPart += roundedIntegerPart[i]
   }
 
-  // Format the decimal part
-  const formattedDecimalPart = decimalPart
-    ? parseFloat('0.' + decimalPart)
-        .toFixed(precision)
-        .split('.')[1]
-    : '00'
+  // Use the already-rounded decimal part
+  const formattedDecimalPart = roundedDecimalPart || '000'
 
   return formattedIntegerPart + '.' + formattedDecimalPart
 }
@@ -284,7 +284,7 @@ export function displayAssets(assets: Payment[]) {
 // Categorization Functions
 
 export function isSwap(event: DecodedTransaction): boolean {
-  if (event.transfers.some((t) => t.type !== 'ERC20' && t.type !== 'native')) return false
+  if (event.transfers.some((t: Asset) => t.type !== 'ERC20' && t.type !== 'native')) return false
 
   const minted = assetsMinted(event.transfers, event.fromAddress)
   const burned = assetsBurned(event.transfers, event.fromAddress)
@@ -352,8 +352,8 @@ export function genericSwapInterpreter(event: DecodedTransaction): InterpretedTr
       type: 'swap',
       action: 'Swapped ' + displayAsset(netSent[0]) + ' for ' + displayAsset(netReceived[0]),
       context: {
-        sent: [netSent[0]],
-        received: [netReceived[0]],
+        netSent: [netSent[0]],
+        netReceived: [netReceived[0]],
       },
     }
 
@@ -396,10 +396,10 @@ export function genericInterpreter(event: DecodedTransaction): InterpretedTransa
   //batch mint
   if (minted.length > 1) {
     const price = newEvent.assetsSent.length === 1 ? newEvent.assetsSent[0] : undefined
-    const uniqueAssets = new Set(minted.map((asset) => asset.asset.address))
+    const uniqueAssets = new Set(minted.map((asset: AssetTransfer) => asset.asset.address))
 
     if (uniqueAssets.size === 1) {
-      const amount = minted.reduce((acc, asset) => acc + Number(asset.amount), 0)
+      const amount = minted.reduce((acc: number, asset: AssetTransfer) => acc + Number(asset.amount), 0)
       return {
         ...newEvent,
         type: 'mint',

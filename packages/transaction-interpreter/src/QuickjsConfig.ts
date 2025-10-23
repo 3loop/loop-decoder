@@ -5,6 +5,7 @@ export interface RuntimeConfig {
   timeout?: number
   memoryLimit?: number
   maxStackSize?: number
+  useFetch?: boolean
 }
 
 export interface QuickjsConfig {

@@ -50,9 +50,9 @@ export type AssetTransfer = {
 }
 
 export interface GenericInterpretedTransaction {
+  action: string
   type: TransactionType
   chain: number
-  action: string
   txHash: string
   timestamp: number
   user: Address
@@ -61,16 +61,18 @@ export interface GenericInterpretedTransaction {
   assetsReceived: AssetTransfer[]
   assetsMinted?: AssetTransfer[]
   assetsBurned?: AssetTransfer[]
+  //extra and arbitrary context for the transaction
+  context?: Record<string, unknown>
 }
 
 export interface InterpretedSwapTransaction extends GenericInterpretedTransaction {
   type: 'swap'
   context: {
-    sent: {
+    netSent: {
       amount: string
       asset: Asset
     }[]
-    received: {
+    netReceived: {
       amount: string
       asset: Asset
     }[]
@@ -78,3 +80,7 @@ export interface InterpretedSwapTransaction extends GenericInterpretedTransactio
 }
 
 export type InterpretedTransaction = GenericInterpretedTransaction | InterpretedSwapTransaction
+
+export interface InterpreterOptions {
+  interpretAsUserAddress?: string
+}
