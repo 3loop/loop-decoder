@@ -1,8 +1,16 @@
-import type { InterpretedTransaction } from '@/types.js'
+import type { InterpretedTransaction } from '../src/types.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import { genericSwapInterpreter } from './std.js'
+import { InterpreterOptions } from '../src/types.js'
 
-export function transformEvent(event: DecodedTransaction): InterpretedTransaction {
+export function transformEvent(event: DecodedTransaction, options?: InterpreterOptions): InterpretedTransaction {
+  if (options?.interpretAsUserAddress) {
+    return genericSwapInterpreter({
+      ...event,
+      fromAddress: options.interpretAsUserAddress,
+    })
+  }
+
   return genericSwapInterpreter(event)
 }
 
