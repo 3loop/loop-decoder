@@ -1,16 +1,16 @@
 import { stringify } from './helpers/stringify.js'
 import type { DecodedTransaction } from '@3loop/transaction-decoder'
 import { Effect, Layer } from 'effect'
-import { Interpreter } from './types.js'
+import { Interpreter, InterpreterOptions } from './types.js'
 import { getInterpreter } from './interpreters.js'
 import { QuickjsVM } from './quickjs.js'
 import { TransactionInterpreter } from './interpreter.js'
+import { QuickjsConfig } from './QuickjsConfig.js'
 
 const make = Effect.gen(function* () {
-  const vm = yield* QuickjsVM
+  const config = yield* QuickjsConfig
 
   return {
-    // NOTE: We could export this separately to allow bundling the interpreters separately
     findInterpreter: (decodedTx: DecodedTransaction) => {
       if (!decodedTx.toAddress) return undefined
 
@@ -22,24 +22,42 @@ const make = Effect.gen(function* () {
         id: `${decodedTx.chainID}:${decodedTx.toAddress}`,
       }
     },
+
     interpretTx: (
-      decodedTx: DecodedTransaction,
+      decodedTransaction: DecodedTransaction,
       interpreter: Interpreter,
       options?: { interpretAsUserAddress?: string },
     ) =>
       Effect.gen(function* () {
-        let input
-        if (options?.interpretAsUserAddress) {
-          input = stringify({
-            ...decodedTx,
-            fromAddress: options.interpretAsUserAddress,
-          })
-        } else {
-          input = stringify(decodedTx)
-        }
-        const result = yield* vm.eval(interpreter.schema + '\n' + 'transformEvent(' + input + ')')
+        const vm = yield* QuickjsVM
+
+        const input = stringify(decodedTransaction) + (options ? `,${stringify(options)}` : '')
+        const code = interpreter.schema + '\n' + 'transformEvent(' + input + ')'
+        const result = yield* vm.eval(code)
         return result
-      }).pipe(Effect.withSpan('TransactionInterpreter.interpretTx')),
+      }).pipe(
+        Effect.withSpan('TransactionInterpreter.interpretTx'),
+        Effect.scoped,
+        Effect.provideService(QuickjsConfig, config),
+      ),
+
+    interpretTransaction: (
+      decodedTransaction: DecodedTransaction,
+      interpreter: Interpreter,
+      options?: InterpreterOptions,
+    ) =>
+      Effect.gen(function* () {
+        const vm = yield* QuickjsVM
+
+        const input = stringify(decodedTransaction) + (options ? `,${stringify(options)}` : '')
+        const code = interpreter.schema + '\n' + 'transformEvent(' + input + ')'
+        const result = yield* vm.eval(code)
+        return result
+      }).pipe(
+        Effect.withSpan('TransactionInterpreter.interpretTransaction'),
+        Effect.scoped,
+        Effect.provideService(QuickjsConfig, config),
+      ),
   }
 })
 

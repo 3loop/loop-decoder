@@ -12,7 +12,10 @@ import variant from '@jitl/quickjs-singlefile-browser-release-sync'
 
 const config = Layer.succeed(QuickjsConfig, {
   variant: variant,
-  runtimeConfig: { timeout: 1000 },
+  runtimeConfig: {
+    timeout: 1000,
+    useFetch: true,
+  },
 })
 
 const layer = Layer.provide(QuickjsInterpreterLive, config)
@@ -26,10 +29,13 @@ export interface Interpretation {
 export async function applyInterpreter(
   decodedTx: DecodedTransaction,
   interpreter: Interpreter,
+  interpretAsUserAddress?: string,
 ): Promise<Interpretation> {
   const runnable = Effect.gen(function* () {
     const interpreterService = yield* TransactionInterpreter
-    const interpretation = yield* interpreterService.interpretTx(decodedTx, interpreter)
+    const interpretation = yield* interpreterService.interpretTransaction(decodedTx, interpreter, {
+      interpretAsUserAddress,
+    })
     return interpretation
   }).pipe(Effect.provide(layer))
 

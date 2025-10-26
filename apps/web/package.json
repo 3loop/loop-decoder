@@ -11,7 +11,7 @@
   "dependencies": {
     "@3loop/transaction-decoder": "workspace:*",
     "@3loop/transaction-interpreter": "workspace:*",
-    "@jitl/quickjs-singlefile-browser-release-sync": "^0.29.2",
+    "@jitl/quickjs-singlefile-browser-release-sync": "^0.31.0",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-collapsible": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.4",
