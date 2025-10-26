@@ -5,9 +5,10 @@ import { Interpreter, InterpreterOptions } from './types.js'
 import { getInterpreter } from './interpreters.js'
 import { QuickjsVM } from './quickjs.js'
 import { TransactionInterpreter } from './interpreter.js'
+import { QuickjsConfig } from './QuickjsConfig.js'
 
 const make = Effect.gen(function* () {
-  const vm = yield* QuickjsVM
+  const config = yield* QuickjsConfig
 
   return {
     findInterpreter: (decodedTx: DecodedTransaction) => {
@@ -28,11 +29,17 @@ const make = Effect.gen(function* () {
       options?: { interpretAsUserAddress?: string },
     ) =>
       Effect.gen(function* () {
+        const vm = yield* QuickjsVM
+
         const input = stringify(decodedTransaction) + (options ? `,${stringify(options)}` : '')
         const code = interpreter.schema + '\n' + 'transformEvent(' + input + ')'
         const result = yield* vm.eval(code)
         return result
-      }).pipe(Effect.withSpan('TransactionInterpreter.interpretTx')),
+      }).pipe(
+        Effect.withSpan('TransactionInterpreter.interpretTx'),
+        Effect.scoped,
+        Effect.provideService(QuickjsConfig, config),
+      ),
 
     interpretTransaction: (
       decodedTransaction: DecodedTransaction,
@@ -40,11 +47,17 @@ const make = Effect.gen(function* () {
       options?: InterpreterOptions,
     ) =>
       Effect.gen(function* () {
+        const vm = yield* QuickjsVM
+
         const input = stringify(decodedTransaction) + (options ? `,${stringify(options)}` : '')
         const code = interpreter.schema + '\n' + 'transformEvent(' + input + ')'
         const result = yield* vm.eval(code)
         return result
-      }).pipe(Effect.withSpan('TransactionInterpreter.interpretTransaction')),
+      }).pipe(
+        Effect.withSpan('TransactionInterpreter.interpretTransaction'),
+        Effect.scoped,
+        Effect.provideService(QuickjsConfig, config),
+      ),
   }
 })
 
