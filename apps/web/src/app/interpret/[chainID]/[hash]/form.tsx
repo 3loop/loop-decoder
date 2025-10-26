@@ -26,6 +26,14 @@ const PATH = 'interpret'
 export default function DecodingForm({ decoded, currentHash, chainID, error }: FormProps) {
   const [result, setResult] = React.useState<Interpretation>()
   const [persistedSchema, setSchema] = useLocalStorage(decoded?.toAddress ?? 'unknown', '')
+  const [isInterpreting, setIsInterpreting] = React.useState(false)
+  const [userAddress, setUserAddress] = React.useState<string>('')
+
+  const matchingExample = React.useMemo(() => {
+    return Object.values(EXAMPLE_TXS)
+      .flatMap((categoryTxs) => categoryTxs)
+      .find((tx) => tx.hash.toLowerCase() === currentHash?.toLowerCase())
+  }, [currentHash])
 
   const schema = React.useMemo(() => {
     if (persistedSchema !== '') return persistedSchema
@@ -54,11 +62,25 @@ export default function DecodingForm({ decoded, currentHash, chainID, error }: F
         schema: schema,
       }
 
-      applyInterpreter(decoded, newInterpreter).then((res) => {
-        setResult(res)
-      })
+      setIsInterpreting(true)
+      setResult(undefined)
+
+      applyInterpreter(decoded, newInterpreter, userAddress || undefined)
+        .then((res) => {
+          setResult(res)
+        })
+        .finally(() => {
+          setIsInterpreting(false)
+        })
     }
-  }, [schema, decoded])
+  }, [schema, decoded, userAddress])
+
+  // Set user address from example if available
+  React.useEffect(() => {
+    if (matchingExample && (matchingExample as any).interpretAsUserAddress) {
+      setUserAddress((matchingExample as any).interpretAsUserAddress)
+    }
+  }, [matchingExample])
 
   // Run the interpreter on page load
   React.useEffect(() => {
@@ -68,14 +90,10 @@ export default function DecodingForm({ decoded, currentHash, chainID, error }: F
   }, [schema, decoded, result, onRun])
 
   const interpreterSourceLink = React.useMemo(() => {
-    const matchingExample = Object.values(EXAMPLE_TXS)
-      .flatMap((categoryTxs) => categoryTxs)
-      .find((tx) => tx.hash.toLowerCase() === currentHash?.toLowerCase())
-
     return matchingExample?.interpreter
       ? `${INTERPRETER_REPO}/interpreters/${matchingExample?.interpreter}.ts`
       : INTERPRETER_REPO
-  }, [currentHash])
+  }, [matchingExample])
 
   return (
     <div className="grid h-full items-stretch gap-6 grid-cols-1 lg:grid-cols-[1fr_200px]">
@@ -102,11 +120,21 @@ export default function DecodingForm({ decoded, currentHash, chainID, error }: F
               <Button type="submit" className="flex-1">
                 Decode
               </Button>
-              <Button variant={'outline'} onClick={onRun} type="button" className="flex-1">
+              <Button variant={'outline'} onClick={onRun} type="button" className="flex-1" disabled={isInterpreting}>
                 <PlayIcon className="mr-2 h-4 w-4" />
-                Interpret
+                {isInterpreting ? 'Interpreting...' : 'Interpret'}
               </Button>
             </div>
+          </div>
+          <div className="flex w-full lg:items-center gap-2 flex-col lg:flex-row mt-2">
+            <Input
+              className="flex-1"
+              id="userAddress"
+              name="userAddress"
+              placeholder="Optional: interpret as user address"
+              value={userAddress}
+              onChange={(e) => setUserAddress(e.target.value)}
+            />
           </div>
         </form>
 
@@ -146,12 +174,21 @@ export default function DecodingForm({ decoded, currentHash, chainID, error }: F
                 <Label>Result:</Label>
               </div>
 
-              <CodeBlock
-                language="json"
-                value={result?.error ? result?.error : JSON.stringify(result?.interpretation, null, 2)}
-                readonly={true}
-                lineNumbers={false}
-              />
+              {isInterpreting ? (
+                <div className="flex items-center justify-center p-8 border rounded-md">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600">Interpreting transaction...</p>
+                  </div>
+                </div>
+              ) : (
+                <CodeBlock
+                  language="json"
+                  value={result?.error ? result?.error : JSON.stringify(result?.interpretation, null, 2)}
+                  readonly={true}
+                  lineNumbers={false}
+                />
+              )}
             </div>
           </div>
         )}

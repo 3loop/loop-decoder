@@ -31,6 +31,8 @@ type TransactionType = StringWithAutocompleteOptions<
   | 'burn'
   | 'mint'
   | 'batch'
+  | 'sell-outcome'
+  | 'buy-outcome'
   | 'unknown'
 >
 
