@@ -27,6 +27,22 @@ export const EXAMPLE_TXS = {
       interpreter: 'aave',
     },
   ],
+  'Polymarket Predictions': [
+    {
+      name: 'Buy Outcome',
+      hash: '0xe1429321d4d89f85126d346b01797e7b20b86ba6ea1d53e6c2b782ea46df4247',
+      chainID: 137,
+      interpreter: 'polymarket',
+      interpretAsUserAddress: '0x5f5be567196fe36552f79dca5dac8d7a2132b598',
+    },
+    {
+      name: 'Sell Outcome',
+      hash: '0x5b646ff588feafa9b17d4a181b249cb9d9cd92d468a4ce8efbbb79fe1ab17567',
+      chainID: 137,
+      interpreter: 'polymarket',
+      interpretAsUserAddress: '0xdbade4c82fb72780a0db9a38f821d8671aba9c95',
+    },
+  ],
   'Gnosis Safe': [
     {
       name: 'MultiTransfer',
@@ -119,26 +135,6 @@ export const EXAMPLE_TXS = {
       hash: '0x7a7f39aee8c68f9be272b093f613280a8122291923edba83cc3f1f1754a70ecd',
       chainID: 1,
       interpreter: 'hop-protocol',
-    },
-  ],
-  'Moxie (Base mainnet)': [
-    {
-      name: 'Sell',
-      hash: '0x0f2540f5936228704cf94348085fb16fde87bfb554a76f0234dc8d5a804b0a7b',
-      chainID: 8453,
-      interpreter: 'moxie',
-    },
-    {
-      name: 'Buy',
-      hash: '0xc355f63566a9407d9a610b13f5e4e7fc64ce526f34503af18666904b63e0556f',
-      chainID: 8453,
-      interpreter: 'moxie',
-    },
-    {
-      name: 'Burn',
-      hash: '0x88833e8e873c09b3def62c2fe82f5ac3a20cdb936acce5ba27a5e4ab20417831',
-      chainID: 8453,
-      interpreter: 'moxie',
     },
   ],
 }
