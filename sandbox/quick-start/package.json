@@ -12,8 +12,8 @@
     "vite": "^5.4.9"
   },
   "dependencies": {
-    "@3loop/transaction-decoder": "0.26.0",
-    "effect": "^3.15.1",
-    "viem": "^2.21.35"
+    "@3loop/transaction-decoder": "0.30.0",
+    "effect": "^3.18.1",
+    "viem": "^2.38.4"
   }
 }

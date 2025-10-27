@@ -19,8 +19,11 @@ const getPublicClient = (chainId: number) => {
   if (chainId === 1) {
     return {
       client: createPublicClient({
-        transport: http('https://rpc.ankr.com/eth'),
+        transport: http('https://eth.llamarpc.com'),
       }),
+      config: {
+        traceAPI: 'none' as const,
+      },
     }
   }
 }
