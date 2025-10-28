@@ -40,7 +40,7 @@ const runnable = Effect.gen(function* () {
   // NOTE: Search the interpreter in the default interpreters
   const interpreter = interpreterService.findInterpreter(decodedTx)
 
-  const interpretation = yield* interpreterService.interpretTx(decodedTx, interpreter)
+  const interpretation = yield* interpreterService.interpretTransaction(decodedTx, interpreter)
 
   return interpretation
 }).pipe(Effect.provide(layer))

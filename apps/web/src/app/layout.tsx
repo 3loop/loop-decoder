@@ -4,7 +4,6 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { MainNav } from '@/components/ui/main-nav'
 import { Analytics } from '@vercel/analytics/react'
-import { aaveV2 } from '../app/data'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,11 +31,6 @@ const navLinks = [
     href: '/interpret',
     match: 'interpret',
     title: 'Transaction Interpreter',
-  },
-  {
-    href: `/contract/${aaveV2}`,
-    match: 'contract',
-    title: 'Test contract',
   },
 ]
 
