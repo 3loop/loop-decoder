@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { DecodedTransaction } from '@3loop/transaction-decoder'
-import { Interpretation, applyInterpreter } from '@/lib/interpreter'
+import type { Interpretation } from '@/lib/interpreter-server'
 import CodeBlock from '@/components/ui/code-block'
 import { NetworkSelect } from '@/components/ui/network-select'
 import { fallbackInterpreter, getInterpreter } from '@3loop/transaction-interpreter'
@@ -65,9 +65,28 @@ export default function DecodingForm({ decoded, currentHash, chainID, error }: F
       setIsInterpreting(true)
       setResult(undefined)
 
-      applyInterpreter(decoded, newInterpreter, userAddress || undefined)
+      // Call server-side API to run interpreter (avoids CORS issues)
+      fetch('/api/interpret', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          decodedTx: decoded,
+          interpreter: newInterpreter,
+          interpretAsUserAddress: userAddress || undefined,
+        }),
+      })
+        .then((response) => response.json())
         .then((res) => {
           setResult(res)
+        })
+        .catch((error) => {
+          setResult({
+            tx: decoded,
+            interpretation: null,
+            error: error.message || 'Failed to interpret transaction',
+          })
         })
         .finally(() => {
           setIsInterpreting(false)

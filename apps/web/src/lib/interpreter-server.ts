@@ -4,16 +4,16 @@ import {
   QuickjsInterpreterLive,
   QuickjsConfig,
   TransactionInterpreter,
-  fallbackInterpreter,
-  getInterpreter,
 } from '@3loop/transaction-interpreter'
 import { Effect, Layer } from 'effect'
-import variant from '@jitl/quickjs-singlefile-browser-release-sync'
+import variant from '@jitl/quickjs-singlefile-cjs-release-sync'
 
+// Server-side interpreter configuration using Node.js QuickJS variant
+// This runs in Node.js context where CORS restrictions don't apply
 const config = Layer.succeed(QuickjsConfig, {
   variant: variant,
   runtimeConfig: {
-    timeout: 1000,
+    timeout: 5000,
     useFetch: true,
   },
 })
@@ -26,11 +26,11 @@ export interface Interpretation {
   error?: string
 }
 
-export async function applyInterpreter(
+export const applyInterpreterServer = async (
   decodedTx: DecodedTransaction,
   interpreter: Interpreter,
   interpretAsUserAddress?: string,
-): Promise<Interpretation> {
+): Promise<Interpretation> => {
   const runnable = Effect.gen(function* () {
     const interpreterService = yield* TransactionInterpreter
     const interpretation = yield* interpreterService.interpretTransaction(decodedTx, interpreter, {
@@ -53,19 +53,4 @@ export async function applyInterpreter(
         error: (e as Error).message,
       }
     })
-}
-
-export async function findAndRunInterpreter(decodedTx: DecodedTransaction): Promise<Interpretation> {
-  let interpreter = getInterpreter(decodedTx)
-
-  if (!interpreter) {
-    interpreter = fallbackInterpreter
-  }
-
-  const res = await applyInterpreter(decodedTx, {
-    id: 'default',
-    schema: interpreter,
-  })
-
-  return res
 }

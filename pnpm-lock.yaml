@@ -81,7 +81,7 @@ importers:
       '@effect/sql-pg':
         specifier: ^0.36.1
         version: 0.36.1(@effect/experimental@0.46.1(@effect/platform@0.82.1(effect@3.15.1))(effect@3.15.1))(@effect/platform@0.82.1(effect@3.15.1))(@effect/sql@0.35.1(@effect/experimental@0.46.1(@effect/platform@0.82.1(effect@3.15.1))(effect@3.15.1))(@effect/platform@0.82.1(effect@3.15.1))(effect@3.15.1))(effect@3.15.1)
-      '@jitl/quickjs-singlefile-browser-release-sync':
+      '@jitl/quickjs-singlefile-cjs-release-sync':
         specifier: ^0.31.0
         version: 0.31.0
       '@monaco-editor/react':
@@ -1456,8 +1456,8 @@ packages:
   '@jitl/quickjs-ffi-types@0.31.0':
     resolution: {integrity: sha512-1yrgvXlmXH2oNj3eFTrkwacGJbmM0crwipA3ohCrjv52gBeDaD7PsTvFYinlAnqU8iPME3LGP437yk05a2oejw==}
 
-  '@jitl/quickjs-singlefile-browser-release-sync@0.31.0':
-    resolution: {integrity: sha512-JctBiLmRpxEp83gJWhDcBuFqm5X7T683OLmncN9g0chAHkC8+y5cJmgknaAk5Rb/ANDR3pXMMnGdnGXDdysfBQ==}
+  '@jitl/quickjs-singlefile-cjs-release-sync@0.31.0':
+    resolution: {integrity: sha512-TQ6WUsmdcdlXQKPyyGE/qNAoWY83mvjn+VNru6ug5ILv1D3Y+yaFXnMx+QyNX0onx9xSRGgVNZxXN0V0U+ZKpQ==}
 
   '@jitl/quickjs-wasmfile-debug-asyncify@0.29.2':
     resolution: {integrity: sha512-YdRw2414pFkxzyyoJGv81Grbo9THp/5athDMKipaSBNNQvFE9FGRrgE9tt2DT2mhNnBx1kamtOGj0dX84Yy9bg==}
@@ -8027,7 +8027,7 @@ snapshots:
 
   '@jitl/quickjs-ffi-types@0.31.0': {}
 
-  '@jitl/quickjs-singlefile-browser-release-sync@0.31.0':
+  '@jitl/quickjs-singlefile-cjs-release-sync@0.31.0':
     dependencies:
       '@jitl/quickjs-ffi-types': 0.31.0
 
