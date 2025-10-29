@@ -1,5 +1,17 @@
 # @3loop/transaction-interpreter
 
+## 0.12.0
+
+### Minor Changes
+
+- 60187ea: Add fetch and async calls support to quickjs and eval interpreters with extra config parameter. Add extra optional 'context' field to all interpreted tx
+
+### Patch Changes
+
+- 956dab3: Add polymarket interpretation
+- Updated dependencies [5784e07]
+  - @3loop/transaction-decoder@0.30.2
+
 ## 0.11.32
 
 ### Patch Changes
