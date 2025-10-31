@@ -1,7 +1,6 @@
 import type { InterpretedTransaction, InterpreterOptions } from '../src/types.js'
-import type { DecodedTransaction } from '@3loop/transaction-decoder'
-import { defaultEvent, assetsSent, assetsReceived } from './std.js'
-import { AssetTransfer } from '../src/types.js'
+import type { DecodedTransaction, Transfer } from '@3loop/transaction-decoder'
+import { defaultEvent, assetsSent, assetsReceived, formatNumber } from './std.js'
 
 const POLYMARKET_API = 'https://gamma-api.polymarket.com'
 
@@ -85,51 +84,58 @@ export async function transformEvent(
   const newEvent = defaultEvent(event)
 
   // Find OrderFilled events to determine transaction type
-  const orderFilledEvents = event.interactions
-    .sort((a: OrderFilledEvent, b: OrderFilledEvent) => a.event.logIndex - b.event.logIndex)
-    .filter((i: OrderFilledEvent) => i.event.eventName === 'OrderFilled')
+  const orderFilledEvents = event.interactions.filter((i: OrderFilledEvent) => i.event.eventName === 'OrderFilled')
+  const orderMatchedEvent = event.interactions.find((i: any) => i.event.eventName === 'OrdersMatched')
 
-  if (orderFilledEvents.length === 0) {
+  if (orderFilledEvents.length === 0 || !orderMatchedEvent) {
+    return newEvent
+  }
+
+  // As a user we look at the input address first, otherwise just use the 1st maker address
+  const userAddress =
+    options?.interpretAsUserAddress?.toLowerCase() || orderFilledEvents[0]?.event?.params?.maker?.toLowerCase()
+
+  if (!userAddress) {
     return newEvent
   }
 
   // Usually users are trading from the proxy wallets created by the polymarket
   // Signer is EOA owned by the user
   const signersAndProxies = event.methodCall?.params
-    ?.filter((p: OrderParam) => p?.name === 'takerOrder' || p?.name === 'makerOrders')
-    .map((p: OrderParam) => ({
-      signer:
-        p?.name === 'takerOrder'
-          ? p?.components?.find((c) => c?.name === 'signer')?.value
-          : p?.components?.[0]?.components?.find((c) => c?.name === 'signer')?.value,
-      proxy:
-        p?.name === 'takerOrder'
-          ? p?.components?.find((c) => c?.name === 'maker')?.value
-          : p?.components?.[0]?.components?.find((c) => c?.name === 'maker')?.value,
-    }))
+    ?.filter((p: OrderParam) => p.name === 'takerOrder' || p.name === 'makerOrders')
+    .map((p: OrderParam) => {
+      const components = p.name === 'takerOrder' ? p.components : p.components?.[0]?.components
+      return {
+        signer: components?.find((c) => c.name === 'signer')?.value,
+        proxy: components?.find((c) => c.name === 'maker')?.value,
+      }
+    })
 
-  // As a user we look at the input address first, otherwise just use the 1st maker address
-  const userAddress = options?.interpretAsUserAddress || orderFilledEvents[0]?.event?.params?.maker?.toLowerCase()
+  // To interpret the case like with minting/burning new CT tokens,
+  // we need to look at the final token transfers instead of the event params
+  const conditionalTokenTransfers = event.transfers.filter(
+    (t: Transfer) =>
+      t.type === 'ERC1155' &&
+      t.tokenId != null &&
+      (t.to.toLowerCase() === userAddress.toLowerCase() || t.from.toLowerCase() === userAddress.toLowerCase()),
+  )
 
-  if (!userAddress) {
-    return newEvent
-  }
+  const tokenId = conditionalTokenTransfers.length === 1 ? conditionalTokenTransfers[0].tokenId : undefined
 
   // Find the primary event for the user to determine the trade direction
-  const primaryEvent = orderFilledEvents.find(
-    (e: OrderFilledEvent) =>
-      e.event?.params?.maker?.toLowerCase() === userAddress.toLowerCase() ||
-      e.event?.params?.taker?.toLowerCase() === userAddress.toLowerCase(),
-  )
+  const primaryEvent = orderFilledEvents.find((e: OrderFilledEvent) => {
+    const params = e.event?.params
+    const isUserInvolved = params?.maker?.toLowerCase() === userAddress || params?.taker?.toLowerCase() === userAddress
+    const isTokenInvolved = params?.makerAssetId === tokenId || params?.takerAssetId === tokenId
+    return isUserInvolved && isTokenInvolved
+  })
 
   if (!primaryEvent?.event?.params) {
     return newEvent
   }
 
-  const { maker, taker, makerAssetId, takerAssetId, makerAmountFilled, takerAmountFilled } = primaryEvent.event
-    .params as {
+  const { maker, makerAssetId, makerAmountFilled, takerAmountFilled, takerAssetId } = primaryEvent.event.params as {
     maker: string
-    taker: string
     makerAssetId: string
     takerAssetId: string
     makerAmountFilled: number
@@ -137,102 +143,58 @@ export async function transformEvent(
   }
 
   // Determine transaction type based on asset IDs
-  const isMakerBuying = makerAssetId === '0'
-  const isTakerBuying = takerAssetId === '0'
-  const userIsMaker = maker.toLowerCase() === userAddress.toLowerCase()
-  const userIsTaker = taker.toLowerCase() === userAddress.toLowerCase()
-
-  if (!userIsMaker && !userIsTaker) {
-    return newEvent
-  }
-
-  const userIsBuying = (userIsMaker && isMakerBuying) || (userIsTaker && isTakerBuying)
-  const userIsSelling = (userIsMaker && !isMakerBuying) || (userIsTaker && !isTakerBuying)
+  const userIsMaker = maker?.toLowerCase() === userAddress
+  const userIsBuying = userIsMaker ? makerAssetId === '0' : makerAssetId !== '0'
+  const tokenAmount = (userIsMaker ? takerAmountFilled : makerAmountFilled) / 1e6
+  const costAmount = (userIsMaker ? makerAmountFilled : takerAmountFilled) / 1e6
 
   const sent = assetsSent(event.transfers, userAddress)
   const received = assetsReceived(event.transfers, userAddress)
-
   const context: Record<string, unknown> = {}
-  const tokenId = [...sent, ...received].find(
-    (t: AssetTransfer) => t.asset.type === 'ERC1155' && t.asset.tokenId != null,
-  )?.asset.tokenId
 
   if (tokenId) {
     const response = await fetch(`${POLYMARKET_API}/markets?clob_token_ids=${tokenId}`)
-
     if (response.ok) {
       const data = await response.json()
-
       if (data.length > 0) {
-        const marketData = data[0]
-        const outcomes = typeof marketData.outcomes === 'string' ? JSON.parse(marketData.outcomes) : marketData.outcomes
-        const clobTokenIds =
-          typeof marketData.clobTokenIds === 'string' ? JSON.parse(marketData.clobTokenIds) : marketData.clobTokenIds
+        const { outcomes, clobTokenIds, conditionId, question, slug, negRisk } = data[0]
+        const parsedOutcomes = typeof outcomes === 'string' ? JSON.parse(outcomes) : outcomes
+        const parsedTokenIds = typeof clobTokenIds === 'string' ? JSON.parse(clobTokenIds) : clobTokenIds
 
         context.marketData = {
-          conditionId: marketData?.conditionId,
-          question: marketData?.question,
-          slug: marketData?.slug,
-          negRisk: marketData?.negRisk,
-          tokens: outcomes.map((outcome: any, index: number) => ({
+          conditionId,
+          question,
+          slug,
+          negRisk,
+          tokens: parsedOutcomes.map((outcome: any, index: number) => ({
             outcome,
-            tokenId: clobTokenIds[index],
+            tokenId: parsedTokenIds[index],
           })),
         }
       }
     }
   }
 
+  const marketData = context.marketData as any
   const user = { address: userAddress, name: null }
   const baseContext = { proxyWallets: signersAndProxies, ...context }
+  const lookupTokenId = userIsBuying ? takerAssetId : tokenId
+  const outcome = marketData?.tokens.find((t: any) => t.tokenId === lookupTokenId)?.outcome
+  const outcomeText = outcome ? `'${outcome}'` : 'outcome tokens'
+  const marketText = marketData?.question ? ` in the market '${marketData.question}'` : ''
+  const action = userIsBuying ? 'Bought' : 'Sold'
+  const type = userIsBuying ? 'buy-outcome' : 'sell-outcome'
 
-  // Buying outcome tokens
-  if (userIsBuying) {
-    const [cost, amount] = [takerAmountFilled / 10 ** 6, makerAmountFilled / 10 ** 6]
-    const outcome = (context.marketData as any)?.tokens.find((t: any) => t.tokenId === tokenId)?.outcome
-    const question = (context.marketData as any)?.question
-
-    const outcomeText = outcome ? `'${outcome}'` : 'outcome tokens'
-    const marketText = question ? ` in the market '${question}'` : ''
-
-    return {
-      ...newEvent,
-      user,
-      type: 'buy-outcome',
-      action: `Bought ${amount} shares of ${outcomeText}${marketText} for ${cost} of USDC`,
-      assetsSent: sent,
-      assetsReceived: received,
-      context: baseContext,
-    }
-  }
-
-  // Selling outcome tokens
-  if (userIsSelling) {
-    const [cost, amount] = [takerAmountFilled / 10 ** 6, makerAmountFilled / 10 ** 6]
-    const outcome = (context.marketData as any)?.tokens.find((t: any) => t.tokenId === tokenId)?.outcome
-    const question = (context.marketData as any)?.question
-
-    const outcomeText = outcome ? `'${outcome}'` : 'outcome tokens'
-    const marketText = question ? ` in the market '${question}'` : ''
-
-    return {
-      ...newEvent,
-      user,
-      type: 'sell-outcome',
-      action: `Sold ${amount} shares of ${outcomeText}${marketText} for ${cost} of USDC`,
-      assetsSent: sent,
-      assetsReceived: received,
-      context: baseContext,
-    }
-  }
-
-  // TODO: Handle complex scenarios (minting/burning)
-  // When both users are buying opposite outcomes, tokens are minted
-
-  // Fallback to default interpretation with assets
   return {
     ...newEvent,
-    action: 'Traded on Polymarket',
+    user,
+    type,
+    action: `${action} ${formatNumber(tokenAmount.toString())} shares of ${outcomeText}${marketText} for ${formatNumber(
+      costAmount.toString(),
+    )} of USDC`,
+    assetsSent: sent,
+    assetsReceived: received,
+    context: baseContext,
   }
 }
 
