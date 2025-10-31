@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.12.1
+
+### Patch Changes
+
+- 4826fd7: Update polymarket interpreter
+
 ## 0.12.0
 
 ### Minor Changes
