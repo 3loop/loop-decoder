@@ -9,7 +9,6 @@ import {
 // Create an in-memory cache for the ABIs
 const abiCache = new Map<string, ContractABI>()
 
-// ABI store implementation with caching and multiple resolution strategies
 const abiStore: VanillaAbiStore = {
   strategies: [
     // List of stratagies to resolve new ABIs
