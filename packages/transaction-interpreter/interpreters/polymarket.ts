@@ -178,7 +178,7 @@ export async function transformEvent(
   const marketData = context.marketData as any
   const user = { address: userAddress, name: null }
   const baseContext = { proxyWallets: signersAndProxies, ...context }
-  const lookupTokenId = userIsBuying ? takerAssetId : tokenId
+  const lookupTokenId = userAddress && tokenId ? tokenId : userIsBuying && userIsMaker ? takerAssetId : makerAssetId
   const outcome = marketData?.tokens.find((t: any) => t.tokenId === lookupTokenId)?.outcome
   const outcomeText = outcome ? `'${outcome}'` : 'outcome tokens'
   const marketText = marketData?.question ? ` in the market '${marketData.question}'` : ''
