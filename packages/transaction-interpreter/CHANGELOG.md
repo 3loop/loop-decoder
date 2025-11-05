@@ -1,5 +1,11 @@
 # @3loop/transaction-interpreter
 
+## 0.12.2
+
+### Patch Changes
+
+- 65f4a90: Fix logic in CT lookup
+
 ## 0.12.1
 
 ### Patch Changes
