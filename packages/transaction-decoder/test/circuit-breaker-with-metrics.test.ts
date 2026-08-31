@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { Effect, MetricLabel, Duration, Either, TestContext } from 'effect'
+import { Deferred, Duration, Effect, Either, Fiber, MetricLabel, Ref, TestContext } from 'effect'
 import * as CircuitBreaker from '../src/circuit-breaker/circuit-breaker.js'
 
 describe('CircuitBreaker with Metrics', () => {
@@ -179,5 +179,103 @@ describe('CircuitBreaker with Metrics', () => {
 
     const result = await Effect.runPromise(testEffect.pipe(Effect.provide(TestContext.TestContext)))
     expect(result).toBe(true)
+  })
+
+  it('resets the consecutive failure count after a success', async () => {
+    const testEffect = Effect.gen(function* () {
+      const circuitBreaker = yield* CircuitBreaker.make<Error>({
+        strategy: CircuitBreaker.failureCount(2),
+      })
+      const strategyId = 'consecutive-failures'
+
+      yield* Effect.either(circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(true)))
+      yield* circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(false))
+      yield* Effect.either(circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(true)))
+
+      expect(yield* circuitBreaker.currentState(strategyId)).toBe('Closed')
+
+      yield* Effect.either(circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(true)))
+      expect(yield* circuitBreaker.currentState(strategyId)).toBe('Open')
+    })
+
+    await Effect.runPromise(testEffect.pipe(Effect.provide(TestContext.TestContext)))
+  })
+
+  it('includes successful calls in the failure-rate window', async () => {
+    const testEffect = Effect.gen(function* () {
+      const circuitBreaker = yield* CircuitBreaker.make<Error>({
+        strategy: CircuitBreaker.failureRate({
+          threshold: 0.75,
+          minCalls: 4,
+          windowSize: 4,
+        }),
+      })
+      const strategyId = 'failure-rate'
+
+      yield* circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(false))
+      yield* circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(false))
+      yield* Effect.either(circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(true)))
+      yield* Effect.either(circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(true)))
+
+      expect(yield* circuitBreaker.currentState(strategyId)).toBe('Closed')
+
+      yield* Effect.either(circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(true)))
+      expect(yield* circuitBreaker.currentState(strategyId)).toBe('Open')
+    })
+
+    await Effect.runPromise(testEffect.pipe(Effect.provide(TestContext.TestContext)))
+  })
+
+  it('atomically limits concurrent half-open probes', async () => {
+    const testEffect = Effect.gen(function* () {
+      const firstTransitionStarted = yield* Deferred.make<void>()
+      const secondTransitionStarted = yield* Deferred.make<void>()
+      const releaseTransition = yield* Deferred.make<void>()
+      const secondCompleted = yield* Deferred.make<void>()
+      const transitionCount = yield* Ref.make(0)
+      const executedProbes = yield* Ref.make(0)
+
+      const circuitBreaker = yield* CircuitBreaker.make<Error>({
+        maxFailures: 1,
+        resetTimeout: Duration.millis(0),
+        halfOpenMaxCalls: 1,
+        onStateChange: (change) =>
+          change.from === 'Open' && change.to === 'HalfOpen'
+            ? Effect.gen(function* () {
+                const count = yield* Ref.updateAndGet(transitionCount, (current) => current + 1)
+                yield* Deferred.succeed(count === 1 ? firstTransitionStarted : secondTransitionStarted, undefined)
+                yield* Deferred.await(releaseTransition)
+              })
+            : Effect.void,
+      })
+      const strategyId = 'half-open-limit'
+      const probe = circuitBreaker.withCircuitBreaker(
+        strategyId,
+        Ref.update(executedProbes, (count) => count + 1),
+      )
+
+      yield* Effect.either(circuitBreaker.withCircuitBreaker(strategyId, mockApiCall(true)))
+      expect(yield* circuitBreaker.currentState(strategyId)).toBe('Open')
+
+      const firstFiber = yield* Effect.fork(probe)
+      yield* Deferred.await(firstTransitionStarted)
+
+      const secondFiber = yield* Effect.fork(
+        Effect.either(probe).pipe(Effect.tap(() => Deferred.succeed(secondCompleted, undefined))),
+      )
+      yield* Effect.race(Deferred.await(secondCompleted), Deferred.await(secondTransitionStarted))
+      yield* Deferred.succeed(releaseTransition, undefined)
+
+      yield* Fiber.join(firstFiber)
+      const secondResult = yield* Fiber.join(secondFiber)
+
+      expect(yield* Ref.get(executedProbes)).toBe(1)
+      expect(Either.isLeft(secondResult)).toBe(true)
+      if (Either.isLeft(secondResult)) {
+        expect(CircuitBreaker.isCircuitBreakerOpenError(secondResult.left)).toBe(true)
+      }
+    })
+
+    await Effect.runPromise(testEffect.pipe(Effect.provide(TestContext.TestContext)))
   })
 })

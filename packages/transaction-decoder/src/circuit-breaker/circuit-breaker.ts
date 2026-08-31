@@ -326,93 +326,146 @@ export const make = <E = unknown>(
     const getState = (strategyId: string): Effect.Effect<CircuitBreaker.CircuitBreakerState, never, never> =>
       Ref.get(states).pipe(Effect.map((map) => map.get(strategyId) ?? defaultState))
 
-    const updateState = (strategyId: string, newState: CircuitBreaker.CircuitBreakerState) =>
-      Ref.update(states, (map) => new Map(map).set(strategyId, newState))
-
-    const shouldAllowRequest = (state: CircuitBreaker.CircuitBreakerState): Effect.Effect<boolean, never, never> =>
-      Effect.gen(function* () {
-        const now = yield* Clock.currentTimeMillis
-
-        switch (state.state) {
-          case 'Closed':
-            return true
-          case 'Open':
-            return now - state.lastFailureTime >= Duration.toMillis(finalConfig.resetTimeout ?? Duration.seconds(60))
-          case 'HalfOpen':
-            return state.halfOpenCalls < (finalConfig.halfOpenMaxCalls ?? 3)
-        }
-      })
-
     // Create tripping strategy if provided, otherwise use default failure count
     const trippingStrategy = finalConfig.strategy
       ? yield* finalConfig.strategy
       : yield* failureCount(finalConfig.maxFailures ?? 5)
 
-    const onSuccess = (strategyId: string, state: CircuitBreaker.CircuitBreakerState) =>
+    type Admission = 'Allowed' | 'Rejected' | 'HalfOpened'
+
+    const tryAdmit = (strategyId: string, now: number): Effect.Effect<Admission, never, never> =>
+      Ref.modify(states, (map): [Admission, Map<string, CircuitBreaker.CircuitBreakerState>] => {
+        const state = map.get(strategyId) ?? defaultState
+
+        switch (state.state) {
+          case 'Closed':
+            return ['Allowed', map]
+          case 'HalfOpen':
+            if (state.halfOpenCalls >= (finalConfig.halfOpenMaxCalls ?? 3)) {
+              return ['Rejected', map]
+            }
+
+            return [
+              'Allowed',
+              new Map(map).set(strategyId, {
+                ...state,
+                halfOpenCalls: state.halfOpenCalls + 1,
+              }),
+            ]
+          case 'Open':
+            if (now - state.lastFailureTime < Duration.toMillis(finalConfig.resetTimeout ?? Duration.seconds(60))) {
+              return ['Rejected', map]
+            }
+
+            return [
+              'HalfOpened',
+              new Map(map).set(strategyId, {
+                ...state,
+                state: 'HalfOpen',
+                halfOpenCalls: 1,
+              }),
+            ]
+        }
+      })
+
+    const onSuccess = (strategyId: string) =>
       Effect.gen(function* () {
-        if (state.state === 'HalfOpen') {
+        yield* trippingStrategy.shouldTrip(true)
+
+        const closedCircuit = yield* Ref.modify(
+          states,
+          (map): [boolean, Map<string, CircuitBreaker.CircuitBreakerState>] => {
+            const state = map.get(strategyId) ?? defaultState
+
+            if (state.state === 'HalfOpen') {
+              return [
+                true,
+                new Map(map).set(strategyId, {
+                  ...defaultState,
+                  state: 'Closed',
+                }),
+              ]
+            }
+
+            if (state.failures > 0) {
+              return [
+                false,
+                new Map(map).set(strategyId, {
+                  ...state,
+                  failures: 0,
+                }),
+              ]
+            }
+
+            return [false, map]
+          },
+        )
+
+        if (closedCircuit) {
           // Reset to closed state after successful half-open calls
           yield* trippingStrategy.onReset
-          yield* notifyStateChange(state.state, 'Closed')
-          yield* updateState(strategyId, {
-            ...defaultState,
-            state: 'Closed',
-          })
+          yield* notifyStateChange('HalfOpen', 'Closed')
           yield* withMetrics((metrics) =>
             Metric.increment(metrics.stateChanges).pipe(
               Effect.zipRight(Metric.set(metrics.state, stateToCode('Closed'))),
             ),
           )
-        } else if (state.failures > 0) {
-          // Reset failures on success
-          yield* updateState(strategyId, {
-            ...state,
-            failures: 0,
-          })
         }
       })
 
-    const onFailure = (strategyId: string, state: CircuitBreaker.CircuitBreakerState) =>
+    const onFailure = (strategyId: string) =>
       Effect.gen(function* () {
         const now = yield* Clock.currentTimeMillis
         const shouldTrip = yield* trippingStrategy.shouldTrip(false)
 
-        if (state.state === 'HalfOpen') {
-          // Failed during half-open, go back to open
-          yield* notifyStateChange(state.state, 'Open')
-          yield* updateState(strategyId, {
-            ...state,
-            state: 'Open',
-            failures: state.failures + 1,
-            lastFailureTime: now,
-            halfOpenCalls: 0,
-          })
+        const openedFrom = yield* Ref.modify(
+          states,
+          (map): [CircuitBreaker.State | undefined, Map<string, CircuitBreaker.CircuitBreakerState>] => {
+            const state = map.get(strategyId) ?? defaultState
+
+            if (state.state === 'HalfOpen') {
+              return [
+                'HalfOpen',
+                new Map(map).set(strategyId, {
+                  ...state,
+                  state: 'Open',
+                  failures: state.failures + 1,
+                  lastFailureTime: now,
+                  halfOpenCalls: 0,
+                }),
+              ]
+            }
+
+            if (shouldTrip && state.state === 'Closed') {
+              return [
+                'Closed',
+                new Map(map).set(strategyId, {
+                  ...state,
+                  state: 'Open',
+                  failures: state.failures + 1,
+                  lastFailureTime: now,
+                }),
+              ]
+            }
+
+            return [
+              undefined,
+              new Map(map).set(strategyId, {
+                ...state,
+                failures: state.failures + 1,
+                lastFailureTime: now,
+              }),
+            ]
+          },
+        )
+
+        if (openedFrom !== undefined) {
+          yield* notifyStateChange(openedFrom, 'Open')
           yield* withMetrics((metrics) =>
             Metric.increment(metrics.stateChanges).pipe(
               Effect.zipRight(Metric.set(metrics.state, stateToCode('Open'))),
             ),
           )
-        } else if (shouldTrip && state.state === 'Closed') {
-          // Threshold reached, open the circuit
-          yield* notifyStateChange(state.state, 'Open')
-          yield* updateState(strategyId, {
-            ...state,
-            state: 'Open',
-            failures: state.failures + 1,
-            lastFailureTime: now,
-          })
-          yield* withMetrics((metrics) =>
-            Metric.increment(metrics.stateChanges).pipe(
-              Effect.zipRight(Metric.set(metrics.state, stateToCode('Open'))),
-            ),
-          )
-        } else {
-          // Increment failures but keep closed
-          yield* updateState(strategyId, {
-            ...state,
-            failures: state.failures + 1,
-            lastFailureTime: now,
-          })
         }
       })
 
@@ -421,38 +474,27 @@ export const make = <E = unknown>(
       effect: Effect.Effect<A, E2, R>,
     ): Effect.Effect<A, E2 | CircuitBreaker.OpenError, R> =>
       Effect.gen(function* () {
-        const state = yield* getState(strategyId)
-        const shouldAllow = yield* shouldAllowRequest(state)
+        const now = yield* Clock.currentTimeMillis
+        const admission = yield* tryAdmit(strategyId, now)
 
-        if (!shouldAllow) {
+        if (admission === 'Rejected') {
           yield* withMetrics((metrics) => Metric.increment(metrics.rejectedCalls))
           return yield* Effect.fail(OpenError(strategyId))
         }
 
-        // Transition to half-open if we're allowing a request from open state
-        if (state.state === 'Open') {
-          yield* notifyStateChange(state.state, 'HalfOpen')
-          yield* updateState(strategyId, {
-            ...state,
-            state: 'HalfOpen',
-            halfOpenCalls: 1,
-          })
+        if (admission === 'HalfOpened') {
+          yield* notifyStateChange('Open', 'HalfOpen')
           yield* withMetrics((metrics) =>
             Metric.increment(metrics.stateChanges).pipe(
               Effect.zipRight(Metric.set(metrics.state, stateToCode('HalfOpen'))),
             ),
           )
-        } else if (state.state === 'HalfOpen') {
-          yield* updateState(strategyId, {
-            ...state,
-            halfOpenCalls: state.halfOpenCalls + 1,
-          })
         }
 
         const result = yield* Effect.either(effect)
 
         if (Either.isRight(result)) {
-          yield* onSuccess(strategyId, yield* getState(strategyId))
+          yield* onSuccess(strategyId)
           yield* withMetrics((metrics) => Metric.increment(metrics.successfulCalls))
           return result.right
         } else {
@@ -460,14 +502,13 @@ export const make = <E = unknown>(
           const shouldCountFailure = finalConfig.isFailure ? finalConfig.isFailure(result.left) : true
 
           if (shouldCountFailure) {
-            yield* onFailure(strategyId, yield* getState(strategyId))
+            yield* onFailure(strategyId)
             yield* withMetrics((metrics) => Metric.increment(metrics.failedCalls))
           }
 
           return yield* Effect.fail(result.left)
         }
       })
-
     const currentState = (strategyId: string): Effect.Effect<CircuitBreaker.State, never, never> =>
       getState(strategyId).pipe(Effect.map((state) => state.state))
 
