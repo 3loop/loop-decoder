@@ -12,8 +12,7 @@ export interface RequestPoolState {
   readonly activeRequests: number
   readonly maxConcurrency: number
   readonly successRate: number
-  readonly totalRequests: number
-  readonly successfulRequests: number
+  readonly recentOutcomes: ReadonlyArray<boolean>
 }
 
 export interface RequestPool {
@@ -33,8 +32,7 @@ const defaultState: RequestPoolState = {
   activeRequests: 0,
   maxConcurrency: 10, // Start conservative
   successRate: 1.0,
-  totalRequests: 0,
-  successfulRequests: 0,
+  recentOutcomes: [],
 }
 
 export const make = (configParam: Partial<RequestPoolConfig> = {}): Effect.Effect<RequestPool, never, never> =>
@@ -48,12 +46,6 @@ export const make = (configParam: Partial<RequestPoolConfig> = {}): Effect.Effec
 
     // Setup metrics if provided
     const metrics = Option.fromNullable(config.metricLabels).pipe(Option.map(makeRequestPoolMetrics))
-
-    const getState = (chainID: number): Effect.Effect<RequestPoolState, never, never> =>
-      Ref.get(poolStates).pipe(Effect.map((map) => map.get(chainID) ?? defaultState))
-
-    const updateState = (chainID: number, newState: RequestPoolState) =>
-      Ref.update(poolStates, (map) => new Map(map).set(chainID, newState))
 
     const incrementActive = (chainID: number) =>
       Effect.gen(function* () {
@@ -116,26 +108,38 @@ export const make = (configParam: Partial<RequestPoolConfig> = {}): Effect.Effec
 
     const getOptimalConcurrency = (chainID: number): Effect.Effect<number, never, never> =>
       Effect.gen(function* () {
-        const state = yield* getState(chainID)
-        const optimalConcurrency = calculateOptimalConcurrency(state)
+        const adjustment = yield* Ref.modify(
+          poolStates,
+          (
+            map,
+          ): [{ readonly optimalConcurrency: number; readonly changed: boolean }, Map<number, RequestPoolState>] => {
+            const state = map.get(chainID) ?? defaultState
+            const optimalConcurrency = calculateOptimalConcurrency(state)
+            const changed = optimalConcurrency !== state.maxConcurrency
 
-        // Update the max concurrency in state if it changed
-        if (optimalConcurrency !== state.maxConcurrency) {
-          yield* updateState(chainID, {
-            ...state,
-            maxConcurrency: optimalConcurrency,
-          })
+            return [
+              { optimalConcurrency, changed },
+              changed
+                ? new Map(map).set(chainID, {
+                    ...state,
+                    maxConcurrency: optimalConcurrency,
+                  })
+                : map,
+            ]
+          },
+        )
 
+        if (adjustment.changed) {
           // Track concurrency adjustment in metrics
           yield* withRequestPoolMetrics(metrics, (m) =>
             Effect.all([
               Metric.increment(m.concurrencyAdjustments),
-              Metric.set(m.maxConcurrency, optimalConcurrency),
+              Metric.set(m.maxConcurrency, adjustment.optimalConcurrency),
             ]).pipe(Effect.asVoid),
           )
         }
 
-        return optimalConcurrency
+        return adjustment.optimalConcurrency
       })
 
     const withPoolManagement = <A, E>(
@@ -161,22 +165,26 @@ export const make = (configParam: Partial<RequestPoolConfig> = {}): Effect.Effec
 
     const updateMetrics = (chainID: number, success: boolean): Effect.Effect<void, never, never> =>
       Effect.gen(function* () {
-        const state = yield* getState(chainID)
-        const newTotalRequests = state.totalRequests + 1
-        const newSuccessfulRequests = state.successfulRequests + (success ? 1 : 0)
-
-        // Use sliding window to prevent metrics from becoming stale
         const windowSize = 100
-        const effectiveTotalRequests = Math.min(newTotalRequests, windowSize)
-        const effectiveSuccessfulRequests = Math.min(newSuccessfulRequests, windowSize)
-        const effectiveSuccessRate = effectiveSuccessfulRequests / effectiveTotalRequests
+        const updated = yield* Ref.modify(
+          poolStates,
+          (map): [{ readonly successRate: number; readonly maxConcurrency: number }, Map<number, RequestPoolState>] => {
+            const state = map.get(chainID) ?? defaultState
+            const recentOutcomes = state.recentOutcomes.slice(-(windowSize - 1))
+            recentOutcomes.push(success)
+            const successful = recentOutcomes.reduce((count, outcome) => count + (outcome ? 1 : 0), 0)
+            const successRate = recentOutcomes.length === 0 ? 1 : successful / recentOutcomes.length
 
-        yield* updateState(chainID, {
-          ...state,
-          totalRequests: effectiveTotalRequests,
-          successfulRequests: effectiveSuccessfulRequests,
-          successRate: effectiveSuccessRate,
-        })
+            return [
+              { successRate, maxConcurrency: state.maxConcurrency },
+              new Map(map).set(chainID, {
+                ...state,
+                recentOutcomes,
+                successRate,
+              }),
+            ]
+          },
+        )
 
         // Update metrics
         yield* withRequestPoolMetrics(metrics, (m: RequestPoolMetrics) =>
@@ -186,11 +194,11 @@ export const make = (configParam: Partial<RequestPoolConfig> = {}): Effect.Effec
             } else {
               yield* Metric.increment(m.failedRequests)
             }
-            yield* Metric.set(m.successRate, effectiveSuccessRate)
+            yield* Metric.set(m.successRate, updated.successRate)
 
             // Determine and update pool state
             const activeCount = yield* Ref.get(activeCounters).pipe(Effect.map((map) => map.get(chainID) ?? 0))
-            const poolState = determinePoolState(effectiveSuccessRate, activeCount, state.maxConcurrency)
+            const poolState = determinePoolState(updated.successRate, activeCount, updated.maxConcurrency)
             yield* Metric.set(m.poolState, poolStateToCode(poolState))
           }),
         )

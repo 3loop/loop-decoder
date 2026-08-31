@@ -295,4 +295,31 @@ describe('RequestPool with Metrics', () => {
     const result = await Effect.runPromise(testEffect.pipe(Effect.provide(TestContext.TestContext)))
     expect(result).toBe(true)
   })
+
+  it('adapts to failures after the outcome window is saturated', async () => {
+    const testEffect = Effect.gen(function* () {
+      const pool = yield* makeRequestPool({
+        maxConcurrentRequests: 20,
+        adaptiveConcurrency: true,
+        healthThreshold: 0.8,
+        concurrencyStep: 2,
+      })
+      const chainId = 1
+
+      yield* pool.getOptimalConcurrency(chainId)
+      for (let i = 0; i < 100; i++) {
+        yield* pool.updateMetrics(chainId, true)
+      }
+      const concurrencyAfterSuccesses = yield* pool.getOptimalConcurrency(chainId)
+
+      for (let i = 0; i < 100; i++) {
+        yield* pool.updateMetrics(chainId, false)
+      }
+      const concurrencyAfterFailures = yield* pool.getOptimalConcurrency(chainId)
+
+      expect(concurrencyAfterFailures).toBeLessThan(concurrencyAfterSuccesses)
+    })
+
+    await Effect.runPromise(testEffect.pipe(Effect.provide(TestContext.TestContext)))
+  })
 })

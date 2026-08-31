@@ -202,7 +202,7 @@ export const AbiLoaderRequestResolver = RequestResolver.makeBatched((requests: A
       }
     }
 
-    const concurrency = Math.min(...[...concurrencyMap.values(), 50]) // Use minimum concurrency across all chains, capped at 25
+    const concurrency = Math.min(...[...concurrencyMap.values(), 50]) // Use minimum concurrency across all chains, capped at 50
 
     yield* Effect.logDebug(`Executing ${remaining.length} remaining requests with concurrency ${concurrency}`)
 
