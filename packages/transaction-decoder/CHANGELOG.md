@@ -1,5 +1,11 @@
 # @3loop/transaction-decoder
 
+## 0.30.3
+
+### Patch Changes
+
+- af1b146: Fix circuit breaker outcome tracking and atomic state transitions, and use a bounded request-pool outcome window for adaptive concurrency.
+
 ## 0.30.2
 
 ### Patch Changes
